@@ -1,0 +1,32 @@
+{% macro render_tree(node, current_path) %}
+  {% if node.type == "dir" %}
+    {% set node_prefix = "content/gamedata/" ~ node.path ~ "/_index.md" %}
+    {% set is_active = current_path is starting_with("content/gamedata/" ~ node.path ~ "/") or current_path == node_prefix %}
+    <details class="tree-dir"
+             data-tree-node
+             data-tree-path="{{ node.path }}"
+             data-tree-search="{{ node.name }} {{ node.path }}"
+             {% if is_active %}open{% endif %}>
+      <summary class="tree-dir__name{% if current_path == node_prefix %} tree-active{% endif %}">📁 {{ node.name }}</summary>
+      <ul class="tree-children">
+        <li><a class="tree-dir__view" href="/gamedata/{{ node.path }}/">↗ {{ node.name }}/</a></li>
+        {% if node.children %}
+          {% for child in node.children %}
+            <li>{{ self::render_tree(node=child, current_path=current_path) }}</li>
+          {% endfor %}
+        {% endif %}
+      </ul>
+    </details>
+  {% else %}
+    {% set node_content_path = "content/gamedata/" ~ node.path ~ ".md" %}
+    {% set is_active = current_path == node_content_path %}
+    <a class="tree-file{% if is_active %} tree-active{% endif %}"
+       href="/gamedata/{{ node.path }}/"
+       data-tree-node
+       data-tree-path="{{ node.path }}"
+       data-tree-search="{{ node.name }} {{ node.path }}">
+      {% if node.lang == "galaxy" %}🌌{% else %}📄{% endif %}
+      {{ node.name }}
+    </a>
+  {% endif %}
+{% endmacro render_tree %}

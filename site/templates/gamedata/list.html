@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+
+{% block title %}
+  {% if section.extra.dir_path %}{{ section.extra.dir_path }} — {% endif %}Game Data — {{ config.title }}
+{% endblock title %}
+
+{% block main_class %}{% endblock main_class %}
+
+{% block head %}
+<style>
+  .gamedata-layout {
+    display: flex;
+    gap: 0;
+    align-items: flex-start;
+    min-height: 60vh;
+  }
+  .gamedata-sidebar {
+    width: 340px;
+    flex-shrink: 0;
+    border-right: 1px solid #2d3748;
+    padding: 0.75rem;
+    overflow-y: auto;
+    overflow-x: hidden;
+    max-height: calc(100vh - 4rem);
+    position: sticky;
+    top: 0;
+  }
+  .gamedata-sidebar h2 {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #a0aec0;
+    margin: 0 0 0.75rem;
+  }
+  .gamedata-main {
+    flex: 1;
+    min-width: 0;
+    padding: 1.5rem;
+  }
+  .gamedata-tree-search {
+    display: none;
+    position: relative;
+    margin-bottom: 0.75rem;
+  }
+  .js .gamedata-tree-search { display: block; }
+  .gamedata-tree-search input {
+    width: 100%;
+    box-sizing: border-box;
+    background: #1a2233;
+    border: 1px solid #2d3748;
+    border-radius: 4px;
+    color: #e2e8f0;
+    font-size: 0.78rem;
+    padding: 0.35rem 1.75rem 0.35rem 0.5rem;
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+  }
+  .gamedata-tree-search input:focus {
+    border-color: #4a9eff;
+    box-shadow: 0 0 0 2px rgba(74, 158, 255, 0.28);
+  }
+  .gamedata-tree-search button {
+    position: absolute;
+    right: 0.35rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: 0;
+    color: #a0aec0;
+    cursor: pointer;
+    font-size: 1rem;
+    line-height: 1;
+  }
+  .file-tree { font-size: 0.8rem; }
+  .file-tree details > summary { cursor: pointer; list-style: none; padding: 0.1rem 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .file-tree details > summary::marker { display: none; }
+  .file-tree details > summary::before { content: "▶ "; font-size: 0.7em; color: #4a9eff; }
+  .file-tree details[open] > summary::before { content: "▼ "; }
+  .file-tree .tree-dir__name,
+  .file-tree .tree-dir__view,
+  .file-tree .tree-file {
+    color: inherit;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .file-tree .tree-dir__name:hover,
+  .file-tree .tree-dir__view:hover,
+  .file-tree .tree-file:hover { color: #4a9eff; }
+  .file-tree .tree-dir__view:hover { text-decoration: underline; }
+  .file-tree .tree-dir__view:focus-visible,
+  .file-tree .tree-file:focus-visible,
+  .gamedata-sidebar-toggle:focus-visible,
+  .gamedata-tree-search button:focus-visible {
+    outline: 3px solid #e4b800;
+    outline-offset: 3px;
+  }
+  .file-tree .tree-active { color: #f6c90e; font-weight: 600; }
+  .file-tree .tree-children { list-style: none; padding-left: 0.75rem; margin: 0; }
+  .file-tree .tree-file,
+  .file-tree .tree-dir__view { display: block; padding: 0.1rem 0; }
+  .file-tree .tree-dir__view { color: #a0aec0; font-style: italic; }
+
+  @media (max-width: 700px) {
+    .gamedata-layout { flex-direction: column; }
+
+    .gamedata-sidebar {
+      width: 100%;
+      max-height: 38vh;
+      border-right: none;
+      border-bottom: 1px solid #2d3748;
+      position: static;
+    }
+
+    .gamedata-sidebar-toggle {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      width: 100%;
+      background: none;
+      border: none;
+      border-bottom: 1px solid #2d3748;
+      color: #a0aec0;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 0.5rem 0.75rem;
+      cursor: pointer;
+      text-align: left;
+    }
+    .gamedata-sidebar-toggle[aria-expanded="true"] { border-bottom: none; }
+    .gamedata-sidebar-toggle::after { content: "▶"; font-size: 0.65em; margin-left: auto; transition: transform 0.15s; }
+    .gamedata-sidebar-toggle[aria-expanded="true"]::after { transform: rotate(90deg); }
+
+    .gamedata-sidebar[hidden] { display: none; }
+    .gamedata-sidebar h2 { display: none; }
+
+    .gamedata-main { padding: 0.75rem; }
+  }
+
+  @media (min-width: 701px) {
+    .gamedata-sidebar-toggle { display: none; }
+  }
+</style>
+{% endblock head %}
+
+{% block content %}
+{% if section.extra.dir_path %}
+  {% set current_path = "content/gamedata/" ~ section.extra.dir_path ~ "/_index.md" %}
+{% else %}
+  {% set current_path = "content/gamedata/_index.md" %}
+{% endif %}
+
+<button class="gamedata-sidebar-toggle" type="button" aria-expanded="false" aria-controls="gamedata-sidebar" data-gamedata-sidebar-toggle hidden>
+  Browse files
+</button>
+<div class="gamedata-layout">
+  <aside class="gamedata-sidebar" id="gamedata-sidebar" aria-label="Game data files">
+    <h2>Game Data</h2>
+    <div class="gamedata-tree-search">
+      <input type="search" placeholder="Search tree..." aria-label="Search game data tree" aria-controls="gamedata-tree" autocomplete="off" spellcheck="false" data-gamedata-search-input>
+      <button type="button" aria-label="Clear search" data-gamedata-search-clear hidden>&times;</button>
+    </div>
+    <div class="file-tree" id="gamedata-tree" data-gamedata-tree data-current-path="{{ current_path }}">Loading...</div>
+  </aside>
+
+  <div class="gamedata-main">
+    <header class="gamedata-header">
+      <h1>
+        {% if section.extra.dir_path %}{{ section.extra.dir_path }}{% else %}Game Data{% endif %}
+      </h1>
+      {% if section.extra.dir_path %}
+        <nav class="breadcrumb">
+          <a href="/gamedata/">root</a>
+          {% set parts = section.extra.dir_path | split(pat="/") %}
+          {% for i in range(end=parts | length) %}
+            {% set part = parts[i] %}
+            {% set crumb_path = parts | slice(end=i+1) | join(sep="/") %}
+            <span class="breadcrumb-sep">/</span>
+            <a href="/gamedata/{{ crumb_path }}/">{{ part }}</a>
+          {% endfor %}
+        </nav>
+      {% endif %}
+    </header>
+
+    <ul class="dir-listing">
+      {% for s in section.subsections %}
+        {% set sub = get_section(path=s) %}
+        <li class="dir-entry dir-entry--dir">
+          <a href="{{ sub.permalink }}">Folder {{ sub.title }}</a>
+        </li>
+      {% endfor %}
+      {% for p in section.pages %}
+        <li class="dir-entry dir-entry--file">
+          <a href="{{ p.permalink }}">
+            {% if p.extra.file_ext == "galaxy" %}Galaxy{% else %}File{% endif %}
+            {{ p.title }}
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+{% endblock content %}

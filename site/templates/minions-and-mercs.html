@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}Minions & Mercs — {{ config.title }}{% endblock title %}
+
+{% block content %}
+{% set data = load_data(path="data/minions-and-mercs.json") %}
+
+<div class="minions-page">
+  <h1>Minions &amp; Mercs</h1>
+
+  <p>
+    Lane minion XP uses the experience-globe system: the amount comes from the <code data-datamining>ExperienceAcquiredMinions</code> effect (granted instantly when an enemy Hero lands the last hit, otherwise dropped as a globe pickup) and rises every minute. Mercenaries and bosses grant their unit's kill XP directly.
+  </p>
+  <br>
+  <ul class="mechanics-source-list" data-datamining>
+    <li>
+      <a href="{{ get_url(path='gamedata/mods/heroesdata.stormmod/base.stormdata/gamedata/effectdata-xml') }}#ExperienceAcquiredMinions">effectdata.xml — ExperienceAcquiredMinions</a>
+      <span>base globe XP (<a style="display:inline-block" href="{{ get_url(path='gamedata/mods/heroesmapmods/battlegroundmapmods/tombofthespiderqueen.stormmod/base.stormdata/gamedata/effectdata-xml') }}#ExperienceAcquiredMinions">Tomb override</a>)</span>
+    </li>
+    <li>
+      <a href="{{ get_url(path='gamedata/mods/heroesdata.stormmod/base.stormdata/triggerlibs/gamelib-galaxy') }}#libGame_gt_ExperienceGlobeSpawn_Func">gamelib.galaxy — ExperienceGlobeSpawn / GrantXP / Scaling</a>
+      <span>who drops globes, how XP is awarded, +2 per minute scaling</span>
+    </li>
+  </ul>
+
+  <br>
+
+  {% for group in data.groups %}
+  <section class="minions-section" id="{{ group.id }}">
+    <div class="minions-section__header">
+      <h2>{{ group.title }}</h2>
+    </div>
+
+    <div class="minions-table-wrap">
+      <table class="minions-table">
+        <thead>
+          <tr>
+            <th scope="col">Unit</th>
+            <th scope="col">Context</th>
+            <th scope="col">HP</th>
+            <th scope="col">Armor</th>
+            <th scope="col">Scaling</th>
+            <th scope="col">XP</th>
+            <th scope="col">Weapons</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for unit in group.units %}
+          <tr>
+            <th scope="row">
+              <span class="minions-table__unit">{{ unit.name }}</span>
+              <code data-datamining>{{ unit.id }}</code>
+              <span>{{ unit.role }}</span>
+            </th>
+            <td>{{ unit.context }}</td>
+            <td>{% if unit.hp %}{{ unit.hp }}{% else %}&mdash;{% endif %}</td>
+            <td>{% if unit.armor %}{{ unit.armor }}{% else %}&mdash;{% endif %}</td>
+            <td>
+              {% if unit.scalingRows %}
+              <dl class="scaling-summary">
+                {% for row in unit.scalingRows %}
+                <div>
+                  <dt>{{ row.label }}</dt>
+                  <dd>{{ row.summary }}</dd>
+                </div>
+                {% endfor %}
+              </dl>
+              {% elif unit.scaling %}
+              {{ unit.scaling }}
+              {% else %}
+              &mdash;
+              {% endif %}
+            </td>
+            <td>
+              {% if unit.killXp %}{{ unit.killXp }}{% else %}&mdash;{% endif %}
+              {% if unit.xpScalingSummary %}
+              <span class="minions-xp-summary">{{ unit.xpScalingSummary }}</span>
+              {% elif unit.xpScaling %}
+              <span class="minions-xp-summary">{{ unit.xpScaling }}</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if unit.weapons %}
+              <ul class="minions-weapons">
+                {% for weapon in unit.weapons %}
+                <li>
+                  <code data-datamining>{{ weapon.id }}</code>
+                  <span>
+                    {% if weapon.damage %}{{ weapon.damage }} dmg{% endif %}
+                    {% if weapon.period %}{% if weapon.damage %} / {% endif %}{{ weapon.period }}s{% endif %}
+                    {% if weapon.range %}{% if weapon.damage or weapon.period %} / {% endif %}{{ weapon.range }} range{% endif %}
+                  </span>
+                </li>
+                {% endfor %}
+              </ul>
+              {% else %}
+              &mdash;
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+  {% endfor %}
+</div>
+{% endblock content %}

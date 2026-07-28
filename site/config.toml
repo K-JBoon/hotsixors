@@ -1,0 +1,19 @@
+base_url = "https://hots.epixors.com"
+title = "HotSixors"
+compile_sass = true
+generate_feeds = false
+build_search_index = true
+minify_html = true
+
+[markdown]
+highlight_code = false
+
+[search]
+index_format = "elasticlunr_javascript"
+include_title = true
+include_description = true
+include_path = false
+include_content = false
+
+[extra]
+role_colors = { Warrior = "#1a6bbf", Assassin = "#bf1a1a", Support = "#1abf6b", Specialist = "#8b1abf", Multiclass = "#bf8b1a" }

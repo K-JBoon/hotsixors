@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block title %}Experience — {{ config.title }}{% endblock title %}
+
+{% block content %}
+{% set data = load_data(path="data/experience.json") %}
+
+<div class="mechanics-page">
+  <h1>Experience</h1>
+
+  <section class="mechanics-section" id="xp-per-level">
+    <div class="mechanics-section__header">
+      <h2>XP per Level</h2>
+    </div>
+    <div class="minions-table-wrap">
+      <table class="minions-table experience-levels-table">
+        <thead>
+          <tr>
+            <th scope="col">Level</th>
+            <th scope="col">XP for level</th>
+            <th scope="col">Cumulative XP</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in data.levels %}
+          <tr>
+            <th scope="row">{{ row.level }}</th>
+            <td>{{ row.xpForLevel }}</td>
+            <td>{{ row.cumulativeXp }}{% if row.xpSincePreviousTalentTier %} <span class="experience-tier-delta">({{ row.xpSincePreviousTalentTier }} from level {{ row.previousTalentTierLevel }})</span>{% endif %}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <ul class="mechanics-source-list" data-datamining>
+      <li>
+        <a href="{{ get_url(path='gamedata/mods/heroesdata.stormmod/base.stormdata/gamedata/behaviordata-xml') }}#HeroXPCurve">behaviordata.xml — HeroXPCurve</a>
+        <span>per-level XP entries</span>
+      </li>
+      <li>
+        <a href="{{ get_url(path='gamedata/mods/heroesdata.stormmod/base.stormdata/triggerlibs/heroeslib-galaxy') }}#libCore_gt_DataXPInitializeLevelXPValues_Func">heroeslib.galaxy — DataXPInitializeLevelXPValues</a>
+        <span>sums the entries into level totals</span>
+      </li>
+    </ul>
+  </section>
+
+  <section class="mechanics-section" id="kill-xp-and-underdog-xp">
+    <div class="mechanics-section__header">
+      <h2>Kill XP &amp; Underdog XP</h2>
+      <p>Killing an enemy Hero grants <code>{{ data.killXpFormula.base }} × (victim's level + {{ data.killXpFormula.levelOffset }})</code> base XP, then that base amount is scaled by a bounty modifier based on the level gap between the killer and the victim.</p>
+    </div>
+    <p>
+      The gap compares each hero's fractional level (whole level plus progress toward the next): <code>gap = victim − killer</code>. Its whole part picks a row below (a gap under one full level counts as 0), and the fractional part adds on top:
+    </p>
+    <p>
+      <code>delta = flat bonus + fraction × 0.1 × fraction multiplier</code>
+    </p>
+    <div class="minions-table-wrap">
+      <table class="minions-table experience-underdog-table">
+        <thead>
+          <tr>
+            <th scope="col">Whole-level gap</th>
+            <th scope="col">Flat bonus</th>
+            <th scope="col">Fraction multiplier</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in data.underdogTable %}
+          <tr>
+            <th scope="row">{{ row.levelGap }}{% if row.levelGap == 5 %}+{% endif %}</th>
+            <td>{{ row.truncMod }}</td>
+            <td>{{ row.moduloMod }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <p>
+      If the victim is ahead the modifier is <code>1 + delta</code> (Underdog XP bonus); if the victim is behind it's <code>1 − delta</code> (reduced reward). Either way the result is clamped to
+      <code>{{ data.clamp.min }}–{{ data.clamp.max }}</code>.
+    </p>
+    <div class="underdog-example">
+      <p>Example: a level 11.4 hero kills a level 14.8 hero.</p>
+      <ol>
+        <li>Level gap: <code>14.8 − 11.4 = 3.4</code>, so the whole-level gap is 3 and the fraction is 0.4.</li>
+        <li>The gap-3 row above gives a flat bonus of 0.75 and a fraction multiplier of 4.</li>
+        <li>Delta: <code>0.75 + 0.4 × 0.1 × 4 = 0.91</code>.</li>
+        <li>The victim is ahead, so the modifier is <code>1 + 0.91 = 1.91</code>.</li>
+        <li>Base kill XP uses the victim's whole level: <code>{{ data.killXpFormula.base }} × (14 + {{ data.killXpFormula.levelOffset }}) = 950</code>.</li>
+        <li>The kill grants <code>950 × 1.91 = 1814.5 XP</code>.</li>
+      </ol>
+    </div>
+    <div class="underdog-calc" data-underdog-calc
+      data-max-level="{{ data.maxLevel }}"
+      data-kill-xp-base="{{ data.killXpFormula.base }}"
+      data-kill-xp-offset="{{ data.killXpFormula.levelOffset }}"
+      data-clamp-min="{{ data.clamp.min }}"
+      data-clamp-max="{{ data.clamp.max }}"
+      data-underdog-table='{{ data.underdogTable | json_encode() }}'></div>
+    <ul class="mechanics-source-list" data-datamining>
+      <li>
+        <a href="{{ get_url(path='gamedata/mods/heroesdata.stormmod/base.stormdata/triggerlibs/heroeslib-galaxy') }}#libCore_gf_DataXPXPForHero">heroeslib.galaxy — DataXPXPForHero</a>
+        <span>base kill XP formula</span>
+      </li>
+      <li>
+        <a href="{{ get_url(path='gamedata/mods/heroesdata.stormmod/base.stormdata/triggerlibs/heroeslib-galaxy') }}#libCore_gf_DataXPGetMoreGranularBountyXPModifier">heroeslib.galaxy — DataXPGetMoreGranularBountyXPModifier</a>
+        <span>level-gap modifier table and clamp</span>
+      </li>
+    </ul>
+  </section>
+
+</div>
+{% endblock content %}
+
+{% block scripts %}
+<script src="{{ get_url(path='underdog-calc.js', cachebust=true) }}"></script>
+{% endblock scripts %}

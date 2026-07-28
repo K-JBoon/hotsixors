@@ -1,0 +1,25 @@
+{% set sc = load_data(path="static/shortcode-data.json") %}
+{% set entry = sc | get(key=id, default=false) %}
+{% if entry %}
+  <span class="shortcode-talent">
+    {% if entry.icon %}
+    {% set icon = resize_image(path='images/abilitytalents/' ~ entry.icon, width=24, height=24, op="fill", format="webp", quality=82) %}
+    {% set icon_2x = resize_image(path='images/abilitytalents/' ~ entry.icon, width=48, height=48, op="fill", format="webp", quality=82) %}
+    <img class="shortcode-talent__icon"
+         src="{{ icon.url }}"
+         srcset="{{ icon.url }} 1x, {{ icon_2x.url }} 2x"
+         width="24"
+         height="24"
+         alt=""
+         loading="lazy"
+         decoding="async">
+    {% endif %}
+    <a class="shortcode-talent__link"
+       href="{{ get_url(path='heroes/' ~ entry.heroSlug) }}#talent-{{ id }}">{{ entry.name }}</a>
+    {% if entry.xmlPath %}
+      <a class="shortcode-talent__xml" href="/gamedata/{{ entry.xmlPath }}/{% if entry.anchor %}#{{ entry.anchor }}{% endif %}" data-datamining>[XML]</a>
+    {% endif %}
+  </span>
+{% else %}
+  <span class="shortcode-missing" title="Talent ID not found: {{ id }}">{{ id }}</span>
+{% endif %}

@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% import "macros/images.html" as images %}
+
+{% block title %}Heroes — {{ config.title }}{% endblock title %}
+
+{% block content %}
+{% set heroes_section = get_section(path="heroes/_index.md") %}
+<div data-select-search data-hero-list>
+  <div class="hero-grid-header">
+    <h1>Heroes of the Storm</h1>
+    <div class="hero-view-toggle" role="tablist" aria-label="View mode" data-hero-view-toggle>
+      <button type="button" role="tab" class="hero-view-toggle__btn is-active" data-hero-view="grid" aria-selected="true">Grid</button>
+      <button type="button" role="tab" class="hero-view-toggle__btn" data-hero-view="table" aria-selected="false">Table</button>
+    </div>
+    <span class="select-search-hint">Start typing to search</span>
+    <span class="select-search-status" aria-live="polite" data-select-search-status></span>
+  </div>
+
+  <div class="hero-grid" data-hero-view-pane="grid">
+    {% for page in heroes_section.pages %}
+      {% set portraits = page.extra.portraits %}
+      <a class="hero-card role-{{ page.extra.role | lower }}"
+         href="{{ page.permalink }}"
+         data-select-search-card
+         data-select-search-id="{{ page.slug }}-grid"
+         data-select-search-text="{{ page.extra.hero_name }} {{ page.extra.role }}">
+        {% if portraits.draftScreen %}
+          {{ images::optimized(path='images/heroportraits/' ~ portraits.draftScreen, class="hero-card__portrait", alt="", width=180, height=212, op="fit", display_width=180, display_height=212, loading="lazy") }}
+        {% endif %}
+        <div class="hero-card__info">
+          <span class="hero-card__name">{{ page.extra.hero_name }}</span>
+        </div>
+      </a>
+    {% endfor %}
+  </div>
+
+  <div class="hero-table-wrap" data-hero-view-pane="table" hidden>
+    <table class="hero-table">
+      <thead>
+        <tr>
+          <th scope="col" data-sort="text" data-sort-key="name">Hero</th>
+          <th scope="col" class="num" data-sort="num" data-sort-key="hp">Health</th>
+          <th scope="col" class="num" data-sort="num" data-sort-key="dmg">Damage</th>
+          <th scope="col" class="num" data-sort="num" data-sort-key="atkspeed">Atk Speed</th>
+          <th scope="col" class="num" data-sort="num" data-sort-key="range">Range</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for page in heroes_section.pages %}
+          {% set hd = load_data(path="data/heroes/" ~ page.slug ~ ".json", required=false) %}
+          {% set has_stats = hd.stats and page.slug != "gall" and page.slug != "lostvikings" %}
+          {% set st = hd.stats | default(value=false) %}
+          {% set portraits = page.extra.portraits %}
+          <tr class="hero-row role-{{ page.extra.role | lower }}"
+              data-select-search-card
+              data-select-search-id="{{ page.slug }}-row"
+              data-select-search-text="{{ page.extra.hero_name }} {{ page.extra.role }}"
+              onclick="window.location='{{ page.permalink }}'">
+            <th scope="row" class="hero-row__name" data-sort-value="{{ page.extra.hero_name }}">
+              <a href="{{ page.permalink }}">
+                {% if portraits.draftScreen %}
+                  {{ images::optimized(path='images/heroportraits/' ~ portraits.draftScreen, class="hero-row__portrait", alt="", width=36, height=36, op="fill", display_width=36, display_height=36, loading="lazy") }}
+                {% endif %}
+                <span>{{ page.extra.hero_name }}</span>
+              </a>
+            </th>
+            {% if has_stats %}
+              <td class="num" data-sort-value="{% if st.life %}{{ st.life.amount }}{% endif %}">{% if st.life %}{{ st.life.amount | round }}{% else %}—{% endif %}</td>
+              <td class="num" data-sort-value="{% if st.weapon %}{{ st.weapon.damage }}{% endif %}">{% if st.weapon %}{{ st.weapon.damage | round }}{% else %}—{% endif %}</td>
+              <td class="num" data-sort-value="{% if st.weapon %}{{ st.weapon.attackSpeed }}{% endif %}">{% if st.weapon %}{{ st.weapon.attackSpeed | round(precision=2) }}{% else %}—{% endif %}</td>
+              <td class="num" data-sort-value="{% if st.weapon %}{{ st.weapon.range }}{% endif %}">{% if st.weapon %}{{ st.weapon.range | round(precision=2) }}{% else %}—{% endif %}</td>
+            {% else %}
+              <td class="num" data-sort-value="">—</td>
+              <td class="num" data-sort-value="">—</td>
+              <td class="num" data-sort-value="">—</td>
+              <td class="num" data-sort-value="">—</td>
+            {% endif %}
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock content %}

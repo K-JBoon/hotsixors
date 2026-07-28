@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% import "macros/images.html" as images %}
+
+{% block title %}Effect Index — {{ config.title }}{% endblock title %}
+
+{% block content %}
+{% set data = load_data(path="data/cross-references.json") %}
+
+<div class="effect-index-page">
+  <div class="effect-index-layout">
+    <aside class="effect-index-sidebar" aria-label="Effect groups">
+      <nav class="effect-index-sidebar__nav" aria-label="Effect groups">
+        <ul>
+          {% set_global sidebar_category = "" %}
+          {% for mechanic in data.mechanics %}
+            {% if mechanic.category != sidebar_category %}
+              {% set_global sidebar_category = mechanic.category %}
+              <li><a href="#{{ mechanic.category | slugify }}">{{ mechanic.category }}</a></li>
+            {% endif %}
+          {% endfor %}
+        </ul>
+      </nav>
+    </aside>
+
+    <main class="effect-index-main">
+      <h1>Effect Index</h1>
+
+      <p class="effect-index-intro">
+        Which hero abilities and talents apply each status effect.
+
+        See <a href="{{ get_url(path='status-effects') }}">Status Effects</a> for how each one works.
+        <span data-datamining>Generated dynamically from build {{ data.generatedFrom }}.</span>
+      </p>
+      <p class="effect-index-note">
+        <b>NOTE:</b> this page is a work-in-progress and will likely contain missing or miscategorized items.
+      </p>
+
+      <div class="effect-index-controls">
+        <input type="search" class="effect-index-search" data-effect-search
+               placeholder="Filter by hero, ability, or talent…" aria-label="Filter entries">
+        <div class="effect-index-bulk-actions" role="group" aria-label="Enable or disable all mechanics">
+          <button type="button" class="effect-index-filter-button" data-effect-enable-all>Show all</button>
+          <button type="button" class="effect-index-filter-button" data-effect-disable-all>Hide all</button>
+        </div>
+        <div class="effect-index-chips" data-effect-chips role="group" aria-label="Filter by mechanic">
+          {% for mechanic in data.mechanics %}
+          <button type="button" class="effect-index-chip" data-effect-chip="{{ mechanic.slug }}" aria-pressed="true">{{ mechanic.name }}</button>
+          {% endfor %}
+        </div>
+      </div>
+
+      {% set_global current_category = "" %}
+      {% for mechanic in data.mechanics %}
+        {% if mechanic.category != current_category %}
+          {% set_global current_category = mechanic.category %}
+          <h2 class="effect-index-category" id="{{ mechanic.category | slugify }}" data-effect-category="{{ mechanic.category | slugify }}">{{ mechanic.category }}</h2>
+        {% endif %}
+        <section class="effect-index-mechanic" id="{{ mechanic.slug }}" data-effect-mechanic="{{ mechanic.slug }}" data-effect-category="{{ mechanic.category | slugify }}">
+          <h3>{{ mechanic.name }} <span class="effect-index-count">{{ mechanic.entries | length }}</span></h3>
+          {% if mechanic.entries | length == 0 %}
+            <p class="effect-index-empty">No direct applications found in hero data.</p>
+          {% else %}
+          <ul class="effect-index-list">
+            {% for entry in mechanic.entries %}
+            <li class="effect-index-entry" data-effect-name="{{ entry.heroName }} {{ entry.name }}">
+              {{ images::optimized(path='images/abilitytalents/' ~ entry.icon, class="effect-index-icon", alt="", width=28, height=28, op="fill", display_width=28, display_height=28, loading="lazy") }}
+              <a href="{{ get_url(path='heroes/' ~ entry.heroSlug) }}#{{ entry.kind }}-{{ entry.nameId }}"><span class="effect-index-hero">{{ entry.heroName }}</span> — {{ entry.name }}</a>
+              <span class="effect-index-kind">{{ entry.kind }}{% if entry.abilityType %} · {{ entry.abilityType }}{% endif %}</span>
+            </li>
+            {% endfor %}
+          </ul>
+          {% endif %}
+        </section>
+      {% endfor %}
+    </main>
+  </div>
+</div>
+{% endblock content %}

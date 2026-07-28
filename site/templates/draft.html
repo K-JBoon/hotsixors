@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}Mock Draft — {{ config.title }}{% endblock title %}
+
+{% block head %}
+  <link rel="stylesheet" href="{{ get_url(path='draft/draft.css', cachebust=true) }}">
+{% endblock head %}
+
+{% block main_class %}draft-main-area{% endblock main_class %}
+
+{% block content %}
+<div class="draft-page">
+  <h1>Mock Draft</h1>
+  <div id="draft-root" data-state="loading">
+    <p>Loading draft…</p>
+  </div>
+</div>
+<script type="module" src="{{ get_url(path='draft/draft.js', cachebust=true) }}"></script>
+{% endblock content %}

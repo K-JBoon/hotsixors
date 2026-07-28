@@ -1,0 +1,16 @@
+{%- macro optimized(path, class, alt, width, height, op, display_width, display_height, loading) -%}
+  {#- An empty filename leaves a trailing slash: the generator drops icon names
+      it could not copy, so render nothing rather than failing the build. -#}
+  {%- if path is ending_with("/") -%}{%- else -%}
+  {%- set image_1x = resize_image(path=path, width=width, height=height, op=op, format="webp", quality=82) -%}
+  {%- set image_2x = resize_image(path=path, width=width * 2, height=height * 2, op=op, format="webp", quality=82) -%}
+  <img class="{{ class }}"
+       src="{{ image_1x.url }}"
+       srcset="{{ image_1x.url }} 1x, {{ image_2x.url }} 2x"
+       width="{{ display_width }}"
+       height="{{ display_height }}"
+       alt="{{ alt }}"
+       loading="{{ loading }}"
+       decoding="async">
+  {%- endif -%}
+{%- endmacro optimized -%}

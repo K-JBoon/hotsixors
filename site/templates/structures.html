@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}Structures — {{ config.title }}{% endblock title %}
+
+{% block content %}
+{% set data = load_data(path="data/structures.json") %}
+
+<div class="structures-page">
+  <h1>Structures</h1>
+
+  {% for group in data.groups %}
+  <section class="minions-section" id="{{ group.id }}">
+    <div class="minions-section__header">
+      <h2>{{ group.title }}</h2>
+    </div>
+
+    <div class="minions-table-wrap">
+      <table class="minions-table structures-table">
+        <thead>
+          <tr>
+            <th scope="col">Structure</th>
+            <th scope="col">HP</th>
+            <th scope="col">Shields</th>
+            <th scope="col">Armor</th>
+            <th scope="col">Scaling</th>
+            <th scope="col">XP</th>
+            <th scope="col">Weapons</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for unit in group.units %}
+          <tr>
+            <th scope="row">
+              <span class="minions-table__unit">{{ unit.name }}</span>
+              <code data-datamining>{{ unit.id }}</code>
+              <span>{{ unit.role }}</span>
+            </th>
+            <td>{% if unit.hp %}{{ unit.hp }}{% else %}&mdash;{% endif %}</td>
+            <td>{% if unit.shields %}{{ unit.shields }}{% else %}&mdash;{% endif %}</td>
+            <td>{% if unit.armor %}{{ unit.armor }}{% else %}&mdash;{% endif %}</td>
+            <td>
+              {% if unit.scalingRows %}
+              <dl class="scaling-summary">
+                {% for row in unit.scalingRows %}
+                <div>
+                  <dt>{{ row.label }}</dt>
+                  <dd>{{ row.summary }}</dd>
+                </div>
+                {% endfor %}
+              </dl>
+              {% elif unit.scaling %}
+              {{ unit.scaling }}
+              {% else %}
+              &mdash;
+              {% endif %}
+            </td>
+            <td>{% if unit.killXp %}{{ unit.killXp }}{% else %}&mdash;{% endif %}</td>
+            <td>
+              {% if unit.weapons %}
+              <ul class="minions-weapons">
+                {% for weapon in unit.weapons %}
+                <li>
+                  <code data-datamining>{{ weapon.id }}</code>
+                  <span>
+                    {% if weapon.damage %}{{ weapon.damage }} dmg{% endif %}
+                    {% if weapon.period %}{% if weapon.damage %} / {% endif %}{{ weapon.period }}s{% endif %}
+                    {% if weapon.range %}{% if weapon.damage or weapon.period %} / {% endif %}{{ weapon.range }} range{% endif %}
+                  </span>
+                </li>
+                {% endfor %}
+              </ul>
+              {% else %}
+              &mdash;
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+  {% endfor %}
+</div>
+{% endblock content %}

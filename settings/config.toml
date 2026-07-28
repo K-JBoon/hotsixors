@@ -1,0 +1,39 @@
+[general]
+host = "::"
+port = 8080
+root = "/public"
+log-level = "error"
+compression = true
+cache-control-headers = true
+redirect-trailing-slash = true
+compression-static = true
+page-fallback = "/404.html"
+
+[advanced]
+
+[[advanced.headers]]
+source = "/"
+headers = { Cache-Control = "public, max-age=600" }
+
+[[advanced.headers]]
+source = "**/"
+headers = { Cache-Control = "public, max-age=600" }
+
+[[advanced.headers]]
+source = "*.html"
+headers = { Cache-Control = "public, max-age=600" }
+
+[[advanced.headers]]
+source = "**/*.css"
+headers = { Cache-Control = "public, max-age=31536000, immutable" }
+
+# Only the entry scripts get a cachebusting query string from Zola. The modules
+# they import do not, so immutable would pin those for a year while the entry
+# updates, leaving the browser with a mismatched bundle after a deploy.
+[[advanced.headers]]
+source = "**/*.{js,mjs}"
+headers = { Cache-Control = "public, max-age=300" }
+
+[[advanced.headers]]
+source = "**/*.{svg,ico,png,jpg,jpeg,webp,avif,gif,woff,woff2}"
+headers = { Cache-Control = "public, max-age=31536000" }

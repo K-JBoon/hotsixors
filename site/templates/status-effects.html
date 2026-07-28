@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Status Effects — {{ config.title }}{% endblock title %}
+
+{% block content %}
+{% set data = load_data(path="data/mechanics.json") %}
+
+<div class="mechanics-page">
+  <h1>Status Effects</h1>
+
+  {% set_global current_category = "" %}
+  {% for mechanic in data.mechanics %}
+    {% if mechanic.category != current_category %}
+      {% if current_category != "" %}
+          </tbody>
+        </table>
+      </div>
+      </section>
+      {% endif %}
+      {% set_global current_category = mechanic.category %}
+      <section class="mechanics-section" id="{{ mechanic.category | slugify }}">
+        <div class="mechanics-section__header">
+          <h2>{{ mechanic.category }}</h2>
+        </div>
+        <div class="mechanics-table-wrap">
+          <table class="mechanics-table">
+            <thead>
+              <tr>
+                <th scope="col">Status</th>
+                <th scope="col">Implementation</th>
+                <th scope="col" data-datamining>Sources</th>
+              </tr>
+            </thead>
+            <tbody>
+    {% endif %}
+              <tr id="{{ mechanic.slug }}">
+                <th scope="row">
+                  <a class="mechanics-table__status" href="{{ get_url(path='effect-index') }}?effects={{ mechanic.slug }}">{{ mechanic.name }}</a>
+                  <code data-datamining>{{ mechanic.primaryBehavior }}</code>
+                </th>
+                <td>{{ mechanic.summary }}</td>
+                <td data-datamining>
+                  <ul class="mechanics-source-list">
+                    {% for source in mechanic.sources %}
+                    <li>
+                      <a href="{{ source.url }}">{{ source.label }}</a>
+                      <span>
+                        {{ source.kind }}
+                        {% if source.line %} - line {{ source.line }}{% endif %}
+                      </span>
+                    </li>
+                    {% endfor %}
+                  </ul>
+                </td>
+              </tr>
+  {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+</div>
+{% endblock content %}

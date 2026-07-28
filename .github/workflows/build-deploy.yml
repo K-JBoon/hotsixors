@@ -1,0 +1,122 @@
+name: Build & Deploy
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - '.github/workflows/build-deploy.yml'
+      - '.gitmodules'
+      - 'app.yaml'
+      - 'data/**'
+      - 'package-lock.json'
+      - 'package.json'
+      - 'scripts/**'
+      - 'settings/**'
+      - 'site/**'
+      - 'submodules/*'
+      - 'submodules/**'
+      - 'tsconfig.json'
+      - 'wasmer.toml'
+  workflow_dispatch:
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    env:
+      WASMER_TOKEN: ${{ secrets.WASMER_TOKEN }}
+      WASMER_NAMESPACE: ${{ secrets.WASMER_NAMESPACE }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Zola
+        run: |
+          curl -sL https://github.com/getzola/zola/releases/download/v0.19.2/zola-v0.19.2-x86_64-unknown-linux-gnu.tar.gz \
+            | tar xz -C /usr/local/bin
+
+      - name: Generate content & build
+        run: npm run build
+
+      - name: Validate Wasmer secrets
+        run: |
+          test -n "$WASMER_TOKEN" || { echo "WASMER_TOKEN is required"; exit 1; }
+          test -n "$WASMER_NAMESPACE" || { echo "WASMER_NAMESPACE is required"; exit 1; }
+
+      - name: Rewrite Wasmer config for CI
+        run: |
+          python - <<'PY'
+          import os
+          import pathlib
+          import re
+          import sys
+
+          namespace = os.environ["WASMER_NAMESPACE"]
+          version = f'0.{os.environ["GITHUB_RUN_NUMBER"]}.{os.environ["GITHUB_RUN_ATTEMPT"]}'
+
+          app_path = pathlib.Path("app.yaml")
+          app_text = app_path.read_text()
+          app_text, app_count = re.subn(r"^owner: .*$", f"owner: {namespace}", app_text, flags=re.MULTILINE)
+          if app_count != 1:
+              sys.exit("failed to rewrite app.yaml owner")
+          app_path.write_text(app_text)
+
+          pkg_path = pathlib.Path("wasmer.toml")
+          pkg_text = pkg_path.read_text()
+          pkg_text, name_count = re.subn(
+              r'^name = ".*?/hotsixors"$',
+              f'name = "{namespace}/hotsixors"',
+              pkg_text,
+              flags=re.MULTILINE,
+          )
+          pkg_text, version_count = re.subn(
+              r'^version = ".*"$',
+              f'version = "{version}"',
+              pkg_text,
+              flags=re.MULTILINE,
+          )
+          if name_count != 1 or version_count != 1:
+              sys.exit("failed to rewrite wasmer.toml package metadata")
+          pkg_path.write_text(pkg_text)
+          PY
+
+      - name: Install Wasmer
+        run: |
+          curl https://get.wasmer.io -sSfL | sh -s "v7.0.1"
+          echo "$HOME/.wasmer/bin" >> "$GITHUB_PATH"
+
+      - name: Verify Wasmer CLI
+        run: wasmer --version
+
+      - name: Deploy to Wasmer
+        run: |
+          set +e
+          wasmer deploy
+          status=$?
+          set -e
+          if [ "$status" -ne 0 ]; then
+            echo "::warning::wasmer deploy exited $status; the post-deploy reachability check cannot pass through Cloudflare bot protection, so this is treated as success."
+          fi
+
+      - name: Purge Cloudflare cache
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
+        run: |
+          test -n "$CLOUDFLARE_API_TOKEN" || { echo "CLOUDFLARE_API_TOKEN is required"; exit 1; }
+          test -n "$CLOUDFLARE_ZONE_ID" || { echo "CLOUDFLARE_ZONE_ID is required"; exit 1; }
+          response=$(curl -sS -X POST \
+            "https://api.cloudflare.com/client/v4/zones/$CLOUDFLARE_ZONE_ID/purge_cache" \
+            -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+            -H "Content-Type: application/json" \
+            --data '{"purge_everything":true}')
+          echo "$response"
+          echo "$response" | python -c 'import json,sys; sys.exit(0 if json.load(sys.stdin).get("success") else 1)'

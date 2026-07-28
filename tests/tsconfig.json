@@ -1,0 +1,10 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    // Tests build fixtures inline and lean on the browser modules under
+    // site/static, which ship as plain JS. Annotating every fixture literal
+    // buys nothing, so the tests keep the null checks and drop the rest.
+    "noImplicitAny": false
+  },
+  "include": ["**/*.ts"]
+}

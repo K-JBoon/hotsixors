@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}{{ config.title }}{% endblock title %}</title>
+  <script>
+    (() => {
+      document.documentElement.classList.add('js');
+      try {
+        if (localStorage.getItem('hotsixors.datamining') === 'true') {
+          document.documentElement.classList.add('datamining-enabled');
+        }
+      } catch {}
+    })();
+  </script>
+  <link rel="icon" href="{{ get_url(path='favicon.svg') }}" type="image/svg+xml">
+  <link rel="alternate icon" href="{{ get_url(path='favicon.ico') }}" type="image/x-icon" sizes="any">
+  <meta name="theme-color" content="#0a0e1a">
+  <link rel="preload" href="{{ get_url(path='fonts.css', cachebust=true) }}" as="style">
+  <link rel="stylesheet" href="{{ get_url(path='fonts.css', cachebust=true) }}" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="{{ get_url(path='fonts.css', cachebust=true) }}"></noscript>
+  <link rel="stylesheet" href="{{ get_url(path='main.css', cachebust=true) }}">
+  {% block head %}{% endblock head %}
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to content</a>
+  <nav class="site-nav" aria-label="Primary">
+    <a class="nav-logo" href="{{ get_url(path='/') }}">HotSixors</a>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav-menu" aria-label="Open menu" data-nav-toggle>
+      <span class="nav-toggle__bar" aria-hidden="true"></span>
+      <span class="nav-toggle__bar" aria-hidden="true"></span>
+      <span class="nav-toggle__bar" aria-hidden="true"></span>
+    </button>
+    <div class="site-nav__menu" id="site-nav-menu" data-nav-menu>
+      <a class="nav-link" href="{{ get_url(path='/') }}">Heroes</a>
+      {# Guides hidden while in progress
+      <a class="nav-link" href="{{ get_url(path='guides') }}">Guides</a>
+      #}
+      <a class="nav-link" href="{{ get_url(path='@/battlegrounds/_index.md') }}">Battlegrounds</a>
+      <a class="nav-link" href="{{ get_url(path='@/replay.md') }}">Replay Viewer</a>
+      <a class="nav-link" href="{{ get_url(path='@/draft.md') }}">Draft</a>
+      <a class="nav-link" href="{{ get_url(path='library') }}">Library</a>
+      <a class="nav-link" href="{{ get_url(path='about') }}">About</a>
+      <div class="site-search" role="search" data-site-search>
+        <input class="site-search__input"
+               type="search"
+               role="combobox"
+               placeholder="Search"
+               aria-label="Search site"
+               aria-controls="site-search-results"
+               aria-expanded="false"
+               aria-autocomplete="list"
+               autocomplete="off"
+               spellcheck="false"
+               data-site-search-input>
+        <div class="site-search__results" id="site-search-results" aria-live="polite" data-site-search-results hidden></div>
+      </div>
+    </div>
+  </nav>
+  <main class="site-main{% block main_class %} site-main--constrained{% endblock main_class %}" id="main-content" tabindex="-1">
+    {% block content %}{% endblock content %}
+  </main>
+  <footer class="site-footer">
+    <p>&copy; {{ now() | date(format="%Y") }} HotSixors</p>
+    <p>&copy; 2014 Blizzard Entertainment, Inc. All rights reserved. Heroes of the Storm is a trademark of Blizzard Entertainment, Inc.</p>
+    <label class="datamining-toggle" title="Show XML links, source references, and Game Data navigation">
+      <input type="checkbox" data-datamining-toggle>
+      <span>Show game code</span>
+    </label>
+  </footer>
+  <script type="module" src="{{ get_url(path='hotsixors.js', cachebust=true) }}"></script>
+  {% block scripts %}{% endblock scripts %}
+</body>
+</html>

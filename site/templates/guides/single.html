@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page.title }} — {{ config.title }}{% endblock title %}
+
+{% block content %}
+<div class="guide-layout">
+  <aside class="guide-sidebar" aria-label="Guide navigation">
+    {% if page.extra.hero %}
+      {% set hero_slug = page.extra.hero | lower %}
+      <a class="guide-sidebar__hero-link" href="{{ get_url(path='heroes/' ~ hero_slug) }}">
+        View {{ page.extra.hero }} Data
+      </a>
+    {% endif %}
+    {% if page.toc %}
+    <nav class="guide-sidebar__toc" aria-label="Table of contents">
+      <ul>
+        {% for h in page.toc %}
+          <li><a href="{{ h.permalink | safe }}">{{ h.title }}</a>
+            {% if h.children %}
+            <ul>
+              {% for h2 in h.children %}
+                <li><a href="{{ h2.permalink | safe }}">{{ h2.title }}</a></li>
+              {% endfor %}
+            </ul>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    </nav>
+    {% endif %}
+  </aside>
+  <article class="guide-content">
+    <header class="guide-header">
+      <h1>{{ page.title }}</h1>
+      <div class="guide-header__meta">
+        {% if page.extra.hero %}
+          <span class="badge badge--hero">{{ page.extra.hero }}</span>
+        {% endif %}
+        {% if page.date %}
+          <time datetime="{{ page.date }}">{{ page.date | date(format="%B %d, %Y") }}</time>
+        {% endif %}
+      </div>
+      {% if page.description %}
+        <p class="guide-header__desc">{{ page.description }}</p>
+      {% endif %}
+    </header>
+    {{ page.content | safe }}
+  </article>
+</div>
+{% endblock content %}

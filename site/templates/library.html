@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}Library — {{ config.title }}{% endblock title %}
+
+{% block content %}
+<div class="library-page">
+  <h1>Library</h1>
+
+  <div class="library-grid">
+    <section class="library-group">
+      <h2>Status Effects</h2>
+      <p>Rules and effect lookup for status effects, and the hero abilities or talents that apply them.</p>
+      <ul class="library-links">
+        <li>
+          <a href="{{ get_url(path='status-effects') }}">Status Effects</a>
+          <span>Description of how each status effect is implemented by the game.</span>
+        </li>
+        <li>
+          <a href="{{ get_url(path='effect-index') }}">Effect Index</a>
+          <span>Which heroes, abilities, and talents apply each status effect.</span>
+        </li>
+      </ul>
+    </section>
+
+    <section class="library-group">
+      <h2>Minions, Mercs &amp; Structures</h2>
+      <p>Look up stats like HP, scaling and XP rewards for PvE entities</p>
+      <ul class="library-links">
+        <li>
+          <a href="{{ get_url(path='minions-and-mercs') }}">Minions &amp; Mercs</a>
+          <span>Lane minions and mercenary camps</span>
+        </li>
+        <li>
+          <a href="{{ get_url(path='structures') }}">Structures</a>
+          <span>All the battleground structures</span>
+        </li>
+      </ul>
+    </section>
+
+    <section class="library-group">
+      <h2>Experience</h2>
+      <p>XP curve, kill/underdog XP mechanics</p>
+      <ul class="library-links">
+        <li>
+          <a href="{{ get_url(path='experience') }}">Experience</a>
+          <span>Level XP table, Kill XP &amp; Underdog XP</span>
+        </li>
+      </ul>
+    </section>
+
+    <section class="library-group">
+      <h2>Game Data</h2>
+      <p>The XML and GalaxyScript that define most hero and battleground mechanics</p>
+      <ul class="library-links">
+        <li>
+          <a href="{{ get_url(path='gamedata') }}">Game Data</a>
+          <span>Browse extracted source files.</span>
+        </li>
+      </ul>
+    </section>
+  </div>
+</div>
+{% endblock content %}

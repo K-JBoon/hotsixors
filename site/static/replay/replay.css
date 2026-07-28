@@ -1,0 +1,933 @@
+.replay-page {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+   so feed rows and buttons line up the same way on every platform. */
+.rp-icon {
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.14em;
+  flex-shrink: 0;
+}
+
+.rp-icon--crown {
+  width: 1.1em;
+  height: 1.1em;
+  color: #ffc850;
+}
+
+.replay-drop {
+  border: 2px dashed rgba(140, 160, 220, 0.4);
+  border-radius: 12px;
+  padding: 3rem 2rem;
+  text-align: center;
+  margin: 2rem auto;
+  max-width: 640px;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.replay-drop.is-dragover {
+  border-color: #4da3ff;
+  background: rgba(77, 163, 255, 0.08);
+}
+
+.replay-drop__note {
+  font-size: 0.85rem;
+  opacity: 0.7;
+  max-width: 46ch;
+  margin: 0.5rem auto;
+}
+
+.replay-file-btn {
+  display: inline-block;
+  cursor: pointer;
+  padding: 0.5rem 1.25rem;
+  border-radius: 8px;
+  background: #2b62a8;
+  color: #fff;
+  border: none;
+  font: inherit;
+}
+
+.replay-file-btn:hover {
+  background: #3a76c4;
+}
+
+.replay-summary {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  margin-bottom: 0.75rem;
+}
+
+.replay-summary__teams {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.replay-team-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.replay-team-level {
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.replay-vs {
+  opacity: 0.6;
+  font-size: 0.9rem;
+  align-self: center;
+}
+
+.replay-panel {
+  margin-top: 1rem;
+  border: 1px solid rgba(140, 160, 220, 0.25);
+  border-radius: 6px;
+}
+
+.replay-panel__tabs {
+  display: flex;
+  gap: 0.25rem;
+  padding: 0.3rem 0.3rem 0;
+  border-bottom: 1px solid rgba(140, 160, 220, 0.25);
+}
+
+.replay-panel__tab {
+  background: none;
+  border: 1px solid transparent;
+  border-bottom: none;
+  border-radius: 5px 5px 0 0;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.8rem;
+  opacity: 0.65;
+  padding: 0.3rem 0.7rem;
+}
+
+.replay-panel__tab:hover {
+  opacity: 0.9;
+}
+
+.replay-panel__tab.is-on {
+  opacity: 1;
+  border-color: rgba(140, 160, 220, 0.25);
+  background: rgba(140, 160, 220, 0.12);
+}
+
+.replay-panel__body {
+  padding: 0.6rem;
+  overflow-x: auto;
+}
+
+.panel-scroll {
+  overflow-x: auto;
+}
+
+.talent-table {
+  border-collapse: collapse;
+  font-size: 1rem;
+}
+
+.xp-chart {
+  position: relative;
+}
+
+.xp-chart__empty {
+  opacity: 0.7;
+  font-size: 0.875rem;
+  padding: 1rem 0.2rem;
+}
+
+.xp-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  touch-action: none;
+}
+
+.xp-legend {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 0.8rem;
+  padding: 0 0.2rem 0.4rem;
+}
+
+.xp-legend__item {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.xp-legend__swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+}
+
+.xp-legend__note {
+  margin-left: auto;
+  opacity: 0.6;
+}
+
+.xp-grid {
+  stroke: rgba(140, 160, 220, 0.18);
+  stroke-width: 1;
+}
+
+.xp-tick {
+  fill: currentColor;
+  opacity: 0.55;
+  font-size: 11px;
+  text-anchor: middle;
+}
+
+.xp-tick--y {
+  text-anchor: end;
+}
+
+.xp-band {
+  opacity: 0.16;
+}
+
+.xp-line {
+  fill: none;
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.xp-end {
+  font-size: 11px;
+  font-weight: 600;
+  text-anchor: end;
+  paint-order: stroke;
+  stroke: #0a0e1a;
+  stroke-width: 3px;
+}
+
+.xp-cursor {
+  stroke: rgba(255, 255, 255, 0.45);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+}
+
+.xp-hover-line {
+  stroke: rgba(255, 255, 255, 0.7);
+  stroke-width: 1;
+}
+   class instead. */
+.xp-svg .is-off {
+  display: none;
+}
+
+.xp-dot {
+  stroke: #0a0e1a;
+  stroke-width: 2;
+}
+
+.xp-tip {
+  position: absolute;
+  top: 2rem;
+  transform: translateX(-50%);
+  pointer-events: none;
+  background: rgba(10, 14, 26, 0.96);
+  border: 1px solid rgba(140, 160, 220, 0.3);
+  border-radius: 5px;
+  padding: 0.4rem 0.55rem;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  z-index: 2;
+}
+
+.xp-tip__time {
+  font-variant-numeric: tabular-nums;
+  opacity: 0.7;
+  padding-bottom: 0.2rem;
+}
+
+.xp-tip__table {
+  border-collapse: collapse;
+}
+
+.xp-tip__table th {
+  font-weight: 400;
+  text-align: left;
+  padding-right: 0.6rem;
+  opacity: 0.75;
+}
+
+.xp-tip__head th {
+  font-weight: 600;
+  text-align: right;
+  opacity: 1;
+}
+
+.xp-tip__num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  padding-left: 0.5rem;
+}
+
+.xp-tip__total th,
+.xp-tip__total .xp-tip__num {
+  border-top: 1px solid rgba(140, 160, 220, 0.3);
+  font-weight: 600;
+}
+
+.xp-tip__lead {
+  padding-top: 0.25rem;
+  opacity: 0.75;
+}
+
+.score-cell {
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  padding: 0.25rem 0.5rem;
+  text-align: right;
+}
+
+.score-table thead .score-cell {
+  text-align: right;
+}
+
+.talent-table .team-row th {
+  padding: 0.45rem 0.4rem 0.15rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-align: left;
+  color: var(--team-color);
+  border-left: 3px solid transparent;
+}
+   down relative to the score tab's. */
+.talent-table thead th {
+  box-sizing: border-box;
+  height: 26px;
+  line-height: 1;
+  opacity: 0.6;
+  font-weight: 600;
+  padding: 0 0.4rem;
+  text-align: center;
+}
+
+.talent-table thead .score-cell {
+  padding: 0 0.5rem;
+}
+   switching tabs only swaps the columns to its right. */
+.talent-table thead th:first-child,
+.talent-table .hero-cell {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  width: 190px;
+  min-width: 190px;
+  background: #0a0e1a;
+}
+
+.talent-table tbody th {
+  padding: 0.25rem 0.6rem 0.25rem 0.4rem;
+  font-weight: 400;
+  white-space: nowrap;
+  border-left: 3px solid var(--team-color, transparent);
+}
+
+.hero-cell__inner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+   leaves the hero column where it was. Vertical padding is zeroed, otherwise
+   it adds onto the height the talent icon already fills. */
+.talent-table tbody tr:not(.team-row) th,
+.talent-table tbody tr:not(.team-row) td {
+  box-sizing: border-box;
+  height: 40px;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.talent-table tbody:first-of-type {
+  border-bottom: 1px solid rgba(140, 160, 220, 0.25);
+}
+
+.talent-table td {
+  padding: 0.2rem 0.4rem;
+  text-align: center;
+}
+
+.talent-icon {
+  width: 33px;
+  height: 33px;
+  border-radius: 6px;
+  display: block;
+  margin: 0 auto;
+}
+
+.talent-text {
+  font-size: 0.875rem;
+  opacity: 0.85;
+}
+
+.talent-hero {
+  font-size: 1rem;
+  display: block;
+}
+
+.talent-hero-names {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+  text-align: left;
+}
+
+.talent-player {
+  font-size: 0.75rem;
+  font-weight: 400;
+  opacity: 0.6;
+}
+
+.talent-table .feed-portrait {
+  width: 28px;
+  height: 28px;
+}
+
+.talent-hero-link,
+.talent-portrait-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.talent-portrait-link {
+  display: flex;
+  align-items: center;
+}
+
+.talent-hero-link {
+  align-self: flex-start;
+}
+
+.talent-hero-link:hover {
+  text-decoration: underline;
+}
+   which would make talent rows taller than the score table's. */
+.talent-link {
+  display: inline-block;
+  vertical-align: middle;
+  color: inherit;
+  text-decoration: none;
+}
+
+.talent-link:hover .talent-icon {
+  outline: 1px solid rgba(160, 190, 255, 0.8);
+}
+
+.talent-link:hover .talent-text {
+  text-decoration: underline;
+}
+
+.replay-team {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.replay-portrait {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border-radius: 8px;
+  border: 2px solid var(--team-color, #888);
+  overflow: hidden;
+  cursor: pointer;
+  background: #0a0e1a;
+}
+
+.replay-portrait img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.replay-portrait.is-selected {
+  outline: 3px solid #fff;
+}
+
+.replay-summary__map {
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+.replay-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 1rem;
+  align-items: start;
+}
+
+@media (max-width: 1000px) {
+  .replay-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.replay-canvas {
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+  background: #0a0a0c;
+  cursor: grab;
+  touch-action: none; /* pan the map, not the page */
+}
+
+.replay-canvas.is-panning {
+  cursor: grabbing;
+}
+
+.replay-canvas-box {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 0;
+}
+
+.replay-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 0.5rem;
+}
+
+.replay-controls [data-play] {
+  width: 2.4rem;
+  height: 2.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1px solid rgba(140, 160, 220, 0.4);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.replay-controls [data-fullscreen] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.replay-controls [data-fullscreen] .rp-icon {
+  vertical-align: 0;
+}
+
+.replay-controls [data-fullscreen],
+.replay-controls [data-reset-view] {
+  border: 1px solid rgba(140, 160, 220, 0.4);
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+  padding: 0.3rem 0.5rem;
+}
+
+.replay-controls [data-reset-view] {
+  font-size: 0.78rem;
+  padding: 0.35rem 0.55rem;
+}
+
+.replay-controls input[type='range'] {
+  width: 100%;
+  display: block;
+}
+   over the same width so a round sits above the moment it happened. */
+.replay-track {
+  flex: 1;
+  min-width: 0;
+}
+
+.replay-phases {
+  position: relative;
+  height: calc(var(--rows) * 0.85rem);
+  margin-bottom: 0.15rem;
+}
+   The button keeps its full height so it stays easy to hit, while only the
+   line and dots are painted. */
+.replay-phase {
+  position: absolute;
+  top: calc(var(--row) * 0.85rem);
+  height: 0.85rem;
+  padding: 0;
+  border: 0;
+  background: linear-gradient(currentColor, currentColor) left center / 100% 2px no-repeat;
+  color: rgba(170, 185, 230, 0.75);
+  cursor: pointer;
+  opacity: 0.75;
+}
+
+.replay-phase::before,
+.replay-phase::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 7px;
+  height: 7px;
+  margin-top: -3.5px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.replay-phase::before {
+  left: -3.5px;
+}
+
+.replay-phase::after {
+  right: -3.5px;
+}
+.replay-phase.is-moment {
+  background: none;
+}
+   round's own line, which stays visible wherever nobody held it. */
+.replay-phase__run {
+  position: absolute;
+  top: 50%;
+  height: 3px;
+  margin-top: -1.5px;
+  border-radius: 2px;
+  background: currentColor;
+}
+
+.replay-phase__run.is-team0 {
+  color: #5a96ff;
+}
+
+.replay-phase__run.is-team1 {
+  color: #ff5a5a;
+}
+
+.replay-phase.is-team0 {
+  color: #5a96ff;
+}
+
+.replay-phase.is-team1 {
+  color: #ff5a5a;
+}
+
+.replay-phase.is-past {
+  opacity: 0.9;
+}
+
+.replay-phase.is-now,
+.replay-phase:hover {
+  opacity: 1;
+}
+
+.replay-phase.is-now::before,
+.replay-phase.is-now::after,
+.replay-phase:hover::before,
+.replay-phase:hover::after {
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.6);
+}
+
+.replay-time {
+  font-variant-numeric: tabular-nums;
+  min-width: 3.5rem;
+  text-align: right;
+}
+
+.replay-controls select {
+  background: transparent;
+  color: inherit;
+  border: 1px solid rgba(140, 160, 220, 0.4);
+  border-radius: 6px;
+  padding: 0.2rem 0.4rem;
+}
+
+.replay-toggles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  font-size: 0.85rem;
+  margin-top: 0.4rem;
+  opacity: 0.9;
+}
+
+.replay-note {
+  font-size: 0.78rem;
+  opacity: 0.6;
+  margin-top: 0.5rem;
+  max-width: 70ch;
+}
+
+.replay-feed-pane {
+  border: 1px solid rgba(140, 160, 220, 0.25);
+  border-radius: 10px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  max-height: 78vh;
+}
+
+.replay-feed-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid rgba(140, 160, 220, 0.25);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.replay-feed-head button {
+  font-size: 0.75rem;
+  background: transparent;
+  border: 1px solid rgba(140, 160, 220, 0.4);
+  color: inherit;
+  border-radius: 6px;
+  padding: 0.15rem 0.5rem;
+  cursor: pointer;
+}
+
+.replay-feed-filters {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.45rem 0.6rem;
+  border-bottom: 1px solid rgba(140, 160, 220, 0.25);
+}
+
+.feed-filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.feed-filter-row[hidden] {
+  display: none;
+}
+
+.feed-filter {
+  font-size: 0.7rem;
+  background: transparent;
+  border: 1px solid rgba(140, 160, 220, 0.35);
+  color: inherit;
+  border-radius: 999px;
+  padding: 0.1rem 0.5rem;
+  cursor: pointer;
+  opacity: 0.4;
+}
+
+.feed-filter.is-on {
+  opacity: 1;
+  background: rgba(140, 160, 220, 0.18);
+  border-color: rgba(140, 160, 220, 0.7);
+}
+   the row rather than another filter in it. */
+.feed-filter--all {
+  opacity: 0.75;
+  border-style: dashed;
+  min-width: 3rem;
+}
+
+.feed-filter--all:hover {
+  opacity: 1;
+}
+.feed-hero-grid {
+  display: flex;
+  gap: 0.5rem;
+  flex: 1;
+  min-width: 0;
+}
+   width; the portraits shrink instead of wrapping under the None button. */
+.feed-hero-team {
+  display: grid;
+  grid-template-columns: repeat(var(--hero-count, 5), minmax(0, 1fr));
+  gap: 0.2rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.feed-hero-filter {
+  width: 100%;
+  max-width: 26px;
+  aspect-ratio: 1;
+  justify-self: center;
+  padding: 0;
+  border-radius: 50%;
+  border: 2px solid var(--team-color, #888);
+  background: transparent;
+  color: inherit;
+  font-size: 0.7rem;
+  cursor: pointer;
+  overflow: hidden;
+  opacity: 0.3;
+  filter: grayscale(1);
+}
+
+.feed-hero-filter.is-on {
+  opacity: 1;
+  filter: none;
+}
+
+.feed-hero-filter img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.feed-search {
+  width: 100%;
+  box-sizing: border-box;
+  font: inherit;
+  font-size: 0.78rem;
+  padding: 0.2rem 0.45rem;
+  border-radius: 6px;
+  border: 1px solid rgba(140, 160, 220, 0.35);
+  background: rgba(10, 14, 26, 0.4);
+  color: inherit;
+}
+
+.feed-empty {
+  padding: 0.6rem 0.75rem;
+  font-size: 0.78rem;
+  opacity: 0.55;
+}
+
+.replay-feed {
+  list-style: none;
+  margin: 0;
+  padding: 0.25rem 0;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.feed-item {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.22rem 0.75rem;
+  font-size: 0.82rem;
+  cursor: pointer;
+  opacity: 0.45;
+  border-left: 3px solid transparent;
+}
+
+.feed-item.is-past {
+  opacity: 0.85;
+}
+
+.feed-item.is-current {
+  opacity: 1;
+  background: rgba(77, 163, 255, 0.12);
+  border-left-color: #4da3ff;
+}
+
+.feed-item:hover {
+  background: rgba(140, 160, 220, 0.12);
+}
+
+.feed-time {
+  font-variant-numeric: tabular-nums;
+  opacity: 0.6;
+  min-width: 2.9rem;
+}
+
+.feed-portrait {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid #888;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.feed-icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.feed-item.is-heroic .feed-icon {
+  outline: 1px solid gold;
+}
+
+.feed-item.is-death {
+  color: #ff9c9c;
+}
+
+.feed-item.is-talent {
+  color: #ffd97a;
+}
+
+.feed-item.is-camp,
+.feed-item.is-level {
+  opacity: 0.7;
+}
+
+.feed-item.is-structure,
+.feed-item.is-objective {
+  opacity: 0.8;
+}
+.feed-item.is-verbose {
+  opacity: 0.55;
+  font-size: 0.92em;
+}
+   talent table are dropped so the map gets the height. */
+
+#replay-root:fullscreen {
+  box-sizing: border-box;
+  height: 100%;
+  padding: 0.6rem;
+  background: #0a0e1a;
+  color: #e0e6f0;
+  overflow: hidden;
+}
+
+#replay-root:fullscreen .replay-layout {
+  height: 100%;
+  align-items: stretch;
+     layout would have stacked them. */
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 320px);
+}
+
+#replay-root:fullscreen .replay-map-pane {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+#replay-root:fullscreen .replay-canvas-box {
+  flex: 1 1 auto;
+}
+
+#replay-root:fullscreen .replay-canvas {
+  width: auto;
+  flex: 0 0 auto;
+}
+
+#replay-root:fullscreen .replay-summary,
+#replay-root:fullscreen .replay-note,
+#replay-root:fullscreen .replay-panel {
+  display: none;
+}
+
+#replay-root:fullscreen .replay-feed-pane {
+  max-height: none;
+  height: 100%;
+}

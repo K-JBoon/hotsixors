@@ -1,0 +1,48 @@
+name: Daily Submodule Update
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+jobs:
+  update-submodules:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Update submodules to latest
+        id: update-submodules
+        run: |
+          git submodule update --remote --checkout
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+          git add submodules/
+          if git diff --cached --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "No submodule updates found."
+            exit 0
+          fi
+          npm ci
+          npx tsx scripts/gen-replay-abillinks.ts
+          git add data/replay-abillinks
+          git commit -m "chore: update submodules"
+          git push
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Trigger build & deploy
+        if: steps.update-submodules.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh workflow run build-deploy.yml --ref "$GITHUB_REF_NAME"

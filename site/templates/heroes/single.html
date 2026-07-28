@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+{% import "macros/images.html" as images %}
+{% import "macros/heroes.html" as heroes %}
+
+{% block title %}{{ page.extra.hero_name }} — {{ config.title }}{% endblock title %}
+
+{% block content %}
+{% set hero = page.extra %}
+{% set hero_data = load_data(path="data/heroes/" ~ page.slug ~ ".json") %}
+{% set sc = load_data(path="static/shortcode-data.json") %}
+
+<div class="hero-detail" data-level-scope>
+
+  <div class="hero-banner role-{{ hero.role | lower }}">
+    {% if hero.portraits.loading %}
+      {{ images::optimized(path='images/heroportraits/' ~ hero.portraits.loading, class="hero-banner__loading", alt="", width=340, height=124, op="fit", display_width=340, display_height=124, loading="eager") }}
+    {% endif %}
+    <div class="hero-banner__info">
+      <h1 class="hero-banner__name">{{ hero.hero_name }}</h1>
+      {% if page.description %}
+        <p class="hero-banner__desc">{{ page.description }}</p>
+      {% endif %}
+      <br>
+      <a class="hero-wiki-link" href="https://heroesofthestorm.fandom.com/wiki/{{ hero.hero_name | replace(from=" ", to="_") }}" target="_blank" rel="noopener noreferrer">Wiki</a>
+    </div>
+  </div>
+
+  {% if hero_data.stats or hero_data.unitStats %}
+  <section class="hero-stats">
+    <div class="hero-stats__header">
+      <h2>Statistics</h2>
+      <div class="hero-level-control" data-level-control>
+        <label class="hero-level-control__label" for="hero-level-slider">
+          Level <output class="hero-level-control__value" data-level-display>0</output>
+        </label>
+        <input id="hero-level-slider" class="hero-level-control__slider" type="range" min="0" max="30" value="0" step="1" data-level-slider>
+      </div>
+    </div>
+
+    {% if hero_data.unitStats %}
+      {% for unit_stat in hero_data.unitStats %}
+      {% set st = unit_stat.stats %}
+      <div class="hero-stats__unit">
+        <h3 class="hero-stats__unit-title">{{ unit_stat.unitName }}</h3>
+        {{ heroes::hero_stats_grid(st=st) }}
+      </div>
+      {% endfor %}
+    {% elif hero_data.stats %}
+    {% set st = hero_data.stats %}
+    {{ heroes::hero_stats_grid(st=st) }}
+    {% endif %}
+  </section>
+  {% endif %}
+
+  <section class="abilities-section" data-ability-section>
+    <div class="abilities-section__header">
+      <h2>Abilities</h2>
+      <button class="ability-details-toggle" data-ability-details-toggle type="button" aria-pressed="false" aria-label="Toggle detailed ability stats">Detailed</button>
+    </div>
+    <div class="abilities-grid">
+      {% for ab in hero_data.abilities %}
+        {% if ab.category == "basic" or ab.category == "heroic" or ab.category == "trait" or ab.category == "activable" %}
+        {{ heroes::ability_card(ab=ab, sc=sc, show_stats=true) }}
+        {% endif %}
+      {% endfor %}
+    </div>
+
+    {% for group in hero_data.subAbilityGroups %}
+    <div class="hero-unit-section{% if group.isSecondary %} hero-unit-section--secondary{% endif %}">
+      <h3 class="hero-unit-section__label">{{ group.parentLabel }}</h3>
+      <div class="abilities-grid">
+        {% for ab in group.abilities %}
+          {% if ab.category == "basic" or ab.category == "heroic" or ab.category == "trait" or ab.category == "activable" %}
+          {{ heroes::ability_card(ab=ab, sc=sc, show_stats=true) }}
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+    {% endfor %}
+
+    {% for unit in hero_data.heroUnitAbilities %}
+    <div class="hero-unit-section">
+      <h3 class="hero-unit-section__label">{{ unit.heroUnitName }} (Alternate Form)</h3>
+      <div class="abilities-grid">
+        {% for ab in unit.abilities %}
+          {% if ab.category == "basic" or ab.category == "heroic" or ab.category == "trait" %}
+          {{ heroes::ability_card(ab=ab, sc=sc, show_stats=true) }}
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+    {% endfor %}
+  </section>
+
+  <section class="talents-section" data-talent-hero="{{ hero.hero_name }}">
+    <h2>Talents</h2>
+    <div class="talent-builder-help">
+      <p>Build and share talent picks directly from this list.</p>
+      <ul>
+        <li>Click or tap a talent to mark it as the recommended pick for that tier.</li>
+        <li>Right-click or long press a talent to mark it as optional.</li>
+        <li>Use Copy Build URL to share the current picks.</li>
+        <li>Use Copy Build Code to grab the in-game build string.</li>
+      </ul>
+    </div>
+    {% set tiers = ["level1","level4","level7","level10","level13","level16","level20"] %}
+    {% for tier in tiers %}
+      {% set tier_talents = hero_data.talents | filter(attribute="tier", value=tier) %}
+      {% if tier_talents %}
+        <div class="talent-tier">
+          <h3 class="talent-tier__label">
+            {% if tier == "level1" %}Level 1
+            {% elif tier == "level4" %}Level 4
+            {% elif tier == "level7" %}Level 7
+            {% elif tier == "level10" %}Level 10
+            {% elif tier == "level13" %}Level 13
+            {% elif tier == "level16" %}Level 16
+            {% elif tier == "level20" %}Level 20
+            {% endif %}
+          </h3>
+          <div class="talent-row">
+            {% for tal in tier_talents | sort(attribute="sort") %}
+            <div class="talent-card"
+                 id="talent-{{ tal.nameId }}"
+                 data-talent-id="{{ tal.nameId }}"
+                 data-talent-tier="{{ tier }}">
+              {{ images::optimized(path='images/abilitytalents/' ~ tal.icon, class="talent-card__icon", alt="", width=40, height=40, op="fill", display_width=40, display_height=40, loading="lazy") }}
+              <div class="talent-card__body">
+                <div class="talent-card__header">
+                  <span class="talent-card__name">{{ tal.name }}</span>
+                  {% set sc_entry = sc | get(key=tal.nameId, default=false) %}
+                  {% if sc_entry and sc_entry.xmlPath %}
+                    <a class="talent-card__xml-link"
+                       data-datamining
+                       href="/gamedata/{{ sc_entry.xmlPath }}/{% if sc_entry.anchor %}#{{ sc_entry.anchor }}{% endif %}">XML</a>
+                  {% endif %}
+                </div>
+                {% if tal.fullDescHtml %}
+                  <p class="talent-card__desc storm-game-string">{{ tal.fullDescHtml | safe }}</p>
+                {% elif tal.fullDesc %}
+                  <p class="talent-card__desc">{{ tal.fullDesc }}</p>
+                {% endif %}
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
+    {% endfor %}
+    <div class="talent-build-actions" data-share-build-actions>
+      <input class="build-code-preview" type="text" data-build-code-preview value="[T0000000,{{ hero.hero_name }}]" size="22" disabled hidden>
+      <button class="share-build-button" type="button" data-copy-build-code hidden>Copy Build Code</button>
+      <button class="share-build-button talent-build-actions__share-url" type="button" data-share-build hidden>Copy Build URL</button>
+      <span class="share-build-status" data-share-build-status aria-live="polite"></span>
+    </div>
+  </section>
+
+</div>
+{% endblock content %}
+
+{% block scripts %}
+<script src="{{ get_url(path='level-slider.js', cachebust=true) }}"></script>
+{% endblock scripts %}

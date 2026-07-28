@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Battlegrounds — {{ config.title }}{% endblock title %}
+
+{% block content %}
+<div class="battlegrounds-list" data-select-search>
+  <div class="battlegrounds-list__header">
+    <h1 class="page-title">Battlegrounds</h1>
+    <span class="select-search-status" aria-live="polite" data-select-search-status></span>
+  </div>
+  <div class="battlegrounds-grid">
+    {% for page in section.pages | sort(attribute="title") %}
+    <a class="battleground-card"
+       href="{{ page.permalink }}"
+       data-select-search-card
+       data-select-search-id="{{ page.slug }}"
+       data-select-search-text="{{ page.title }}">
+      <span class="battleground-card__name">{{ page.title }}</span>
+    </a>
+    {% endfor %}
+  </div>
+</div>
+{% endblock content %}

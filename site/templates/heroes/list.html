@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% import "macros/heroes.html" as heroes %}
+
+{% block title %}Heroes — {{ config.title }}{% endblock title %}
+
+{% block content %}
+{% set heroes_section = get_section(path="heroes/_index.md") %}
+{{ heroes::hero_index(pages=heroes_section.pages, show_role=true) }}
+{% endblock content %}

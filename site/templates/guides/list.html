@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}Guides — {{ config.title }}{% endblock title %}
+
+{% block content %}
+<div class="guides-list">
+  <h1>Guides</h1>
+  {% if section.pages %}
+    <div class="guide-cards">
+      {% for page in section.pages %}
+        <a class="guide-card" href="{{ page.permalink }}">
+          <div class="guide-card__header">
+            <h2 class="guide-card__title">{{ page.title }}</h2>
+            {% if page.extra.hero %}
+              <span class="badge badge--hero">{{ page.extra.hero }}</span>
+            {% endif %}
+          </div>
+          {% if page.description %}
+            <p class="guide-card__desc">{{ page.description }}</p>
+          {% endif %}
+          {% if page.date %}
+            <span class="guide-card__date">{{ page.date | date(format="%B %d, %Y") }}</span>
+          {% endif %}
+        </a>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="empty-state">No guides yet. Add markdown files to <code>site/content/guides/</code>.</p>
+  {% endif %}
+</div>
+{% endblock content %}

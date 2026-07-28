@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title>HotSixors favicon</title>
+  <defs>
+    <linearGradient id="hex-fill" x1="14" y1="8" x2="50" y2="56" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#1e2a40"/>
+      <stop offset="0.55" stop-color="#111827"/>
+      <stop offset="1" stop-color="#0a0e1a"/>
+    </linearGradient>
+    <linearGradient id="hex-stroke" x1="32" y1="4" x2="32" y2="60" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#f6c90e"/>
+      <stop offset="1" stop-color="#c8961e"/>
+    </linearGradient>
+    <linearGradient id="core" x1="20" y1="18" x2="44" y2="46" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#4a9eff"/>
+      <stop offset="1" stop-color="#1a6bbf"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="12" fill="#0a0e1a"/>
+  <path d="M32 4 56 18v28L32 60 8 46V18L32 4Z" fill="url(#hex-fill)" stroke="url(#hex-stroke)" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M32 13 48 22.5v19L32 51 16 41.5v-19L32 13Z" fill="none" stroke="#2a3a55" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M32 18 43 24.5v13L32 44 21 37.5v-13L32 18Z" fill="url(#core)" stroke="#e0e6f0" stroke-width="1.5" stroke-linejoin="round"/>
+  <path d="M32 18 43 24.5 32 31 21 24.5 32 18Z" fill="#7db9ff" opacity="0.35"/>
+</svg>

@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page.title }} — {{ config.title }}{% endblock title %}
+
+{% block content %}
+{% set bg = load_data(path="data/battlegrounds/" ~ page.extra.battleground_slug ~ ".json") %}
+
+<div class="battleground-detail">
+
+  <div class="hero-banner role-battleground">
+    <div class="hero-banner__info">
+      <h1 class="hero-banner__name">{{ bg.name }}</h1>
+      <a class="hero-wiki-link" href="https://heroesofthestorm.fandom.com/wiki/{{ bg.name | replace(from=" ", to="_") }}" target="_blank" rel="noopener noreferrer">Wiki</a>
+    </div>
+  </div>
+
+  {% if bg.summary %}
+  <section class="bg-section bg-section--summary">
+    <ul class="bg-summary-list">
+      {% for point in bg.summary %}
+      <li>{{ point }}</li>
+      {% endfor %}
+    </ul>
+  </section>
+  {% endif %}
+
+  {% if bg.timers %}
+  <section class="bg-section">
+    <h2>Objective Timers</h2>
+    <table class="bg-timers-table">
+      <thead>
+        <tr>
+          <th scope="col">Event</th>
+          <th scope="col">Duration</th>
+          <th scope="col">Seconds</th>
+          <th scope="col" data-datamining>Source</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for t in bg.timers %}
+        <tr>
+          <td>
+            {{ t.label }}
+            {%- if t.note %} <span class="bg-timer-note">{{ t.note }}</span>{% endif -%}
+          </td>
+          <td class="bg-timers-table__display">
+            {%- if t.displayMin %}{{ t.displayMin }}–{{ t.displayMax }}{% else %}{{ t.display }}{% endif -%}
+          </td>
+          <td class="bg-timers-table__seconds">
+            {%- if t.min %}{{ t.min }}–{{ t.max }}s{% else %}{{ t.seconds }}s{% endif -%}
+          </td>
+          <td class="bg-timers-table__source" data-datamining>
+            {%- if t.galaxyConst %}<code>{{ t.galaxyConst }}</code>{% else %}—{% endif -%}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+  {% endif %}
+
+  {% if bg.summons %}
+  <section class="bg-section">
+    <h2>Units</h2>
+    {% for summon in bg.summons %}
+    <div class="summon-card{% if summon.variants | length > 1 %} summon-card--multi{% endif %}">
+      <div class="summon-card__header">
+        <h3 class="summon-card__name">{{ summon.label }}</h3>
+      </div>
+      <div class="summon-card__variants" style="--variant-count: {{ summon.variants | length }}">
+        {% for v in summon.variants %}
+        <div class="summon-variant">
+          {% if summon.variants | length > 1 %}
+          <div class="summon-variant__header">
+            <h4 class="summon-variant__label">{{ v.label }}</h4>
+            {% if v.xmlPath %}
+              <a class="summon-card__xml-link" href="/gamedata/{{ v.xmlPath }}/" data-datamining>XML</a>
+            {% endif %}
+          </div>
+          {% elif v.xmlPath %}
+          <div class="summon-variant__header">
+            <a class="summon-card__xml-link" href="/gamedata/{{ v.xmlPath }}/" data-datamining>XML</a>
+          </div>
+          {% endif %}
+          <dl class="summon-card__stats">
+            {% if v.hp %}<dt>HP</dt><dd>{{ v.hp }}</dd>{% endif %}
+            {% if v.speed %}<dt>Speed</dt><dd>{{ v.speed }}</dd>{% endif %}
+            {% if v.armor %}<dt>Armor</dt><dd>{{ v.armor }}</dd>{% endif %}
+          </dl>
+          {% if v.scalingRows %}
+          <div class="summon-card__scaling">
+            <h5>Scaling</h5>
+            <dl class="scaling-summary">
+              {% for row in v.scalingRows %}
+              <div>
+                <dt>{{ row.label }}</dt>
+                <dd>{{ row.summary }}</dd>
+              </div>
+              {% endfor %}
+            </dl>
+          </div>
+          {% endif %}
+          {% if v.abilities %}
+          <div class="summon-card__abilities">
+            <h5>Abilities</h5>
+            <ul class="summon-abilities">
+              {% for ab in v.abilities %}
+              <li>
+                <div class="summon-ability__head">
+                  {% if ab.slot %}<span class="summon-ability__slot">{{ ab.slot }}</span>{% endif %}
+                  <span class="summon-ability__name">{{ ab.name | default(value=ab.id) }}</span>
+                  <code class="summon-ability__id" data-datamining>{{ ab.id }}</code>
+                </div>
+                {% if ab.fullDesc %}<p class="summon-ability__desc">{{ ab.fullDesc }}</p>{% endif %}
+              </li>
+              {% endfor %}
+            </ul>
+          </div>
+          {% endif %}
+          {% if v.weapons %}
+          <div class="summon-card__weapons">
+            <h5>Weapons</h5>
+            <table class="bg-timers-table">
+              <thead><tr><th scope="col" data-datamining>ID</th><th scope="col">Damage</th><th scope="col">Period</th><th scope="col">Range</th></tr></thead>
+              <tbody>
+                {% for w in v.weapons %}
+                <tr>
+                  <td data-datamining><code>{{ w.id }}</code></td>
+                  <td>{% if w.damage %}{{ w.damage }}{% else %}—{% endif %}</td>
+                  <td>{% if w.period %}{{ w.period }}s{% else %}—{% endif %}</td>
+                  <td>{% if w.range %}{{ w.range }}{% else %}—{% endif %}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endfor %}
+  </section>
+  {% endif %}
+
+  {% for mechanic in bg.mechanics %}
+  <section class="bg-section bg-section--mechanic">
+    <h2>{{ mechanic.title }}</h2>
+    <p class="bg-mechanic-desc">{{ mechanic.body }}</p>
+	<br/>
+    {% if mechanic.codeBlock %}
+    <pre class="bg-code-block__pre" data-datamining><code class="language-galaxy">{{ mechanic.codeBlock.code | replace(from="&", to="&amp;") | replace(from="<", to="&lt;") | replace(from=">", to="&gt;") | safe }}</code></pre>
+    {% endif %}
+  </section>
+  {% endfor %}
+
+  {% if bg.codeBlocks %}
+  <section class="bg-section" data-datamining>
+    <h2>Timer Source</h2>
+    {% for cb in bg.codeBlocks %}
+    <div class="bg-code-block">
+      <h3 class="bg-code-block__label">{{ cb.label }}</h3>
+      <pre class="bg-code-block__pre"><code class="language-galaxy">{{ cb.code | replace(from="&", to="&amp;") | replace(from="<", to="&lt;") | replace(from=">", to="&gt;") | safe }}</code></pre>
+    </div>
+    {% endfor %}
+  </section>
+  {% endif %}
+
+  {% if bg.xmlFiles %}
+  <section class="bg-section" data-datamining>
+    <h2>Source Files</h2>
+    <ul class="bg-xml-list">
+      {% for f in bg.xmlFiles %}
+      <li><a href="/gamedata/{{ f.path }}/">{{ f.label }}</a></li>
+      {% endfor %}
+    </ul>
+  </section>
+  {% endif %}
+
+</div>
+{% endblock content %}

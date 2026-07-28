@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}About — {{ config.title }}{% endblock title %}
+
+{% block content %}
+{% set build_info = load_data(path="data/build-info.json") %}
+<div class="about-page">
+  <h1>About HotSixors</h1>
+  <div class="about-content">
+    {{ page.content | safe }}
+
+    <h2>Build Info</h2>
+    <dl class="build-info">
+      <div class="build-info__row">
+        <dt>Website build date</dt>
+        <dd><time datetime="{{ build_info.build_date }}">{{ build_info.build_date_display }}</time></dd>
+      </div>
+      {% for source in build_info.sources %}
+      <div class="build-info__row" data-datamining>
+        <dt><a href="{{ source.url }}">{{ source.name }}</a></dt>
+        <dd>
+          <span>Game version: {{ source.game_version }}</span>
+          <span>Source version: {{ source.source_version }}</span>
+          {% if source.note %}
+          <span>{{ source.note }}</span>
+          {% endif %}
+        </dd>
+      </div>
+      {% endfor %}
+    </dl>
+  </div>
+</div>
+{% endblock content %}

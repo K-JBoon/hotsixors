@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}404 Not Found — {{ config.title }}{% endblock title %}
+{% block content %}
+<div style="text-align:center;padding:4rem 0">
+  <h1 style="color:#e4b800;font-size:3rem;font-family:'Rajdhani',sans-serif;">404</h1>
+  <p style="color:#8899aa;margin:1rem 0">Page not found.</p>
+  <a href="{{ get_url(path='/') }}" style="color:#4a9eff">← Back to heroes</a>
+</div>
+{% endblock content %}

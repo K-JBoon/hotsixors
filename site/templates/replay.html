@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Replay Viewer — {{ config.title }}{% endblock title %}
+
+{% block head %}
+  <link rel="stylesheet" href="{{ get_url(path='replay/replay.css', cachebust=true) }}">
+{% endblock head %}
+
+{% block main_class %} replay-main-area{% endblock main_class %}
+
+{% block content %}
+<div class="replay-page">
+  <h1>Replay Viewer</h1>
+  <div id="replay-root" data-state="idle">
+    <div class="replay-drop" data-drop-zone>
+      <p><strong>Drop a .StormReplay file here</strong> or</p>
+      <p><label class="replay-file-btn">Choose file<input type="file" accept=".StormReplay" data-file-input hidden></label></p>
+      <p class="replay-drop__note">Parsed entirely in your browser, replays are not uploaded.</p>
+    </div>
+  </div>
+</div>
+<script type="module" src="{{ get_url(path='replay/replay-ui.js', cachebust=true) }}"></script>
+{% endblock content %}

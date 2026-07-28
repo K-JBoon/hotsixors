@@ -1,0 +1,15 @@
+[submodule "submodules/heroes-images"]
+	path = submodules/heroes-images
+	url = https://github.com/HeroesToolChest/heroes-images
+[submodule "submodules/HeroesOfTheStorm_Gamedata"]
+	path = submodules/HeroesOfTheStorm_Gamedata
+	url = https://github.com/jamiephan/HeroesOfTheStorm_Gamedata
+[submodule "submodules/heroes-data2"]
+	path = submodules/heroes-data2
+	url = https://github.com/HeroesToolChest/heroes-data2
+[submodule "submodules/heroprotocol"]
+	path = submodules/heroprotocol
+	url = https://github.com/Blizzard/heroprotocol
+[submodule "submodules/HeroesOfTheStorm_S2MA"]
+	path = submodules/HeroesOfTheStorm_S2MA
+	url = https://github.com/jamiephan/HeroesOfTheStorm_S2MA
