@@ -227,7 +227,7 @@
   stroke: rgba(255, 255, 255, 0.7);
   stroke-width: 1;
 }
-   class instead. */
+/* Use the .is-off class instead. */
 .xp-svg .is-off {
   display: none;
 }
@@ -311,7 +311,7 @@
   color: var(--team-color);
   border-left: 3px solid transparent;
 }
-   down relative to the score tab's. */
+/* Keep the header row down relative to the score tab's. */
 .talent-table thead th {
   box-sizing: border-box;
   height: 26px;
@@ -325,7 +325,7 @@
 .talent-table thead .score-cell {
   padding: 0 0.5rem;
 }
-   switching tabs only swaps the columns to its right. */
+/* Sticky the hero column so switching tabs only swaps the columns to its right. */
 .talent-table thead th:first-child,
 .talent-table .hero-cell {
   position: sticky;
@@ -348,7 +348,7 @@
   align-items: center;
   gap: 0.5rem;
 }
-   leaves the hero column where it was. Vertical padding is zeroed, otherwise
+/* This leaves the hero column where it was. Vertical padding is zeroed, otherwise
    it adds onto the height the talent icon already fills. */
 .talent-table tbody tr:not(.team-row) th,
 .talent-table tbody tr:not(.team-row) td {
@@ -421,7 +421,7 @@
 .talent-hero-link:hover {
   text-decoration: underline;
 }
-   which would make talent rows taller than the score table's. */
+/* Avoid padding on the link itself, which would make talent rows taller than the score table's. */
 .talent-link {
   display: inline-block;
   vertical-align: middle;
@@ -555,7 +555,7 @@
   width: 100%;
   display: block;
 }
-   over the same width so a round sits above the moment it happened. */
+/* Stretch the track over the same width so a round sits above the moment it happened. */
 .replay-track {
   flex: 1;
   min-width: 0;
@@ -566,7 +566,7 @@
   height: calc(var(--rows) * 0.85rem);
   margin-bottom: 0.15rem;
 }
-   The button keeps its full height so it stays easy to hit, while only the
+/* The button keeps its full height so it stays easy to hit, while only the
    line and dots are painted. */
 .replay-phase {
   position: absolute;
@@ -602,7 +602,7 @@
 .replay-phase.is-moment {
   background: none;
 }
-   round's own line, which stays visible wherever nobody held it. */
+/* The round's own line stays visible wherever nobody held it. */
 .replay-phase__run {
   position: absolute;
   top: 50%;
@@ -737,7 +737,7 @@
   background: rgba(140, 160, 220, 0.18);
   border-color: rgba(140, 160, 220, 0.7);
 }
-   the row rather than another filter in it. */
+/* Make `None` look like part of the row rather than another filter in it. */
 .feed-filter--all {
   opacity: 0.75;
   border-style: dashed;
@@ -753,7 +753,7 @@
   flex: 1;
   min-width: 0;
 }
-   width; the portraits shrink instead of wrapping under the None button. */
+/* Fix the team width; the portraits shrink instead of wrapping under the None button. */
 .feed-hero-team {
   display: grid;
   grid-template-columns: repeat(var(--hero-count, 5), minmax(0, 1fr));
@@ -889,7 +889,7 @@
   opacity: 0.55;
   font-size: 0.92em;
 }
-   talent table are dropped so the map gets the height. */
+/* Keep the feed and talent table out of fullscreen so the map gets the height. */
 
 #replay-root:fullscreen {
   box-sizing: border-box;
@@ -903,7 +903,7 @@
 #replay-root:fullscreen .replay-layout {
   height: 100%;
   align-items: stretch;
-     layout would have stacked them. */
+  /* Otherwise fullscreen layout would have stacked them. */
   grid-template-columns: minmax(0, 1fr) minmax(220px, 320px);
 }
 
