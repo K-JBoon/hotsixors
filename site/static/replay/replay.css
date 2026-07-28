@@ -3,8 +3,9 @@
   margin: 0 auto;
   padding: 0 1rem;
 }
-   so feed rows and buttons line up the same way on every platform. */
+/* Keep inline SVG icons aligned with text so feed rows and controls stay tidy. */
 .rp-icon {
+  display: inline-block;
   width: 1em;
   height: 1em;
   vertical-align: -0.14em;
