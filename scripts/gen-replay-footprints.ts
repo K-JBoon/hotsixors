@@ -7,7 +7,18 @@ import { attr } from "./lib/catalog-xml.ts";
 
 type Shape = { rings: [number, number][][]; r: number };
 type FootprintDef = { parent?: string; shape?: Shape };
-type UnitDef = { parent?: string; footprint?: string; sight?: number; visionHeight?: number; speed?: number };
+type UnitDef = {
+  parent?: string;
+  footprint?: string;
+  sight?: number;
+  visionHeight?: number;
+  speed?: number;
+  weapons?: string[];
+};
+type WeaponDef = { parent?: string; range?: number };
+
+// A weapon with no <Range> of its own inherits the editor default rather than an XML value.
+const DEFAULT_WEAPON_RANGE = 5;
 
 // Unit ids the replay tracker reports as team structures.
 const STRUCTURE_ID_RE =
@@ -66,12 +77,19 @@ async function main() {
   console.log("gen-replay-footprints: starting");
   const footprints = new Map<string, FootprintDef>();
   const units = new Map<string, UnitDef>();
+  const weapons = new Map<string, WeaponDef>();
 
   const all: string[] = [];
   for await (const file of xmlFiles(GAMEDATA_DIR)) all.push(file);
 
   for (const file of scanOrder(all)) {
     const xml = await readFile(file, "utf-8");
+    for (const m of xml.matchAll(/<CWeapon\w*\b([^>]*?)(\/>|>([\s\S]*?)<\/CWeapon\w*>)/g)) {
+      const id = attr(m[1], "id");
+      if (!id || weapons.has(id)) continue;
+      const range = /<Range\s+value="([\d.]+)"/.exec(m[3] ?? "")?.[1];
+      weapons.set(id, { parent: attr(m[1], "parent") ?? undefined, range: range === undefined ? undefined : Number(range) });
+    }
     if (!xml.includes("<CFootprint") && !xml.includes("<CUnit")) continue;
     for (const m of xml.matchAll(/<CFootprint\b([^>]*?)(\/>|>([\s\S]*?)<\/CFootprint>)/g)) {
       const id = attr(m[1], "id");
@@ -88,12 +106,14 @@ async function main() {
       const sight = /<Sight\s+value="([\d.]+)"/.exec(m[3] ?? "")?.[1];
       const visionHeight = /<VisionHeight\s+value="([\d.]+)"/.exec(m[3] ?? "")?.[1];
       const speed = /<Speed\s+value="([\d.]+)"/.exec(m[3] ?? "")?.[1];
+      const weaponLinks = [...(m[3] ?? "").matchAll(/<WeaponArray\b[^>]*?\sLink="([^"]+)"/g)].map((w) => w[1]);
       units.set(id, {
         parent,
         footprint,
         sight: sight === undefined ? undefined : Number(sight),
         visionHeight: visionHeight === undefined ? undefined : Number(visionHeight),
         speed: speed === undefined ? undefined : Number(speed),
+        weapons: weaponLinks.length ? weaponLinks : undefined,
       });
     }
   }
@@ -110,17 +130,32 @@ async function main() {
     return undefined;
   };
 
+  // Longest reach of anything the unit can shoot with; drives where marching units stop to fight.
+  const attackRange = (id: string) => {
+    const links = inherited(units, id, (u) => u.weapons);
+    if (!links) return undefined;
+    let best = 0;
+    for (const link of links) {
+      if (!weapons.has(link)) continue;
+      best = Math.max(best, inherited(weapons, link, (w) => w.range) ?? DEFAULT_WEAPON_RANGE);
+    }
+    return best > 0 ? best : undefined;
+  };
+
   const shapes: Shape[] = [];
   const shapeIndex = new Map<string, number>();
   const unitToShape: Record<string, number> = {};
   const unitToSight: Record<string, number> = {};
   const unitToFlying: Record<string, true> = {};
   const unitToSpeed: Record<string, number> = {};
+  const unitToRange: Record<string, number> = {};
   let missing = 0;
   let missingSight = 0;
 
   for (const id of [...units.keys()].sort()) {
     if (/Destroyed/.test(id)) continue;
+    const range = attackRange(id);
+    if (range !== undefined) unitToRange[id] = range;
     if (!NO_SIGHT_ID_RE.test(id)) {
       const sight = inherited(units, id, (u) => u.sight);
       if (sight === undefined) missingSight++;
@@ -150,14 +185,22 @@ async function main() {
   await mkdir(path.dirname(out), { recursive: true });
   await writeFile(
     out,
-    JSON.stringify({ shapes, units: unitToShape, sight: unitToSight, flying: unitToFlying, speed: unitToSpeed }),
+    JSON.stringify({
+      shapes,
+      units: unitToShape,
+      sight: unitToSight,
+      flying: unitToFlying,
+      speed: unitToSpeed,
+      range: unitToRange,
+    }),
     "utf-8"
   );
   console.log(
     `gen-replay-footprints: ${Object.keys(unitToShape).length} unit types over ${shapes.length} shapes (${missing} without a footprint shape), ` +
       `${Object.keys(unitToSight).length} with a sight radius (${missingSight} without), ` +
       `${Object.keys(unitToFlying).length} that see over terrain, ` +
-      `${Object.keys(unitToSpeed).length} with a move speed`
+      `${Object.keys(unitToSpeed).length} with a move speed, ` +
+      `${Object.keys(unitToRange).length} with an attack range`
   );
 }
 

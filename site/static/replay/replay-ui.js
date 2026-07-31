@@ -108,7 +108,8 @@ function setupViewer(model, { draftData, shortcodeData, mapsData, footprints, ab
     if (c.moves.length) c.timeline = buildPositionTimeline(c, model.durationLoops);
     else mobileUnits.push(c);
   }
-  marchUnits(mobileUnits, unitSpeeds);
+  const unitRanges = footprints && footprints.range ? footprints.range : null;
+  marchUnits(mobileUnits, unitSpeeds, { model, ranges: unitRanges });
   nameStructures(model, lanePaths);
 
   const baseView = viewRect(model, mapMeta);
@@ -119,6 +120,7 @@ function setupViewer(model, { draftData, shortcodeData, mapsData, footprints, ab
     summons,
     mobileUnits,
     unitSpeeds,
+    unitRanges,
     draftData,
     shortcodeData,
     mapMeta,
@@ -180,7 +182,7 @@ function setupViewer(model, { draftData, shortcodeData, mapsData, footprints, ab
         }
       }
       routeUnitsThroughTerrain(state.mobileUnits, state.walkGrid);
-      marchUnits(state.mobileUnits, state.unitSpeeds);
+      marchUnits(state.mobileUnits, state.unitSpeeds, { model: state.model, ranges: state.unitRanges });
       draw();
     };
     img.src = mapMeta.vision;

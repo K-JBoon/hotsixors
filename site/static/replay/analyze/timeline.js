@@ -156,7 +156,7 @@ export function buildPositionTimeline(player, durationLoops, options = {}) {
 }
 export function minionPositionAt(m, loop) {
   if (loop < m.bornLoop || (m.diedLoop != null && loop > m.diedLoop)) return null;
-  const a = m.anchors;
+  const a = m.path || m.anchors; // `path` is the marched route; `anchors` are the logged positions
   let i = 0;
   while (i + 1 < a.length && a[i + 1].loop <= loop) i++;
   const from = a[i];

@@ -2,6 +2,16 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
+// Pages hand most of their markup to macros, so an assertion about what a page renders has to see
+// the macros it imports too. Returns the template followed by every macro file it pulls in.
+function renderedBy(templatePath: string, seen = new Set<string>()): string {
+  if (seen.has(templatePath)) return "";
+  seen.add(templatePath);
+  const source = readFileSync(new URL(`../site/templates/${templatePath}`, import.meta.url), "utf-8");
+  const imports = [...source.matchAll(/\{%-?\s*import\s+"([^"]+)"/g)].map((m) => m[1]);
+  return [source, ...imports.map((path) => renderedBy(path, seen))].join("\n");
+}
+
 test("base navigation exposes the approved player-first IA", () => {
   const template = readFileSync(new URL("../site/templates/base.html", import.meta.url), "utf-8");
 
@@ -50,7 +60,7 @@ test("base navigation exposes persisted datamining toggle", () => {
 });
 
 test("datamining details are tagged in data-heavy templates", () => {
-  const heroTemplate = readFileSync(new URL("../site/templates/heroes/single.html", import.meta.url), "utf-8");
+  const heroTemplate = renderedBy("heroes/single.html");
   const battlegroundTemplate = readFileSync(new URL("../site/templates/battlegrounds/single.html", import.meta.url), "utf-8");
   const statusEffectsTemplate = readFileSync(new URL("../site/templates/status-effects.html", import.meta.url), "utf-8");
   const aboutTemplate = readFileSync(new URL("../site/templates/about.html", import.meta.url), "utf-8");
@@ -108,9 +118,9 @@ test("fonts are vendored and loaded without blocking first render", () => {
 
 test("site images are routed through Zola resize_image", () => {
   const macro = readFileSync(new URL("../site/templates/macros/images.html", import.meta.url), "utf-8");
-  const homeTemplate = readFileSync(new URL("../site/templates/index.html", import.meta.url), "utf-8");
-  const heroListTemplate = readFileSync(new URL("../site/templates/heroes/list.html", import.meta.url), "utf-8");
-  const heroTemplate = readFileSync(new URL("../site/templates/heroes/single.html", import.meta.url), "utf-8");
+  const homeTemplate = renderedBy("index.html");
+  const heroListTemplate = renderedBy("heroes/list.html");
+  const heroTemplate = renderedBy("heroes/single.html");
   const effectIndexTemplate = readFileSync(new URL("../site/templates/effect-index.html", import.meta.url), "utf-8");
   const abilityShortcode = readFileSync(new URL("../site/templates/shortcodes/ability.html", import.meta.url), "utf-8");
 
@@ -244,9 +254,9 @@ test("hero banner loading images cap width and crop from the left", () => {
 });
 
 test("hero and battleground lists expose typeahead select search hooks without search bars", () => {
-  const heroTemplate = readFileSync(new URL("../site/templates/heroes/list.html", import.meta.url), "utf-8");
-  const homeTemplate = readFileSync(new URL("../site/templates/index.html", import.meta.url), "utf-8");
-  const battlegroundTemplate = readFileSync(new URL("../site/templates/battlegrounds/list.html", import.meta.url), "utf-8");
+  const heroTemplate = renderedBy("heroes/list.html");
+  const homeTemplate = renderedBy("index.html");
+  const battlegroundTemplate = renderedBy("battlegrounds/list.html");
   const styles = readFileSync(new URL("../site/sass/main.scss", import.meta.url), "utf-8");
 
   assert.match(heroTemplate, /data-select-search/);
