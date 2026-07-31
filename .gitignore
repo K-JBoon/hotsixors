@@ -30,6 +30,5 @@ site/static/draft/draft-data.json
 site/static/replay/footprints.json
 site/static/replay/summons.json
 site/static/replay/abillinks/
-data/replay-abillinks/
 site/static/replay/protocols/
 site/static/replay/movement-abilities.json
