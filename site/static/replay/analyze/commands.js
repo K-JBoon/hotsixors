@@ -28,6 +28,7 @@ export function runGamePass(data, protocol, model, reg) {
     ownerAtLoop: ownerAtLoopOf(reg),
     lastKey: new Map(), // userId -> {key, loop}
     selections: new Map(), // userId -> {units, groups}
+    zoom: new Map(), // userId -> camera distance, only sent when the player zooms
   };
 
   for (const ev of decodeGameEvents(data, protocol)) {
@@ -40,7 +41,8 @@ export function runGamePass(data, protocol, model, reg) {
 }
 
 const HANDLERS = {
-  'NNet.Game.SCameraUpdateEvent': (ctx, ev, p) => {
+  'NNet.Game.SCameraUpdateEvent': (ctx, ev, p, uid) => {
+    if (ev.m_distance != null) ctx.zoom.set(uid, ev.m_distance / CAMERA_FIXED);
     if (!ev.m_target) return;
     const cam = (p.camera ||= []);
     const last = cam[cam.length - 1];
@@ -49,6 +51,7 @@ const HANDLERS = {
       loop: ev._gameloop,
       x: ev.m_target.x / CAMERA_FIXED,
       y: ev.m_target.y / CAMERA_FIXED,
+      d: ctx.zoom.get(uid),
     });
   },
   'NNet.Game.STriggerKeyPressedEvent': (ctx, ev, p, uid) => {

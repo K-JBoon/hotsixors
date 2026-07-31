@@ -57,6 +57,7 @@ const ICON_PATHS = {
   target:
     '<path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm0 1.8a5.2 5.2 0 1 1 0 10.4 5.2 5.2 0 0 1 0-10.4zm0 1.9a3.3 3.3 0 1 0 0 6.6 3.3 3.3 0 0 0 0-6.6zm0 1.9a1.4 1.4 0 1 1 0 2.8 1.4 1.4 0 0 1 0-2.8z"/>',
   levelUp: '<path d="M8 1.8 14 8h-3.4v6.2H5.4V8H2z"/>',
+  gear: '<path d="M6.6 1h2.8l.3 1.9 1.2.7 1.8-.8 1.4 2.4-1.5 1.2v1.2l1.5 1.2-1.4 2.4-1.8-.8-1.2.7-.3 1.9H6.6l-.3-1.9-1.2-.7-1.8.8-1.4-2.4 1.5-1.2V6.4L1.9 5.2l1.4-2.4 1.8.8 1.2-.7zM8 5.7a2.3 2.3 0 1 0 0 4.6 2.3 2.3 0 0 0 0-4.6z"/>',
 };
 export function icon(name, cls) {
   return `<svg class="rp-icon${cls ? ` ${cls}` : ''}" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">${

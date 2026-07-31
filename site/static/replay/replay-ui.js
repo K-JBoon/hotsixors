@@ -138,6 +138,7 @@ function setupViewer(model, { draftData, shortcodeData, mapsData, footprints, ab
     trails: true,
     minions: true,
     objectives: true,
+    camera: true, // only drawn for the selected hero
     selected: null, // playerId
     feedKinds: new Set(FEED_KINDS.filter((k) => !k.off).map((k) => k.id)),
     feedHeroes: new Set(players.map((p) => p.playerId)),
@@ -233,6 +234,23 @@ function renderShell() {
           <canvas class="replay-canvas" data-canvas width="${BASE_CANVAS_WIDTH}" height="${Math.round(
             BASE_CANVAS_WIDTH * canvasAspect()
           )}"></canvas>
+          <div class="replay-settings" data-settings-panel hidden role="dialog" aria-label="View settings">
+            <div class="replay-settings__group">
+              <div class="replay-settings__legend">Layers</div>
+              <label class="rp-switch"><input type="checkbox" data-trails checked><span class="rp-switch__track"></span>Trails</label>
+              <label class="rp-switch"><input type="checkbox" data-minions checked><span class="rp-switch__track"></span>Minions &amp; mercs</label>
+              <label class="rp-switch"><input type="checkbox" data-objectives checked><span class="rp-switch__track"></span>Objectives</label>
+              <label class="rp-switch"><input type="checkbox" data-camera checked><span class="rp-switch__track"></span>Camera of selected hero</label>
+            </div>
+            <div class="replay-settings__group">
+              <div class="replay-settings__legend">Fog of war</div>
+              <div class="rp-segmented">
+                <label><input type="radio" name="vision" value="" checked data-vision><span>Off</span></label>
+                <label style="--seg-color:${TEAM_COLORS[0]}"><input type="radio" name="vision" value="0" data-vision><span>Blue</span></label>
+                <label style="--seg-color:${TEAM_COLORS[1]}"><input type="radio" name="vision" value="1" data-vision><span>Red</span></label>
+              </div>
+            </div>
+          </div>
         </div>
         <div class="replay-controls">
           <button data-play title="Play/Pause" aria-label="Play">${icon('play')}</button>
@@ -249,20 +267,17 @@ function renderShell() {
             <option value="16">16×</option>
           </select>
           <button data-reset-view title="Reset zoom (r)" hidden>Reset view</button>
+          <button data-settings title="View settings" aria-label="View settings" aria-expanded="false">${icon('gear')}</button>
           <button data-fullscreen title="Full screen (f)" aria-label="Full screen">${icon('expand')}</button>
         </div>
-        <div class="replay-toggles">
-          <label><input type="checkbox" data-trails checked> Trails</label>
-          <label><input type="checkbox" data-minions checked> Minions &amp; mercs</label>
-          <label><input type="checkbox" data-objectives checked> Objectives</label>
-          <label><input type="radio" name="vision" value="" checked data-vision> Fog of War disabled</label>
-          <label><input type="radio" name="vision" value="0" data-vision> <span style="color:${TEAM_COLORS[0]}">Blue vision</span></label>
-          <label><input type="radio" name="vision" value="1" data-vision> <span style="color:${TEAM_COLORS[1]}">Red vision</span></label>
-        </div>
-        <p class="replay-note">Unit positions are only logged occasionally in replays, so the visualizations here are estimated from position events, input commands, camera movement, the map terrain, etc.</p>
-        <p class="replay-note">Vision is approximated by ray-casting each unit's sight radius against the map's vision-blocking terrain and brush.</p>
-		<p class="replay-note">Abilities in the event log are shown when players push the ability's button. The ability may not actually have fired (e.g. on cooldown, no mana, silenced, etc.).</p>
-		<p class="replay-note">Click on a hero's portrait to see their detailed ability log.</p>
+        <details class="replay-notes">
+          <summary>About this view</summary>
+          <p class="replay-note">Unit positions are only logged occasionally in replays, so the visualizations here are estimated from position events, input commands, camera movement, the map terrain, etc.</p>
+          <p class="replay-note">Vision is approximated by ray-casting each unit's sight radius against the map's vision-blocking terrain and brush.</p>
+          <p class="replay-note">Abilities in the event log are shown when players push the ability's button. The ability may not actually have fired (e.g. on cooldown, no mana, silenced, etc.).</p>
+          <p class="replay-note">The camera outline shows the ground the selected player had on screen. Replays log where the camera pointed, not the screen shape, so the outline assumes a 16:9 screen at the game's default field of view.</p>
+          <p class="replay-note">Click on a hero's portrait to see their detailed ability log.</p>
+        </details>
         <div class="replay-panel" data-panel></div>
       </div>
       <div class="replay-feed-pane">
@@ -340,6 +355,10 @@ function renderShell() {
     state.objectives = e.target.checked;
     draw();
   });
+  root.querySelector('[data-camera]').addEventListener('change', (e) => {
+    state.camera = e.target.checked;
+    draw();
+  });
   for (const radio of root.querySelectorAll('[data-vision]')) {
     radio.addEventListener('change', (e) => {
       state.visionTeam = e.target.value === '' ? null : Number(e.target.value);
@@ -358,6 +377,7 @@ function renderShell() {
     state.feedQuery = e.target.value;
     renderFeed();
   });
+  wireSettingsPanel();
   root.querySelector('[data-fullscreen]').addEventListener('click', toggleFullscreen);
   root.querySelector('[data-reset-view]').addEventListener('click', resetView);
   canvas.addEventListener('click', onCanvasClick);
@@ -366,6 +386,30 @@ function renderShell() {
   canvas.addEventListener('pointermove', onCanvasPointerMove);
   canvas.addEventListener('pointerup', onCanvasPointerUp);
   canvas.addEventListener('pointercancel', onCanvasPointerUp);
+}
+
+/* The panel lives inside the canvas box so it stays reachable in fullscreen,
+   where the rest of the map pane is hidden. */
+function wireSettingsPanel() {
+  const btn = root.querySelector('[data-settings]');
+  const panel = root.querySelector('[data-settings-panel]');
+  const setOpen = (open) => {
+    panel.hidden = !open;
+    btn.setAttribute('aria-expanded', String(open));
+    btn.classList.toggle('is-on', open);
+  };
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    setOpen(panel.hidden);
+  });
+  panel.addEventListener('click', (e) => e.stopPropagation());
+  // renderShell can run again for a new replay; those listeners hold a detached panel.
+  document.addEventListener('click', () => {
+    if (panel.isConnected) setOpen(false);
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && panel.isConnected && !panel.hidden) setOpen(false);
+  });
 }
 
 function onCanvasClick(e) {

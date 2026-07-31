@@ -497,17 +497,155 @@
 }
 
 .replay-canvas-box {
+  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 0;
 }
 
-.replay-controls {
+.replay-settings {
+  position: absolute;
+  right: 0.6rem;
+  bottom: 0.6rem;
+  z-index: 3;
+  display: grid;
+  gap: 0.9rem;
+  min-width: 13rem;
+  padding: 0.8rem 0.9rem;
+  border: 1px solid rgba(140, 160, 220, 0.35);
+  border-radius: 10px;
+  background: rgba(12, 14, 22, 0.94);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  font-size: 0.82rem;
+}
+
+.replay-settings[hidden] {
+  display: none;
+}
+
+.replay-settings__legend {
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.55;
+  margin-bottom: 0.45rem;
+}
+
+.rp-switch {
   display: flex;
   align-items: center;
+  gap: 0.5rem;
+  padding: 0.15rem 0;
+  cursor: pointer;
+}
+
+.rp-switch input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.rp-switch__track {
+  box-sizing: border-box;
+  flex: none;
+  display: flex;
+  align-items: center;
+  width: 1.8rem;
+  height: 1rem;
+  padding: 0 0.12rem;
+  border-radius: 1rem;
+  background: rgba(140, 160, 220, 0.22);
+  border: 1px solid rgba(140, 160, 220, 0.35);
+  transition: background 0.12s ease;
+}
+
+.rp-switch__track::after {
+  content: '';
+  width: 0.68rem;
+  height: 0.68rem;
+  border-radius: 50%;
+  background: rgba(220, 230, 255, 0.8);
+  transition: transform 0.12s ease;
+}
+
+.rp-switch input:checked + .rp-switch__track {
+  background: rgba(90, 150, 255, 0.75);
+  border-color: rgba(90, 150, 255, 0.9);
+}
+
+.rp-switch input:checked + .rp-switch__track::after {
+  transform: translateX(0.82rem);
+  background: #fff;
+}
+
+.rp-switch input:focus-visible + .rp-switch__track {
+  outline: 2px solid rgba(140, 180, 255, 0.8);
+  outline-offset: 2px;
+}
+
+.rp-segmented {
+  display: flex;
+  border: 1px solid rgba(140, 160, 220, 0.35);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.rp-segmented label {
+  flex: 1;
+  text-align: center;
+  padding: 0.28rem 0.2rem;
+  cursor: pointer;
+  color: var(--seg-color, inherit);
+  border-left: 1px solid rgba(140, 160, 220, 0.25);
+}
+
+.rp-segmented label:first-child {
+  border-left: 0;
+}
+
+.rp-segmented input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.rp-segmented label:hover {
+  background: rgba(140, 160, 220, 0.12);
+}
+
+.rp-segmented input:checked + span {
+  font-weight: 600;
+}
+
+.rp-segmented label:has(input:checked) {
+  background: color-mix(in srgb, var(--seg-color, #8ca0dc) 28%, transparent);
+}
+
+.rp-segmented label:has(input:focus-visible) {
+  outline: 2px solid rgba(140, 180, 255, 0.8);
+  outline-offset: -2px;
+}
+
+.replay-controls {
+  display: flex;
+  align-items: end;
   gap: 0.6rem;
   margin-top: 0.5rem;
+  --control-h: 2.4rem;
+}
+
+.replay-controls > :not(.replay-track) {
+  box-sizing: border-box;
+  height: var(--control-h);
+}
+
+.replay-controls > button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .replay-controls [data-play] {
@@ -554,6 +692,8 @@
 .replay-controls input[type='range'] {
   width: 100%;
   display: block;
+  height: var(--control-h);
+  margin: 0;
 }
 /* Stretch the track over the same width so a round sits above the moment it happened. */
 .replay-track {
@@ -647,7 +787,9 @@
 .replay-time {
   font-variant-numeric: tabular-nums;
   min-width: 3.5rem;
-  text-align: right;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
 }
 
 .replay-controls select {
@@ -658,13 +800,41 @@
   padding: 0.2rem 0.4rem;
 }
 
-.replay-toggles {
+.replay-controls [data-settings] {
   display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  font-size: 0.85rem;
-  margin-top: 0.4rem;
-  opacity: 0.9;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(140, 160, 220, 0.4);
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0.3rem 0.5rem;
+}
+
+.replay-controls [data-settings] .rp-icon {
+  vertical-align: 0;
+}
+
+.replay-controls [data-settings].is-on {
+  background: rgba(140, 160, 220, 0.2);
+  border-color: rgba(140, 180, 255, 0.7);
+}
+
+.replay-notes {
+  margin-top: 0.6rem;
+  font-size: 0.8rem;
+}
+
+.replay-notes > summary {
+  cursor: pointer;
+  opacity: 0.6;
+  width: fit-content;
+}
+
+.replay-notes > summary:hover {
+  opacity: 0.85;
 }
 
 .replay-note {
@@ -923,7 +1093,7 @@
 }
 
 #replay-root:fullscreen .replay-summary,
-#replay-root:fullscreen .replay-note,
+#replay-root:fullscreen .replay-notes,
 #replay-root:fullscreen .replay-panel {
   display: none;
 }

@@ -1,6 +1,7 @@
 
 import { isAliveAt, isDeadAt, LOOPS_PER_SECOND, minionPositionAt, objectiveOwnerAt, objectivePositionAt } from '../analyze.js';
 import { brushPatchAt, castVisibility, pointInShapes } from '../vision.js';
+import { cameraAt, cameraQuad } from './camera.js';
 import { drawDeathCross, drawIcon, iconImages } from './icons.js';
 import { updateXpCursor } from './panel.js';
 import { HERO_SIGHT, MERC_RE, SIGHT_OVERRIDES, SIGHT_WHEN_DEPLOYED, WISP_BRUSH_VISION, WISP_BRUSH_VISION_SENTINEL, WISP_FLYING_TALENT, WISP_UNIT } from './sight.js';
@@ -162,6 +163,29 @@ function drawCompanions(loop) {
     });
   }
 }
+/* What the player had on screen: the ground the game camera covered. */
+function drawCameraBox(loop, p) {
+  if (!p) return;
+  const cam = cameraAt(p, loop);
+  if (!cam) return;
+  const { ctx } = state;
+  const quad = cameraQuad(cam.x, cam.y, cam.d);
+  ctx.save();
+  ctx.beginPath();
+  quad.forEach(([wx, wy], i) => {
+    const [x, y] = worldToCanvas(wx, wy);
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  });
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(255,255,255,0.07)';
+  ctx.fill();
+  ctx.strokeStyle = TEAM_COLORS[p.team] + 'cc';
+  ctx.lineWidth = 1.5;
+  ctx.setLineDash([6, 4]);
+  ctx.stroke();
+  ctx.restore();
+}
 function drawVisionUnits(loop) {
   const { ctx, model } = state;
   const scale = iconScale();
@@ -206,6 +230,7 @@ export function draw() {
     if (el) el.textContent = `Level ${teamLevelAt(ti, loop)}`;
   }
   if (state.visionTeam != null) drawVision(loop, state.visionTeam);
+  if (state.camera && state.selected) drawCameraBox(loop, state.playersById.get(state.selected));
   if (state.minions) drawMinions(loop);
   if (state.trails) {
     for (const p of model.players) {
