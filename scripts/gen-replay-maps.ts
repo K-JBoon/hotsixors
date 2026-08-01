@@ -5,6 +5,7 @@
 // in maps.json carrying the map rect, camera bounds, lane waypoints and the
 // regions each team permanently sees.
 
+import { createHash } from "node:crypto";
 import { mkdirSync, readFileSync, writeFileSync, readdirSync, unlinkSync } from "node:fs";
 import { join } from "node:path";
 import zlib from "node:zlib";
@@ -17,6 +18,7 @@ import {
   brushMask,
   lanePaths,
   loadBaseDoodadActors,
+  localizedMapNames,
   parseMapInfo,
   readMember,
   type BaseRegions,
@@ -30,6 +32,8 @@ interface MapEntry {
   slug: string;
   image: string;
   vision: string;
+  hash: string; // sha256, matching the replay's s2ma cache handles
+  names: string[]; // DocInfo/Name per locale
   mapWidth: number;
   mapHeight: number;
   camera: CameraBounds | null;
@@ -179,7 +183,8 @@ async function main(): Promise<void> {
     const name = file.replace(/\.stormmap$/, "");
     const slug = slugify(name);
     try {
-      const { archive, info, grids } = openMap(readFileSync(join(S2MA_MAPS_DIR, file)), baseActors);
+      const buf = readFileSync(join(S2MA_MAPS_DIR, file));
+      const { archive, info, grids } = openMap(buf, baseActors);
       const image = renderSchematic(grids);
       writeFileSync(join(OUT_DIR, `${slug}.png`), encodePng(image));
       writeFileSync(join(OUT_DIR, `${slug}.vision.png`), encodePng(renderVisionMask(grids)));
@@ -188,6 +193,8 @@ async function main(): Promise<void> {
         slug,
         image: `/replay/maps/${slug}.png`,
         vision: `/replay/maps/${slug}.vision.png`,
+        hash: createHash("sha256").update(buf).digest("hex"),
+        names: localizedMapNames(archive),
         // image pixel for world (x,y): px = x*2, py = (mapHeight-y)*2
         mapWidth: info.width,
         mapHeight: info.height,

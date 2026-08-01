@@ -42,9 +42,20 @@ function newPlayers(details) {
   }));
 }
 
+// Each handle is a 4-byte type, a 4-byte region, then the file's sha256.
+function cacheHashes(details) {
+  const hex = [];
+  for (const handle of details.m_cacheHandles || []) {
+    if (!(handle instanceof Uint8Array) || handle.length < 40) continue;
+    hex.push(Array.from(handle.subarray(8, 40), (b) => b.toString(16).padStart(2, '0')).join(''));
+  }
+  return hex;
+}
+
 function newModel(details, header, baseBuild, players) {
   return {
     map: str(details.m_title),
+    mapHashes: cacheHashes(details),
     durationLoops: header.m_elapsedGameLoops,
     build: header.m_version ? header.m_version.m_build : null,
     baseBuild,

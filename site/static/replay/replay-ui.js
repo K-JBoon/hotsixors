@@ -20,15 +20,16 @@ import { nameStructures, structureStyle } from './ui/structures.js';
 import { canvasAspect, onCanvasPointerDown, onCanvasPointerMove, onCanvasPointerUp, onCanvasWheel, resetView, toggleFullscreen } from './ui/viewport.js';
 
 async function loadStaticData() {
-  const [draftData, shortcodeData, mapsData, footprints, movementAbilities, summons] = await Promise.all([
+  const [draftData, shortcodeData, mapsData, footprints, movementAbilities, heroUnits, summons] = await Promise.all([
     fetch('/draft/draft-data.json').then((r) => r.json()),
     fetch('/shortcode-data.json').then((r) => r.json()),
     fetchJson('/replay/maps.json', {}),
     fetchJson('/replay/footprints.json', { shapes: [], units: {} }),
     fetchJson('/replay/movement-abilities.json', {}),
+    fetchJson('/replay/hero-units.json', {}),
     loadSummons(),
   ]);
-  return { draftData, shortcodeData, mapsData, footprints, movementAbilities, summons };
+  return { draftData, shortcodeData, mapsData, footprints, movementAbilities, heroUnits, summons };
 }
 async function loadAbilLinkIndex(build) {
   const index = await fetchJson('/replay/abillinks/index.json', null);
@@ -37,6 +38,23 @@ async function loadAbilLinkIndex(build) {
   const pick = older.length ? older[older.length - 1] : index.builds[0];
   return fetchJson(`/replay/abillinks/${pick}.json`, {});
 }
+// A replay names its map in the recorder's language, so fall back to the map's
+// content hash and then to its other localized names.
+function findMap(mapsData, model) {
+  if (!mapsData) return null;
+  const hashes = new Set(model.mapHashes || []);
+  for (const entry of Object.values(mapsData)) {
+    if (entry.hash && hashes.has(entry.hash)) return entry;
+  }
+  if (mapsData[model.map]) return mapsData[model.map];
+  const want = normalizeName(model.map || '');
+  if (!want) return null;
+  for (const entry of Object.values(mapsData)) {
+    if ((entry.names || []).some((n) => normalizeName(n) === want)) return entry;
+  }
+  return null;
+}
+
 function viewRect(model, mapMeta) {
   if (mapMeta) {
     const c = mapMeta.camera || { left: 0, bottom: 0, right: mapMeta.mapWidth, top: mapMeta.mapHeight };
@@ -64,13 +82,14 @@ async function handleFile(file) {
 }
 
 
-function setupViewer(model, { draftData, shortcodeData, mapsData, footprints, abilLinkIndex, movementAbilities, summons }) {
+function setupViewer(model, { draftData, shortcodeData, mapsData, footprints, abilLinkIndex, movementAbilities, heroUnits, summons }) {
   const players = model.players;
   const movementLinks = movementLinkSet(abilLinkIndex, movementAbilities);
   const hearthLinks = hearthLinkSet(abilLinkIndex);
   const playersById = new Map(players.map((p) => [p.playerId, p]));
   for (const p of players) {
-    p.meta = heroMeta(draftData, p.hero);
+    p.meta = heroMeta(draftData, p.hero, heroUnits, p.unitType);
+    if (p.meta) p.hero = p.meta.name; // the replay's name is in the recorder's language
     p.timeline = buildPositionTimeline(p, model.durationLoops, {
       movementLinks,
       hearthLinks,
@@ -87,7 +106,7 @@ function setupViewer(model, { draftData, shortcodeData, mapsData, footprints, ab
     }
   }
 
-  const mapMeta = (mapsData && mapsData[model.map]) || null;
+  const mapMeta = findMap(mapsData, model);
   for (const s of model.structures) {
     const index = footprints && footprints.units ? footprints.units[s.type] : undefined;
     s.shape = index === undefined ? null : footprints.shapes[index];

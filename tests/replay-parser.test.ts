@@ -281,6 +281,7 @@ test("the objective band never overlaps two rounds on one row", () => {
 });
 
 const MAPS_JSON = new URL("../site/static/replay/maps.json", import.meta.url).pathname;
+const HERO_UNITS_JSON = new URL("../site/static/replay/hero-units.json", import.meta.url).pathname;
 
 test("extracted minimap metadata is coherent", { skip: !existsSync(MAPS_JSON) }, async () => {
   const maps = JSON.parse(readFileSync(MAPS_JSON, "utf8"));
@@ -292,6 +293,34 @@ test("extracted minimap metadata is coherent", { skip: !existsSync(MAPS_JSON) },
     if (m.camera) {
       assert.ok(m.camera.left < m.camera.right && m.camera.right <= m.mapWidth, name);
       assert.ok(m.camera.bottom < m.camera.top && m.camera.top <= m.mapHeight, name);
+    }
+    assert.match(m.hash, /^[0-9a-f]{64}$/, `${name}: no content hash`);
+    assert.ok(m.names.length > 0, `${name}: no localized names`);
+  }
+});
+
+test("maps and heroes are identifiable from a localized replay", { skip: !existsSync(MAPS_JSON) || !existsSync(HERO_UNITS_JSON) }, async () => {
+  const maps = JSON.parse(readFileSync(MAPS_JSON, "utf8"));
+  // A replay records the map and hero names in the recorder's language, so
+  // neither can be matched by the name alone.
+  const braxis = maps["Braxis Holdout"];
+  assert.ok(braxis.names.includes("Le laboratoire de Braxis"), "missing the French name");
+
+  const heroUnits = JSON.parse(readFileSync(HERO_UNITS_JSON, "utf8"));
+  assert.equal(heroUnits.HeroWhitemane, "Whitemane");
+  // Unit types are codenames, not names, and multi-body heroes spawn as one of
+  // their bodies rather than as the unit the hero is filed under.
+  assert.equal(heroUnits.HeroAmazon, "Cassia");
+  assert.equal(heroUnits.HeroOlaf, "LostVikings");
+  assert.equal(heroUnits.HeroDVaPilot, "DVa");
+});
+
+test("every hero a replay reports resolves to a known hero", { skip: !haveReplays || !existsSync(HERO_UNITS_JSON) }, async () => {
+  const heroUnits = JSON.parse(readFileSync(HERO_UNITS_JSON, "utf8"));
+  for (const file of replayFiles) {
+    const model = await analyzeReplay(loadArchive(file));
+    for (const p of model.players) {
+      assert.ok(heroUnits[p.unitType], `${p.hero}: no hero for unit type ${p.unitType}`);
     }
   }
 });

@@ -13,7 +13,14 @@ const ABILITY_ID_ALIASES = {
 export const normalizeName = (s) =>
   s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]/g, '');
 
-export function heroMeta(draftData, heroName) {
+// The unit type is the only hero identity a replay does not localize, so it
+// decides; the name is the fallback for units missing from the table.
+export function heroMeta(draftData, heroName, heroUnits, unitType) {
+  const id = heroUnits && unitType ? heroUnits[unitType] : null;
+  if (id) {
+    const byId = draftData.heroes.find((h) => h.id === id);
+    if (byId) return byId;
+  }
   const want = normalizeName(heroName);
   return draftData.heroes.find((h) => normalizeName(h.name) === want) || null;
 }

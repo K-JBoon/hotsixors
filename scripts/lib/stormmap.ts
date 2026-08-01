@@ -47,6 +47,30 @@ function readText(archive: MPQArchive, name: string): string | null {
 const attr = (source: string, name: string) =>
   new RegExp(`\\b${name}="([^"]*)"`).exec(source)?.[1];
 
+// ------------------------------------------------------------ map titles
+
+const LOCALES = [
+  "enUS", "deDE", "esES", "esMX", "frFR", "itIT",
+  "koKR", "plPL", "ptBR", "ruRU", "zhCN", "zhTW",
+];
+
+/** Every localized DocInfo/Name for a map, English first, deduplicated. */
+export function localizedMapNames(archive: MPQArchive): string[] {
+  const names: string[] = [];
+  for (const locale of LOCALES) {
+    const text = readText(archive, `${locale}.StormData\\LocalizedData\\GameStrings.txt`);
+    if (!text) continue;
+    for (const line of text.split(/\r?\n/)) {
+      const stripped = line.replace(/^﻿/, "");
+      if (!stripped.startsWith("DocInfo/Name=")) continue;
+      const name = stripped.slice("DocInfo/Name=".length).trim();
+      if (name && !names.includes(name)) names.push(name);
+      break;
+    }
+  }
+  return names;
+}
+
 // ---------------------------------------------------------------- MapInfo
 
 export function parseMapInfo(data: Uint8Array): MapInfo {
