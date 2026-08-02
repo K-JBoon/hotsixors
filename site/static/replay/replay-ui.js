@@ -13,11 +13,25 @@ import { buildBaseMasks, draw, iconScale, positionAt, worldToCanvas } from './ui
 import { buildFeed, FEED_KINDS, objectiveBandHtml, renderFeed, syncFeed } from './ui/feed.js';
 import { escapeHtml } from './ui/html.js';
 import { icon } from './ui/icons.js';
+import {
+  addEntry,
+  buildCard,
+  findEntry,
+  library,
+  libraryHtml,
+  removeEntry,
+} from './ui/library.js';
 import { buildPanel } from './ui/panel.js';
 import { selectPlayer, seekTo, tick, togglePlay, updatePlayButton, wireFilterRow } from './ui/playback.js';
-import { BASE_CANVAS_WIDTH, dropZone, fileInput, root, setState, state, TEAM_COLORS } from './ui/state.js';
+import { BASE_CANVAS_WIDTH, dropStatus, dropZone, fileInput, root, setState, state, TEAM_COLORS } from './ui/state.js';
 import { nameStructures, structureStyle } from './ui/structures.js';
-import { canvasAspect, onCanvasPointerDown, onCanvasPointerMove, onCanvasPointerUp, onCanvasWheel, resetView, toggleFullscreen } from './ui/viewport.js';
+import { canvasAspect, fitCanvas, onCanvasPointerDown, onCanvasPointerMove, onCanvasPointerUp, onCanvasWheel, resetView, toggleFullscreen } from './ui/viewport.js';
+
+let staticDataPromise = null;
+function staticData() {
+  if (!staticDataPromise) staticDataPromise = loadStaticData();
+  return staticDataPromise;
+}
 
 async function loadStaticData() {
   const [draftData, shortcodeData, mapsData, footprints, movementAbilities, heroUnits, summons] = await Promise.all([
@@ -31,7 +45,12 @@ async function loadStaticData() {
   ]);
   return { draftData, shortcodeData, mapsData, footprints, movementAbilities, heroUnits, summons };
 }
-async function loadAbilLinkIndex(build) {
+const abilLinkCache = new Map();
+function loadAbilLinkIndex(build) {
+  if (!abilLinkCache.has(build)) abilLinkCache.set(build, fetchAbilLinkIndex(build));
+  return abilLinkCache.get(build);
+}
+async function fetchAbilLinkIndex(build) {
   const index = await fetchJson('/replay/abillinks/index.json', null);
   if (!index || !index.builds.length) return {};
   const older = index.builds.filter((b) => b <= build);
@@ -63,29 +82,96 @@ function viewRect(model, mapMeta) {
   return { minX: model.bounds.minX, minY: model.bounds.minY, maxX: model.bounds.maxX, maxY: model.bounds.maxY };
 }
 
-async function handleFile(file) {
-  root.dataset.state = 'loading';
-  if (!dropZone.isConnected) {
-    root.replaceChildren(dropZone);
-  }
-  dropZone.innerHTML = `<p>Parsing ${file.name}…</p>`;
-  try {
-    const [data, buffer] = await Promise.all([loadStaticData(), file.arrayBuffer()]);
-    const model = await analyzeReplay(new MPQArchive(buffer));
-    const abilLinkIndex = await loadAbilLinkIndex(model.baseBuild ?? model.build ?? 0);
-    setupViewer(model, { ...data, abilLinkIndex });
-  } catch (err) {
-    console.error(err);
-    root.dataset.state = 'error';
-    dropZone.innerHTML = `<p><strong>Could not parse this replay.</strong></p>
-      <p class="replay-drop__note">${escapeHtml(String(err && err.message || err))}</p>
-      <p><button class="replay-file-btn" data-retry>Try another file</button></p>`;
-    dropZone.querySelector('[data-retry]').addEventListener('click', () => location.reload());
+async function handleFiles(files) {
+  const all = Array.from(files || []);
+  const replays = all.filter((f) => f.name.toLowerCase().endsWith('.stormreplay'));
+  const list = replays.length ? replays : all;
+  if (!list.length) return;
+  for (const entry of library.entries.filter((e) => e.status === 'error')) removeEntry(entry.id);
+  const pending = list.map((file) => ({ file, entry: addEntry(file.name) }));
+  refreshLibrary();
+  for (const { file, entry } of pending) {
+    try {
+      const [data, buffer] = await Promise.all([staticData(), file.arrayBuffer()]);
+      const model = await analyzeReplay(new MPQArchive(buffer));
+      const abilLinkIndex = await loadAbilLinkIndex(model.baseBuild ?? model.build ?? 0);
+      if (!findEntry(entry.id)) continue; // removed while it was parsing
+      entry.viewer = buildViewer(model, { ...data, abilLinkIndex });
+      entry.card = buildCard(model, entry.viewer.mapMeta, data.draftData);
+      entry.status = 'ready';
+    } catch (err) {
+      console.error(err);
+      entry.status = 'error';
+      entry.error = String((err && err.message) || err);
+    }
+    if (library.activeId === null && entry.status === 'ready') activate(entry.id);
+    else refreshLibrary();
   }
 }
 
+/* The library only has a place to live once a viewer is on screen; before that,
+   progress and failures go in the drop zone. */
+function refreshLibrary() {
+  if (library.activeId !== null) {
+    const host = root.querySelector('[data-library]');
+    if (host) host.outerHTML = libraryHtml();
+    wireLibrary();
+    return;
+  }
+  const lines = library.entries.map((e) =>
+    e.status === 'error'
+      ? `<p class="replay-drop__note"><strong>Could not parse ${escapeHtml(e.fileName)}.</strong> ${escapeHtml(
+          e.error
+        )}</p>`
+      : `<p>Parsing ${escapeHtml(e.fileName)}…</p>`
+  );
+  const failed = library.entries.some((e) => e.status === 'error');
+  root.dataset.state = failed ? 'error' : library.entries.length ? 'loading' : 'idle';
+  dropStatus.innerHTML = lines.join('');
+  dropStatus.hidden = !lines.length;
+}
 
-function setupViewer(model, { draftData, shortcodeData, mapsData, footprints, abilLinkIndex, movementAbilities, heroUnits, summons }) {
+function resetToIdle() {
+  setState(null);
+  library.activeId = null;
+  root.replaceChildren(dropZone);
+  refreshLibrary();
+}
+
+function activate(id) {
+  const entry = findEntry(id);
+  if (!entry || entry.status !== 'ready') return;
+  library.activeId = id;
+  setState(entry.viewer);
+  renderShell();
+  buildPanel();
+  buildFeed();
+  fitCanvas(); // also draws, and keeps the canvas sized when switching in fullscreen
+  startClock();
+}
+
+function removeReplay(id) {
+  const wasActive = library.activeId === id;
+  const index = removeEntry(id);
+  if (!wasActive) {
+    refreshLibrary();
+    return;
+  }
+  library.activeId = null;
+  const next = library.entries.filter((e) => e.status === 'ready');
+  const pick = next[Math.min(index, next.length - 1)];
+  if (pick) activate(pick.id);
+  else resetToIdle();
+}
+
+let clockRunning = false;
+function startClock() {
+  if (clockRunning) return;
+  clockRunning = true;
+  requestAnimationFrame(tick);
+}
+
+function buildViewer(model, { draftData, shortcodeData, mapsData, footprints, abilLinkIndex, movementAbilities, heroUnits, summons }) {
   const players = model.players;
   const movementLinks = movementLinkSet(abilLinkIndex, movementAbilities);
   const hearthLinks = hearthLinkSet(abilLinkIndex);
@@ -135,7 +221,7 @@ function setupViewer(model, { draftData, shortcodeData, mapsData, footprints, ab
   nameStructures(model, lanePaths);
 
   const baseView = viewRect(model, mapMeta);
-  setState({
+  const s = {
     model,
     playersById,
     footprints,
@@ -171,12 +257,16 @@ function setupViewer(model, { draftData, shortcodeData, mapsData, footprints, ab
     walkGrid: null, // same mask's walkability bit; paths are straight until it loads
     movementLinks,
     hearthLinks,
-  });
+  };
+  // These finish whenever they finish; only redraw if this replay is the one on screen.
+  const redraw = () => {
+    if (state === s) draw();
+  };
   if (mapMeta) {
     const img = new Image();
     img.onload = () => {
-      state.bg = img;
-      draw();
+      s.bg = img;
+      redraw();
     };
     img.src = mapMeta.image;
   }
@@ -189,32 +279,28 @@ function setupViewer(model, { draftData, shortcodeData, mapsData, footprints, ab
       const g = c.getContext('2d', { willReadFrequently: true });
       g.drawImage(img, 0, 0);
       const rgba = g.getImageData(0, 0, img.width, img.height).data;
-      state.visionGrid = buildVisionGrid(rgba, img.width, img.height);
-      state.walkGrid = buildWalkGrid(rgba, img.width, img.height);
-      for (const p of state.model.players) {
-        p.timeline = buildPositionTimeline(p, state.model.durationLoops, {
-          movementLinks: state.movementLinks,
-          hearthLinks: state.hearthLinks,
-          hall: state.model.teamHalls[p.team],
-          walkGrid: state.walkGrid,
+      s.visionGrid = buildVisionGrid(rgba, img.width, img.height);
+      s.walkGrid = buildWalkGrid(rgba, img.width, img.height);
+      for (const p of s.model.players) {
+        p.timeline = buildPositionTimeline(p, s.model.durationLoops, {
+          movementLinks: s.movementLinks,
+          hearthLinks: s.hearthLinks,
+          hall: s.model.teamHalls[p.team],
+          walkGrid: s.walkGrid,
         });
       }
-      for (const c of state.model.companions) {
+      for (const c of s.model.companions) {
         if (c.timeline) {
-          c.timeline = buildPositionTimeline(c, state.model.durationLoops, { walkGrid: state.walkGrid });
+          c.timeline = buildPositionTimeline(c, s.model.durationLoops, { walkGrid: s.walkGrid });
         }
       }
-      routeUnitsThroughTerrain(state.mobileUnits, state.walkGrid);
-      marchUnits(state.mobileUnits, state.unitSpeeds, { model: state.model, ranges: state.unitRanges });
-      draw();
+      routeUnitsThroughTerrain(s.mobileUnits, s.walkGrid);
+      marchUnits(s.mobileUnits, s.unitSpeeds, { model: s.model, ranges: s.unitRanges });
+      redraw();
     };
     img.src = mapMeta.vision;
   }
-
-  renderShell();
-  buildPanel();
-  buildFeed();
-  requestAnimationFrame(tick);
+  return s;
 }
 
 function renderShell() {
@@ -224,7 +310,8 @@ function renderShell() {
   root.dataset.state = 'loaded';
   root.innerHTML = `
     <div class="replay-layout">
-      <div class="replay-map-pane">
+      ${libraryHtml()}
+      <div class="replay-map-pane" style="--canvas-aspect:${canvasAspect()}">
 
 		<div class="replay-summary">
 			<div class="replay-summary__map">${escapeHtml(model.map)} · build ${model.build ?? '?'}</div>
@@ -400,6 +487,8 @@ function renderShell() {
     renderFeed();
   });
   wireSettingsPanel();
+  wireLibrary();
+  restoreControls();
   root.querySelector('[data-fullscreen]').addEventListener('click', toggleFullscreen);
   root.querySelector('[data-reset-view]').addEventListener('click', resetView);
   canvas.addEventListener('click', onCanvasClick);
@@ -408,6 +497,61 @@ function renderShell() {
   canvas.addEventListener('pointermove', onCanvasPointerMove);
   canvas.addEventListener('pointerup', onCanvasPointerUp);
   canvas.addEventListener('pointercancel', onCanvasPointerUp);
+}
+
+/* Each replay keeps its own view state, so a shell rendered for a replay we are
+   returning to has to be put back the way that replay left it. */
+function restoreControls() {
+  root.querySelector('[data-speed]').value = String(state.speed);
+  root.querySelector('[data-scrub]').value = state.loop;
+  root.querySelector('[data-trails]').checked = state.trails;
+  root.querySelector('[data-minions]').checked = state.minions;
+  root.querySelector('[data-objectives]').checked = state.objectives;
+  root.querySelector('[data-camera]').checked = state.camera;
+  for (const radio of root.querySelectorAll('[data-vision]')) {
+    radio.checked = radio.value === (state.visionTeam === null ? '' : String(state.visionTeam));
+  }
+  for (const btn of root.querySelectorAll('[data-kind]')) {
+    btn.classList.toggle('is-on', state.feedKinds.has(btn.dataset.kind));
+  }
+  for (const btn of root.querySelectorAll('[data-hero]')) {
+    btn.classList.toggle('is-on', state.feedHeroes.has(Number(btn.dataset.hero)));
+  }
+  root.querySelector('[data-feed-search]').value = state.feedQuery;
+  root.querySelector('[data-reset-view]').hidden = state.zoom === 1;
+  updatePlayButton();
+  if (state.selected !== null) {
+    const p = state.model.players.find((x) => x.playerId === state.selected);
+    root.querySelector('[data-feed-title]').textContent = p ? `${p.hero} (${p.name})` : 'All events';
+    root.querySelector('[data-clear-select]').hidden = !p;
+    root.querySelector('[data-kind-row]').hidden = !!p;
+    root.querySelector('[data-hero-row]').hidden = !!p;
+    for (const btn of root.querySelectorAll('[data-select]')) {
+      btn.classList.toggle('is-selected', Number(btn.dataset.select) === state.selected);
+    }
+  }
+}
+
+function wireLibrary() {
+  const host = root.querySelector('[data-library]');
+  if (!host) return;
+  host.addEventListener('click', (e) => {
+    const toggle = e.target.closest('[data-lib-toggle]');
+    if (toggle) {
+      library.expanded = !library.expanded;
+      library.userToggled = true;
+      refreshLibrary();
+      return;
+    }
+    const remove = e.target.closest('[data-lib-remove]');
+    if (remove) {
+      removeReplay(Number(remove.dataset.libRemove));
+      return;
+    }
+    const select = e.target.closest('[data-lib-select]');
+    const id = select && Number(select.dataset.libSelect);
+    if (select && id !== library.activeId) activate(id);
+  });
 }
 
 /* The panel lives inside the canvas box so it stays reachable in fullscreen,
@@ -458,7 +602,8 @@ function onCanvasClick(e) {
 }
 
 fileInput.addEventListener('change', () => {
-  if (fileInput.files.length) handleFile(fileInput.files[0]);
+  handleFiles(fileInput.files);
+  fileInput.value = ''; // so picking the same file again still fires a change
 });
 
 function hasFiles(e) {
@@ -495,19 +640,19 @@ window.addEventListener('dragleave', (e) => {
 window.addEventListener('drop', (e) => {
   e.preventDefault();
   endDrag();
-  const file = e.dataTransfer?.files?.[0];
-  if (file) handleFile(file);
+  handleFiles(e.dataTransfer?.files);
 });
 window.addEventListener('dragend', endDrag);
-const replayUrl = new URLSearchParams(location.search).get('url');
-if (replayUrl) {
+const replayUrls = new URLSearchParams(location.search).getAll('url');
+for (const replayUrl of replayUrls) {
   fetch(replayUrl)
     .then((r) => {
       if (!r.ok) throw new Error(`HTTP ${r.status} fetching replay`);
       return r.blob();
     })
-    .then((b) => handleFile(new File([b], replayUrl.split('/').pop())))
+    .then((b) => handleFiles([new File([b], replayUrl.split('/').pop())]))
     .catch((err) => {
-      dropZone.insertAdjacentHTML('beforeend', `<p class="replay-drop__note">${escapeHtml(String(err))}</p>`);
+      dropStatus.hidden = false;
+      dropStatus.insertAdjacentHTML('beforeend', `<p class="replay-drop__note">${escapeHtml(String(err))}</p>`);
     });
 }

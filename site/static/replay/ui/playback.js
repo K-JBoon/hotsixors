@@ -68,7 +68,7 @@ export function selectPlayer(playerId) {
 }
 
 export function tick(now) {
-  if (state.playing) {
+  if (state && state.playing) {
     const dt = (now - state.lastTick) / 1000;
     state.lastTick = now;
     state.loop = Math.min(state.loop + dt * LOOPS_PER_SECOND * state.speed, state.model.durationLoops);

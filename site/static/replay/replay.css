@@ -1,7 +1,20 @@
 .replay-page {
-  max-width: 1400px;
+  max-width: none;
   margin: 0 auto;
-  padding: 0 1rem;
+  padding: 0 1.25rem;
+}
+/* Once a replay is up the heading is only wasted vertical space, but it stays
+   in the accessibility tree. */
+.replay-page:has(#replay-root[data-state='loaded']) .replay-page__title {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 /* Keep inline SVG icons aligned with text so feed rows and controls stay tidy. */
 .rp-icon {
@@ -35,6 +48,12 @@
 
 .replay-drop p {
   margin: 0;
+}
+
+.replay-drop__body {
+  display: grid;
+  justify-items: center;
+  gap: 0.35rem;
 }
 
 .replay-drop__title {
@@ -516,7 +535,7 @@ body.is-dragging-file .replay-drop-overlay {
 
 .replay-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 340px;
+  grid-template-columns: auto minmax(0, 1fr) clamp(340px, 26vw, 560px);
   gap: 1rem;
   align-items: start;
 }
@@ -524,6 +543,11 @@ body.is-dragging-file .replay-drop-overlay {
 @media (max-width: 1000px) {
   .replay-layout {
     grid-template-columns: 1fr;
+  }
+
+  .replay-canvas-box,
+  .replay-controls {
+    max-width: none;
   }
 }
 
@@ -546,6 +570,15 @@ body.is-dragging-file .replay-drop-overlay {
   justify-content: center;
   align-items: center;
   min-height: 0;
+}
+/* Full page width would otherwise make tall maps run off the bottom. The
+   controls track the canvas so the scrubber stays the map's width. */
+.replay-canvas-box,
+.replay-controls {
+  box-sizing: border-box;
+  max-width: calc(85vh / var(--canvas-aspect, 0.85));
+  margin-inline: auto;
+  width: 100%;
 }
 
 .replay-settings {
@@ -894,7 +927,7 @@ body.is-dragging-file .replay-drop-overlay {
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  max-height: 78vh;
+  max-height: 82vh;
 }
 
 .replay-feed-head {
@@ -1127,6 +1160,11 @@ body.is-dragging-file .replay-drop-overlay {
   min-height: 0;
 }
 
+#replay-root:fullscreen .replay-canvas-box,
+#replay-root:fullscreen .replay-controls {
+  max-width: none;
+}
+
 #replay-root:fullscreen .replay-canvas-box {
   flex: 1 1 auto;
 }
@@ -1145,4 +1183,305 @@ body.is-dragging-file .replay-drop-overlay {
 #replay-root:fullscreen .replay-feed-pane {
   max-height: none;
   height: 100%;
+}
+
+#replay-root:fullscreen .rp-lib {
+  display: none;
+}
+
+.replay-drop__status {
+  margin-top: 1rem;
+  display: grid;
+  gap: 0.25rem;
+}
+
+.rp-lib {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  width: clamp(232px, 18vw, 320px);
+  max-height: 82vh;
+  border: 1px solid rgba(140, 160, 220, 0.22);
+  border-radius: 12px;
+  padding: 0.5rem;
+  background: rgba(16, 22, 38, 0.35);
+}
+
+.rp-lib.is-collapsed {
+  width: 76px;
+  padding: 0.4rem;
+}
+
+.rp-lib__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.75;
+}
+
+.rp-lib.is-collapsed .rp-lib__title {
+  display: none;
+}
+
+.rp-lib.is-collapsed .rp-lib__head {
+  justify-content: center;
+}
+
+.rp-lib__count {
+  margin-left: 0.35rem;
+  padding: 0 0.35rem;
+  border-radius: 999px;
+  background: rgba(140, 160, 220, 0.2);
+}
+
+.rp-lib__toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.rp-lib__toggle:hover {
+  background: rgba(140, 160, 220, 0.2);
+}
+
+.rp-lib__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-height: 0;
+}
+
+.rp-lib-item {
+  position: relative;
+}
+
+.rp-lib-card {
+  position: relative;
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  padding: 0.45rem 0.5rem;
+  border: 1px solid rgba(140, 160, 220, 0.25);
+  border-radius: 10px;
+  background: rgba(10, 14, 26, 0.6);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.rp-lib-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: var(--card-bg, none);
+  background-size: cover;
+  background-position: center;
+  opacity: 0.3;
+}
+
+.rp-lib-card:hover::before {
+  opacity: 0.45;
+}
+
+.rp-lib-item.is-active .rp-lib-card {
+  border-color: #4da3ff;
+  box-shadow: 0 0 0 1px #4da3ff;
+}
+
+.rp-lib-card[disabled] {
+  cursor: default;
+  opacity: 0.7;
+}
+
+.rp-lib-card__body {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+/* Room for the hovered player's name. */
+.rp-lib-card:not([disabled]) .rp-lib-card__body {
+  padding-bottom: 1.05rem;
+}
+
+.rp-lib-card__title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.2;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+}
+
+.rp-lib-card__note {
+  font-size: 0.75rem;
+  opacity: 0.8;
+}
+
+.rp-lib-card__note--error {
+  color: #ff9d9d;
+  opacity: 1;
+}
+
+.rp-lib-card__teams {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.rp-lib-team {
+  display: flex;
+  align-items: center;
+  gap: 0.1rem;
+  padding-left: 0.25rem;
+  border-left: 3px solid var(--team-color);
+}
+
+.rp-lib-team__crown {
+  display: inline-flex;
+  margin-left: 0.15rem;
+}
+
+.rp-lib-hero {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: clamp(22px, 2vw, 30px);
+  height: clamp(22px, 2vw, 30px);
+  border-radius: 4px;
+  overflow: visible;
+  font-size: 0.75rem;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.rp-lib-hero img {
+  width: 100%;
+  height: 100%;
+  border-radius: 4px;
+  object-fit: cover;
+  display: block;
+}
+
+/* Player names are only interesting on demand, and there is no room for ten of
+   them. The label sits in reserved space inside the card, since the scrolling
+   list would clip a tooltip that floated outside it. */
+.rp-lib-hero:hover::after {
+  content: attr(data-label);
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 5;
+  padding: 0.1rem 0.3rem;
+  border-radius: 6px;
+  background: #0a0e1a;
+  border: 1px solid rgba(140, 160, 220, 0.35);
+  color: #e0e6f0;
+  font-size: 0.7rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: none;
+}
+
+.rp-lib-remove {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 1.15rem;
+  height: 1.15rem;
+  padding: 0;
+  border: none;
+  border-radius: 5px;
+  background: rgba(10, 14, 26, 0.85);
+  color: #e0e6f0;
+  font-size: 0.6rem;
+  cursor: pointer;
+}
+
+.rp-lib-item:hover .rp-lib-remove,
+.rp-lib-remove:focus-visible {
+  display: flex;
+}
+
+.rp-lib-remove:hover {
+  background: #a33;
+}
+
+.rp-lib__add {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.4rem;
+  border: 1px dashed rgba(140, 160, 220, 0.45);
+  border-radius: 8px;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.rp-lib__add:hover {
+  border-color: #4da3ff;
+  background: rgba(77, 163, 255, 0.1);
+}
+
+.rp-lib.is-collapsed .rp-lib__add span,
+.rp-lib.is-collapsed .rp-lib-card__teams,
+.rp-lib.is-collapsed .rp-lib-card__note {
+  display: none;
+}
+
+.rp-lib.is-collapsed .rp-lib-card {
+  height: 44px;
+  padding: 0.25rem 0.3rem;
+}
+
+.rp-lib.is-collapsed .rp-lib-card__body {
+  padding-bottom: 0;
+}
+
+.rp-lib.is-collapsed .rp-lib-card__title {
+  font-size: 0.6rem;
+  line-height: 1.1;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+@media (max-width: 1000px) {
+  .rp-lib,
+  .rp-lib.is-collapsed {
+    width: auto;
+    max-height: none;
+  }
+
+  .rp-lib__list {
+    flex-direction: row;
+    overflow-x: auto;
+  }
+
+  .rp-lib-item {
+    flex: 0 0 260px;
+  }
+
+  .rp-lib.is-collapsed .rp-lib-item {
+    flex-basis: 76px;
+  }
 }

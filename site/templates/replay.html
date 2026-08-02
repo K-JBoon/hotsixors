@@ -10,18 +10,24 @@
 
 {% block content %}
 <div class="replay-page">
-  <h1>Replay Viewer</h1>
+  <h1 class="replay-page__title">Replay Viewer</h1>
+  <!-- Outside #replay-root so the viewer's re-renders never detach it: the sidebar's
+       add button and the drop zone both point at this input by id. -->
+  <input type="file" id="replay-file-input" accept=".StormReplay" multiple data-file-input hidden>
   <div id="replay-root" data-state="idle">
     <div class="replay-drop" data-drop-zone>
-      <p class="replay-drop__title"><strong>Drop a .StormReplay file anywhere on this page</strong></p>
-      <p class="replay-drop__or">or</p>
-      <p><label class="replay-file-btn">Choose file<input type="file" accept=".StormReplay" data-file-input hidden></label></p>
-      <p class="replay-drop__note">Parsed entirely in your browser, replays are not uploaded.</p>
+      <div class="replay-drop__body">
+        <p class="replay-drop__title"><strong>Drop .StormReplay files anywhere on this page</strong></p>
+        <p class="replay-drop__or">or</p>
+        <p><label class="replay-file-btn" for="replay-file-input">Choose files</label></p>
+        <p class="replay-drop__note">Parsed entirely in your browser, replays are not uploaded.</p>
+      </div>
+      <div class="replay-drop__status" data-drop-status hidden></div>
     </div>
   </div>
   <!-- Outside #replay-root: the viewer replaces that element's contents wholesale. -->
   <div class="replay-drop-overlay" data-drop-overlay aria-hidden="true">
-    <div class="replay-drop-overlay__inner"><strong>Drop to open the replay</strong></div>
+    <div class="replay-drop-overlay__inner"><strong>Drop to add replays</strong></div>
   </div>
 </div>
 <script type="module" src="{{ get_url(path='replay/replay-ui.js', cachebust=true) }}"></script>

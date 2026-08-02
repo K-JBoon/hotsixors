@@ -5,7 +5,7 @@ import { cameraAt, cameraQuad } from './camera.js';
 import { drawDeathCross, drawIcon, iconImages } from './icons.js';
 import { updateXpCursor } from './panel.js';
 import { HERO_SIGHT, MERC_RE, SIGHT_OVERRIDES, SIGHT_WHEN_DEPLOYED, WISP_BRUSH_VISION, WISP_BRUSH_VISION_SENTINEL, WISP_FLYING_TALENT, WISP_UNIT } from './sight.js';
-import { BASE_CANVAS_WIDTH, root, state, ILLUSION_EDGE, ILLUSION_TINT, TEAM_COLORS } from './state.js';
+import { root, state, ILLUSION_EDGE, ILLUSION_TINT, TEAM_COLORS } from './state.js';
 import { formatLoop } from './html.js';
 import { PET_LEASH } from './companions.js';
 import { WALL_CLASS } from './structures.js';
@@ -23,8 +23,11 @@ function worldScale() {
   const v = state.view;
   return state.canvas.width / (v.maxX - v.minX);
 }
+/* Icons keep their size relative to the map, so this reference width is fixed
+   rather than tied to the canvas resolution. */
+const ICON_REF_WIDTH = 900;
 export function iconScale() {
-  return Math.min(state.zoom, 3) * (state.canvas.width / BASE_CANVAS_WIDTH);
+  return Math.min(state.zoom, 3) * (state.canvas.width / ICON_REF_WIDTH);
 }
 function heroDeadAt(p, loop) {
   if (!p.multiBody) return isDeadAt(p, loop, state.model.durationLoops);
