@@ -16,6 +16,9 @@ import { icon } from './ui/icons.js';
 import {
   addEntry,
   buildCard,
+  fileKey,
+  findByHash,
+  findByKey,
   findEntry,
   library,
   libraryHtml,
@@ -82,20 +85,51 @@ function viewRect(model, mapMeta) {
   return { minX: model.bounds.minX, minY: model.bounds.minY, maxX: model.bounds.maxX, maxY: model.bounds.maxY };
 }
 
+// crypto.subtle is missing outside secure contexts; without it the name/size/date
+// key is the only dedupe we get.
+async function contentHash(buffer) {
+  if (!globalThis.crypto || !crypto.subtle) return '';
+  const digest = await crypto.subtle.digest('SHA-256', buffer);
+  return Array.from(new Uint8Array(digest), (b) => b.toString(16).padStart(2, '0')).join('');
+}
+
 async function handleFiles(files) {
   const all = Array.from(files || []);
   const replays = all.filter((f) => f.name.toLowerCase().endsWith('.stormreplay'));
   const list = replays.length ? replays : all;
   if (!list.length) return;
   for (const entry of library.entries.filter((e) => e.status === 'error')) removeEntry(entry.id);
-  const pending = list.map((file) => ({ file, entry: addEntry(file.name) }));
+  const pending = [];
+  let known = null;
+  for (const file of list) {
+    const key = fileKey(file);
+    const seen = findByKey(key);
+    if (seen) {
+      known = seen;
+      continue;
+    }
+    pending.push({ file, entry: addEntry(file.name, key) });
+  }
+  if (!pending.length) {
+    if (known && known.status === 'ready' && library.activeId !== known.id) activate(known.id);
+    return;
+  }
   refreshLibrary();
   for (const { file, entry } of pending) {
     try {
       const [data, buffer] = await Promise.all([staticData(), file.arrayBuffer()]);
+      const hash = await contentHash(buffer);
       const model = await analyzeReplay(new MPQArchive(buffer));
       const abilLinkIndex = await loadAbilLinkIndex(model.baseBuild ?? model.build ?? 0);
       if (!findEntry(entry.id)) continue; // removed while it was parsing
+      const twin = findByHash(hash, entry.id);
+      if (twin) {
+        removeEntry(entry.id);
+        if (library.activeId === null && twin.status === 'ready') activate(twin.id);
+        else refreshLibrary();
+        continue;
+      }
+      entry.hash = hash;
       entry.viewer = buildViewer(model, { ...data, abilLinkIndex });
       entry.card = buildCard(model, entry.viewer.mapMeta, data.draftData);
       entry.status = 'ready';
