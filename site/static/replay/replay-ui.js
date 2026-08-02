@@ -536,13 +536,6 @@ function wireLibrary() {
   const host = root.querySelector('[data-library]');
   if (!host) return;
   host.addEventListener('click', (e) => {
-    const toggle = e.target.closest('[data-lib-toggle]');
-    if (toggle) {
-      library.expanded = !library.expanded;
-      library.userToggled = true;
-      refreshLibrary();
-      return;
-    }
     const remove = e.target.closest('[data-lib-remove]');
     if (remove) {
       removeReplay(Number(remove.dataset.libRemove));

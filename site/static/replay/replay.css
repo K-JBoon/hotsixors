@@ -1207,11 +1207,6 @@ body.is-dragging-file .replay-drop-overlay {
   background: rgba(16, 22, 38, 0.35);
 }
 
-.rp-lib.is-collapsed {
-  width: 76px;
-  padding: 0.4rem;
-}
-
 .rp-lib__head {
   display: flex;
   align-items: center;
@@ -1223,36 +1218,10 @@ body.is-dragging-file .replay-drop-overlay {
   opacity: 0.75;
 }
 
-.rp-lib.is-collapsed .rp-lib__title {
-  display: none;
-}
-
-.rp-lib.is-collapsed .rp-lib__head {
-  justify-content: center;
-}
-
 .rp-lib__count {
   margin-left: 0.35rem;
   padding: 0 0.35rem;
   border-radius: 999px;
-  background: rgba(140, 160, 220, 0.2);
-}
-
-.rp-lib__toggle {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 1.6rem;
-  height: 1.6rem;
-  padding: 0;
-  border: none;
-  border-radius: 6px;
-  background: transparent;
-  color: inherit;
-  cursor: pointer;
-}
-
-.rp-lib__toggle:hover {
   background: rgba(140, 160, 220, 0.2);
 }
 
@@ -1441,33 +1410,8 @@ body.is-dragging-file .replay-drop-overlay {
   background: rgba(77, 163, 255, 0.1);
 }
 
-.rp-lib.is-collapsed .rp-lib__add span,
-.rp-lib.is-collapsed .rp-lib-card__teams,
-.rp-lib.is-collapsed .rp-lib-card__note {
-  display: none;
-}
-
-.rp-lib.is-collapsed .rp-lib-card {
-  height: 44px;
-  padding: 0.25rem 0.3rem;
-}
-
-.rp-lib.is-collapsed .rp-lib-card__body {
-  padding-bottom: 0;
-}
-
-.rp-lib.is-collapsed .rp-lib-card__title {
-  font-size: 0.6rem;
-  line-height: 1.1;
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-}
-
 @media (max-width: 1000px) {
-  .rp-lib,
-  .rp-lib.is-collapsed {
+  .rp-lib {
     width: auto;
     max-height: none;
   }
@@ -1479,9 +1423,5 @@ body.is-dragging-file .replay-drop-overlay {
 
   .rp-lib-item {
     flex: 0 0 260px;
-  }
-
-  .rp-lib.is-collapsed .rp-lib-item {
-    flex-basis: 76px;
   }
 }
