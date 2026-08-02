@@ -65,6 +65,9 @@ function viewRect(model, mapMeta) {
 
 async function handleFile(file) {
   root.dataset.state = 'loading';
+  if (!dropZone.isConnected) {
+    root.replaceChildren(dropZone);
+  }
   dropZone.innerHTML = `<p>Parsing ${file.name}…</p>`;
   try {
     const [data, buffer] = await Promise.all([loadStaticData(), file.arrayBuffer()]);
@@ -457,16 +460,45 @@ function onCanvasClick(e) {
 fileInput.addEventListener('change', () => {
   if (fileInput.files.length) handleFile(fileInput.files[0]);
 });
-dropZone.addEventListener('dragover', (e) => {
-  e.preventDefault();
-  dropZone.classList.add('is-dragover');
-});
-dropZone.addEventListener('dragleave', () => dropZone.classList.remove('is-dragover'));
-dropZone.addEventListener('drop', (e) => {
-  e.preventDefault();
+
+function hasFiles(e) {
+  return Array.from(e.dataTransfer?.types || []).includes('Files');
+}
+
+let dragDepth = 0;
+
+function endDrag() {
+  dragDepth = 0;
+  document.body.classList.remove('is-dragging-file');
   dropZone.classList.remove('is-dragover');
-  if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+}
+
+window.addEventListener('dragenter', (e) => {
+  if (!hasFiles(e)) return;
+  e.preventDefault();
+  dragDepth++;
+  document.body.classList.add('is-dragging-file');
 });
+window.addEventListener('dragover', (e) => {
+  if (!hasFiles(e)) return;
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'copy';
+  if (!dragDepth) {
+    dragDepth = 1;
+    document.body.classList.add('is-dragging-file');
+  }
+});
+window.addEventListener('dragleave', (e) => {
+  if (!hasFiles(e)) return;
+  if (--dragDepth <= 0 || !e.relatedTarget) endDrag();
+});
+window.addEventListener('drop', (e) => {
+  e.preventDefault();
+  endDrag();
+  const file = e.dataTransfer?.files?.[0];
+  if (file) handleFile(file);
+});
+window.addEventListener('dragend', endDrag);
 const replayUrl = new URLSearchParams(location.search).get('url');
 if (replayUrl) {
   fetch(replayUrl)

@@ -13,10 +13,15 @@
   <h1>Replay Viewer</h1>
   <div id="replay-root" data-state="idle">
     <div class="replay-drop" data-drop-zone>
-      <p><strong>Drop a .StormReplay file here</strong> or</p>
+      <p class="replay-drop__title"><strong>Drop a .StormReplay file anywhere on this page</strong></p>
+      <p class="replay-drop__or">or</p>
       <p><label class="replay-file-btn">Choose file<input type="file" accept=".StormReplay" data-file-input hidden></label></p>
       <p class="replay-drop__note">Parsed entirely in your browser, replays are not uploaded.</p>
     </div>
+  </div>
+  <!-- Outside #replay-root: the viewer replaces that element's contents wholesale. -->
+  <div class="replay-drop-overlay" data-drop-overlay aria-hidden="true">
+    <div class="replay-drop-overlay__inner"><strong>Drop to open the replay</strong></div>
   </div>
 </div>
 <script type="module" src="{{ get_url(path='replay/replay-ui.js', cachebust=true) }}"></script>
