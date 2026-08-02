@@ -20,17 +20,24 @@ import {
   loadBaseDoodadActors,
   localizedMapNames,
   parseMapInfo,
+  previewAccent,
   readMember,
+  terrainHeights,
   type BaseRegions,
   type CameraBounds,
+  type HeightField,
   type LanePath,
 } from "./lib/stormmap.ts";
 
 const OUT_DIR = join(SITE_STATIC_REPLAY, "maps");
 
+/** Schematic pixels per game unit. The viewer reads this back out of maps.json. */
+const IMAGE_SCALE = 4;
+
 interface MapEntry {
   slug: string;
   image: string;
+  imageScale: number;
   vision: string;
   hash: string; // sha256, matching the replay's s2ma cache handles
   names: string[]; // DocInfo/Name per locale
@@ -47,6 +54,8 @@ interface Grids {
   pcl: Uint8Array | null;
   vbl: Uint8Array | null;
   brush: Uint8Array | null;
+  height: HeightField | null;
+  accent: [number, number, number] | null;
   mapW: number;
   mapH: number;
 }
@@ -55,11 +64,19 @@ interface Grids {
 
 const SCHEME = {
   void: [15, 8, 19], // unpathable and vision-blocking: walls, cliffs
+  voidLip: [31, 24, 38], // the first cells in from that mass, so it is not a flat silhouette
   low: [43, 36, 51], // unpathable but see-through: fences, water
-  ground: [93, 86, 101],
-  groundShade: [77, 70, 85], // pathable cell hugging a wall
-  bush: [83, 130, 71],
+  ground: [82, 76, 89],
+  groundLit: [101, 94, 109], // pathable cell out in the open
+  bush: [76, 118, 65],
   outline: [5, 0, 7],
+};
+
+/** How far the map's own art colour is allowed to pull each tone. */
+const ACCENT_STRENGTH = {
+  ground: 0.15,
+  wall: 0.3,
+  bush: 0.08,
 };
 
 /** Pathable only when neither grid blocks the cell. */
@@ -78,44 +95,177 @@ const visionBlockedAt = (g: Grids, cx: number, cy: number) =>
 const concealedAt = (g: Grids, cx: number, cy: number) =>
   (g.brush && g.brush[cy * g.mapW + cx] !== 0) || visionBlockedAt(g, cx, cy);
 
-/** True when any of the four orthogonal neighbours is pathable. */
-const touchesPath = (g: Grids, cx: number, cy: number) =>
-  pathableAt(g, cx + 1, cy) ||
-  pathableAt(g, cx - 1, cy) ||
-  pathableAt(g, cx, cy + 1) ||
-  pathableAt(g, cx, cy - 1);
+const mix = (a: number[], b: number[], t: number) => [
+  a[0]! + (b[0]! - a[0]!) * t,
+  a[1]! + (b[1]! - a[1]!) * t,
+  a[2]! + (b[2]! - a[2]!) * t,
+];
 
-/** True when any of the four orthogonal neighbours blocks. */
-const touchesWall = (g: Grids, cx: number, cy: number) =>
-  !pathableAt(g, cx + 1, cy) ||
-  !pathableAt(g, cx - 1, cy) ||
-  !pathableAt(g, cx, cy + 1) ||
-  !pathableAt(g, cx, cy - 1);
-
-function schematicColor(g: Grids, cx: number, cy: number): number[] {
-  if (pathableAt(g, cx, cy)) {
-    const shaded = touchesWall(g, cx, cy);
-    if (concealedAt(g, cx, cy)) {
-      return shaded ? SCHEME.bush.map((c) => Math.round(c * 0.85)) : SCHEME.bush;
-    }
-    return shaded ? SCHEME.groundShade : SCHEME.ground;
-  }
-  if (touchesPath(g, cx, cy)) return SCHEME.outline;
-  return visionBlockedAt(g, cx, cy) ? SCHEME.void : SCHEME.low;
+/**
+ * Rescales each channel towards the accent's own channel ratios, which shifts
+ * the hue without moving the tone's brightness far.
+ */
+function tinted(base: number[], accent: [number, number, number] | null, amount: number): number[] {
+  if (!accent) return base;
+  const peak = Math.max(...accent) || 1;
+  return base.map((c, i) => c * (1 - amount) + c * (accent[i]! / peak) * amount * 1.6);
 }
 
+/**
+ * Cell distance from every seed cell, spreading only through cells `pass`
+ * accepts. Cells the flood never reaches keep Infinity.
+ */
+function distanceField(
+  g: Grids,
+  seed: (cx: number, cy: number) => boolean,
+  pass: (cx: number, cy: number) => boolean
+): Float32Array {
+  const dist = new Float32Array(g.mapW * g.mapH).fill(Infinity);
+  let front: number[] = [];
+  for (let i = 0; i < dist.length; i++) {
+    if (seed(i % g.mapW, Math.floor(i / g.mapW))) {
+      dist[i] = 0;
+      front.push(i);
+    }
+  }
+  while (front.length) {
+    const next: number[] = [];
+    for (const i of front) {
+      const cx = i % g.mapW;
+      const cy = Math.floor(i / g.mapW);
+      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]] as const) {
+        const nx = cx + dx;
+        const ny = cy + dy;
+        if (nx < 0 || ny < 0 || nx >= g.mapW || ny >= g.mapH) continue;
+        const ni = ny * g.mapW + nx;
+        if (dist[ni] !== Infinity || !pass(nx, ny)) continue;
+        dist[ni] = dist[i]! + 1;
+        next.push(ni);
+      }
+    }
+    front = next;
+  }
+  return dist;
+}
+
+function hash2(x: number, y: number): number {
+  let h = Math.imul(x, 374761393) + Math.imul(y, 668265263);
+  h = Math.imul(h ^ (h >>> 13), 1274126177);
+  return ((h ^ (h >>> 16)) >>> 0) / 4294967295;
+}
+
+function valueNoise(x: number, y: number): number {
+  const xi = Math.floor(x);
+  const yi = Math.floor(y);
+  const smooth = (t: number) => t * t * (3 - 2 * t);
+  const u = smooth(x - xi);
+  const v = smooth(y - yi);
+  const a = hash2(xi, yi);
+  const b = hash2(xi + 1, yi);
+  const c = hash2(xi, yi + 1);
+  const d = hash2(xi + 1, yi + 1);
+  return a + (b - a) * u + (c - a) * v + (a - b - c + d) * u * v;
+}
+
+/** Three octaves, centred on zero. */
+const fbm = (x: number, y: number) =>
+  valueNoise(x, y) * 0.6 + valueNoise(x * 2.3, y * 2.3) * 0.3 + valueNoise(x * 5.1, y * 5.1) * 0.1 - 0.5;
+
+// Everything is lit from the top left, both the hillshade and the cast shadows.
+const LIGHT = [-0.55, 0.55, 0.63];
+const LIGHT_LEN = Math.hypot(...LIGHT);
+
+function heightAt(h: HeightField, wx: number, wy: number): number {
+  const x = Math.min(h.vw - 2, Math.max(0, Math.floor(wx)));
+  const y = Math.min(h.vh - 2, Math.max(0, Math.floor(wy)));
+  const tx = wx - x;
+  const ty = wy - y;
+  const top = h.verts[y * h.vw + x]! * (1 - tx) + h.verts[y * h.vw + x + 1]! * tx;
+  const bottom = h.verts[(y + 1) * h.vw + x]! * (1 - tx) + h.verts[(y + 1) * h.vw + x + 1]! * tx;
+  return top * (1 - ty) + bottom * ty;
+}
+
+/** -1..1 relief from the real terrain, zero on flat ground. */
+function hillshade(h: HeightField | null, wx: number, wy: number): number {
+  if (!h) return 0;
+  const dzdx = heightAt(h, wx + 0.5, wy) - heightAt(h, wx - 0.5, wy);
+  const dzdy = heightAt(h, wx, wy + 0.5) - heightAt(h, wx, wy - 0.5);
+  const normal = [-dzdx, -dzdy, 1];
+  const dot =
+    (normal[0]! * LIGHT[0]! + normal[1]! * LIGHT[1]! + normal[2]! * LIGHT[2]!) /
+    (Math.hypot(...normal) * LIGHT_LEN);
+  return Math.max(-1, Math.min(1, (dot - LIGHT[2]! / LIGHT_LEN) * 2.2));
+}
+
+const AO_REACH = 2; // cells of ground darkening alongside a wall
+const SHADOW_REACH = 2.2; // cells a wall throws its shadow across the ground
+const SHADOW_STEPS = 7;
+
+/**
+ * The map as terrain rather than a flat mask: ground darkens into corners and
+ * under the shadow walls cast, wall masses carry a lip and the terrain's own
+ * relief, and the whole palette leans on the map's art colour.
+ */
 function renderSchematic(g: Grids): Bitmap {
-  const width = g.mapW * 2;
-  const height = g.mapH * 2;
+  const walkable = (cx: number, cy: number) => pathableAt(g, cx, cy);
+  const openness = distanceField(g, (cx, cy) => !walkable(cx, cy), walkable);
+  const wallDepth = distanceField(g, walkable, (cx, cy) => !walkable(cx, cy));
+
+  const accent = g.accent;
+  const pal = {
+    ground: tinted(SCHEME.ground, accent, ACCENT_STRENGTH.ground),
+    groundLit: tinted(SCHEME.groundLit, accent, ACCENT_STRENGTH.ground),
+    void: tinted(SCHEME.void, accent, ACCENT_STRENGTH.wall),
+    voidLip: tinted(SCHEME.voidLip, accent, ACCENT_STRENGTH.wall),
+    low: tinted(SCHEME.low, accent, ACCENT_STRENGTH.wall),
+    bush: tinted(SCHEME.bush, accent, ACCENT_STRENGTH.bush),
+  };
+
+  const width = g.mapW * IMAGE_SCALE;
+  const height = g.mapH * IMAGE_SCALE;
   const rgba = new Uint8Array(width * height * 4);
   for (let iy = 0; iy < height; iy++) {
-    const cy = g.mapH - 1 - Math.floor(iy / 2); // row 0 = world top
+    const wy = g.mapH - iy / IMAGE_SCALE; // row 0 = world top
+    const cy = Math.min(g.mapH - 1, Math.max(0, Math.floor(wy)));
     for (let ix = 0; ix < width; ix++) {
-      const color = schematicColor(g, Math.floor(ix / 2), cy);
+      const wx = ix / IMAGE_SCALE;
+      const cx = Math.min(g.mapW - 1, Math.floor(wx));
+      const cell = cy * g.mapW + cx;
+      const relief = hillshade(g.height, wx, wy);
+      const grain = fbm(wx * 0.9, wy * 0.9);
+
+      let color: number[];
+      if (walkable(cx, cy)) {
+        const open = Math.min(1, (openness[cell]! - 0.2) / AO_REACH);
+        const patches = fbm(wx * 0.11, wy * 0.11);
+        const bush = concealedAt(g, cx, cy);
+        const base = bush ? pal.bush : mix(pal.ground, pal.groundLit, 0.3 + 0.7 * open);
+        color = base.map(
+          (c) => c * (1 + relief * 0.22) * (1 + grain * 0.06) * (1 + patches * 0.13) * (0.84 + 0.16 * open)
+        );
+        let shadow = 0;
+        for (let step = 1; step <= SHADOW_STEPS; step++) {
+          const reach = (step / SHADOW_STEPS) * SHADOW_REACH;
+          const sx = Math.floor(wx - reach * 0.75);
+          const sy = Math.floor(wy + reach * 0.75);
+          if (sx < 0 || sy < 0 || sx >= g.mapW || sy >= g.mapH) continue;
+          if (!walkable(sx, sy)) shadow = Math.max(shadow, 1 - step / (SHADOW_STEPS + 1));
+        }
+        color = color.map((c) => c * (1 - shadow * 0.34));
+        if (!walkable(cx + 1, cy) || !walkable(cx, cy - 1)) color = color.map((c) => c * 1.1);
+        if (bush) color = color.map((c) => c * (0.86 + 0.28 * (fbm(wx * 4.5, wy * 4.5) + 0.5)));
+      } else if (wallDepth[cell]! <= 1) {
+        color = SCHEME.outline;
+      } else {
+        const inset = Math.min(1, (wallDepth[cell]! - 2) / 5);
+        const body = visionBlockedAt(g, cx, cy) ? pal.void : pal.low;
+        color = mix(pal.voidLip, body, inset).map((c) => c * (1 + relief * 0.4) * (1 + grain * 0.16));
+      }
+
       const i = (iy * width + ix) * 4;
-      rgba[i] = color[0]!;
-      rgba[i + 1] = color[1]!;
-      rgba[i + 2] = color[2]!;
+      rgba[i] = Math.max(0, Math.min(255, Math.round(color[0]!)));
+      rgba[i + 1] = Math.max(0, Math.min(255, Math.round(color[1]!)));
+      rgba[i + 2] = Math.max(0, Math.min(255, Math.round(color[2]!)));
       rgba[i + 3] = 255;
     }
   }
@@ -165,6 +315,8 @@ function openMap(buf: Buffer, baseActors: ReturnType<typeof loadBaseDoodadActors
     pcl: pcl ? pcl.subarray(4) : null,
     vbl: vbl ? vbl.subarray(4) : null,
     brush: brushMask(archive, baseActors, info.width, info.height),
+    height: terrainHeights(archive),
+    accent: previewAccent(archive),
     mapW: info.width,
     mapH: info.height,
   };
@@ -192,10 +344,11 @@ async function main(): Promise<void> {
       const entry: MapEntry = {
         slug,
         image: `/replay/maps/${slug}.png`,
+        imageScale: IMAGE_SCALE,
         vision: `/replay/maps/${slug}.vision.png`,
         hash: createHash("sha256").update(buf).digest("hex"),
         names: localizedMapNames(archive),
-        // image pixel for world (x,y): px = x*2, py = (mapHeight-y)*2
+        // image pixel for world (x,y): px = x*imageScale, py = (mapHeight-y)*imageScale
         mapWidth: info.width,
         mapHeight: info.height,
         camera: info.camera, // playable subrect, null = full map

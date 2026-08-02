@@ -24,8 +24,18 @@ function crc32(buf: Buffer): number {
 }
 
 /** Truecolor PNG, no alpha channel: the bitmaps here are always opaque. */
-export function encodePng({ width, height, rgba }: Bitmap): Buffer {
-  const raw = Buffer.alloc(height * (1 + width * 3));
+export function encodePng(bitmap: Bitmap): Buffer {
+  return encode(bitmap, false);
+}
+
+/** Truecolor PNG with an alpha channel. */
+export function encodePngAlpha(bitmap: Bitmap): Buffer {
+  return encode(bitmap, true);
+}
+
+function encode({ width, height, rgba }: Bitmap, alpha: boolean): Buffer {
+  const channels = alpha ? 4 : 3;
+  const raw = Buffer.alloc(height * (1 + width * channels));
   let p = 0;
   for (let y = 0; y < height; y++) {
     raw[p++] = 0; // filter type: none
@@ -34,6 +44,7 @@ export function encodePng({ width, height, rgba }: Bitmap): Buffer {
       raw[p++] = rgba[i]!;
       raw[p++] = rgba[i + 1]!;
       raw[p++] = rgba[i + 2]!;
+      if (alpha) raw[p++] = rgba[i + 3]!;
     }
   }
 
@@ -51,7 +62,7 @@ export function encodePng({ width, height, rgba }: Bitmap): Buffer {
   ihdr.writeUInt32BE(width, 0);
   ihdr.writeUInt32BE(height, 4);
   ihdr[8] = 8; // bit depth
-  ihdr[9] = 2; // truecolor
+  ihdr[9] = alpha ? 6 : 2; // truecolor, with or without alpha
   chunk("IHDR", ihdr);
   chunk("IDAT", zlib.deflateSync(raw, { level: 9 }));
   chunk("IEND", Buffer.alloc(0));

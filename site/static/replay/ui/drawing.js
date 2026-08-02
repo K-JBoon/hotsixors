@@ -100,12 +100,35 @@ function summonPortrait(type) {
   const summon = state.summons && state.summons[type];
   return summon && summon.portrait ? { dir: 'unitportraits', file: summon.portrait } : null;
 }
+let portraitDrawPending = false;
+function schedulePortraitDraw() {
+  if (portraitDrawPending) return;
+  portraitDrawPending = true;
+  requestAnimationFrame(() => {
+    portraitDrawPending = false;
+    if (state) draw();
+  });
+}
+const missingIcons = new Set();
+function minimapIcon(type) {
+  const file = state.minimapIcons && state.minimapIcons[type];
+  return file && !missingIcons.has(file) ? { dir: 'minimapicons', file } : null;
+}
 function drawBodyPortrait(ctx, body, type, fallbackFile, x, y, r) {
   if (!body.portraitImg) {
-    const unit = BODY_PORTRAITS[type] || summonPortrait(type);
+    const icon = minimapIcon(type);
+    const unit = icon || BODY_PORTRAITS[type] || summonPortrait(type);
     const file = unit ? unit.file : fallbackFile;
     if (!file) return false;
     const img = new Image();
+    img.onload = schedulePortraitDraw;
+    if (icon) {
+      img.onerror = () => {
+        missingIcons.add(icon.file);
+        body.portraitImg = null;
+        schedulePortraitDraw();
+      };
+    }
     img.src = `/images/${(unit && unit.dir) || 'heroportraits'}/${file}`;
     body.portraitImg = img;
     body.portraitCrop = unit || null;
@@ -160,7 +183,7 @@ function drawCompanions(loop) {
     drawUnitMarker(ctx, c, c.unitType, owner && owner.meta ? owner.meta.portrait : null, x, y, r, {
       fill: TEAM_COLORS[c.team],
       edge: decoy ? ILLUSION_EDGE : TEAM_COLORS[c.team],
-      lineWidth: (decoy ? 1.5 : 2) * Math.min(scale, 2),
+      lineWidth: (decoy ? 1 : 1.25) * Math.min(scale, 2),
       dash: decoy ? [3 * scale, 3 * scale] : null,
       tint: decoy ? ILLUSION_TINT : null,
     });
@@ -200,7 +223,7 @@ function drawVisionUnits(loop) {
     drawUnitMarker(ctx, u, u.type, null, x, y, r, {
       fill: TEAM_COLORS[u.team],
       edge: TEAM_COLORS[u.team],
-      lineWidth: 1.5 * Math.min(scale, 2),
+      lineWidth: 1 * Math.min(scale, 2),
     });
   }
 }
@@ -213,10 +236,11 @@ export function draw() {
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   if (state.bg && state.mapMeta) {
     const v = state.view;
-    const sx = v.minX * 2;
-    const sy = (state.mapMeta.mapHeight - v.maxY) * 2;
-    const sw = (v.maxX - v.minX) * 2;
-    const sh = (v.maxY - v.minY) * 2;
+    const s = state.mapMeta.imageScale || 2;
+    const sx = v.minX * s;
+    const sy = (state.mapMeta.mapHeight - v.maxY) * s;
+    const sw = (v.maxX - v.minX) * s;
+    const sh = (v.maxY - v.minY) * s;
     ctx.drawImage(state.bg, sx, sy, sw, sh, 0, 0, canvas.width, canvas.height);
   }
   for (const s of model.structures) {
@@ -295,7 +319,7 @@ export function draw() {
     drawUnitMarker(ctx, p, p.unitType, p.meta ? p.meta.portrait : null, x, y, r, {
       fill: dead ? '#333' : TEAM_COLORS[p.team],
       edge: state.selected === p.playerId ? '#fff' : dead ? '#777' : TEAM_COLORS[p.team],
-      lineWidth: 2 * Math.min(scale, 2),
+      lineWidth: 1.25 * Math.min(scale, 2),
       filter: dead ? 'grayscale(1) brightness(0.5)' : null,
       tint: dead ? 'rgba(0,0,0,0.45)' : null,
       tintOnlyWhenDrawn: true,

@@ -71,6 +71,65 @@ export function localizedMapNames(archive: MPQArchive): string[] {
   return names;
 }
 
+// ------------------------------------------------------------- shading data
+
+/** Terrain heights on the vertex grid, one more vertex than cells per axis. */
+export interface HeightField {
+  verts: Float32Array;
+  vw: number;
+  vh: number;
+}
+
+/**
+ * t3HeightMap is 32 header bytes then 6 bytes per vertex, of which the first
+ * uint16 is the height, quantized by the factors t3Terrain.xml carries.
+ */
+export function terrainHeights(archive: MPQArchive): HeightField | null {
+  const data = readMember(archive, "t3HeightMap");
+  const xml = readText(archive, "t3Terrain.xml");
+  if (!data || !xml) return null;
+  const bias = Number(attr(xml, "quantizeBias"));
+  const scale = Number(attr(xml, "quantizeScale"));
+  if (!Number.isFinite(bias) || !Number.isFinite(scale)) return null;
+  const buf = Buffer.from(data);
+  const vw = buf.readUInt32LE(8);
+  const vh = buf.readUInt32LE(12);
+  if (buf.length < 32 + vw * vh * 6) return null;
+  const verts = new Float32Array(vw * vh);
+  for (let i = 0; i < verts.length; i++) verts[i] = buf.readUInt16LE(32 + i * 6) * scale + bias;
+  return { verts, vw, vh };
+}
+
+/**
+ * The dominant saturated colour of the map's loading-screen art, used to tint
+ * its schematic. Grey and near-black pixels are ignored so the result tracks
+ * the art's theme rather than its overall brightness.
+ */
+export function previewAccent(archive: MPQArchive): [number, number, number] | null {
+  const tga = readMember(archive, "ReplaysPreviewImage.tga");
+  if (!tga) return null;
+  const bytes = tga[16]! / 8;
+  if (bytes < 3) return null;
+  const width = tga[12]! | (tga[13]! << 8);
+  const height = tga[14]! | (tga[15]! << 8);
+  const start = 18 + tga[0]!;
+  let r = 0, g = 0, b = 0, total = 0;
+  for (let i = 0; i < width * height; i++) {
+    const p = start + i * bytes;
+    const pb = tga[p]!, pg = tga[p + 1]!, pr = tga[p + 2]!;
+    const max = Math.max(pr, pg, pb);
+    const chroma = max - Math.min(pr, pg, pb);
+    if (max < 40 || chroma < 25) continue;
+    const weight = chroma / 255;
+    r += pr * weight;
+    g += pg * weight;
+    b += pb * weight;
+    total += weight;
+  }
+  if (!total) return null;
+  return [r / total, g / total, b / total];
+}
+
 // ---------------------------------------------------------------- MapInfo
 
 export function parseMapInfo(data: Uint8Array): MapInfo {

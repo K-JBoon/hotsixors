@@ -37,16 +37,18 @@ function staticData() {
 }
 
 async function loadStaticData() {
-  const [draftData, shortcodeData, mapsData, footprints, movementAbilities, heroUnits, summons] = await Promise.all([
-    fetch('/draft/draft-data.json').then((r) => r.json()),
-    fetch('/shortcode-data.json').then((r) => r.json()),
-    fetchJson('/replay/maps.json', {}),
-    fetchJson('/replay/footprints.json', { shapes: [], units: {} }),
-    fetchJson('/replay/movement-abilities.json', {}),
-    fetchJson('/replay/hero-units.json', {}),
-    loadSummons(),
-  ]);
-  return { draftData, shortcodeData, mapsData, footprints, movementAbilities, heroUnits, summons };
+  const [draftData, shortcodeData, mapsData, footprints, movementAbilities, heroUnits, minimapIcons, summons] =
+    await Promise.all([
+      fetch('/draft/draft-data.json').then((r) => r.json()),
+      fetch('/shortcode-data.json').then((r) => r.json()),
+      fetchJson('/replay/maps.json', {}),
+      fetchJson('/replay/footprints.json', { shapes: [], units: {} }),
+      fetchJson('/replay/movement-abilities.json', {}),
+      fetchJson('/replay/hero-units.json', {}),
+      fetchJson('/replay/minimap-icons.json', {}),
+      loadSummons(),
+    ]);
+  return { draftData, shortcodeData, mapsData, footprints, movementAbilities, heroUnits, minimapIcons, summons };
 }
 const abilLinkCache = new Map();
 function loadAbilLinkIndex(build) {
@@ -205,7 +207,7 @@ function startClock() {
   requestAnimationFrame(tick);
 }
 
-function buildViewer(model, { draftData, shortcodeData, mapsData, footprints, abilLinkIndex, movementAbilities, heroUnits, summons }) {
+function buildViewer(model, { draftData, shortcodeData, mapsData, footprints, abilLinkIndex, movementAbilities, heroUnits, minimapIcons, summons }) {
   const players = model.players;
   const movementLinks = movementLinkSet(abilLinkIndex, movementAbilities);
   const hearthLinks = hearthLinkSet(abilLinkIndex);
@@ -259,6 +261,7 @@ function buildViewer(model, { draftData, shortcodeData, mapsData, footprints, ab
     model,
     playersById,
     footprints,
+    minimapIcons,
     summons,
     mobileUnits,
     unitSpeeds,

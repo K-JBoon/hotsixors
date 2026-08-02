@@ -12,6 +12,7 @@ export const GAMEDATA_REPO = path.join(REPO_ROOT, "submodules/HeroesOfTheStorm_G
 export const HEROPROTOCOL_VERSIONS = path.join(REPO_ROOT, "submodules/heroprotocol/heroprotocol/versions");
 export const S2MA_MAPS_DIR = path.join(REPO_ROOT, "submodules/HeroesOfTheStorm_S2MA/maps");
 export const ABILLINK_STORE = path.join(REPO_ROOT, "data/replay-abillinks");
+export const MINIMAP_ICONS_DIR = path.join(REPO_ROOT, "data/minimapicons");
 export const SITE_CONTENT = path.join(REPO_ROOT, "site/content");
 export const SITE_CONTENT_HEROES = path.join(REPO_ROOT, "site/content/heroes");
 export const SITE_CONTENT_BATTLEGROUNDS = path.join(REPO_ROOT, "site/content/battlegrounds");

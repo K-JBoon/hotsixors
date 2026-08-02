@@ -3,20 +3,39 @@ import { escapeHtml } from './html.js';
 import { icon } from './icons.js';
 import { TEAM_COLORS } from './state.js';
 
-export const library = { entries: [], activeId: null, expanded: false, userToggled: false };
+export const library = { entries: [], activeId: null };
 
 let nextId = 1;
 
-export function addEntry(fileName) {
-  const entry = { id: nextId++, fileName, status: 'loading', error: '', viewer: null, card: null };
+export function addEntry(fileName, key) {
+  const entry = {
+    id: nextId++,
+    fileName,
+    key: key || '',
+    hash: '',
+    status: 'loading',
+    error: '',
+    viewer: null,
+    card: null,
+  };
   library.entries.push(entry);
-  // A single replay does not need the full list taking up room, several do.
-  if (!library.userToggled) library.expanded = library.entries.length > 1;
   return entry;
+}
+
+export function fileKey(file) {
+  return `${file.name}:${file.size}:${file.lastModified}`;
 }
 
 export function findEntry(id) {
   return library.entries.find((e) => e.id === id) || null;
+}
+
+export function findByKey(key) {
+  return (key && library.entries.find((e) => e.key === key)) || null;
+}
+
+export function findByHash(hash, exceptId) {
+  return (hash && library.entries.find((e) => e.hash === hash && e.id !== exceptId)) || null;
 }
 
 export function removeEntry(id) {
@@ -88,12 +107,9 @@ function entryHtml(entry) {
 }
 
 export function libraryHtml() {
-  return `<aside class="rp-lib${library.expanded ? '' : ' is-collapsed'}" data-library>
+  return `<aside class="rp-lib" data-library>
     <div class="rp-lib__head">
       <span class="rp-lib__title">Replays<span class="rp-lib__count">${library.entries.length}</span></span>
-      <button class="rp-lib__toggle" data-lib-toggle title="${
-        library.expanded ? 'Collapse replay list' : 'Expand replay list'
-      }" aria-expanded="${library.expanded}">${icon(library.expanded ? 'chevronLeft' : 'chevronRight')}</button>
     </div>
     <div class="rp-lib__list">${library.entries.map(entryHtml).join('')}</div>
     <label class="rp-lib__add" for="replay-file-input" title="Add a replay to this view">${icon(
