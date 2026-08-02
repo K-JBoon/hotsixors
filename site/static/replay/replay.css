@@ -130,7 +130,9 @@ body.is-dragging-file .replay-drop-overlay {
   display: flex;
   align-items: flex-start;
   justify-content: center;
+  flex-wrap: wrap;
   gap: 0.75rem;
+  max-width: 100%;
 }
 
 .replay-team-block {
@@ -503,12 +505,16 @@ body.is-dragging-file .replay-drop-overlay {
 .replay-team {
   display: flex;
   align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
   gap: 4px;
+  max-width: 100%;
 }
 
 .replay-portrait {
-  width: 44px;
-  height: 44px;
+  width: clamp(30px, 3.2vw, 44px);
+  aspect-ratio: 1;
+  flex: 0 0 auto;
   padding: 0;
   border-radius: 8px;
   border: 2px solid var(--team-color, #888);
@@ -531,6 +537,10 @@ body.is-dragging-file .replay-drop-overlay {
 .replay-summary__map {
   font-size: 0.9rem;
   opacity: 0.8;
+}
+
+.replay-map-pane {
+  min-width: 0;
 }
 
 .replay-layout {
