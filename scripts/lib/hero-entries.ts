@@ -91,6 +91,7 @@ function anchorXmlPathToAbsPath(xmlPath: string): string {
 
 export function createEntryResolver(gs: Gamestrings, anchorMap: AnchorMap) {
   const shortcodeData: ShortcodeData = {};
+  const abilityDescriptions: Record<string, string> = {};
   const missingIcons = new Set<string>();
   const xmlFileCache = new Map<string, string>();
 
@@ -109,14 +110,18 @@ export function createEntryResolver(gs: Gamestrings, anchorMap: AnchorMap) {
   }
 
   // Two heroes can share a nameId; collisions get heroSlug prefixes.
-  function addShortcodeEntry(nameId: string, entry: ShortcodeEntry): void {
+  function addShortcodeEntry(nameId: string, entry: ShortcodeEntry, fullDescHtml: string): void {
     const existing = shortcodeData[nameId];
     if (!existing) {
       shortcodeData[nameId] = entry;
+      if (fullDescHtml) abilityDescriptions[nameId] = fullDescHtml;
       return;
     }
     shortcodeData[`${existing.heroSlug}:${nameId}`] = existing;
     shortcodeData[`${entry.heroSlug}:${nameId}`] = entry;
+    const existingDesc = abilityDescriptions[nameId];
+    if (existingDesc) abilityDescriptions[`${existing.heroSlug}:${nameId}`] = existingDesc;
+    if (fullDescHtml) abilityDescriptions[`${entry.heroSlug}:${nameId}`] = fullDescHtml;
   }
 
   // Talents have no XML stats.
@@ -134,6 +139,7 @@ export function createEntryResolver(gs: Gamestrings, anchorMap: AnchorMap) {
     const shortDescSource = getAbilityShortDesc(gs, entry.linkId);
     const fullDescSource = getAbilityFullDesc(gs, entry.linkId);
     const shortDesc = stripMarkup(shortDescSource);
+    const fullDescHtml = renderGameStringMarkup(fullDescSource);
 
     const xmlData = type === "ability" ? await loadXmlForAbility(nameId) : null;
     const stats = xmlData ? parseAbilityStats(xmlData.xml, nameId, xmlData.xmlPath) : null;
@@ -152,7 +158,7 @@ export function createEntryResolver(gs: Gamestrings, anchorMap: AnchorMap) {
       xmlPath: anchor ? anchor.xmlPath : "",
       anchor: anchor ? nameId : "",
       type,
-    });
+    }, fullDescHtml);
 
     return {
       nameId,
@@ -166,11 +172,11 @@ export function createEntryResolver(gs: Gamestrings, anchorMap: AnchorMap) {
       shortDesc,
       shortDescHtml: renderGameStringMarkup(shortDescSource),
       fullDesc: stripMarkup(fullDescSource),
-      fullDescHtml: renderGameStringMarkup(fullDescSource),
+      fullDescHtml,
       category,
       stats,
     };
   };
 
-  return { resolveEntry, shortcodeData, missingIcons };
+  return { resolveEntry, shortcodeData, abilityDescriptions, missingIcons };
 }

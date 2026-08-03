@@ -3,7 +3,8 @@ import { LOOPS_PER_SECOND, XP_SOURCES } from '../analyze.js';
 import { abilityEntryFor } from './abilities.js';
 import { clockText, escapeHtml, externalLink, heroUrl, portraitHtml, talentUrl } from './html.js';
 import { seekTo } from './playback.js';
-import { activeScoreColumns, compactNumber, scoreValues } from './scores.js';
+import { activeScoreColumns, compactNumber, scoreSortValue, scoreValues } from './scores.js';
+import { hideTalentTooltip, initTalentTooltip } from './talent-tooltip.js';
 import { root, state, TEAM_COLORS } from './state.js';
 
 export const TALENT_TIERS = [1, 4, 7, 10, 13, 16, 20];
@@ -44,12 +45,14 @@ function talentTableHtml() {
           if (!pick) return '<td></td>';
           const entry = abilityEntryFor(shortcodeData, p.heroSlug, pick.name);
           const label = entry ? entry.name : pick.name;
-          const title = `${escapeHtml(label)} (level ${tier})`;
           const inner =
             entry && entry.icon
               ? `<img class="talent-icon" src="/images/abilitytalents/${entry.icon}" alt="${escapeHtml(label)}">`
               : `<span class="talent-text">${escapeHtml(label)}</span>`;
-          return `<td>${externalLink(talentUrl(p, pick.name), inner, 'talent-link', title)}</td>`;
+          const cellAttrs = `data-talent-id="${escapeHtml(pick.name)}" data-talent-hero="${escapeHtml(
+            p.heroSlug || ''
+          )}" data-talent-tier="${tier}"`;
+          return `<td ${cellAttrs}>${externalLink(talentUrl(p, pick.name), inner, 'talent-link', null)}</td>`;
         }).join('');
         return `<tr style="--team-color:${TEAM_COLORS[team]}">
           ${heroCellHtml(p)}
@@ -73,31 +76,94 @@ function scoreTableHtml() {
   const teamRows = (team) =>
     model.players
       .filter((p) => p.team === team)
-      .map((p) => {
+      .map((p, order) => {
         const cells = columns
           .map((col) => {
             const values = scoreValues(p, col);
             const text = col.text ? col.text(values) : compactNumber(values[0]);
-            return `<td class="score-cell" title="${col.title}">${text}</td>`;
+            return `<td class="score-cell" title="${col.title}" data-sort="${scoreSortValue(p, col)}">${text}</td>`;
           })
           .join('');
-        return `<tr style="--team-color:${TEAM_COLORS[team]}">
+        return `<tr style="--team-color:${TEAM_COLORS[team]}" data-order="${order}">
           ${heroCellHtml(p)}
           ${cells}
         </tr>`;
       })
       .join('');
   const head = columns
-    .map((col) => `<th class="score-cell" title="${col.title}">${col.label}</th>`)
+    .map(
+      (col, i) =>
+        `<th class="score-cell score-head" title="${col.title}" data-score-sort="${i}" role="button" tabindex="0">${col.label}<span class="score-arrow"></span></th>`
+    )
     .join('');
   return `
     <div class="panel-scroll">
     <table class="talent-table score-table">
-      <thead><tr><th></th>${head}</tr></thead>
+      <thead><tr><th class="score-head score-head--name" data-score-reset role="button" tabindex="0">Player</th>${head}</tr></thead>
       <tbody>${teamRowHtml(model, 0, columns.length)}${teamRows(0)}</tbody>
       <tbody>${teamRowHtml(model, 1, columns.length)}${teamRows(1)}</tbody>
     </table>
     </div>`;
+}
+
+function initScoreTable(body) {
+  const table = body.querySelector('.score-table');
+  if (!table) return;
+  const bodies = [...table.querySelectorAll('tbody')];
+  const heads = [...table.querySelectorAll('[data-score-sort]')];
+  let active = null;
+  let dir = -1;
+
+  const apply = () => {
+    for (const tbody of bodies) {
+      const rows = [...tbody.querySelectorAll('tr:not(.team-row)')];
+      rows.sort((a, b) => {
+        const fallback = Number(a.dataset.order) - Number(b.dataset.order);
+        if (active == null) return fallback;
+        const va = Number(a.querySelectorAll('[data-sort]')[active].dataset.sort);
+        const vb = Number(b.querySelectorAll('[data-sort]')[active].dataset.sort);
+        return dir * (va - vb) || fallback;
+      });
+      for (const row of rows) tbody.append(row);
+      for (const row of rows) {
+        row.querySelectorAll('[data-sort]').forEach((cell, i) => {
+          cell.classList.toggle('is-sorted', i === active);
+        });
+      }
+    }
+    heads.forEach((th, i) => {
+      const on = i === active;
+      th.classList.toggle('is-sorted', on);
+      th.querySelector('.score-arrow').textContent = on ? (dir === -1 ? '▾' : '▴') : '';
+    });
+  };
+
+  const sortBy = (i) => {
+    if (active === i) dir = dir === -1 ? 1 : -1;
+    else {
+      active = i;
+      dir = -1;
+    }
+    apply();
+  };
+  const activate = (el, fn) => {
+    el.addEventListener('click', fn);
+    el.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        fn();
+      }
+    });
+  };
+
+  heads.forEach((th, i) => activate(th, () => sortBy(i)));
+  const reset = table.querySelector('[data-score-reset]');
+  if (reset)
+    activate(reset, () => {
+      active = null;
+      dir = -1;
+      apply();
+    });
 }
 
 const XP_CHART = { w: 760, padL: 54, padR: 18, padT: 18, padB: 26, plotH: 260 };
@@ -319,8 +385,8 @@ export function updateXpCursor() {
   cursor.setAttribute('x2', px);
 }
 const PANEL_TABS = [
-  { id: 'talents', label: 'Talents', html: talentTableHtml },
-  { id: 'scores', label: 'Scores', html: scoreTableHtml },
+  { id: 'talents', label: 'Talents', html: talentTableHtml, init: initTalentTooltip },
+  { id: 'scores', label: 'Scores', html: scoreTableHtml, init: initScoreTable },
   { id: 'xp', label: 'XP', html: xpChartHtml, init: initXpChart },
 ];
 
@@ -340,8 +406,9 @@ export function buildPanel() {
   const body = container.querySelector('[data-panel-body]');
   const show = (id) => {
     const tab = PANEL_TABS.find((t) => t.id === id) || PANEL_TABS[0];
+    hideTalentTooltip();
     body.innerHTML = tab.html();
-    if (tab.init) tab.init();
+    if (tab.init) tab.init(body);
     for (const btn of container.querySelectorAll('[data-panel-tab]')) {
       const on = btn.dataset.panelTab === tab.id;
       btn.classList.toggle('is-on', on);

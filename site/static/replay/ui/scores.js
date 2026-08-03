@@ -14,6 +14,7 @@ export const SCORE_COLUMNS = [
     title: 'Kills / assists / deaths',
     keys: ['SoloKill', 'Assists', 'Deaths'],
     text: ([k, a, d]) => `${k}/${a}/${d}`,
+    sort: ([k, a]) => k * 1000 + a,
     always: true,
   },
   { id: 'takedowns', label: 'TD', title: 'Takedowns', keys: ['Takedowns'], always: true },
@@ -74,6 +75,10 @@ export const SCORE_COLUMNS = [
 ];
 
 export const scoreValues = (p, col) => col.keys.map((k) => Number(p.score[k] ?? 0));
+export const scoreSortValue = (p, col) => {
+  const values = scoreValues(p, col);
+  return col.sort ? col.sort(values) : values[0];
+};
 export function activeScoreColumns(players) {
   return SCORE_COLUMNS.filter(
     (col) =>

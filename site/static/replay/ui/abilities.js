@@ -28,10 +28,16 @@ export function heroMeta(draftData, heroName, heroUnits, unitType) {
 export function toSlotLetter(abilityType) {
   return abilityType === 'Heroic' ? 'R' : abilityType === 'Trait' ? 'D' : abilityType;
 }
-export function abilityEntryFor(shortcodeData, heroSlug, nameId) {
+export function abilityKeyFor(shortcodeData, heroSlug, nameId) {
   const entry = shortcodeData[nameId];
-  if (entry && normalizeName(entry.heroSlug || '') === heroSlug) return entry;
-  return shortcodeData[`${heroSlug}:${nameId}`] || (entry && !entry.heroSlug ? entry : null);
+  if (entry && normalizeName(entry.heroSlug || '') === heroSlug) return nameId;
+  const prefixed = `${heroSlug}:${nameId}`;
+  if (shortcodeData[prefixed]) return prefixed;
+  return entry && !entry.heroSlug ? nameId : null;
+}
+export function abilityEntryFor(shortcodeData, heroSlug, nameId) {
+  const key = abilityKeyFor(shortcodeData, heroSlug, nameId);
+  return key ? shortcodeData[key] : null;
 }
 export function humanizeNameId(nameId, heroId) {
   let rest = nameId;

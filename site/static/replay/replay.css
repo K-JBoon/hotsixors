@@ -357,15 +357,56 @@ body.is-dragging-file .replay-drop-overlay {
 }
 
 .score-cell {
-  font-size: 0.875rem;
+  font-size: 1rem;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
-  padding: 0.25rem 0.5rem;
+  padding: 0.25rem 0.6rem;
   text-align: right;
+  min-width: 3.5rem;
 }
 
 .score-table thead .score-cell {
   text-align: right;
+}
+
+.score-table tbody tr:not(.team-row) td:nth-child(odd) {
+  background: rgba(140, 160, 220, 0.05);
+}
+
+.score-table tbody tr:not(.team-row):hover td {
+  background: rgba(140, 160, 220, 0.14);
+}
+
+.score-table tbody tr:not(.team-row):hover th.hero-cell {
+  background: #1c2235;
+}
+
+.score-table .is-sorted {
+  background: rgba(140, 160, 220, 0.12);
+}
+
+.talent-table thead .score-head {
+  font-size: 0.875rem;
+  opacity: 0.8;
+  cursor: pointer;
+  user-select: none;
+}
+
+.talent-table thead .score-head:hover,
+.talent-table thead .score-head.is-sorted {
+  opacity: 1;
+}
+
+.talent-table thead .score-head--name {
+  text-align: left;
+  padding-left: 0.4rem;
+}
+
+.score-arrow {
+  display: inline-block;
+  width: 0.8em;
+  text-align: right;
+  font-size: 0.75em;
 }
 
 .talent-table .team-row th {
@@ -388,7 +429,7 @@ body.is-dragging-file .replay-drop-overlay {
 }
 
 .talent-table thead .score-cell {
-  padding: 0 0.5rem;
+  padding: 0 0.6rem;
 }
 /* Sticky the hero column so switching tabs only swaps the columns to its right. */
 .talent-table thead th:first-child,
@@ -500,6 +541,48 @@ body.is-dragging-file .replay-drop-overlay {
 
 .talent-link:hover .talent-text {
   text-decoration: underline;
+}
+
+.talent-tooltip {
+  position: fixed;
+  z-index: 60;
+  max-width: min(320px, calc(100vw - 16px));
+  padding: 0.5rem 0.6rem;
+  border: 1px solid rgba(140, 160, 220, 0.35);
+  border-radius: 8px;
+  background: rgba(14, 18, 32, 0.97);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  font-size: 0.8125rem;
+  line-height: 1.35;
+  pointer-events: none;
+}
+
+.talent-tooltip__head {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.talent-tooltip__icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+}
+
+.talent-tooltip__name {
+  font-weight: 600;
+  font-size: 0.9375rem;
+}
+
+.talent-tooltip__meta {
+  margin-top: 0.15rem;
+  font-size: 0.75rem;
+  opacity: 0.6;
+}
+
+.talent-tooltip__desc {
+  margin-top: 0.35rem;
+  opacity: 0.9;
 }
 
 .replay-team {

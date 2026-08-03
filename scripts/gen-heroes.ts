@@ -351,7 +351,7 @@ async function main(): Promise<void> {
     await mkdir(dir, { recursive: true });
   }
 
-  const { resolveEntry, shortcodeData, missingIcons } = createEntryResolver(gs, anchorMap);
+  const { resolveEntry, shortcodeData, abilityDescriptions, missingIcons } = createEntryResolver(gs, anchorMap);
 
   for (const [heroName, hero] of Object.entries(heroData)) {
     const slug = heroPageSlug(heroName, hero);
@@ -379,6 +379,15 @@ async function main(): Promise<void> {
 
   await writeFile(path.join(SITE_STATIC, "shortcode-data.json"), JSON.stringify(shortcodeData, null, 2), "utf-8");
   console.log(`gen-heroes: wrote shortcode-data.json with ${Object.keys(shortcodeData).length} entries`);
+
+  await writeFile(
+    path.join(SITE_STATIC, "ability-descriptions.json"),
+    JSON.stringify(abilityDescriptions),
+    "utf-8"
+  );
+  console.log(
+    `gen-heroes: wrote ability-descriptions.json with ${Object.keys(abilityDescriptions).length} entries`
+  );
 
   if (missingIcons.size > 0) {
     console.warn(
