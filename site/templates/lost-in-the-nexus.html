@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}Lost in the Nexus — {{ config.title }}{% endblock title %}
+
+{% block head %}
+  <link rel="stylesheet" href="{{ get_url(path='lost-in-the-nexus/viewer.css', cachebust=true) }}">
+  <script type="importmap">
+    { "imports": { "three": "/lost-in-the-nexus/vendor/three.module.min.js" } }
+  </script>
+{% endblock head %}
+
+{% block main_class %} nexus-main-area{% endblock main_class %}
+
+{% block content %}
+<div class="nexus-page" data-nexus-assets="{{ config.extra.nexus_assets | default(value='') }}">
+  <div class="nexus-view" id="nexus-view">
+    <div class="nexus-overlay">
+      <div class="nexus-overlay__top">
+        <h1 class="nexus-title">Lost in the Nexus</h1>
+        <div class="nexus-controls">
+          <label for="nexus-map">Battleground</label>
+          <select id="nexus-map"></select>
+        </div>
+      </div>
+      <p class="nexus-hint">Drag to orbit, wheel to zoom, right-drag to pan, WASD/QE to move, C for a flat camera, R to reset.</p>
+    </div>
+    <div class="nexus-status" id="nexus-status">Loading…</div>
+    <div class="nexus-gate" id="nexus-gate" hidden>
+      <div class="nexus-gate__panel">
+        <h2>Heads Up! Heavy Page Ahead</h2>
+        <p>
+		  This page renders the game's battlegrounds into a 3D viewer.
+          Opening one battleground downloads about <strong id="nexus-gate-size">X megabytes</strong> and
+		  may tax your CPU, GPU and battery.
+        </p>
+		<p>
+		  <strong>NOTE:</strong> This is a work-in-progress. Cursed Hollow is the most complete map, others may range anywhere from pretty good to a complete mess.
+		<p>
+        <button type="button" id="nexus-gate-load">Load</button>
+        <label class="nexus-gate__remember">
+          <input type="checkbox" id="nexus-gate-remember" checked>
+          Don't ask again on this device
+        </label>
+      </div>
+    </div>
+  </div>
+</div>
+<script type="module" src="{{ get_url(path='lost-in-the-nexus/viewer.js', cachebust=true) }}"></script>
+{% endblock content %}

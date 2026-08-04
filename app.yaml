@@ -1,4 +1,0 @@
-kind: wasmer.io/App.v0
-owner: __WASMER_NAMESPACE__
-name: hotsixors
-package: .

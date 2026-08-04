@@ -32,3 +32,10 @@ site/static/replay/summons.json
 site/static/replay/abillinks/
 site/static/replay/protocols/
 site/static/replay/movement-abilities.json
+
+# Converted battleground geometry. Produced by hots3d-tools and published to
+# the R2 bucket the viewer reads, not served from the site: 6676 files and
+# 300 MB. See hots3d-tools/scripts/sync-r2.ts.
+site/static/lost-in-the-nexus/models/
+site/static/lost-in-the-nexus/terrain/
+site/static/lost-in-the-nexus/maps3d/

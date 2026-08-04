@@ -1,0 +1,154 @@
+/* The page never scrolls, so a wheel over the canvas is always a zoom. */
+body:has(.nexus-page) {
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+}
+
+body:has(.nexus-page) .site-footer {
+  display: none;
+}
+
+.nexus-main-area {
+  display: flex;
+  min-height: 0;
+  padding: 0;
+  max-width: none;
+}
+
+.nexus-page {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+
+.nexus-view {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: #0c1018;
+}
+
+.nexus-view canvas {
+  display: block;
+}
+
+/* Overlays pass the pointer through so a drag started on them still orbits. */
+.nexus-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  pointer-events: none;
+}
+
+.nexus-overlay__top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1.5rem;
+}
+
+.nexus-title {
+  margin: 0;
+  font-size: 1.15rem;
+  letter-spacing: 0.08em;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85);
+}
+
+.nexus-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  pointer-events: auto;
+}
+
+.nexus-controls select {
+  background: rgba(12, 16, 26, 0.85);
+  color: inherit;
+  border: 1px solid rgba(140, 160, 200, 0.35);
+  border-radius: 4px;
+  padding: 0.3rem 0.5rem;
+  font: inherit;
+}
+
+.nexus-hint {
+  margin: 0;
+  color: #8f99b3;
+  font-size: 0.75rem;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85);
+}
+
+.nexus-status {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(8, 11, 20, 0.72);
+  color: #ccd3e6;
+  font-size: 0.95rem;
+  pointer-events: none;
+}
+
+.nexus-status[hidden] {
+  display: none;
+}
+
+.nexus-gate {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+  background: rgba(8, 11, 20, 0.85);
+}
+
+.nexus-gate[hidden] {
+  display: none;
+}
+
+.nexus-gate__panel {
+  max-width: 34rem;
+  padding: 1.5rem 1.75rem;
+  border: 1px solid rgba(140, 160, 200, 0.28);
+  border-radius: 8px;
+  background: rgba(16, 21, 34, 0.96);
+  text-align: center;
+}
+
+.nexus-gate__panel h2 {
+  margin: 0 0 0.75rem;
+}
+
+.nexus-gate__panel p {
+  margin: 0 0 1.25rem;
+  color: #b6bfd6;
+}
+
+.nexus-gate__panel button {
+  padding: 0.55rem 1.4rem;
+  border: 1px solid rgba(140, 160, 200, 0.45);
+  border-radius: 4px;
+  background: rgba(60, 90, 160, 0.35);
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.nexus-gate__panel button:hover {
+  background: rgba(70, 105, 185, 0.5);
+}
+
+.nexus-gate__remember {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  margin-top: 1rem;
+  color: #8f99b3;
+  font-size: 0.8rem;
+  cursor: pointer;
+}

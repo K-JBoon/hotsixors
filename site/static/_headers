@@ -1,0 +1,55 @@
+# Cloudflare merges every matching rule rather than letting the most specific
+# one win, so these must not overlap: a /* catch-all alongside /*.js emits
+# "max-age=600, max-age=300" on scripts. Pages' own defaults cover anything
+# not listed here.
+
+/
+  Cache-Control: public, max-age=600
+
+/*/
+  Cache-Control: public, max-age=600
+
+/*.html
+  Cache-Control: public, max-age=600
+
+/*.css
+  Cache-Control: public, max-age=31536000, immutable
+
+# Only the entry scripts get a cachebusting query string from Zola. The modules
+# they import do not, so immutable would pin those for a year while the entry
+# updates, leaving the browser with a mismatched bundle after a deploy.
+/*.js
+  Cache-Control: public, max-age=300
+
+/*.mjs
+  Cache-Control: public, max-age=300
+
+/*.svg
+  Cache-Control: public, max-age=31536000
+
+/*.ico
+  Cache-Control: public, max-age=31536000
+
+/*.png
+  Cache-Control: public, max-age=31536000
+
+/*.jpg
+  Cache-Control: public, max-age=31536000
+
+/*.jpeg
+  Cache-Control: public, max-age=31536000
+
+/*.webp
+  Cache-Control: public, max-age=31536000
+
+/*.avif
+  Cache-Control: public, max-age=31536000
+
+/*.gif
+  Cache-Control: public, max-age=31536000
+
+/*.woff
+  Cache-Control: public, max-age=31536000
+
+/*.woff2
+  Cache-Control: public, max-age=31536000

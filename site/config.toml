@@ -17,3 +17,7 @@ include_content = false
 
 [extra]
 role_colors = { Warrior = "#1a6bbf", Assassin = "#bf1a1a", Support = "#1abf6b", Specialist = "#8b1abf", Multiclass = "#bf8b1a" }
+# The 3D battleground geometry is served from R2, not from the site: it is
+# hundreds of megabytes and tens of thousands of files, which a static host
+# will not take. Empty means "same origin", which is what a local build wants.
+nexus_assets = "https://nexus.epixors.com"
