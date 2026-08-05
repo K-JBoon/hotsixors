@@ -7,6 +7,8 @@ import { MeshoptDecoder } from '/lost-in-the-nexus/vendor/meshopt_decoder.module
 const view = document.getElementById('nexus-view');
 const status = document.getElementById('nexus-status');
 const picker = document.getElementById('nexus-map');
+const shadowBox = document.getElementById('nexus-shadows');
+const SHADOWS = 'hotsixors.nexus.shadows';
 
 // Geometry lives in an R2 bucket rather than alongside the page: it is hundreds
 // of megabytes over tens of thousands of files. The indexes store site-absolute
@@ -22,9 +24,16 @@ view.appendChild(renderer.domElement);
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x0c1018);
 scene.add(new THREE.HemisphereLight(0xbfd4ff, 0x36302a, 2.2));
+const SUN_DIR = new THREE.Vector3(-60, 90, 60).normalize();
 const sun = new THREE.DirectionalLight(0xfff3e0, 2.4);
-sun.position.set(-60, 90, 60);
+sun.position.copy(SUN_DIR).multiplyScalar(150);
+sun.castShadow = true;
+sun.shadow.mapSize.set(4096, 4096);
+sun.shadow.radius = 3;
 scene.add(sun);
+scene.add(sun.target);
+
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
 const world = new THREE.Group();
 scene.add(world);
@@ -221,8 +230,48 @@ async function loadMap(slug) {
     }
   }
 
+  markShadows();
   frame();
   status.hidden = true;
+}
+
+// Translucent surfaces (water, glow planes) would cast an opaque blob.
+function markShadows() {
+  world.traverse((node) => {
+    if (!node.isMesh) return;
+    node.castShadow = ![node.material].flat().some((m) => m?.transparent);
+    node.receiveShadow = true;
+  });
+}
+
+// Toggling the shadow map changes every program, so the materials recompile.
+function setShadows(on) {
+  renderer.shadowMap.enabled = on;
+  world.traverse((node) => {
+    for (const m of [node.material].flat()) if (m) m.needsUpdate = true;
+  });
+  shadowBox.checked = on;
+  try {
+    localStorage.setItem(SHADOWS, String(on));
+  } catch {
+    // Private mode: the choice lasts this visit.
+  }
+}
+
+// One ortho shadow camera over the framed area; a tighter fit buys resolution.
+function fitShadow() {
+  const radius = span * 1.6;
+  sun.target.position.copy(centre);
+  sun.position.copy(centre).addScaledVector(SUN_DIR, radius * 2.5);
+  const cam = sun.shadow.camera;
+  cam.left = -radius;
+  cam.right = radius;
+  cam.top = radius;
+  cam.bottom = -radius;
+  cam.near = 0.5;
+  cam.far = radius * 5;
+  cam.updateProjectionMatrix();
+  sun.shadow.normalBias = (2 * radius) / sun.shadow.mapSize.x * 1.5;
 }
 
 // Query params can frame a spot instead of the whole map.
@@ -236,6 +285,7 @@ function frame() {
   if (params.has('cx')) centre.x = Number(params.get('cx'));
   if (params.has('cy')) centre.z = -Number(params.get('cy'));
   if (params.get('cam') === 'flat' && camera !== ortho) swapCamera();
+  fitShadow();
   resetCamera();
 }
 
@@ -290,6 +340,7 @@ addEventListener('keydown', (e) => {
   if (typing(e.target) || e.ctrlKey || e.metaKey || e.altKey) return;
   const key = e.key.toLowerCase();
   if (key === 'c') swapCamera();
+  if (key === 'h') setShadows(!renderer.shadowMap.enabled);
   if (key === 'r') resetCamera();
   held.add(key);
 });
@@ -374,6 +425,40 @@ picker.onchange = () => {
   if (gate.hidden) start(picker.value);
   else describeGate();
 };
+
+shadowBox.onchange = () => {
+  // Keeping focus would send WASD into the checkbox.
+  shadowBox.blur();
+  setShadows(shadowBox.checked);
+};
+
+{
+  const button = document.getElementById('nexus-settings');
+  const panel = document.getElementById('nexus-settings-panel');
+  const setOpen = (open) => {
+    panel.hidden = !open;
+    button.setAttribute('aria-expanded', String(open));
+    button.classList.toggle('is-on', open);
+  };
+  button.onclick = (e) => {
+    e.stopPropagation();
+    button.blur();
+    setOpen(panel.hidden);
+  };
+  panel.onclick = (e) => e.stopPropagation();
+  addEventListener('click', () => setOpen(false));
+  addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') setOpen(false);
+  });
+}
+
+let shadowsWanted = true;
+try {
+  shadowsWanted = localStorage.getItem(SHADOWS) !== 'false';
+} catch {
+  // Private mode: default on.
+}
+setShadows(shadowsWanted);
 
 let remembered = false;
 try {

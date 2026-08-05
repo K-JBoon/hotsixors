@@ -18,11 +18,17 @@
       <div class="nexus-overlay__top">
         <h1 class="nexus-title">Lost in the Nexus</h1>
         <div class="nexus-controls">
-          <label for="nexus-map">Battleground</label>
           <select id="nexus-map"></select>
+          <button type="button" id="nexus-settings" title="View settings" aria-label="View settings" aria-expanded="false">
+            <svg class="rp-icon" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M6.6 1h2.8l.3 1.9 1.2.7 1.8-.8 1.4 2.4-1.5 1.2v1.2l1.5 1.2-1.4 2.4-1.8-.8-1.2.7-.3 1.9H6.6l-.3-1.9-1.2-.7-1.8.8-1.4-2.4 1.5-1.2V6.4L1.9 5.2l1.4-2.4 1.8.8 1.2-.7zM8 5.7a2.3 2.3 0 1 0 0 4.6 2.3 2.3 0 0 0 0-4.6z"/></svg>
+          </button>
+          <div class="nexus-settings" id="nexus-settings-panel" hidden role="dialog" aria-label="View settings">
+            <div class="nexus-settings__legend">Rendering</div>
+            <label class="rp-switch"><input type="checkbox" id="nexus-shadows"><span class="rp-switch__track"></span>Shadows</label>
+          </div>
         </div>
       </div>
-      <p class="nexus-hint">Drag to orbit, wheel to zoom, right-drag to pan, WASD/QE to move, C for a flat camera, R to reset.</p>
+      <p class="nexus-hint">Drag to orbit, wheel to zoom, right-drag to pan, WASD/QE to move, C for a flat camera, H for shadows, R to reset.</p>
     </div>
     <div class="nexus-status" id="nexus-status">Loading…</div>
     <div class="nexus-gate" id="nexus-gate" hidden>
