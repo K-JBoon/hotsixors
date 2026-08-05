@@ -385,9 +385,19 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
   const forward = new THREE.Vector3();
   const right = new THREE.Vector3();
   const step = new THREE.Vector3();
+  const MOVE_KEYS = ['w', 'a', 's', 'd', 'q', 'e'];
+  const RAMP_SECONDS = 1.1;
+  const CREEP = 0.2;
+  let throttle = 0;
+
   function fly(dt) {
-    if (!held.size) return;
-    const speed = (held.has('shift') ? 3 : 1) * span * 0.5 * dt;
+    if (!MOVE_KEYS.some((key) => held.has(key))) {
+      throttle = 0;
+      return;
+    }
+    throttle = Math.min(1, throttle + dt / RAMP_SECONDS);
+    const ramp = CREEP + (1 - CREEP) * throttle * throttle;
+    const speed = (held.has('shift') ? 3 : 1) * span * 0.5 * dt * ramp;
     camera.getWorldDirection(forward);
     forward.y = 0;
     if (forward.lengthSq() < 1e-6) forward.set(0, 0, -1);
