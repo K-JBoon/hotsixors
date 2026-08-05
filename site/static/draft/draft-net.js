@@ -2,11 +2,11 @@
 const APP_ID = "hotsixors-draft";
 const TRYSTERO_URL = "https://esm.sh/trystero@0.21/nostr";
 
-export async function createNet({ lobbyCode, role, onCommand, onEvent, onPeers, onHostElection }) {
+export async function createNet({ lobbyCode, role, appId = APP_ID, onCommand, onEvent, onPeers, onHostElection }) {
   const trystero = await import(TRYSTERO_URL);
   const { joinRoom, selfId } = trystero;
   const peerId = selfId;
-  const room = joinRoom({ appId: APP_ID }, lobbyCode);
+  const room = joinRoom({ appId }, lobbyCode);
   const [sendCmd, getCmd] = room.makeAction("cmd");
   const [sendEvt, getEvt] = room.makeAction("event");
 

@@ -1,0 +1,523 @@
+.ng {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  font-size: 0.9rem;
+}
+
+.ng-hud {
+  position: absolute;
+  inset: auto 0 0 0;
+  display: flex;
+  justify-content: center;
+  padding: 0.9rem 1rem 1.2rem;
+}
+
+.ng-hud__inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem 1rem;
+  max-width: min(60rem, 100%);
+  padding: 0.6rem 0.9rem;
+  border: 1px solid rgba(140, 160, 220, 0.3);
+  border-radius: 10px;
+  background: rgba(10, 13, 22, 0.88);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  pointer-events: auto;
+}
+
+.ng-hud__main {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.ng-hud__label {
+  color: #ccd3e6;
+}
+
+.ng-clock {
+  font-variant-numeric: tabular-nums;
+  font-size: 1.25rem;
+  letter-spacing: 0.04em;
+}
+
+.ng-clock.is-critical {
+  color: #ff8b6b;
+}
+
+.ng-hud__players {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ng-chip {
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  padding: 0.2rem 0.5rem;
+  border: 1px solid rgba(140, 160, 220, 0.25);
+  border-radius: 999px;
+  background: rgba(20, 26, 40, 0.9);
+  font-size: 0.75rem;
+}
+
+.ng-chip.is-self {
+  border-color: rgba(140, 180, 255, 0.7);
+}
+
+.ng-chip.is-done {
+  background: rgba(60, 110, 80, 0.55);
+}
+
+.ng-chip__state {
+  color: #8f99b3;
+  font-size: 0.68rem;
+}
+
+.ng-panels {
+  position: absolute;
+  inset: 0;
+  display: none;
+  place-items: center;
+  padding: 1.5rem;
+  background: rgba(8, 11, 20, 0.85);
+  pointer-events: auto;
+}
+
+.ng-panels.is-open {
+  display: grid;
+}
+
+.ng-panel {
+  display: grid;
+  gap: 0.9rem;
+  justify-items: center;
+  width: min(30rem, 100%);
+  max-height: 100%;
+  overflow: auto;
+  padding: 1.5rem 1.75rem;
+  border: 1px solid rgba(140, 160, 200, 0.28);
+  border-radius: 8px;
+  background: rgba(16, 21, 34, 0.96);
+  text-align: center;
+}
+
+.ng-panel--wide {
+  width: min(60rem, 100%);
+}
+
+.ng-panel h2 {
+  margin: 0;
+}
+
+.ng-muted {
+  margin: 0;
+  color: #8f99b3;
+  font-size: 0.82rem;
+}
+
+.ng-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.6rem;
+}
+
+.ng-btn {
+  padding: 0.5rem 1.1rem;
+  border: 1px solid rgba(140, 160, 200, 0.45);
+  border-radius: 4px;
+  background: rgba(30, 38, 58, 0.8);
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.ng-btn:hover:not(:disabled) {
+  background: rgba(50, 65, 100, 0.9);
+}
+
+.ng-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.ng-btn--primary {
+  background: rgba(60, 90, 160, 0.55);
+}
+
+.ng-btn--primary:hover:not(:disabled) {
+  background: rgba(70, 105, 185, 0.75);
+}
+
+.ng-btn--quiet {
+  background: transparent;
+}
+
+.ng-input {
+  width: 100%;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid rgba(140, 160, 220, 0.4);
+  border-radius: 6px;
+  background: rgba(12, 16, 26, 0.85);
+  color: inherit;
+  font: inherit;
+  text-align: center;
+}
+
+.ng-code {
+  font-size: 2rem;
+  letter-spacing: 0.35em;
+  text-indent: 0.35em;
+  color: #cfe0ff;
+}
+
+.ng-players {
+  display: grid;
+  gap: 0.35rem;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ng-player {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.35rem 0.7rem;
+  border: 1px solid rgba(140, 160, 220, 0.2);
+  border-radius: 6px;
+  background: rgba(22, 28, 44, 0.85);
+}
+
+.ng-player.is-self {
+  border-color: rgba(140, 180, 255, 0.65);
+}
+
+.ng-tag {
+  padding: 0.05rem 0.4rem;
+  border-radius: 999px;
+  background: rgba(90, 150, 255, 0.3);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.ng-maps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  gap: 0.7rem;
+  width: 100%;
+}
+
+.ng-map {
+  position: relative;
+  display: grid;
+  align-content: end;
+  gap: 0.15rem;
+  aspect-ratio: 16 / 10;
+  padding: 0.55rem;
+  border: 1px solid rgba(140, 160, 220, 0.35);
+  border-radius: 10px;
+  background: rgba(12, 16, 26, 0.9) center / cover no-repeat;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+}
+
+.ng-map::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(rgba(8, 11, 20, 0.1), rgba(8, 11, 20, 0.9));
+}
+
+.ng-map > * {
+  position: relative;
+  z-index: 1;
+}
+
+.ng-map.is-dealing {
+  filter: grayscale(1) brightness(0.45);
+  cursor: default;
+}
+
+.ng-map.is-rolling {
+  filter: none;
+  transform: scale(1.06);
+  box-shadow: 0 0 0 2px rgba(180, 210, 255, 0.9);
+}
+
+.ng-map.is-out {
+  opacity: 0.3;
+  filter: grayscale(1) brightness(0.5);
+  cursor: default;
+}
+
+.ng-map.is-offered {
+  box-shadow: 0 0 0 2px rgba(140, 180, 255, 0.75), 0 10px 26px rgba(0, 0, 0, 0.5);
+  animation: ng-pop 0.35s ease backwards;
+}
+
+.ng-map.is-offered:not(:disabled):hover {
+  transform: translateY(-4px) scale(1.04);
+  filter: saturate(1.15);
+}
+
+.ng-maps.is-settled .ng-map:not(.is-picked) {
+  opacity: 0.2;
+  filter: grayscale(1);
+  box-shadow: none;
+}
+
+.ng-map.is-picked {
+  transform: scale(1.06);
+  box-shadow: 0 0 0 2px rgba(180, 210, 255, 1);
+}
+
+.ng-map__name {
+  font-size: 0.95rem;
+}
+
+.ng-map__size {
+  color: #8f99b3;
+  font-size: 0.75rem;
+}
+
+.ng-limit {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.ng-slider {
+  width: 12rem;
+}
+
+.ng-limit__value {
+  font-variant-numeric: tabular-nums;
+  min-width: 4rem;
+  text-align: left;
+}
+
+.ng-preview {
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid rgba(140, 160, 220, 0.3);
+}
+
+.ng-preview--large {
+  width: auto;
+  max-width: 100%;
+  max-height: 62vh;
+}
+
+.ng-preview--zoom {
+  cursor: zoom-in;
+}
+
+.ng-lightbox {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  gap: 0.75rem;
+  padding: 2rem;
+  background: rgba(6, 8, 14, 0.92);
+  pointer-events: auto;
+  cursor: zoom-out;
+  animation: ng-fade 0.25s ease;
+}
+
+.ng-lightbox[hidden] {
+  display: none;
+}
+
+.ng-lightbox__image {
+  max-width: min(60rem, 100%);
+  max-height: 70vh;
+  border-radius: 10px;
+  border: 1px solid rgba(140, 160, 220, 0.35);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+}
+
+.ng-lightbox__hint {
+  margin: 0;
+  text-align: center;
+  color: #8f99b3;
+}
+
+.ng-thumb {
+  position: absolute;
+  top: 4.5rem;
+  right: 1rem;
+  width: min(16rem, 34vw);
+  padding: 0;
+  border: 1px solid rgba(140, 160, 220, 0.45);
+  border-radius: 8px;
+  background: none;
+  cursor: zoom-in;
+  overflow: hidden;
+  pointer-events: auto;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  animation: ng-fade 0.25s ease;
+}
+
+.ng-thumb[hidden] {
+  display: none;
+}
+
+.ng-thumb img {
+  display: block;
+  width: 100%;
+}
+
+.ng-results {
+  display: grid;
+  gap: 0.5rem;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ng-result {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid rgba(140, 160, 220, 0.2);
+  border-radius: 8px;
+  background: rgba(22, 28, 44, 0.85);
+  text-align: left;
+  opacity: 0;
+  transform: translateY(18px) scale(0.96);
+  transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.2, 1.3, 0.4, 1);
+}
+
+.ng-result.is-in {
+  opacity: 1;
+  transform: none;
+  animation: ng-flash 0.6s ease;
+}
+
+.ng-result__rank {
+  min-width: 2.6rem;
+  font-size: 1.05rem;
+  color: #8f99b3;
+  text-align: center;
+}
+
+.ng-result__image {
+  width: 8rem;
+  border-radius: 4px;
+  cursor: zoom-in;
+  transition: transform 0.15s ease;
+}
+
+.ng-result__image:hover {
+  transform: scale(1.05);
+}
+
+.ng-result__body {
+  display: grid;
+  flex: 1;
+}
+
+.ng-result__detail {
+  color: #8f99b3;
+  font-size: 0.75rem;
+}
+
+.ng-result__points {
+  font-size: 1.4rem;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Podium: the ring, the rank badge and the score all take the medal's colour. */
+.ng-result.is-gold,
+.ng-result.is-silver,
+.ng-result.is-bronze {
+  padding: 0.7rem 0.9rem;
+}
+
+.ng-result.is-gold .ng-result__rank,
+.ng-result.is-silver .ng-result__rank,
+.ng-result.is-bronze .ng-result__rank {
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.ng-result.is-gold {
+  border-color: rgba(255, 205, 90, 0.85);
+  background: linear-gradient(90deg, rgba(120, 92, 20, 0.55), rgba(22, 28, 44, 0.9));
+  box-shadow: 0 0 22px rgba(255, 200, 80, 0.28);
+}
+
+.ng-result.is-gold .ng-result__rank,
+.ng-result.is-gold .ng-result__points {
+  color: #ffd873;
+}
+
+.ng-result.is-gold .ng-result__points {
+  font-size: 1.8rem;
+}
+
+.ng-result.is-silver {
+  border-color: rgba(214, 224, 240, 0.75);
+  background: linear-gradient(90deg, rgba(92, 102, 120, 0.5), rgba(22, 28, 44, 0.9));
+  box-shadow: 0 0 18px rgba(200, 214, 235, 0.18);
+}
+
+.ng-result.is-silver .ng-result__rank,
+.ng-result.is-silver .ng-result__points {
+  color: #dde5f3;
+}
+
+.ng-result.is-silver .ng-result__points {
+  font-size: 1.6rem;
+}
+
+.ng-result.is-bronze {
+  border-color: rgba(214, 145, 88, 0.7);
+  background: linear-gradient(90deg, rgba(104, 62, 30, 0.5), rgba(22, 28, 44, 0.9));
+  box-shadow: 0 0 16px rgba(214, 145, 88, 0.16);
+}
+
+.ng-result.is-bronze .ng-result__rank,
+.ng-result.is-bronze .ng-result__points {
+  color: #e0a271;
+}
+
+.ng-result.is-bronze .ng-result__points {
+  font-size: 1.5rem;
+}
+
+@keyframes ng-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes ng-flash {
+  0% { box-shadow: 0 0 0 3px rgba(140, 180, 255, 0.55); }
+  100% { box-shadow: 0 0 0 3px rgba(140, 180, 255, 0); }
+}
+
+@keyframes ng-pop {
+  from { transform: scale(0.9); opacity: 0.4; }
+  to { transform: none; opacity: 1; }
+}
