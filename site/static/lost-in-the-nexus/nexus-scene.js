@@ -3,6 +3,10 @@ import { GLTFLoader } from '/lost-in-the-nexus/vendor/GLTFLoader.js';
 import { OrbitControls } from '/lost-in-the-nexus/vendor/OrbitControls.js';
 import { clone as cloneSkinned } from '/lost-in-the-nexus/vendor/SkeletonUtils.js';
 import { MeshoptDecoder } from '/lost-in-the-nexus/vendor/meshopt_decoder.module.js';
+import { EffectComposer } from '/lost-in-the-nexus/vendor/postprocessing/EffectComposer.js';
+import { RenderPass } from '/lost-in-the-nexus/vendor/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from '/lost-in-the-nexus/vendor/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from '/lost-in-the-nexus/vendor/postprocessing/OutputPass.js';
 
 function fetchJson(url) {
   return fetch(url).then((r) => (r.ok ? r.json() : null)).catch(() => null);
@@ -39,6 +43,16 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
   const persp = new THREE.PerspectiveCamera(50, aspect(), 0.2, 6000);
   let camera = persp;
 
+  // Glow art is flat cards of bright texture: what makes the game's read as
+  // light is the bloom over it, so the scene renders through one. The threshold
+  // is what keeps it off the lit ground, which is nearly as bright.
+  const composer = new EffectComposer(renderer);
+  const renderPass = new RenderPass(scene, camera);
+  composer.addPass(renderPass);
+  const bloom = new UnrealBloomPass(new THREE.Vector2(1, 1), 0.6, 0.45, 0.5);
+  composer.addPass(bloom);
+  composer.addPass(new OutputPass());
+
   const controls = new OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true;
   controls.dampingFactor = 0.08;
@@ -47,6 +61,7 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
 
   const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
   const mixers = [];
+  const scrollers = [];
   let span = 100;
   let centre = new THREE.Vector3();
   let loadToken = 0;
@@ -57,12 +72,86 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
     return new Promise((resolve) => loader.load(url, resolve, undefined, () => resolve(null)));
   }
 
+  // The game's glow art — the Hall of Storms vortex, energy rings, lit windows,
+  // the gate's ward — is emissive and mostly drawn additively, which glTF has no
+  // mode for, so the converter tags the material and the blend is set here. A
+  // few of those layers scroll, which is the only motion their geometry has.
+  function applyGlow(source) {
+    source.traverse((node) => {
+      for (const material of [node.material].flat()) {
+        const glow = material?.userData?.glow;
+        if (!glow) continue;
+        material.toneMapped = false;
+        // The flat kind is unlit but still a surface: it occludes, so it keeps
+        // its depth write. The vortex's star sphere is one, and drawn additively
+        // its whole centre reads as a hole.
+        if (glow === 'add') {
+          material.blending = THREE.AdditiveBlending;
+          material.depthWrite = false;
+        }
+        const scroll = material.userData.scroll;
+        if (scroll && material.map) scrollers.push({ map: material.map, scroll });
+        if (material.userData.mask) applyMask(material, material.userData.mask);
+        if (material.userData.fresnel) applyFresnel(material, material.userData.fresnel);
+      }
+    });
+  }
+
+  // Half the game's moving glow is a still picture under a mask that slides
+  // over it: the mana well's lightning, the watchtower's beam, the gate's ward.
+  // A scrolling mask is the animation, so it stays its own texture with its own
+  // UVs rather than being baked into the art's alpha.
+  const textures = new THREE.TextureLoader();
+
+  function applyMask(material, { uri, tiling, scroll }) {
+    const map = textures.load(asset('/lost-in-the-nexus/models/' + uri));
+    map.wrapS = THREE.RepeatWrapping;
+    map.wrapT = THREE.RepeatWrapping;
+    map.flipY = false; // glTF UVs, and the art it masks comes in that way
+    map.repeat.set(tiling[0], tiling[1]);
+    material.alphaMap = map;
+    material.transparent = true;
+    material.needsUpdate = true;
+    if (scroll[0] || scroll[1]) scrollers.push({ map, scroll });
+  }
+
+  // A layer can fade by view angle, and on the game's energy that is the whole
+  // effect: the Hall of Storms wall is a full cylinder of bright cyan faded out
+  // wherever it faces the camera, leaving the rim of the portal. Without it the
+  // hall wears a lit drum.
+  function applyFresnel(material, [inverted, exponent, low, span]) {
+    material.onBeforeCompile = (shader) => {
+      shader.vertexShader = `varying vec3 vGlowNormal;
+        varying vec3 vGlowEye;
+        ${shader.vertexShader}`.replace(
+        '#include <project_vertex>',
+        // An unlit material only defines `objectNormal` when something else
+        // wants normals, so this reads the attribute itself.
+        `#include <project_vertex>
+         vGlowNormal = normalize( normalMatrix * normal );
+         vGlowEye = normalize( -mvPosition.xyz );`
+      );
+      shader.fragmentShader = `varying vec3 vGlowNormal;
+        varying vec3 vGlowEye;
+        ${shader.fragmentShader}`.replace(
+        '#include <color_fragment>',
+        `#include <color_fragment>
+         float facing = abs( dot( normalize( vGlowNormal ), normalize( vGlowEye ) ) );
+         float rim = pow( ${inverted ? '1.0 - facing' : 'facing'}, ${exponent.toFixed(2)} );
+         diffuseColor.a *= clamp( ${low.toFixed(3)} + ${span.toFixed(3)} * rim, 0.0, 1.0 );`
+      );
+    };
+    material.needsUpdate = true;
+  }
+
   // Team colour is a mask in the diffuse alpha; alpha is not used for transparency
   // on these materials.
   const TEAM_COLOURS = [new THREE.Color(0x3f7fd8), new THREE.Color(0xd8452f)];
   const teamMaterials = new Map();
 
   function teamMaterial(source, team) {
+    // Glow art has no team mask, and forcing its alpha opaque would blow it out.
+    if (source.userData?.glow) return source;
     const key = `${source.uuid}|${team}`;
     const cached = teamMaterials.get(key);
     if (cached) return cached;
@@ -186,6 +275,7 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
   // Instances share their source's buffers, so each is freed once.
   function clearWorld() {
     mixers.length = 0;
+    scrollers.length = 0;
     groundBox = null;
     const geometries = new Set();
     const materials = new Set();
@@ -239,6 +329,7 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
       const gltf = entry && (await loadGltf(asset(entry.gltf)));
       if (gltf) {
         sources[name] = gltf.scene;
+        applyGlow(gltf.scene);
         if (gltf.animations.length) clips[name] = gltf.animations[0];
       }
       if (token === loadToken && ++done % 8 === 0) {
@@ -288,6 +379,10 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
     world.traverse((node) => {
       for (const m of [node.material].flat()) if (m) m.needsUpdate = true;
     });
+  }
+
+  function setBloom(on) {
+    bloom.enabled = on;
   }
 
   // One ortho shadow camera over the framed area; a tighter fit buys resolution.
@@ -349,6 +444,7 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
     }
     camera.updateProjectionMatrix();
     renderer.setSize(width, height, false);
+    composer.setSize(width, height);
   }
   new ResizeObserver(resize).observe(view);
 
@@ -357,6 +453,7 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
     const offset = camera.position.clone().sub(controls.target);
     other.position.copy(controls.target).add(offset);
     camera = other;
+    renderPass.camera = camera;
     controls.object = camera;
     resize();
     controls.update();
@@ -472,13 +569,136 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
     return url.startsWith('data:image/webp') ? url : canvas.toDataURL('image/jpeg', 0.85);
   }
 
+  // Wisps mark where guessers are standing while they search; the host clicks
+  // one to jump their own camera there. Kept off `world` so a map reload
+  // doesn't sweep them up with clearWorld().
+  const wispGroup = new THREE.Group();
+  scene.add(wispGroup);
+  const wispGeometry = new THREE.SphereGeometry(1.2, 12, 12);
+  const wispMaterial = new THREE.MeshBasicMaterial({ color: 0x8fe3ff, transparent: true, opacity: 0.85, toneMapped: false });
+  const wispMaterials = new Map(); // colour -> material, one per player colour
+  function wispMaterialFor(color) {
+    if (!color) return wispMaterial;
+    let material = wispMaterials.get(color);
+    if (!material) {
+      material = wispMaterial.clone();
+      material.color.set(color);
+      wispMaterials.set(color, material);
+    }
+    return material;
+  }
+  const wisps = new Map(); // id -> mesh
+
+  // The name floats above the dot as a billboarded sprite. Text is baked to a
+  // canvas rather than pulled from geometry, so it stays sharp at any zoom.
+  function labelSprite(text) {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const font = '600 40px system-ui, sans-serif';
+    ctx.font = font;
+    const width = Math.ceil(ctx.measureText(text).width) + 24;
+    canvas.width = width;
+    canvas.height = 56;
+    ctx.font = font;
+    ctx.textBaseline = 'middle';
+    ctx.lineWidth = 6;
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.75)';
+    ctx.fillStyle = '#eaf6ff';
+    ctx.strokeText(text, 12, 28);
+    ctx.fillText(text, 12, 28);
+    const map = new THREE.CanvasTexture(canvas);
+    map.colorSpace = THREE.SRGBColorSpace;
+    const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map, depthTest: false, toneMapped: false }));
+    sprite.scale.set((width / 56) * 1.6, 1.6, 1);
+    sprite.position.y = 2.4;
+    return sprite;
+  }
+
+  let onWispPick = null;
+
+  function setWisps(entries, onPick) {
+    onWispPick = onPick;
+    const seen = new Set();
+    for (const entry of entries) {
+      seen.add(entry.id);
+      let mesh = wisps.get(entry.id);
+      if (!mesh) {
+        mesh = new THREE.Mesh(wispGeometry, wispMaterialFor(entry.color));
+        mesh.userData.wispId = entry.id;
+        wispGroup.add(mesh);
+        wisps.set(entry.id, mesh);
+      }
+      mesh.position.fromArray(entry.p);
+      if (entry.name && mesh.userData.name !== entry.name) {
+        if (mesh.userData.label) mesh.remove(mesh.userData.label);
+        const label = labelSprite(entry.name);
+        mesh.add(label);
+        mesh.userData.label = label;
+        mesh.userData.name = entry.name;
+      }
+    }
+    for (const [id, mesh] of wisps) {
+      if (seen.has(id)) continue;
+      wispGroup.remove(mesh);
+      wisps.delete(id);
+    }
+  }
+
+  // A click, not a drag: OrbitControls already owns pointerdown for orbiting,
+  // so this only fires the pick on a short, near-stationary press.
+  const pickRay = new THREE.Raycaster();
+  let pressAt = null;
+  let pressTime = 0;
+  renderer.domElement.addEventListener('pointerdown', (e) => {
+    pressAt = [e.clientX, e.clientY];
+    pressTime = performance.now();
+  });
+  renderer.domElement.addEventListener('pointerup', (e) => {
+    if (!pressAt) return;
+    const [x, y] = pressAt;
+    pressAt = null;
+    if (!onWispPick || !wisps.size) return;
+    if (Math.hypot(e.clientX - x, e.clientY - y) > 4 || performance.now() - pressTime > 350) return;
+    const rect = renderer.domElement.getBoundingClientRect();
+    pickRay.setFromCamera(
+      new THREE.Vector2(((e.clientX - rect.left) / rect.width) * 2 - 1, -((e.clientY - rect.top) / rect.height) * 2 + 1),
+      camera
+    );
+    const hit = pickRay.intersectObjects([...wisps.values()], false)[0];
+    if (hit) onWispPick(hit.object.userData.wispId);
+  });
+
+  // Keeps the camera a little clear of whatever it is looking straight at, so
+  // dollying or flying in can't push the lens through a wall or a doodad.
+  // Water and glow layers draw with depthWrite off, which doubles as the
+  // "not a real surface" marker here. Free flying is left alone (walls and
+  // terrain are noclip while searching for a spot); this only nudges the
+  // camera out when a shot is actually taken, and only far enough to clear
+  // whatever it is embedded in — a narrow corridor still frames tight.
+  const MIN_SHOT_DIST = 1.2;
+  const surfaceRay = new THREE.Raycaster();
+  const viewDir = new THREE.Vector3();
+  function clampToSurfaces() {
+    camera.getWorldDirection(viewDir);
+    surfaceRay.set(camera.position, viewDir);
+    surfaceRay.far = MIN_SHOT_DIST;
+    const hit = surfaceRay.intersectObject(world, true).find((h) => h.object.material?.depthWrite !== false);
+    if (!hit || hit.distance >= MIN_SHOT_DIST) return;
+    const push = MIN_SHOT_DIST - hit.distance;
+    camera.position.addScaledVector(viewDir, -push);
+    controls.target.addScaledVector(viewDir, -push);
+  }
+
   const clock = new THREE.Clock();
   function render() {
     const dt = Math.min(clock.getDelta(), 0.1);
     fly(dt);
     for (const mixer of mixers) mixer.update(dt);
+    for (const { map, scroll } of scrollers) {
+      map.offset.set((map.offset.x + scroll[0] * dt) % 1, (map.offset.y + scroll[1] * dt) % 1);
+    }
     controls.update();
-    renderer.render(scene, camera);
+    composer.render();
     requestAnimationFrame(render);
   }
   render();
@@ -497,13 +717,17 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
     resetCamera,
     swapCamera,
     setShadows,
+    setBloom,
     setFlyEnabled,
     getShot,
     applyShot,
     renderShot,
+    clampToSurfaces,
+    setWisps,
     getSpan: () => span,
     getCentre: () => centre.clone(),
     shadowsEnabled: () => renderer.shadowMap.enabled,
+    bloomEnabled: () => bloom.enabled,
     // Lets a headless check confirm the keys move the camera.
     probe: () => controls.target.toArray().map((v) => Math.round(v)),
   };

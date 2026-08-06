@@ -82,6 +82,14 @@
   font-size: 0.68rem;
 }
 
+.ng-chip__dot {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  align-self: center;
+  flex: none;
+}
+
 .ng-panels {
   position: absolute;
   inset: 0;
@@ -162,6 +170,11 @@
   background: transparent;
 }
 
+.ng-btn--small {
+  padding: 0.2rem 0.55rem;
+  font-size: 0.8rem;
+}
+
 .ng-input {
   width: 100%;
   padding: 0.5rem 0.6rem;
@@ -202,6 +215,12 @@
 
 .ng-player.is-self {
   border-color: rgba(140, 180, 255, 0.65);
+}
+
+.ng-player__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
 }
 
 .ng-tag {

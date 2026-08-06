@@ -58,13 +58,13 @@ export function namePanel({ name, lobbyCode, onSubmit }) {
   queueMicrotask(() => input.focus());
   return el('div', { class: 'ng-panel' }, [
     el('h2', { text: lobbyCode ? `Join lobby ${lobbyCode}` : 'Lost in the Nexus' }),
-    el('p', { class: 'ng-muted', text: 'Guess where the host took their picture. Closest camera wins.' }),
+    el('p', { class: 'ng-muted', text: 'The lobby host will have one minute to fly around the map and take a picture. Players then have a few minutes to find the exact spot they took that picture! How close can you get?' }),
     input,
     el('button', { class: 'ng-btn ng-btn--primary', text: lobbyCode ? 'Join' : 'Create lobby', onClick: submit }),
   ]);
 }
 
-export function lobbyPanel({ lobbyCode, players, selfPeerId, isHost, onStart, onLeave }) {
+export function lobbyPanel({ lobbyCode, players, selfPeerId, isHost, onStart, onLeave, onMakeHost }) {
   const link = `${location.origin}${location.pathname}?game=${lobbyCode}`;
   const copy = el('button', { class: 'ng-btn', text: 'Copy invite link' });
   copy.onclick = () => {
@@ -78,7 +78,14 @@ export function lobbyPanel({ lobbyCode, players, selfPeerId, isHost, onStart, on
       class: 'ng-player' + (p.peerId === selfPeerId ? ' is-self' : ''),
     }, [
       el('span', { class: 'ng-player__name', text: p.name }),
-      p.isHost ? el('span', { class: 'ng-tag', text: 'host' }) : null,
+      el('span', { class: 'ng-player__actions' }, [
+        p.isHost ? el('span', { class: 'ng-tag', text: 'host' }) : null,
+        isHost && !p.isHost ? el('button', {
+          class: 'ng-btn ng-btn--quiet ng-btn--small',
+          text: 'Make host',
+          onClick: () => onMakeHost(p.peerId),
+        }) : null,
+      ]),
     ]))),
     el('p', { class: 'ng-muted', text: `${players.length}/8 players.` }),
     el('div', { class: 'ng-row' }, [
@@ -171,6 +178,7 @@ export function hudView({ label, timeLeft, players, selfPeerId, action }) {
     el('ul', { class: 'ng-hud__players' }, players.map((p) => el('li', {
       class: 'ng-chip' + (p.done ? ' is-done' : '') + (p.peerId === selfPeerId ? ' is-self' : ''),
     }, [
+      el('span', { class: 'ng-chip__dot', style: { background: p.color } }),
       el('span', { text: p.name }),
       el('span', { class: 'ng-chip__state', text: p.state }),
     ]))),
@@ -257,7 +265,7 @@ function countUp(node, to) {
   requestAnimationFrame(step);
 }
 
-export function resultsPanel({ target, onLeave, onOpenImage }) {
+export function resultsPanel({ target, isHost, onLeave, onOpenImage, onPlayAgain }) {
   const list = el('ol', { class: 'ng-results' });
   const panel = el('div', { class: 'ng-panel ng-panel--wide' }, [
     el('h2', { text: 'Results' }),
@@ -270,6 +278,7 @@ export function resultsPanel({ target, onLeave, onOpenImage }) {
     }),
     list,
     el('div', { class: 'ng-row' }, [
+      isHost ? el('button', { class: 'ng-btn ng-btn--primary', text: 'Play again', onClick: onPlayAgain }) : null,
       el('button', { class: 'ng-btn ng-btn--quiet', text: 'Leave', onClick: onLeave }),
     ]),
   ]);

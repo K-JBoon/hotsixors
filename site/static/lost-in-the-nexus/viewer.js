@@ -5,6 +5,8 @@ const status = document.getElementById('nexus-status');
 const picker = document.getElementById('nexus-map');
 const shadowBox = document.getElementById('nexus-shadows');
 const SHADOWS = 'hotsixors.nexus.shadows';
+const bloomBox = document.getElementById('nexus-bloom');
+const BLOOM = 'hotsixors.nexus.bloom';
 
 // Geometry lives in an R2 bucket rather than alongside the page: it is hundreds
 // of megabytes over tens of thousands of files. The indexes store site-absolute
@@ -54,6 +56,16 @@ function setShadows(on) {
   }
 }
 
+function setBloom(on) {
+  nexus.setBloom(on);
+  bloomBox.checked = on;
+  try {
+    localStorage.setItem(BLOOM, String(on));
+  } catch {
+    // Private mode: the choice lasts this visit.
+  }
+}
+
 window.__nexusProbe = () => nexus.probe();
 
 function megabytes(slug) {
@@ -61,10 +73,43 @@ function megabytes(slug) {
   return bytes ? `${Math.round(bytes / 1e6)} MB` : 'tens of megabytes';
 }
 
+// Standard battlegrounds plus Snow Brawl and Garden of Terror Classic.
+const FEATURED_MAP_SLUGS = new Set([
+  'alterac-pass',
+  'battlefield-of-eternity',
+  'blackhearts-bay',
+  'braxis-holdout',
+  'cursed-hollow',
+  'dragon-shire',
+  'garden-of-terror',
+  'hanamura-temple',
+  'haunted-mines',
+  'infernal-shrines',
+  'sky-temple',
+  'tomb-of-the-spider-queen',
+  'towers-of-doom',
+  'volskaya-foundry',
+  'warhead-junction',
+  'snow-brawl',
+  'garden-of-terror-classic',
+]);
+
 const DEFAULT_MAP = 'cursed-hollow';
 const wanted = params.get('map');
-const slugs = Object.keys(maps).sort((a, b) => (maps[a].name || a).localeCompare(maps[b].name || b));
-for (const slug of slugs) {
+const byName = (a, b) => (maps[a].name || a).localeCompare(maps[b].name || b);
+const isSandbox = (slug) => slug.startsWith('sandbox-');
+const featured = Object.keys(maps).filter((slug) => FEATURED_MAP_SLUGS.has(slug)).sort(byName);
+const rest = Object.keys(maps).filter((slug) => !FEATURED_MAP_SLUGS.has(slug) && !isSandbox(slug)).sort(byName);
+const slugs = [...featured, ...rest];
+for (const slug of featured) {
+  picker.add(new Option(`${maps[slug].name || slug} (${megabytes(slug)})`, slug));
+}
+if (featured.length && rest.length) {
+  const sep = new Option('--------', '', false, false);
+  sep.disabled = true;
+  picker.add(sep);
+}
+for (const slug of rest) {
   picker.add(new Option(`${maps[slug].name || slug} (${megabytes(slug)})`, slug));
 }
 picker.value = maps[wanted] ? wanted : (maps[DEFAULT_MAP] ? DEFAULT_MAP : slugs[0]);
@@ -100,6 +145,12 @@ shadowBox.onchange = () => {
   setShadows(shadowBox.checked);
 };
 
+bloomBox.onchange = () => {
+  // Keeping focus would send WASD into the checkbox.
+  bloomBox.blur();
+  setBloom(bloomBox.checked);
+};
+
 {
   const button = document.getElementById('nexus-settings');
   const panel = document.getElementById('nexus-settings-panel');
@@ -128,10 +179,16 @@ try {
 }
 setShadows(shadowsWanted);
 
-// The guessing game is unreleased; everything it needs loads on demand.
+let bloomWanted = true;
+try {
+  bloomWanted = localStorage.getItem(BLOOM) !== 'false';
+} catch {
+  // Private mode: default on.
+}
+setBloom(bloomWanted);
+
+// Everything the guessing game needs loads on demand.
 const gameButton = document.getElementById('nexus-game');
-const gamePreview = params.get('game_preview') === '1' || !!params.get('game');
-if (gamePreview) gameButton.hidden = false;
 
 let gameStarted = false;
 async function startGame(lobbyCode) {
