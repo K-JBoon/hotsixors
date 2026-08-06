@@ -392,10 +392,29 @@ export function createNexusGame({ nexus, page, lobbyCode, setStatus }) {
     render();
   }
 
-  function takeHostShot() {
-    if (!isHost || phase !== 'host-shot') return;
+  function takeHostShot(auto = false) {
+    if (!isHost || phase !== 'host-shot' || confirming) return;
     nexus.clampToSurfaces();
-    hostShot = nexus.getShot();
+    const shot = nexus.getShot();
+    if (auto) {
+      broadcastHostShot(shot);
+      return;
+    }
+    confirming = shot;
+    setPanel(confirmPanel({
+      image: nexus.renderShot(shot, ...SHOT_SIZE),
+      onLockIn: () => broadcastHostShot(confirming),
+      onRetake: () => {
+        confirming = null;
+        setPanel(null);
+        render();
+      },
+    }));
+  }
+
+  function broadcastHostShot(shot) {
+    hostShot = shot;
+    confirming = null;
     phase = 'player-shot';
     deadline = Date.now() + limitSec * 1000;
     broadcast({ kind: 'host-shot', shot: hostShot, limit: limitSec * 1000 });
@@ -603,7 +622,10 @@ export function createNexusGame({ nexus, page, lobbyCode, setStatus }) {
     renderHud();
     const now = Date.now();
     if (deadline && now >= deadline) {
-      if (phase === 'host-shot' && isHost) takeHostShot();
+      if (phase === 'host-shot' && isHost) {
+        if (confirming) broadcastHostShot(confirming);
+        else takeHostShot(true);
+      }
       else if (phase === 'player-shot' && !isHost && !mySubmitted && mapLoaded) offerLockIn(true);
       else if (phase === 'player-shot' && isHost && now >= deadline + SUBMIT_GRACE_MS) finish();
     }
