@@ -64,7 +64,7 @@ export function namePanel({ name, lobbyCode, onSubmit }) {
   ]);
 }
 
-export function lobbyPanel({ lobbyCode, players, selfPeerId, isHost, onStart, onLeave, onMakeHost }) {
+export function lobbyPanel({ lobbyCode, players, selfPeerId, isHost, streamerMode, onStart, onLeave, onMakeHost }) {
   const link = `${location.origin}${location.pathname}?game=${lobbyCode}`;
   const copy = el('button', { class: 'ng-btn', text: 'Copy invite link' });
   copy.onclick = () => {
@@ -73,7 +73,7 @@ export function lobbyPanel({ lobbyCode, players, selfPeerId, isHost, onStart, on
   const enough = players.length >= 2;
   return el('div', { class: 'ng-panel' }, [
     el('h2', { text: 'Lobby' }),
-    el('div', { class: 'ng-code', text: lobbyCode }),
+    el('div', { class: 'ng-code', text: streamerMode ? '••••••' : lobbyCode }),
     el('ul', { class: 'ng-players' }, players.map((p) => el('li', {
       class: 'ng-player' + (p.peerId === selfPeerId ? ' is-self' : ''),
     }, [
@@ -223,11 +223,11 @@ export function createShotView({ shotHost }) {
   thumb.onclick = open;
 
   return {
-    show(dataUrl) {
+    show(dataUrl, hint = 'Find this spot. Click anywhere to start looking.') {
       image = dataUrl;
       overlay.replaceChildren(
         el('img', { class: 'ng-lightbox__image', src: dataUrl, alt: "The host's picture" }),
-        el('p', { class: 'ng-lightbox__hint', text: 'Find this spot. Click anywhere to start looking.' }),
+        el('p', { class: 'ng-lightbox__hint', text: hint }),
       );
       thumb.replaceChildren(el('img', { src: dataUrl, alt: "The host's picture" }));
       open();
@@ -315,10 +315,13 @@ export function resultsPanel({ target, isHost, onLeave, onOpenImage, onPlayAgain
   };
 }
 
-export function noticePanel({ title, body, onLeave }) {
+export function noticePanel({ title, body, onLeave, onPlay }) {
   return el('div', { class: 'ng-panel' }, [
     el('h2', { text: title }),
     body ? el('p', { class: 'ng-muted', text: body }) : null,
-    onLeave ? el('button', { class: 'ng-btn ng-btn--quiet', text: 'Leave', onClick: onLeave }) : null,
+    el('div', { class: 'ng-row' }, [
+      onPlay ? el('button', { class: 'ng-btn ng-btn--primary', text: 'Play Game', onClick: onPlay }) : null,
+      onLeave ? el('button', { class: 'ng-btn ng-btn--quiet', text: 'Leave', onClick: onLeave }) : null,
+    ]),
   ]);
 }

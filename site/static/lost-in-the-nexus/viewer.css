@@ -37,6 +37,7 @@ body:has(.nexus-page) .site-footer {
 .nexus-overlay {
   position: absolute;
   inset: 0;
+  z-index: 2;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -127,6 +128,12 @@ body:has(.nexus-page) .site-footer {
   text-transform: uppercase;
   opacity: 0.55;
   margin-bottom: 0.45rem;
+}
+
+.nexus-settings__sep {
+  height: 1px;
+  margin: -0.35rem 0;
+  background: rgba(140, 160, 220, 0.2);
 }
 
 .rp-switch {

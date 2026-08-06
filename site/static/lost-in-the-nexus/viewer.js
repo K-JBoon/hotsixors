@@ -7,6 +7,8 @@ const shadowBox = document.getElementById('nexus-shadows');
 const SHADOWS = 'hotsixors.nexus.shadows';
 const bloomBox = document.getElementById('nexus-bloom');
 const BLOOM = 'hotsixors.nexus.bloom';
+const streamerBox = document.getElementById('nexus-streamer');
+const STREAMER = 'ng-streamer-mode';
 
 // Geometry lives in an R2 bucket rather than alongside the page: it is hundreds
 // of megabytes over tens of thousands of files. The indexes store site-absolute
@@ -94,13 +96,17 @@ const FEATURED_MAP_SLUGS = new Set([
   'garden-of-terror-classic',
 ]);
 
-const DEFAULT_MAP = 'cursed-hollow';
 const wanted = params.get('map');
 const byName = (a, b) => (maps[a].name || a).localeCompare(maps[b].name || b);
 const isSandbox = (slug) => slug.startsWith('sandbox-');
 const featured = Object.keys(maps).filter((slug) => FEATURED_MAP_SLUGS.has(slug)).sort(byName);
 const rest = Object.keys(maps).filter((slug) => !FEATURED_MAP_SLUGS.has(slug) && !isSandbox(slug)).sort(byName);
 const slugs = [...featured, ...rest];
+// Placeholder: nothing downloads until a battleground is picked. Disabled so it
+// cannot be re-selected once the viewer holds a map.
+const placeholder = new Option('Select a map…', '');
+placeholder.disabled = true;
+picker.add(placeholder);
 for (const slug of featured) {
   picker.add(new Option(`${maps[slug].name || slug} (${megabytes(slug)})`, slug));
 }
@@ -112,17 +118,15 @@ if (featured.length && rest.length) {
 for (const slug of rest) {
   picker.add(new Option(`${maps[slug].name || slug} (${megabytes(slug)})`, slug));
 }
-picker.value = maps[wanted] ? wanted : (maps[DEFAULT_MAP] ? DEFAULT_MAP : slugs[0]);
+picker.value = maps[wanted] ? wanted : '';
 
 const AUTOLOAD = 'hotsixors.nexus.autoload';
 const gate = document.getElementById('nexus-gate');
 const gateButton = document.getElementById('nexus-gate-load');
-const gateSize = document.getElementById('nexus-gate-size');
 const gateRemember = document.getElementById('nexus-gate-remember');
 
 function describeGate() {
-  gateSize.textContent = megabytes(picker.value);
-  gateButton.textContent = `Load ${maps[picker.value]?.name || picker.value}`;
+  gateButton.textContent = `Load ${maps[picker.value]?.name || picker.value} (${megabytes(picker.value)})`;
 }
 
 function start(slug) {
@@ -132,11 +136,34 @@ function start(slug) {
   loadMap(slug);
 }
 
+// The gate is a per-pick warning now, so an unloaded viewer costs nothing.
+function requestMap(slug) {
+  if (readAutoload()) {
+    gate.hidden = true;
+    start(slug);
+    return;
+  }
+  describeGate();
+  setStatus('');
+  gate.hidden = false;
+}
+
 picker.onchange = () => {
   // Keeping focus would send WASD into the dropdown.
   picker.blur();
-  if (gate.hidden) start(picker.value);
-  else describeGate();
+  requestMap(picker.value);
+};
+
+gateButton.onclick = () => {
+  if (gateRemember.checked) {
+    try {
+      localStorage.setItem(AUTOLOAD, 'true');
+    } catch {
+      // Nothing to persist to; the choice lasts this visit.
+    }
+  }
+  gate.hidden = true;
+  start(picker.value);
 };
 
 shadowBox.onchange = () => {
@@ -150,6 +177,21 @@ bloomBox.onchange = () => {
   bloomBox.blur();
   setBloom(bloomBox.checked);
 };
+
+streamerBox.onchange = () => {
+  // Keeping focus would send WASD into the checkbox.
+  streamerBox.blur();
+  try {
+    localStorage.setItem(STREAMER, streamerBox.checked ? '1' : '0');
+  } catch {
+    // Private mode: choice lasts this visit only.
+  }
+};
+try {
+  streamerBox.checked = localStorage.getItem(STREAMER) === '1';
+} catch {
+  // Private mode: default off.
+}
 
 {
   const button = document.getElementById('nexus-settings');
@@ -205,27 +247,14 @@ gameButton.onclick = () => {
   startGame(null);
 };
 
-if (!picker.value) {
-  status.textContent = 'No battlegrounds available.';
+if (!slugs.length) {
+  setStatus('No battlegrounds available.');
 } else if (params.get('game')) {
   await startGame(params.get('game'));
-} else if (readAutoload()) {
-  await loadMap(picker.value);
+} else if (picker.value) {
+  requestMap(picker.value);
 } else {
-  status.hidden = true;
-  describeGate();
-  gate.hidden = false;
-  gateButton.onclick = () => {
-    if (gateRemember.checked) {
-      try {
-        localStorage.setItem(AUTOLOAD, 'true');
-      } catch {
-        // Nothing to persist to; the choice lasts this visit.
-      }
-    }
-    gate.hidden = true;
-    start(picker.value);
-  };
+  setStatus('Select a map.');
 }
 
 function readAutoload() {

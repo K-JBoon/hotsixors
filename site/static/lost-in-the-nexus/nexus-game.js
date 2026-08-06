@@ -21,6 +21,7 @@ const MAX_PLAYERS = 8;
 const PLAYER_COLORS = ['#e6474c', '#4c9be6', '#4cd97a', '#e6b93c', '#b073e6', '#e67ba3', '#3ddbd0', '#e68a3c'];
 const HOST_SHOT_MS = 60_000;
 const SUBMIT_GRACE_MS = 4000;
+const JOIN_TIMEOUT_MS = 1000;
 const REVEAL_MS = 1400;
 const PODIUM_MS = 2400;
 const DEFAULT_LIMIT_SEC = 180;
@@ -77,12 +78,15 @@ export function createNexusGame({ nexus, page, lobbyCode, setStatus }) {
   let isHost = false;
   let myName = '';
   let code = lobbyCode || '';
+  const streamerMode = localStorage.getItem('ng-streamer-mode') === '1';
   let phase = 'name';
   let players = [];          // { peerId, name, isHost, loaded, shot, auto, lockedAt }
   let choices = [];
   let limitSec = DEFAULT_LIMIT_SEC;
   let mapSlug = null;
   let hostShot = null;
+  let joined = false;
+  let joinTimer = null;
   let deadline = null;       // local epoch ms
   let hostDeadline = null;
   let mapLoaded = false;
@@ -151,7 +155,23 @@ export function createNexusGame({ nexus, page, lobbyCode, setStatus }) {
     await connect();
     history.replaceState(null, '', `?game=${code}`);
     phase = 'lobby';
+    joined = false;
     setPanel(noticePanel({ title: 'Looking for the lobby…', body: `Lobby ${code}`, onLeave: leave }));
+    clearTimeout(joinTimer);
+    joinTimer = setTimeout(() => {
+      if (joined) return;
+      setPanel(noticePanel({
+        title: 'No lobby found',
+        body: `Lobby ${code} doesn't exist, or the host has left.`,
+        onLeave: leave,
+        onPlay: () => {
+          try { net?.leave(); } catch { /* already gone */ }
+          net = null;
+          setPanel(null);
+          hostLobby();
+        },
+      }));
+    }, JOIN_TIMEOUT_MS);
   }
 
   function handlePeers(event) {
@@ -226,11 +246,15 @@ export function createNexusGame({ nexus, page, lobbyCode, setStatus }) {
     if (!msg?.kind || isHost) return;
     switch (msg.kind) {
       case 'lobby':
+        joined = true;
+        clearTimeout(joinTimer);
         players = msg.players;
         phase = msg.phase === 'lobby' ? 'lobby' : phase;
         render();
         break;
       case 'rejected':
+        joined = true;
+        clearTimeout(joinTimer);
         setPanel(noticePanel({ title: 'Cannot join', body: msg.reason, onLeave: leave }));
         break;
       case 'map-options':
@@ -418,7 +442,7 @@ export function createNexusGame({ nexus, page, lobbyCode, setStatus }) {
     phase = 'player-shot';
     deadline = Date.now() + limitSec * 1000;
     broadcast({ kind: 'host-shot', shot: hostShot, limit: limitSec * 1000 });
-    shots.show(nexus.renderShot(hostShot, ...SHOT_SIZE));
+    setPanel(null);
     render();
   }
 
@@ -517,6 +541,7 @@ export function createNexusGame({ nexus, page, lobbyCode, setStatus }) {
   }
 
   function leave() {
+    clearTimeout(joinTimer);
     stopPositionBroadcast();
     try { net?.leave(); } catch { /* already gone */ }
     net = null;
@@ -544,7 +569,7 @@ export function createNexusGame({ nexus, page, lobbyCode, setStatus }) {
 
   function actionButton() {
     if (!canShoot()) return null;
-    const onClick = phase === 'host-shot' ? takeHostShot : () => offerLockIn();
+    const onClick = phase === 'host-shot' ? () => takeHostShot() : () => offerLockIn();
     return el('button', { class: 'ng-btn ng-btn--primary', text: 'Take a Picture', onClick });
   }
 
@@ -565,6 +590,7 @@ export function createNexusGame({ nexus, page, lobbyCode, setStatus }) {
         players,
         selfPeerId,
         isHost,
+        streamerMode,
         onStart: startGame,
         onLeave: leave,
         onMakeHost: transferHost,
