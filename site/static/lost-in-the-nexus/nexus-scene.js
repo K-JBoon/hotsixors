@@ -17,7 +17,7 @@ function fetchJson(url) {
 export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys = {} }) {
   const asset = (path) => assets + path;
 
-  const renderer = new THREE.WebGLRenderer({ antialias: true });
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
   renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
   view.appendChild(renderer.domElement);
 
@@ -70,6 +70,12 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
 
   function loadGltf(url) {
     return new Promise((resolve) => loader.load(url, resolve, undefined, () => resolve(null)));
+  }
+
+  let modelsPromise = null;
+  function modelsIndex() {
+    modelsPromise ||= fetchJson(asset('/lost-in-the-nexus/models/index.json'));
+    return modelsPromise;
   }
 
   // The game's glow art — the Hall of Storms vortex, energy rings, lit windows,
@@ -292,14 +298,14 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
     teamMaterials.clear();
   }
 
-  async function loadMap(slug, onStatus = () => {}) {
+  async function loadMap(slug, onStatus = () => {}, { skip } = {}) {
     const token = ++loadToken;
     clearWorld();
     onStatus('Loading terrain…');
 
     const [placed, models] = await Promise.all([
       fetchJson(asset(`/lost-in-the-nexus/maps3d/${slug}.json`)),
-      fetchJson(asset('/lost-in-the-nexus/models/index.json')),
+      modelsIndex(),
     ]);
     if (token !== loadToken) return false;
     if (!placed || !models) {
@@ -324,7 +330,8 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
     const sources = {};
     const clips = {};
     let done = 0;
-    await Promise.all(placed.models.map(async (name) => {
+    const wanted = placed.models.filter((name) => !(skip && skip(name)));
+    await Promise.all(wanted.map(async (name) => {
       const entry = models.models[name];
       const gltf = entry && (await loadGltf(asset(entry.gltf)));
       if (gltf) {
@@ -333,7 +340,7 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
         if (gltf.animations.length) clips[name] = gltf.animations[0];
       }
       if (token === loadToken && ++done % 8 === 0) {
-        onStatus(`Loading models ${done}/${placed.models.length}…`);
+        onStatus(`Loading models ${done}/${wanted.length}…`);
       }
     }));
     if (token !== loadToken) return false;
@@ -540,19 +547,26 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
   }
 
   const shotCamera = new THREE.PerspectiveCamera(50, 1, 0.2, 6000);
+
   // Readback of an offscreen render: the live canvas keeps showing the player's
   // own view while a shot is developed.
-  function renderShot(shot, width, height) {
+  function readTarget(cam, width, height, transparent = false) {
     const target = new THREE.WebGLRenderTarget(width, height, { samples: 4 });
     target.texture.colorSpace = THREE.SRGBColorSpace;
-    poseCamera(shotCamera, shot, width / height);
+    const background = scene.background;
+    if (transparent) {
+      scene.background = null;
+      renderer.setClearAlpha(0);
+    }
     const previous = renderer.getRenderTarget();
     renderer.setRenderTarget(target);
-    renderer.render(scene, shotCamera);
+    renderer.render(scene, cam);
     const pixels = new Uint8Array(width * height * 4);
     renderer.readRenderTargetPixels(target, 0, 0, width, height, pixels);
     renderer.setRenderTarget(previous);
     target.dispose();
+    scene.background = background;
+    renderer.setClearAlpha(1);
 
     const canvas = document.createElement('canvas');
     canvas.width = width;
@@ -565,8 +579,116 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
       image.data.set(pixels.subarray(y * stride, y * stride + stride), (height - 1 - y) * stride);
     }
     context.putImageData(image, 0, 0);
+    return canvas;
+  }
+
+  function renderShot(shot, width, height) {
+    const canvas = readTarget(poseCamera(shotCamera, shot, width / height), width, height);
     const url = canvas.toDataURL('image/webp', 0.85);
     return url.startsWith('data:image/webp') ? url : canvas.toDataURL('image/jpeg', 0.85);
+  }
+
+  // Straight-down orthographic plate of a game-coordinate rect, at the replay
+  // viewer's pixels per game unit. Image north is +y, which is how the viewer
+  // reads its minimaps.
+  const rectCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 8000);
+  function renderRect({ minX, minY, maxX, maxY, pxPerUnit = 4, transparent = false, format = 'image/png', quality = 0.92 }) {
+    const w = maxX - minX;
+    const h = maxY - minY;
+    const cx = (minX + maxX) / 2;
+    const cz = -(minY + maxY) / 2;
+    rectCamera.position.set(cx, 3000, cz);
+    rectCamera.up.set(0, 0, -1);
+    rectCamera.lookAt(cx, 0, cz);
+    rectCamera.left = -w / 2;
+    rectCamera.right = w / 2;
+    rectCamera.top = h / 2;
+    rectCamera.bottom = -h / 2;
+    rectCamera.updateProjectionMatrix();
+    centre.set(cx, 0, cz);
+    span = Math.max(w, h) / 2;
+    fitShadow();
+    const canvas = readTarget(rectCamera, Math.round(w * pxPerUnit), Math.round(h * pxPerUnit), transparent);
+    return canvas.toDataURL(format, quality);
+  }
+
+  // One model alone on transparent ground, pitched the way the replay viewer
+  // pastes it over a flat map. The anchor is where the instance's own origin
+  // lands in the image, so the viewer can place it from a world position.
+  const modelCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 8000);
+  const SPRITE_PAD = 0.15; // game units of margin, so antialiasing has room
+  async function renderModel(name, { pxPerUnit = 26, pitch: spritePitch = 60, team, r = 0, s = 0, format = 'image/png', quality = 0.92 } = {}) {
+    const models = await modelsIndex();
+    const entry = models?.models?.[name];
+    const gltf = entry && (await loadGltf(asset(entry.gltf)));
+    if (!gltf) return null;
+    clearWorld();
+    applyGlow(gltf.scene);
+    if (team !== undefined && entry.team) applyTeam(gltf.scene, team);
+    const node = gltf.scene;
+    node.rotation.y = r;
+    if (s) node.scale.setScalar(s);
+    node.updateMatrixWorld(true);
+    world.add(node);
+    markShadows();
+
+    const box = new THREE.Box3().setFromObject(node);
+    const target = box.getCenter(new THREE.Vector3());
+    const reach = box.getSize(new THREE.Vector3()).length() || 1;
+    const rad = THREE.MathUtils.degToRad(spritePitch);
+    modelCamera.position.copy(target).addScaledVector(new THREE.Vector3(0, Math.sin(rad), Math.cos(rad)), reach * 3 + 100);
+    modelCamera.up.set(0, 1, 0);
+    modelCamera.lookAt(target);
+    modelCamera.updateMatrixWorld();
+    const toCamera = modelCamera.matrixWorldInverse;
+
+    const point = new THREE.Vector3();
+    let left = Infinity;
+    let right = -Infinity;
+    let bottom = Infinity;
+    let top = -Infinity;
+    for (const x of [box.min.x, box.max.x]) {
+      for (const y of [box.min.y, box.max.y]) {
+        for (const z of [box.min.z, box.max.z]) {
+          point.set(x, y, z).applyMatrix4(toCamera);
+          left = Math.min(left, point.x);
+          right = Math.max(right, point.x);
+          bottom = Math.min(bottom, point.y);
+          top = Math.max(top, point.y);
+        }
+      }
+    }
+    // An empty or unbounded box means the model brought no drawable geometry.
+    if (!Number.isFinite(left) || !Number.isFinite(right) || !Number.isFinite(bottom) || !Number.isFinite(top)) return null;
+    left -= SPRITE_PAD;
+    right += SPRITE_PAD;
+    bottom -= SPRITE_PAD;
+    top += SPRITE_PAD;
+    modelCamera.left = left;
+    modelCamera.right = right;
+    modelCamera.top = top;
+    modelCamera.bottom = bottom;
+    modelCamera.updateProjectionMatrix();
+
+    centre.copy(target);
+    span = reach;
+    fitShadow();
+
+    const worldW = right - left;
+    const worldH = top - bottom;
+    const width = Math.max(1, Math.round(worldW * pxPerUnit));
+    const height = Math.max(1, Math.round(worldH * pxPerUnit));
+    const origin = point.set(0, 0, 0).applyMatrix4(toCamera);
+    const png = readTarget(modelCamera, width, height, true).toDataURL(format, quality);
+    return {
+      png,
+      w: width,
+      h: height,
+      worldW: Number(worldW.toFixed(3)),
+      worldH: Number(worldH.toFixed(3)),
+      anchorX: Number(((origin.x - left) / worldW).toFixed(4)),
+      anchorY: Number(((top - origin.y) / worldH).toFixed(4)),
+    };
   }
 
   // Wisps mark where guessers are standing while they search; the host clicks
@@ -722,6 +844,8 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
     getShot,
     applyShot,
     renderShot,
+    renderRect,
+    renderModel,
     clampToSurfaces,
     setWisps,
     getSpan: () => span,

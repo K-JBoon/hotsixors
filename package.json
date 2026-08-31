@@ -11,11 +11,13 @@
     "build:prune-nexus": "rm -rf site/public/lost-in-the-nexus/models site/public/lost-in-the-nexus/terrain site/public/lost-in-the-nexus/maps3d",
     "dev": "npm run gen && zola --root site serve",
     "clean": "find site/content/heroes -name '*.md' ! -name '_index.md' -delete 2>/dev/null; rm -rf site/content/gamedata site/content/battlegrounds site/static/images site/static/*.json site/static/draft/draft-data.json site/static/replay/*.json site/static/replay/typeinfos.js site/static/replay/maps site/static/replay/abillinks site/static/replay/protocols site/static/replay/movement-abilities.json site/data/*.json site/data/battlegrounds/*.json site/data/heroes",
+    "gen:map3d": "tsx scripts/gen-replay-map3d.ts",
     "typecheck": "tsc",
     "test": "tsx --test tests/*.test.ts"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
+    "puppeteer": "^25.9.0",
     "saxes": "^6.0.0",
     "three": "^0.185.1",
     "tsx": "^4.19.2",

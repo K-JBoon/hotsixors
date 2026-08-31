@@ -1,15 +1,35 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import test from "node:test";
 
-// Pages hand most of their markup to macros, so an assertion about what a page renders has to see
-// the macros it imports too. Returns the template followed by every macro file it pulls in.
+// Pages hand most of their markup to components, so an assertion about what a page renders has to
+// see the components it calls too. Returns the template followed by every component file it uses.
+const TEMPLATE_ROOT = new URL("../site/templates/", import.meta.url);
+
+function componentFiles(): Map<string, string> {
+  const found = new Map<string, string>();
+  const walk = (dir: string) => {
+    for (const entry of readdirSync(new URL(dir, TEMPLATE_ROOT), { withFileTypes: true })) {
+      const path = `${dir}${entry.name}`;
+      if (entry.isDirectory()) walk(`${path}/`);
+      else if (entry.name.endsWith(".html")) {
+        const source = readFileSync(new URL(path, TEMPLATE_ROOT), "utf-8");
+        for (const m of source.matchAll(/\{%-?\s*component\s+([\w.]+)\(/g)) found.set(m[1], path);
+      }
+    }
+  };
+  walk("");
+  return found;
+}
+
+const COMPONENTS = componentFiles();
+
 function renderedBy(templatePath: string, seen = new Set<string>()): string {
   if (seen.has(templatePath)) return "";
   seen.add(templatePath);
-  const source = readFileSync(new URL(`../site/templates/${templatePath}`, import.meta.url), "utf-8");
-  const imports = [...source.matchAll(/\{%-?\s*import\s+"([^"]+)"/g)].map((m) => m[1]);
-  return [source, ...imports.map((path) => renderedBy(path, seen))].join("\n");
+  const source = readFileSync(new URL(templatePath, TEMPLATE_ROOT), "utf-8");
+  const used = [...source.matchAll(/\{[{%]\s*<([\w.]+)[\s/>]/g)].map((m) => COMPONENTS.get(m[1]));
+  return [source, ...used.filter((path): path is string => Boolean(path)).map((path) => renderedBy(path, seen))].join("\n");
 }
 
 test("base navigation exposes the approved player-first IA", () => {
@@ -117,21 +137,21 @@ test("fonts are vendored and loaded without blocking first render", () => {
 });
 
 test("site images are routed through Zola resize_image", () => {
-  const macro = readFileSync(new URL("../site/templates/macros/images.html", import.meta.url), "utf-8");
+  const imageComponent = readFileSync(new URL("../site/templates/components/images.html", import.meta.url), "utf-8");
   const homeTemplate = renderedBy("index.html");
   const heroListTemplate = renderedBy("heroes/list.html");
   const heroTemplate = renderedBy("heroes/single.html");
   const effectIndexTemplate = readFileSync(new URL("../site/templates/effect-index.html", import.meta.url), "utf-8");
-  const abilityShortcode = readFileSync(new URL("../site/templates/shortcodes/ability.html", import.meta.url), "utf-8");
+  const abilityShortcode = readFileSync(new URL("../site/templates/components/ability.html", import.meta.url), "utf-8");
 
-  assert.match(macro, /resize_image\(path=path/);
-  assert.match(macro, /format="webp"/);
-  assert.match(macro, /srcset="\{\{ image_1x\.url \}\} 1x, \{\{ image_2x\.url \}\} 2x"/);
+  assert.match(imageComponent, /resize_image\(path=path/);
+  assert.match(imageComponent, /format="webp"/);
+  assert.match(imageComponent, /srcset="\{\{ image_1x\.url \}\} 1x, \{\{ image_2x\.url \}\} 2x"/);
 
-  assert.match(homeTemplate, /images::optimized/);
-  assert.match(heroListTemplate, /images::optimized/);
-  assert.match(heroTemplate, /images::optimized/);
-  assert.match(effectIndexTemplate, /images::optimized/);
+  assert.match(homeTemplate, /<images\.optimized/);
+  assert.match(heroListTemplate, /<images\.optimized/);
+  assert.match(heroTemplate, /<images\.optimized/);
+  assert.match(effectIndexTemplate, /<images\.optimized/);
   assert.match(abilityShortcode, /resize_image\(path='images\/abilitytalents\/' ~ entry\.icon/);
 });
 

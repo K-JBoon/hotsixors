@@ -4,9 +4,9 @@ compile_sass = true
 generate_feeds = false
 build_search_index = true
 minify_html = true
-
-[markdown]
-highlight_code = false
+# Generated pages carry game strings that can contain Tera-looking braces; only
+# hand-written guides are templated.
+skip_content_templating = ["heroes/**", "gamedata/**", "battlegrounds/**"]
 
 [search]
 index_format = "elasticlunr_javascript"

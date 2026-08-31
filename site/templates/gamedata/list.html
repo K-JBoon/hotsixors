@@ -174,7 +174,7 @@
           {% set parts = section.extra.dir_path | split(pat="/") %}
           {% for i in range(end=parts | length) %}
             {% set part = parts[i] %}
-            {% set crumb_path = parts | slice(end=i+1) | join(sep="/") %}
+            {% set crumb_path = parts[:i+1] | join(sep="/") %}
             <span class="breadcrumb-sep">/</span>
             <a href="/gamedata/{{ crumb_path }}/">{{ part }}</a>
           {% endfor %}

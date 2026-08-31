@@ -93,9 +93,12 @@ const BODY_PORTRAITS = {
   JunkratSteelTrap: { dir: 'abilitytalents', file: 'storm_ui_icon_junkrat_steel_trap.png', sx: 0 },
   JunkratRIPTire: { dir: 'abilitytalents', file: 'storm_ui_icon_junkrat_rip_tire.png', sx: 0 },
   ChromieTimeTrap: { dir: 'abilitytalents', file: 'storm_ui_icon_chromie_timetrap.png', sx: 0 },
+  AbathurSymbiote: { dir: 'abilitytalents', file: 'storm_ui_icon_abathur_symbiote.png', sx: 0 },
+  AbathurToxicNest: { dir: 'abilitytalents', file: 'storm_ui_icon_abathur_toxicnest.png', sx: 0 },
   ZagaraCreepTumor: { dir: 'abilitytalents', file: 'storm_ui_icon_zagara_creep.png', sx: 0 },
   ZagaraCreepTumorBurrowed: { dir: 'abilitytalents', file: 'storm_ui_icon_zagara_creep.png', sx: 0 },
 };
+const PORTRAIT_OVERRIDES = new Set(['AbathurSymbiote']);
 function summonPortrait(type) {
   const summon = state.summons && state.summons[type];
   return summon && summon.portrait ? { dir: 'unitportraits', file: summon.portrait } : null;
@@ -116,8 +119,9 @@ function minimapIcon(type) {
 }
 function drawBodyPortrait(ctx, body, type, fallbackFile, x, y, r) {
   if (!body.portraitImg) {
-    const icon = minimapIcon(type);
-    const unit = icon || BODY_PORTRAITS[type] || summonPortrait(type);
+    const override = PORTRAIT_OVERRIDES.has(type) ? BODY_PORTRAITS[type] : null;
+    const icon = override ? null : minimapIcon(type);
+    const unit = override || icon || BODY_PORTRAITS[type] || summonPortrait(type);
     const file = unit ? unit.file : fallbackFile;
     if (!file) return false;
     const img = new Image();
@@ -177,9 +181,10 @@ function drawCompanions(loop) {
     const pos = companionPositionAt(c, loop);
     if (!pos) continue;
     const owner = state.playersById.get(c.ownerId);
-    const decoy = c.kind === 'decoy';
+    const decoy = c.kind === 'decoy' || c.kind === 'clone';
     const [x, y] = worldToCanvas(pos[0], pos[1]);
-    const r = (decoy || c.kind === 'summon' ? 6.5 : 9) * scale;
+    const small = c.kind === 'summon' || c.kind === 'symbiote' || c.kind === 'decoy';
+    const r = (small ? 6.5 : 9) * scale;
     drawUnitMarker(ctx, c, c.unitType, owner && owner.meta ? owner.meta.portrait : null, x, y, r, {
       fill: TEAM_COLORS[c.team],
       edge: decoy ? ILLUSION_EDGE : TEAM_COLORS[c.team],
@@ -234,20 +239,24 @@ export function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.fillStyle = '#0a0a0c';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
-  if (state.bg && state.mapMeta) {
+  const plate = state.mapStyle === 'schematic' ? null : state.plate;
+  const ground = (plate && plate.image) || state.bg;
+  if (ground && state.mapMeta) {
     const v = state.view;
-    const s = state.mapMeta.imageScale || 2;
+    const s = plate ? plate.scale : state.mapMeta.imageScale || 2;
     const sx = v.minX * s;
     const sy = (state.mapMeta.mapHeight - v.maxY) * s;
     const sw = (v.maxX - v.minX) * s;
     const sh = (v.maxY - v.minY) * s;
-    ctx.drawImage(state.bg, sx, sy, sw, sh, 0, 0, canvas.width, canvas.height);
+    ctx.drawImage(ground, sx, sy, sw, sh, 0, 0, canvas.width, canvas.height);
   }
   for (const s of model.structures) {
     if (s.bornLoop > loop) continue;
     if (s.diedLoop != null && s.diedLoop <= loop) continue;
+    if (plate && s.plated) continue; // a sprite stands here instead
     drawStructure(ctx, s);
   }
+  if (plate) drawBuildings(plate, loop);
   drawCamps(loop);
   if (state.objectives) drawObjectives(loop);
 
@@ -372,6 +381,26 @@ function teamShade(team, tint, a) {
   };
   return `rgba(${mix(0)},${mix(1)},${mix(2)},${a})`;
 }
+/** Building sprites, already sorted north to south so they overlap correctly. */
+function drawBuildings(plate, loop) {
+  const { ctx } = state;
+  const scale = worldScale();
+  for (const b of plate.buildings) {
+    const s = b.structure;
+    if (s) {
+      if (s.bornLoop > loop) continue;
+      if (s.diedLoop != null && s.diedLoop <= loop) continue;
+    }
+    const sprite = plate.sprites[b.sprite];
+    const img = plate.images.get(b.sprite);
+    if (!sprite || !img) continue;
+    const [x, y] = worldToCanvas(b.x, b.y);
+    const w = sprite.worldW * scale;
+    const h = sprite.worldH * scale;
+    ctx.drawImage(img, x - sprite.anchorX * w, y - sprite.anchorY * h, w, h);
+  }
+}
+
 function drawStructure(ctx, s) {
   const [x, y] = worldToCanvas(s.x, s.y);
   const style = s.style || WALL_CLASS;
@@ -606,7 +635,7 @@ function drawVision(loop, team) {
     if (pos) punch(p, pos[0], pos[1], unitSight(p.unitType));
   }
   for (const c of model.companions) {
-    if (c.team !== team || !isAliveAt(c.spans, loop)) continue;
+    if (c.team !== team || c.kind === 'symbiote' || !isAliveAt(c.spans, loop)) continue;
     const pos = companionPositionAt(c, loop);
     if (!pos) continue;
     const brush = brushVision(c, loop, pos);
@@ -616,7 +645,9 @@ function drawVision(loop, team) {
   for (const u of model.visionUnits) {
     if (u.team !== team) continue;
     const pos = minionPositionAt(u, loop);
-    if (pos) punch(u, pos[0], pos[1], unitSight(u.type, loop - u.bornLoop), unitFlies(u.type));
+    if (!pos) continue;
+    const sight = unitSight(u.type, loop - u.bornLoop);
+    if (sight > 0) punch(u, pos[0], pos[1], sight, unitFlies(u.type));
   }
   for (const s of model.structures) {
     if (s.team !== team || s.bornLoop > loop) continue;

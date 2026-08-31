@@ -1,6 +1,4 @@
 {% extends "base.html" %}
-{% import "macros/images.html" as images %}
-{% import "macros/heroes.html" as heroes %}
 
 {% block title %}{{ page.extra.hero_name }} — {{ config.title }}{% endblock title %}
 
@@ -13,7 +11,7 @@
 
   <div class="hero-banner role-{{ hero.role | lower }}">
     {% if hero.portraits.loading %}
-      {{ images::optimized(path='images/heroportraits/' ~ hero.portraits.loading, class="hero-banner__loading", alt="", width=340, height=124, op="fit", display_width=340, display_height=124, loading="eager") }}
+      {{<images.optimized path={'images/heroportraits/' ~ hero.portraits.loading} class="hero-banner__loading" alt="" width={340} height={124} op="fit" display_width={340} display_height={124} loading="eager" />}}
     {% endif %}
     <div class="hero-banner__info">
       <h1 class="hero-banner__name">{{ hero.hero_name }}</h1>
@@ -42,12 +40,12 @@
       {% set st = unit_stat.stats %}
       <div class="hero-stats__unit">
         <h3 class="hero-stats__unit-title">{{ unit_stat.unitName }}</h3>
-        {{ heroes::hero_stats_grid(st=st) }}
+        {{<heroes.hero_stats_grid st={st} />}}
       </div>
       {% endfor %}
     {% elif hero_data.stats %}
     {% set st = hero_data.stats %}
-    {{ heroes::hero_stats_grid(st=st) }}
+    {{<heroes.hero_stats_grid st={st} />}}
     {% endif %}
   </section>
   {% endif %}
@@ -60,7 +58,7 @@
     <div class="abilities-grid">
       {% for ab in hero_data.abilities %}
         {% if ab.category == "basic" or ab.category == "heroic" or ab.category == "trait" or ab.category == "activable" %}
-        {{ heroes::ability_card(ab=ab, sc=sc, show_stats=true) }}
+        {{<heroes.ability_card ab={ab} sc={sc} show_stats={true} />}}
         {% endif %}
       {% endfor %}
     </div>
@@ -71,7 +69,7 @@
       <div class="abilities-grid">
         {% for ab in group.abilities %}
           {% if ab.category == "basic" or ab.category == "heroic" or ab.category == "trait" or ab.category == "activable" %}
-          {{ heroes::ability_card(ab=ab, sc=sc, show_stats=true) }}
+          {{<heroes.ability_card ab={ab} sc={sc} show_stats={true} />}}
           {% endif %}
         {% endfor %}
       </div>
@@ -84,7 +82,7 @@
       <div class="abilities-grid">
         {% for ab in unit.abilities %}
           {% if ab.category == "basic" or ab.category == "heroic" or ab.category == "trait" %}
-          {{ heroes::ability_card(ab=ab, sc=sc, show_stats=true) }}
+          {{<heroes.ability_card ab={ab} sc={sc} show_stats={true} />}}
           {% endif %}
         {% endfor %}
       </div>
@@ -105,7 +103,7 @@
     </div>
     {% set tiers = ["level1","level4","level7","level10","level13","level16","level20"] %}
     {% for tier in tiers %}
-      {% set tier_talents = hero_data.talents | filter(attribute="tier", value=tier) %}
+      {% set tier_talents = [t for t in hero_data.talents if t.tier == tier] %}
       {% if tier_talents %}
         <div class="talent-tier">
           <h3 class="talent-tier__label">
@@ -124,7 +122,7 @@
                  id="talent-{{ tal.nameId }}"
                  data-talent-id="{{ tal.nameId }}"
                  data-talent-tier="{{ tier }}">
-              {{ images::optimized(path='images/abilitytalents/' ~ tal.icon, class="talent-card__icon", alt="", width=40, height=40, op="fill", display_width=40, display_height=40, loading="lazy") }}
+              {{<images.optimized path={'images/abilitytalents/' ~ tal.icon} class="talent-card__icon" alt="" width={40} height={40} op="fill" display_width={40} display_height={40} loading="lazy" />}}
               <div class="talent-card__body">
                 <div class="talent-card__header">
                   <span class="talent-card__name">{{ tal.name }}</span>

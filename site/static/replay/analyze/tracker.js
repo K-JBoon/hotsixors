@@ -30,6 +30,7 @@ import {
 } from './registry.js';
 import { anchor } from './timeline.js';
 import {
+  BODY_SPAWNED_SUMMONS,
   CAMP_DEFENDER_DIST,
   CAMP_DEFENDER_TYPES,
   COMPANION_TYPES,
@@ -41,11 +42,12 @@ import {
 } from './units.js';
 const HALL_SAMPLE_LOOPS = 200;
 
-export function runTrackerPass(data, protocol, model, reg, summons) {
+export function runTrackerPass(data, protocol, model, reg, summons, heroUnits) {
   const ctx = {
     model,
     reg,
     summons,
+    heroUnits,
     signals: newPhaseSignals(),
     templeWindows: new Map(),
     volleys: new Map(),
@@ -133,8 +135,8 @@ function bornHero(ctx, ev, name, p) {
   }
 }
 
-function bornCompanion(ctx, ev, name, p) {
-  const c = addCompanion(ctx.model, p, name, COMPANION_TYPES[name], ev._gameloop);
+function bornCompanion(ctx, ev, name, p, kind) {
+  const c = addCompanion(ctx.model, p, name, kind || COMPANION_TYPES[name], ev._gameloop);
   ctx.reg.unitToPlayer.set(tagOf(ev), p);
   ctx.reg.companionsByTag.set(tagOf(ev), c);
   pushByIndex(ctx.reg.companionsByIndex, ev.m_unitTagIndex, c);
@@ -220,6 +222,15 @@ function objectiveUnitLine(ctx, ev, name) {
   });
 }
 
+/* Abathur's Ultimate Evolution copies an ally, so the copy is another hero's
+   unit type under his control. It is a companion, not a second body. */
+function isClonedHero(ctx, name, p) {
+  if (p.unitType == null || !ctx.heroUnits) return false;
+  const hero = ctx.heroUnits[name];
+  const own = ctx.heroUnits[p.unitType];
+  return !!hero && !!own && hero !== own;
+}
+
 function onUnitBorn(ctx, ev) {
   const { model, reg } = ctx;
   const name = str(ev.m_unitTypeName);
@@ -227,7 +238,8 @@ function onUnitBorn(ctx, ev) {
   growBounds(model, ev.m_x, ev.m_y);
 
   if (name.startsWith('Hero') && name !== VIKING_CONTROLLER) {
-    if (owner) bornHero(ctx, ev, name, owner);
+    if (owner && isClonedHero(ctx, name, owner)) bornCompanion(ctx, ev, name, owner, 'clone');
+    else if (owner) bornHero(ctx, ev, name, owner);
   } else if (COMPANION_TYPES[name] && owner) {
     bornCompanion(ctx, ev, name, owner);
   } else if ((VISION_UNITS.has(name) || name in ctx.summons) && owner) {
@@ -239,6 +251,7 @@ function onUnitBorn(ctx, ev) {
   } else if (!isAiPlayer(ev.m_controlPlayerId) && name in CAMP_DEFENDER_TYPES && model.campSites.length) {
     bornCampDefender(ctx, ev, name);
   }
+  if (owner && BODY_SPAWNED_SUMMONS.has(name)) anchor(owner, ev._gameloop, ev.m_x, ev.m_y);
 
   if (PHASE_BORN_TYPES.has(name)) {
     ctx.signals.add('born', name, ev._gameloop, ctx.teamOfOwner(ev.m_controlPlayerId));

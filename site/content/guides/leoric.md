@@ -22,15 +22,15 @@ the last phase of the draft when the enemy team has shown their damage structure
 
 ## Abilities
 
-{{ ability_card(id="LeoricSkeletalSwingTargetedReady") }}
+{{<ability_card id="LeoricSkeletalSwingTargetedReady" />}}
 
-{{ ability_card(id="LeoricDrainHope") }}
+{{<ability_card id="LeoricDrainHope" />}}
 
-{{ ability_card(id="LeoricWraithWalk") }}
+{{<ability_card id="LeoricWraithWalk" />}}
 
-{{ ability_card(id="LeoricEntomb") }}
+{{<ability_card id="LeoricEntomb" />}}
 
-{{ ability_card(id="LeoricMarchoftheBlackKing") }}
+{{<ability_card id="LeoricMarchoftheBlackKing" />}}
 
 ## Talent Tiers
 
@@ -58,12 +58,12 @@ the last phase of the draft when the enemy team has shown their damage structure
 
 ## Shortcode Examples
 
-Ability: {{ ability(id="LeoricDrainHope") }}
+Ability: {{<ability id="LeoricDrainHope" />}}
 
 Ability card:
 
-{{ ability_card(id="LeoricWraithWalk", note="Mobility") }}
+{{<ability_card id="LeoricWraithWalk" note="Mobility" />}}
 
-Talent: {{ talent(id="LeoricMasteryBuriedAliveEntomb") }}
+Talent: {{<talent id="LeoricMasteryBuriedAliveEntomb" />}}
 
-XML: {{ xml_file(path="mods/heroesdata.stormmod/base.stormdata/gamedata/heroes/leoricdata/leoricdata-xml", anchor="LeoricDrainHope") }}
+XML: {{<xml_file path="mods/heroesdata.stormmod/base.stormdata/gamedata/heroes/leoricdata/leoricdata-xml" anchor="LeoricDrainHope" />}}

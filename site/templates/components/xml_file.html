@@ -1,0 +1,5 @@
+{% component xml_file(path: string, anchor = "") %}
+<a class="shortcode-xml-file" href="{{ get_url(path='gamedata/' ~ path) }}{% if anchor %}#{{ anchor }}{% endif %}" data-datamining>
+  📄 {{ path | split(pat="/") | last }}{% if anchor %} <code>#{{ anchor }}</code>{% endif %}
+</a>
+{% endcomponent xml_file %}

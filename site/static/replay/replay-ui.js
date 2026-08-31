@@ -1,5 +1,5 @@
 
-import { fetchJson } from '../js/storage.js';
+import { fetchJson, getAvailableStorage, getStoredString, setStoredString } from '../js/storage.js';
 import { MPQArchive } from './mpq.js';
 import { analyzeReplay, buildPositionTimeline } from './analyze.js';
 import { buildVisionGrid } from './vision.js';
@@ -28,7 +28,13 @@ import { buildPanel } from './ui/panel.js';
 import { selectPlayer, seekTo, tick, togglePlay, updatePlayButton, wireFilterRow } from './ui/playback.js';
 import { BASE_CANVAS_WIDTH, dropStatus, dropZone, fileInput, root, setState, state, TEAM_COLORS } from './ui/state.js';
 import { nameStructures, structureStyle } from './ui/structures.js';
+import { hasPlate, loadPlate } from './ui/plates.js';
 import { canvasAspect, fitCanvas, onCanvasPointerDown, onCanvasPointerMove, onCanvasPointerUp, onCanvasWheel, resetView, toggleFullscreen } from './ui/viewport.js';
+
+const MAP_STYLE_KEY = 'hotsixors.replay.mapstyle';
+const MAP_STYLES = ['rendered', 'schematic'];
+const storage = getAvailableStorage();
+const storedMapStyle = () => getStoredString(storage, MAP_STYLE_KEY, 'schematic', MAP_STYLES);
 
 let staticDataPromise = null;
 function staticData() {
@@ -280,6 +286,10 @@ function buildViewer(model, { draftData, shortcodeData, mapsData, footprints, ab
     playing: false,
     speed: 4,
     visionTeam: null,
+    mapStyle: storedMapStyle(),
+    plateAvailable: false,
+    plate: null,
+    platePromise: null,
     trails: true,
     minions: true,
     objectives: true,
@@ -306,6 +316,11 @@ function buildViewer(model, { draftData, shortcodeData, mapsData, footprints, ab
       redraw();
     };
     img.src = mapMeta.image;
+    hasPlate(mapMeta).then((available) => {
+      s.plateAvailable = available;
+      if (state === s) syncMapStyleControl();
+      if (available && s.mapStyle === 'rendered') ensurePlate(s);
+    });
   }
   if (mapMeta && mapMeta.vision) {
     const img = new Image();
@@ -387,6 +402,13 @@ function renderShell() {
               <label class="rp-switch"><input type="checkbox" data-minions checked><span class="rp-switch__track"></span>Minions &amp; mercs</label>
               <label class="rp-switch"><input type="checkbox" data-objectives checked><span class="rp-switch__track"></span>Objectives</label>
               <label class="rp-switch"><input type="checkbox" data-camera checked><span class="rp-switch__track"></span>Camera of selected hero</label>
+            </div>
+            <div class="replay-settings__group" data-map-style-group hidden>
+              <div class="replay-settings__legend">Map style</div>
+              <div class="rp-segmented">
+                <label><input type="radio" name="mapstyle" value="rendered" checked data-map-style><span>Rendered</span></label>
+                <label><input type="radio" name="mapstyle" value="schematic" data-map-style><span>Schematic</span></label>
+              </div>
             </div>
             <div class="replay-settings__group">
               <div class="replay-settings__legend">Fog of war</div>
@@ -511,6 +533,14 @@ function renderShell() {
       draw();
     });
   }
+  for (const radio of root.querySelectorAll('[data-map-style]')) {
+    radio.addEventListener('change', (e) => {
+      state.mapStyle = e.target.value;
+      setStoredString(storage, MAP_STYLE_KEY, state.mapStyle);
+      if (state.mapStyle === 'rendered') ensurePlate(state);
+      draw();
+    });
+  }
   for (const btn of root.querySelectorAll('[data-select]')) {
     btn.addEventListener('click', () => selectPlayer(Number(btn.dataset.select)));
   }
@@ -536,6 +566,30 @@ function renderShell() {
   canvas.addEventListener('pointercancel', onCanvasPointerUp);
 }
 
+/* Megabytes of sprites, so a replay only downloads them once its reader picks
+   the rendered style. */
+function ensurePlate(s) {
+  if (s.plate || s.platePromise) return s.platePromise;
+  s.platePromise = loadPlate(s.mapMeta, s.model, () => {
+    if (state === s) draw();
+  }).then((plate) => {
+    s.plate = plate;
+    if (state === s) draw();
+    return plate;
+  });
+  return s.platePromise;
+}
+
+/* Only battlegrounds with a rendered plate get the choice. */
+function syncMapStyleControl() {
+  const group = root.querySelector('[data-map-style-group]');
+  if (!group) return;
+  group.hidden = !state.plateAvailable;
+  for (const radio of root.querySelectorAll('[data-map-style]')) {
+    radio.checked = radio.value === state.mapStyle;
+  }
+}
+
 /* Each replay keeps its own view state, so a shell rendered for a replay we are
    returning to has to be put back the way that replay left it. */
 function restoreControls() {
@@ -548,6 +602,7 @@ function restoreControls() {
   for (const radio of root.querySelectorAll('[data-vision]')) {
     radio.checked = radio.value === (state.visionTeam === null ? '' : String(state.visionTeam));
   }
+  syncMapStyleControl();
   for (const btn of root.querySelectorAll('[data-kind]')) {
     btn.classList.toggle('is-on', state.feedKinds.has(btn.dataset.kind));
   }

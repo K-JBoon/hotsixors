@@ -218,7 +218,7 @@
         {% set url_parts = page.extra.url_path | split(pat="/") %}
         {% for i in range(end=display_parts | length) %}
           {% set part = display_parts[i] %}
-          {% set crumb_path = url_parts | slice(end=i+1) | join(sep="/") %}
+          {% set crumb_path = url_parts[:i+1] | join(sep="/") %}
           <span class="breadcrumb-sep">/</span>
           {% if loop.last %}
             <span class="breadcrumb-current">{{ part }}</span>

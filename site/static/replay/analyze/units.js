@@ -25,7 +25,17 @@ export const COMPANION_TYPES = {
   NovaHoloClone: 'decoy',
   SamuroMirrorImage: 'decoy',
   DryadWispUnit: 'summon',
+  AbathurSymbiote: 'symbiote',
+  AbathurEvolvedMonstrosity: 'summon',
 };
+
+/* Units that spawn on top of their owner, so their birth pins the owner's body. */
+export const BODY_SPAWNED_SUMMONS = new Set([
+  'AbathurLocust',
+  'AbathurLocustNormal',
+  'AbathurLocustAssaultStrain',
+  'AbathurLocustBombardStrain',
+]);
 export const VIKING_CONTROLLER = 'HeroLostVikingsController';
 export const VIKING_BODIES = new Set(['HeroErik', 'HeroBaleog', 'HeroOlaf']);
-export const VISION_UNITS = new Set(['ChromieTimeTrap']);
+export const VISION_UNITS = new Set(['ChromieTimeTrap', 'AbathurToxicNest']);

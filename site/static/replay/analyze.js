@@ -1,5 +1,6 @@
 
 import { decodeDetails, decodeHeader, loadProtocol } from './protocol.js';
+import { loadHeroUnits } from './hero-units.js';
 import { loadSummons } from './summons.js';
 import { runGamePass } from './analyze/commands.js';
 import { buildObjectivePhases } from './analyze/phases.js';
@@ -101,6 +102,7 @@ export async function analyzeReplay(archive) {
   const baseBuild = decodeHeader(archive.userData).m_version?.m_baseBuild ?? null;
   const protocol = await loadProtocol(baseBuild);
   const summons = await loadSummons();
+  const heroUnits = await loadHeroUnits();
 
   const header = decodeHeader(archive.userData, protocol);
   const details = decodeDetails(archive.readFile('replay.details'), protocol);
@@ -109,7 +111,7 @@ export async function analyzeReplay(archive) {
   const model = newModel(details, header, baseBuild, players);
   const reg = newRegistry(new Map(players.map((p) => [p.playerId, p])));
 
-  const tracked = runTrackerPass(archive.readFile('replay.tracker.events'), protocol, model, reg, summons);
+  const tracked = runTrackerPass(archive.readFile('replay.tracker.events'), protocol, model, reg, summons, heroUnits);
   runGamePass(archive.readFile('replay.game.events'), protocol, model, reg);
 
   assignObjectiveVariants(model);

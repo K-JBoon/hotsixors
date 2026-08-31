@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-{% import "macros/images.html" as images %}
 
 {% block title %}Effect Index — {{ config.title }}{% endblock title %}
 
@@ -63,7 +62,7 @@
           <ul class="effect-index-list">
             {% for entry in mechanic.entries %}
             <li class="effect-index-entry" data-effect-name="{{ entry.heroName }} {{ entry.name }}">
-              {{ images::optimized(path='images/abilitytalents/' ~ entry.icon, class="effect-index-icon", alt="", width=28, height=28, op="fill", display_width=28, display_height=28, loading="lazy") }}
+              {{<images.optimized path={'images/abilitytalents/' ~ entry.icon} class="effect-index-icon" alt="" width={28} height={28} op="fill" display_width={28} display_height={28} loading="lazy" />}}
               <a href="{{ get_url(path='heroes/' ~ entry.heroSlug) }}#{{ entry.kind }}-{{ entry.nameId }}"><span class="effect-index-hero">{{ entry.heroName }}</span> — {{ entry.name }}</a>
               <span class="effect-index-kind">{{ entry.kind }}{% if entry.abilityType %} · {{ entry.abilityType }}{% endif %}</span>
             </li>

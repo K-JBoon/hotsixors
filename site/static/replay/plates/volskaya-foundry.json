@@ -1,0 +1,1358 @@
+{
+ "scale": 16,
+ "pitch": 60,
+ "sprites": {
+  "storm_building_owvol_core.y45.s100.t0": {
+   "w": 280,
+   "h": 387,
+   "worldW": 10.777,
+   "worldH": 14.866,
+   "anchorX": 0.4818,
+   "anchorY": 0.5352,
+   "file": "/replay/plates/volskaya-foundry/storm_building_owvol_core.y45.s100.t0.webp"
+  },
+  "storm_building_owvol_core.y315.s100.t1": {
+   "w": 280,
+   "h": 387,
+   "worldW": 10.776,
+   "worldH": 14.867,
+   "anchorX": 0.4851,
+   "anchorY": 0.5144,
+   "file": "/replay/plates/volskaya-foundry/storm_building_owvol_core.y315.s100.t1.webp"
+  },
+  "storm_building_owvol_tower_00.y270.s100.t1": {
+   "w": 71,
+   "h": 104,
+   "worldW": 2.716,
+   "worldH": 3.998,
+   "anchorX": 0.5624,
+   "anchorY": 0.7495,
+   "file": "/replay/plates/volskaya-foundry/storm_building_owvol_tower_00.y270.s100.t1.webp"
+  },
+  "storm_building_owvol_tower_00.y253.s100.t1": {
+   "w": 83,
+   "h": 118,
+   "worldW": 3.178,
+   "worldH": 4.523,
+   "anchorX": 0.5512,
+   "anchorY": 0.7298,
+   "file": "/replay/plates/volskaya-foundry/storm_building_owvol_tower_00.y253.s100.t1.webp"
+  },
+  "storm_building_owvol_tower_00.y255.s100.t1": {
+   "w": 82,
+   "h": 117,
+   "worldW": 3.154,
+   "worldH": 4.493,
+   "anchorX": 0.5518,
+   "anchorY": 0.7307,
+   "file": "/replay/plates/volskaya-foundry/storm_building_owvol_tower_00.y255.s100.t1.webp"
+  },
+  "storm_building_owvol_tower_00.y103.s100.t0": {
+   "w": 81,
+   "h": 115,
+   "worldW": 3.104,
+   "worldH": 4.432,
+   "anchorX": 0.4468,
+   "anchorY": 0.7327,
+   "file": "/replay/plates/volskaya-foundry/storm_building_owvol_tower_00.y103.s100.t0.webp"
+  },
+  "storm_building_owvol_tower_00.y90.s100.t0": {
+   "w": 71,
+   "h": 104,
+   "worldW": 2.716,
+   "worldH": 3.998,
+   "anchorX": 0.4376,
+   "anchorY": 0.7495,
+   "file": "/replay/plates/volskaya-foundry/storm_building_owvol_tower_00.y90.s100.t0.webp"
+  },
+  "storm_building_owvol_tower_00.y104.s100.t0": {
+   "w": 81,
+   "h": 116,
+   "worldW": 3.124,
+   "worldH": 4.457,
+   "anchorX": 0.4474,
+   "anchorY": 0.7319,
+   "file": "/replay/plates/volskaya-foundry/storm_building_owvol_tower_00.y104.s100.t0.webp"
+  },
+  "storm_building_owvol_tower_00.y288.s100.t1": {
+   "w": 83,
+   "h": 118,
+   "worldW": 3.204,
+   "worldH": 4.556,
+   "anchorX": 0.5504,
+   "anchorY": 0.7091,
+   "file": "/replay/plates/volskaya-foundry/storm_building_owvol_tower_00.y288.s100.t1.webp"
+  },
+  "storm_building_owvol_tower_00.y72.s100.t0": {
+   "w": 83,
+   "h": 119,
+   "worldW": 3.211,
+   "worldH": 4.566,
+   "anchorX": 0.4498,
+   "anchorY": 0.7084,
+   "file": "/replay/plates/volskaya-foundry/storm_building_owvol_tower_00.y72.s100.t0.webp"
+  },
+  "storm_building_owvol_tower_00.y289.s100.t1": {
+   "w": 84,
+   "h": 119,
+   "worldW": 3.233,
+   "worldH": 4.594,
+   "anchorX": 0.5495,
+   "anchorY": 0.7066,
+   "file": "/replay/plates/volskaya-foundry/storm_building_owvol_tower_00.y289.s100.t1.webp"
+  },
+  "storm_building_owvol_tower_00.y74.s100.t0": {
+   "w": 82,
+   "h": 117,
+   "worldW": 3.161,
+   "worldH": 4.501,
+   "anchorX": 0.4484,
+   "anchorY": 0.7128,
+   "file": "/replay/plates/volskaya-foundry/storm_building_owvol_tower_00.y74.s100.t0.webp"
+  },
+  "storm_building_owvol_tower_01.y224.s100.t1": {
+   "w": 90,
+   "h": 131,
+   "worldW": 3.47,
+   "worldH": 5.039,
+   "anchorX": 0.5243,
+   "anchorY": 0.7127,
+   "file": "/replay/plates/volskaya-foundry/storm_building_owvol_tower_01.y224.s100.t1.webp"
+  },
+  "storm_building_owvol_tower_01.y42.s100.t0": {
+   "w": 90,
+   "h": 131,
+   "worldW": 3.445,
+   "worldH": 5.052,
+   "anchorX": 0.4768,
+   "anchorY": 0.682,
+   "file": "/replay/plates/volskaya-foundry/storm_building_owvol_tower_01.y42.s100.t0.webp"
+  },
+  "storm_building_owvol_tower_01.y87.s100.t0": {
+   "w": 76,
+   "h": 107,
+   "worldW": 2.917,
+   "worldH": 4.113,
+   "anchorX": 0.4588,
+   "anchorY": 0.7411,
+   "file": "/replay/plates/volskaya-foundry/storm_building_owvol_tower_01.y87.s100.t0.webp"
+  },
+  "storm_building_owvol_tower_01.y90.s100.t0": {
+   "w": 73,
+   "h": 104,
+   "worldW": 2.816,
+   "worldH": 4,
+   "anchorX": 0.4572,
+   "anchorY": 0.7494,
+   "file": "/replay/plates/volskaya-foundry/storm_building_owvol_tower_01.y90.s100.t0.webp"
+  },
+  "storm_building_owvol_tower_01.y271.s100.t1": {
+   "w": 74,
+   "h": 105,
+   "worldW": 2.844,
+   "worldH": 4.031,
+   "anchorX": 0.5423,
+   "anchorY": 0.7471,
+   "file": "/replay/plates/volskaya-foundry/storm_building_owvol_tower_01.y271.s100.t1.webp"
+  },
+  "storm_building_owvol_tower_01.y269.s100.t1": {
+   "w": 74,
+   "h": 104,
+   "worldW": 2.833,
+   "worldH": 4.019,
+   "anchorX": 0.5425,
+   "anchorY": 0.7484,
+   "file": "/replay/plates/volskaya-foundry/storm_building_owvol_tower_01.y269.s100.t1.webp"
+  },
+  "storm_building_owvol_tower_01.y134.s100.t0": {
+   "w": 91,
+   "h": 131,
+   "worldW": 3.481,
+   "worldH": 5.029,
+   "anchorX": 0.475,
+   "anchorY": 0.7127,
+   "file": "/replay/plates/volskaya-foundry/storm_building_owvol_tower_01.y134.s100.t0.webp"
+  },
+  "storm_building_owvol_tower_01.y136.s100.t0": {
+   "w": 90,
+   "h": 131,
+   "worldW": 3.466,
+   "worldH": 5.042,
+   "anchorX": 0.4759,
+   "anchorY": 0.7127,
+   "file": "/replay/plates/volskaya-foundry/storm_building_owvol_tower_01.y136.s100.t0.webp"
+  },
+  "storm_building_owvol_tower_01.y45.s100.t0": {
+   "w": 90,
+   "h": 131,
+   "worldW": 3.471,
+   "worldH": 5.039,
+   "anchorX": 0.4756,
+   "anchorY": 0.6832,
+   "file": "/replay/plates/volskaya-foundry/storm_building_owvol_tower_01.y45.s100.t0.webp"
+  },
+  "storm_building_owvol_tower_01.y316.s100.t1": {
+   "w": 90,
+   "h": 131,
+   "worldW": 3.469,
+   "worldH": 5.041,
+   "anchorX": 0.5242,
+   "anchorY": 0.6831,
+   "file": "/replay/plates/volskaya-foundry/storm_building_owvol_tower_01.y316.s100.t1.webp"
+  },
+  "storm_building_owvol_tower_01.y319.s100.t1": {
+   "w": 89,
+   "h": 131,
+   "worldW": 3.436,
+   "worldH": 5.054,
+   "anchorX": 0.5228,
+   "anchorY": 0.6817,
+   "file": "/replay/plates/volskaya-foundry/storm_building_owvol_tower_01.y319.s100.t1.webp"
+  },
+  "storm_building_owvol_tower_01.y47.s100.t0": {
+   "w": 91,
+   "h": 131,
+   "worldW": 3.483,
+   "worldH": 5.026,
+   "anchorX": 0.4749,
+   "anchorY": 0.6842,
+   "file": "/replay/plates/volskaya-foundry/storm_building_owvol_tower_01.y47.s100.t0.webp"
+  },
+  "storm_building_owvol_tower_01.y94.s100.t0": {
+   "w": 77,
+   "h": 108,
+   "worldW": 2.954,
+   "worldH": 4.155,
+   "anchorX": 0.4593,
+   "anchorY": 0.7419,
+   "file": "/replay/plates/volskaya-foundry/storm_building_owvol_tower_01.y94.s100.t0.webp"
+  },
+  "storm_building_owvol_tower_01.y266.s100.t1": {
+   "w": 77,
+   "h": 108,
+   "worldW": 2.954,
+   "worldH": 4.156,
+   "anchorX": 0.5406,
+   "anchorY": 0.7419,
+   "file": "/replay/plates/volskaya-foundry/storm_building_owvol_tower_01.y266.s100.t1.webp"
+  },
+  "storm_building_owvol_tower_01.y313.s100.t1": {
+   "w": 91,
+   "h": 131,
+   "worldW": 3.484,
+   "worldH": 5.026,
+   "anchorX": 0.5251,
+   "anchorY": 0.6842,
+   "file": "/replay/plates/volskaya-foundry/storm_building_owvol_tower_01.y313.s100.t1.webp"
+  },
+  "storm_building_owvol_gate.y75.s100.t1": {
+   "w": 106,
+   "h": 241,
+   "worldW": 4.078,
+   "worldH": 9.263,
+   "anchorX": 0.5,
+   "anchorY": 0.6027,
+   "file": "/replay/plates/volskaya-foundry/storm_building_owvol_gate.y75.s100.t1.webp"
+  },
+  "storm_building_owvol_gate.y75.s100.t0": {
+   "w": 106,
+   "h": 241,
+   "worldW": 4.078,
+   "worldH": 9.263,
+   "anchorX": 0.5,
+   "anchorY": 0.6027,
+   "file": "/replay/plates/volskaya-foundry/storm_building_owvol_gate.y75.s100.t0.webp"
+  },
+  "storm_building_owvol_gate.y285.s100.t0": {
+   "w": 106,
+   "h": 241,
+   "worldW": 4.076,
+   "worldH": 9.263,
+   "anchorX": 0.5,
+   "anchorY": 0.6027,
+   "file": "/replay/plates/volskaya-foundry/storm_building_owvol_gate.y285.s100.t0.webp"
+  },
+  "storm_building_owvol_gate.y285.s100.t1": {
+   "w": 106,
+   "h": 241,
+   "worldW": 4.076,
+   "worldH": 9.263,
+   "anchorX": 0.5,
+   "anchorY": 0.6027,
+   "file": "/replay/plates/volskaya-foundry/storm_building_owvol_gate.y285.s100.t1.webp"
+  },
+  "storm_building_owvol_manawell.y315.s100.t1": {
+   "w": 127,
+   "h": 171,
+   "worldW": 4.897,
+   "worldH": 6.563,
+   "anchorX": 0.5259,
+   "anchorY": 0.6435,
+   "file": "/replay/plates/volskaya-foundry/storm_building_owvol_manawell.y315.s100.t1.webp"
+  },
+  "storm_building_owvol_manawell.y50.s100.t0": {
+   "w": 127,
+   "h": 170,
+   "worldW": 4.887,
+   "worldH": 6.537,
+   "anchorX": 0.4698,
+   "anchorY": 0.647,
+   "file": "/replay/plates/volskaya-foundry/storm_building_owvol_manawell.y50.s100.t0.webp"
+  },
+  "storm_building_owvol_manawell.y310.s100.t1": {
+   "w": 127,
+   "h": 170,
+   "worldW": 4.887,
+   "worldH": 6.537,
+   "anchorX": 0.5285,
+   "anchorY": 0.6457,
+   "file": "/replay/plates/volskaya-foundry/storm_building_owvol_manawell.y310.s100.t1.webp"
+  },
+  "storm_building_owvol_manawell.y45.s100.t0": {
+   "w": 127,
+   "h": 171,
+   "worldW": 4.897,
+   "worldH": 6.563,
+   "anchorX": 0.4722,
+   "anchorY": 0.6447,
+   "file": "/replay/plates/volskaya-foundry/storm_building_owvol_manawell.y45.s100.t0.webp"
+  },
+  "storm_building_owvol_manawell.y52.s100.t0": {
+   "w": 127,
+   "h": 169,
+   "worldW": 4.873,
+   "worldH": 6.518,
+   "anchorX": 0.469,
+   "anchorY": 0.6482,
+   "file": "/replay/plates/volskaya-foundry/storm_building_owvol_manawell.y52.s100.t0.webp"
+  },
+  "storm_building_owvol_manawell.y40.s100.t0": {
+   "w": 127,
+   "h": 170,
+   "worldW": 4.868,
+   "worldH": 6.555,
+   "anchorX": 0.4745,
+   "anchorY": 0.6433,
+   "file": "/replay/plates/volskaya-foundry/storm_building_owvol_manawell.y40.s100.t0.webp"
+  },
+  "storm_building_owvol_manawell.y320.s100.t1": {
+   "w": 127,
+   "h": 170,
+   "worldW": 4.868,
+   "worldH": 6.555,
+   "anchorX": 0.5234,
+   "anchorY": 0.6422,
+   "file": "/replay/plates/volskaya-foundry/storm_building_owvol_manawell.y320.s100.t1.webp"
+  },
+  "storm_building_owvol_fort.y75.s100.t0": {
+   "w": 199,
+   "h": 230,
+   "worldW": 7.663,
+   "worldH": 8.842,
+   "anchorX": 0.5,
+   "anchorY": 0.6199,
+   "file": "/replay/plates/volskaya-foundry/storm_building_owvol_fort.y75.s100.t0.webp"
+  },
+  "storm_building_owvol_fort.y260.s100.t1": {
+   "w": 189,
+   "h": 221,
+   "worldW": 7.264,
+   "worldH": 8.497,
+   "anchorX": 0.5,
+   "anchorY": 0.6248,
+   "file": "/replay/plates/volskaya-foundry/storm_building_owvol_fort.y260.s100.t1.webp"
+  },
+  "storm_building_owvol_fort.y255.s100.t1": {
+   "w": 199,
+   "h": 230,
+   "worldW": 7.663,
+   "worldH": 8.842,
+   "anchorX": 0.5,
+   "anchorY": 0.6199,
+   "file": "/replay/plates/volskaya-foundry/storm_building_owvol_fort.y255.s100.t1.webp"
+  },
+  "storm_building_owvol_fort.y80.s100.t0": {
+   "w": 189,
+   "h": 221,
+   "worldW": 7.264,
+   "worldH": 8.497,
+   "anchorX": 0.5,
+   "anchorY": 0.6248,
+   "file": "/replay/plates/volskaya-foundry/storm_building_owvol_fort.y80.s100.t0.webp"
+  },
+  "storm_building_owvol_fort.y70.s100.t0": {
+   "w": 208,
+   "h": 237,
+   "worldW": 7.999,
+   "worldH": 9.133,
+   "anchorX": 0.5,
+   "anchorY": 0.6161,
+   "file": "/replay/plates/volskaya-foundry/storm_building_owvol_fort.y70.s100.t0.webp"
+  },
+  "storm_building_owvol_fort.y250.s100.t1": {
+   "w": 208,
+   "h": 238,
+   "worldW": 8.005,
+   "worldH": 9.139,
+   "anchorX": 0.5,
+   "anchorY": 0.616,
+   "file": "/replay/plates/volskaya-foundry/storm_building_owvol_fort.y250.s100.t1.webp"
+  },
+  "storm_building_owvol_keep.y80.s100.t0": {
+   "w": 189,
+   "h": 218,
+   "worldW": 7.286,
+   "worldH": 8.391,
+   "anchorX": 0.5,
+   "anchorY": 0.6214,
+   "file": "/replay/plates/volskaya-foundry/storm_building_owvol_keep.y80.s100.t0.webp"
+  },
+  "storm_building_owvol_keep.y279.s100.t1": {
+   "w": 188,
+   "h": 217,
+   "worldW": 7.227,
+   "worldH": 8.339,
+   "anchorX": 0.5,
+   "anchorY": 0.6221,
+   "file": "/replay/plates/volskaya-foundry/storm_building_owvol_keep.y279.s100.t1.webp"
+  },
+  "storm_building_owvol_keep.y128.s100.t0": {
+   "w": 228,
+   "h": 251,
+   "worldW": 8.765,
+   "worldH": 9.671,
+   "anchorX": 0.5,
+   "anchorY": 0.6053,
+   "file": "/replay/plates/volskaya-foundry/storm_building_owvol_keep.y128.s100.t0.webp"
+  },
+  "storm_building_owvol_keep.y44.s100.t0": {
+   "w": 229,
+   "h": 253,
+   "worldW": 8.826,
+   "worldH": 9.724,
+   "anchorX": 0.5,
+   "anchorY": 0.6047,
+   "file": "/replay/plates/volskaya-foundry/storm_building_owvol_keep.y44.s100.t0.webp"
+  },
+  "storm_building_owvol_keep.y316.s100.t1": {
+   "w": 229,
+   "h": 253,
+   "worldW": 8.827,
+   "worldH": 9.725,
+   "anchorX": 0.5,
+   "anchorY": 0.6047,
+   "file": "/replay/plates/volskaya-foundry/storm_building_owvol_keep.y316.s100.t1.webp"
+  },
+  "storm_building_owvol_keep.y232.s100.t1": {
+   "w": 228,
+   "h": 251,
+   "worldW": 8.761,
+   "worldH": 9.667,
+   "anchorX": 0.5,
+   "anchorY": 0.6053,
+   "file": "/replay/plates/volskaya-foundry/storm_building_owvol_keep.y232.s100.t1.webp"
+  },
+  "storm_building_owvol_wall.y225.s100.t1": {
+   "w": 158,
+   "h": 162,
+   "worldW": 6.091,
+   "worldH": 6.218,
+   "anchorX": 0.5635,
+   "anchorY": 0.531,
+   "file": "/replay/plates/volskaya-foundry/storm_building_owvol_wall.y225.s100.t1.webp"
+  },
+  "storm_building_owvol_wall.y210.s100.t1": {
+   "w": 139,
+   "h": 169,
+   "worldW": 5.359,
+   "worldH": 6.509,
+   "anchorX": 0.5841,
+   "anchorY": 0.5442,
+   "file": "/replay/plates/volskaya-foundry/storm_building_owvol_wall.y210.s100.t1.webp"
+  },
+  "storm_building_owvol_wall.y195.s100.t1": {
+   "w": 111,
+   "h": 167,
+   "worldW": 4.283,
+   "worldH": 6.439,
+   "anchorX": 0.613,
+   "anchorY": 0.5613,
+   "file": "/replay/plates/volskaya-foundry/storm_building_owvol_wall.y195.s100.t1.webp"
+  },
+  "storm_building_owvol_wall.y180.s100.t1": {
+   "w": 76,
+   "h": 156,
+   "worldW": 2.938,
+   "worldH": 6.012,
+   "anchorX": 0.6649,
+   "anchorY": 0.584,
+   "file": "/replay/plates/volskaya-foundry/storm_building_owvol_wall.y180.s100.t1.webp"
+  },
+  "storm_building_owvol_wall.y165.s100.t1": {
+   "w": 111,
+   "h": 167,
+   "worldW": 4.285,
+   "worldH": 6.439,
+   "anchorX": 0.6055,
+   "anchorY": 0.595,
+   "file": "/replay/plates/volskaya-foundry/storm_building_owvol_wall.y165.s100.t1.webp"
+  },
+  "storm_building_owvol_wall.y150.s100.t1": {
+   "w": 139,
+   "h": 169,
+   "worldW": 5.36,
+   "worldH": 6.509,
+   "anchorX": 0.5725,
+   "anchorY": 0.6087,
+   "file": "/replay/plates/volskaya-foundry/storm_building_owvol_wall.y150.s100.t1.webp"
+  },
+  "storm_building_owvol_wall.y135.s100.t1": {
+   "w": 158,
+   "h": 162,
+   "worldW": 6.092,
+   "worldH": 6.217,
+   "anchorX": 0.549,
+   "anchorY": 0.6264,
+   "file": "/replay/plates/volskaya-foundry/storm_building_owvol_wall.y135.s100.t1.webp"
+  },
+  "storm_building_owvol_wall.y120.s100.t1": {
+   "w": 167,
+   "h": 145,
+   "worldW": 6.428,
+   "worldH": 5.583,
+   "anchorX": 0.5293,
+   "anchorY": 0.6507,
+   "file": "/replay/plates/volskaya-foundry/storm_building_owvol_wall.y120.s100.t1.webp"
+  },
+  "storm_building_owvol_wall.y45.s100.t0": {
+   "w": 158,
+   "h": 162,
+   "worldW": 6.091,
+   "worldH": 6.218,
+   "anchorX": 0.4365,
+   "anchorY": 0.6142,
+   "file": "/replay/plates/volskaya-foundry/storm_building_owvol_wall.y45.s100.t0.webp"
+  },
+  "storm_building_owvol_wall.y30.s100.t0": {
+   "w": 139,
+   "h": 169,
+   "worldW": 5.359,
+   "worldH": 6.509,
+   "anchorX": 0.4159,
+   "anchorY": 0.5944,
+   "file": "/replay/plates/volskaya-foundry/storm_building_owvol_wall.y30.s100.t0.webp"
+  },
+  "storm_building_owvol_wall.y15.s100.t0": {
+   "w": 111,
+   "h": 167,
+   "worldW": 4.283,
+   "worldH": 6.439,
+   "anchorX": 0.387,
+   "anchorY": 0.5789,
+   "file": "/replay/plates/volskaya-foundry/storm_building_owvol_wall.y15.s100.t0.webp"
+  },
+  "storm_building_owvol_wall.y0.s100.t0": {
+   "w": 76,
+   "h": 156,
+   "worldW": 2.936,
+   "worldH": 6.012,
+   "anchorX": 0.335,
+   "anchorY": 0.5661,
+   "file": "/replay/plates/volskaya-foundry/storm_building_owvol_wall.y0.s100.t0.webp"
+  },
+  "storm_building_owvol_wall.y345.s100.t0": {
+   "w": 111,
+   "h": 167,
+   "worldW": 4.285,
+   "worldH": 6.439,
+   "anchorX": 0.3945,
+   "anchorY": 0.5452,
+   "file": "/replay/plates/volskaya-foundry/storm_building_owvol_wall.y345.s100.t0.webp"
+  },
+  "storm_building_owvol_wall.y330.s100.t0": {
+   "w": 139,
+   "h": 169,
+   "worldW": 5.36,
+   "worldH": 6.509,
+   "anchorX": 0.4275,
+   "anchorY": 0.53,
+   "file": "/replay/plates/volskaya-foundry/storm_building_owvol_wall.y330.s100.t0.webp"
+  },
+  "storm_building_owvol_wall.y315.s100.t0": {
+   "w": 158,
+   "h": 162,
+   "worldW": 6.092,
+   "worldH": 6.217,
+   "anchorX": 0.451,
+   "anchorY": 0.5188,
+   "file": "/replay/plates/volskaya-foundry/storm_building_owvol_wall.y315.s100.t0.webp"
+  },
+  "storm_building_owvol_wall.y300.s100.t0": {
+   "w": 167,
+   "h": 145,
+   "worldW": 6.428,
+   "worldH": 5.583,
+   "anchorX": 0.4707,
+   "anchorY": 0.5109,
+   "file": "/replay/plates/volskaya-foundry/storm_building_owvol_wall.y300.s100.t0.webp"
+  }
+ },
+ "buildings": [
+  {
+   "m": "storm_building_owvol_core",
+   "x": 41,
+   "y": 96,
+   "z": 7.928,
+   "r": 0.7851,
+   "t": 0,
+   "sprite": "storm_building_owvol_core.y45.s100.t0"
+  },
+  {
+   "m": "storm_building_owvol_core",
+   "x": 207,
+   "y": 96,
+   "z": 7.928,
+   "r": 5.4975,
+   "t": 1,
+   "sprite": "storm_building_owvol_core.y315.s100.t1"
+  },
+  {
+   "m": "storm_building_owvol_tower_00",
+   "x": 144,
+   "y": 142,
+   "z": 7.928,
+   "r": 4.7121,
+   "t": 1,
+   "sprite": "storm_building_owvol_tower_00.y270.s100.t1"
+  },
+  {
+   "m": "storm_building_owvol_tower_00",
+   "x": 147,
+   "y": 55,
+   "z": 7.928,
+   "r": 4.4235,
+   "t": 1,
+   "sprite": "storm_building_owvol_tower_00.y253.s100.t1"
+  },
+  {
+   "m": "storm_building_owvol_tower_00",
+   "x": 145,
+   "y": 47,
+   "z": 7.928,
+   "r": 4.4428,
+   "t": 1,
+   "sprite": "storm_building_owvol_tower_00.y255.s100.t1"
+  },
+  {
+   "m": "storm_building_owvol_tower_00",
+   "x": 146,
+   "y": 135,
+   "z": 7.928,
+   "r": 4.7121,
+   "t": 1,
+   "sprite": "storm_building_owvol_tower_00.y270.s100.t1"
+  },
+  {
+   "m": "storm_building_owvol_tower_00",
+   "x": 101,
+   "y": 55,
+   "z": 7.928,
+   "r": 1.8024,
+   "t": 0,
+   "sprite": "storm_building_owvol_tower_00.y103.s100.t0"
+  },
+  {
+   "m": "storm_building_owvol_tower_00",
+   "x": 104,
+   "y": 142,
+   "z": 7.928,
+   "r": 1.5705,
+   "t": 0,
+   "sprite": "storm_building_owvol_tower_00.y90.s100.t0"
+  },
+  {
+   "m": "storm_building_owvol_tower_00",
+   "x": 103,
+   "y": 47,
+   "z": 7.928,
+   "r": 1.8173,
+   "t": 0,
+   "sprite": "storm_building_owvol_tower_00.y104.s100.t0"
+  },
+  {
+   "m": "storm_building_owvol_tower_00",
+   "x": 102,
+   "y": 135,
+   "z": 7.928,
+   "r": 1.5705,
+   "t": 0,
+   "sprite": "storm_building_owvol_tower_00.y90.s100.t0"
+  },
+  {
+   "m": "storm_building_owvol_tower_00",
+   "x": 140,
+   "y": 103,
+   "z": 7.928,
+   "r": 5.0236,
+   "t": 1,
+   "sprite": "storm_building_owvol_tower_00.y288.s100.t1"
+  },
+  {
+   "m": "storm_building_owvol_tower_00",
+   "x": 106,
+   "y": 95,
+   "z": 7.928,
+   "r": 1.2531,
+   "t": 0,
+   "sprite": "storm_building_owvol_tower_00.y72.s100.t0"
+  },
+  {
+   "m": "storm_building_owvol_tower_00",
+   "x": 142,
+   "y": 95,
+   "z": 7.928,
+   "r": 5.05,
+   "t": 1,
+   "sprite": "storm_building_owvol_tower_00.y289.s100.t1"
+  },
+  {
+   "m": "storm_building_owvol_tower_00",
+   "x": 108,
+   "y": 103,
+   "z": 7.928,
+   "r": 1.2961,
+   "t": 0,
+   "sprite": "storm_building_owvol_tower_00.y74.s100.t0"
+  },
+  {
+   "m": "storm_building_owvol_tower_01",
+   "x": 175,
+   "y": 124,
+   "z": 7.928,
+   "r": 3.9182,
+   "t": 1,
+   "sprite": "storm_building_owvol_tower_01.y224.s100.t1"
+  },
+  {
+   "m": "storm_building_owvol_tower_01",
+   "x": 62,
+   "y": 64,
+   "z": 7.928,
+   "r": 0.725,
+   "t": 0,
+   "sprite": "storm_building_owvol_tower_01.y42.s100.t0"
+  },
+  {
+   "m": "storm_building_owvol_tower_01",
+   "x": 79,
+   "y": 90,
+   "z": 7.928,
+   "r": 1.5166,
+   "t": 0,
+   "sprite": "storm_building_owvol_tower_01.y87.s100.t0"
+  },
+  {
+   "m": "storm_building_owvol_tower_01",
+   "x": 79,
+   "y": 98,
+   "z": 7.928,
+   "r": 1.5717,
+   "t": 0,
+   "sprite": "storm_building_owvol_tower_01.y90.s100.t0"
+  },
+  {
+   "m": "storm_building_owvol_tower_01",
+   "x": 169,
+   "y": 90,
+   "z": 7.928,
+   "r": 4.7275,
+   "t": 1,
+   "sprite": "storm_building_owvol_tower_01.y271.s100.t1"
+  },
+  {
+   "m": "storm_building_owvol_tower_01",
+   "x": 169,
+   "y": 98,
+   "z": 7.928,
+   "r": 4.7026,
+   "t": 1,
+   "sprite": "storm_building_owvol_tower_01.y269.s100.t1"
+  },
+  {
+   "m": "storm_building_owvol_tower_01",
+   "x": 73,
+   "y": 124,
+   "z": 7.928,
+   "r": 2.3347,
+   "t": 0,
+   "sprite": "storm_building_owvol_tower_01.y134.s100.t0"
+  },
+  {
+   "m": "storm_building_owvol_tower_01",
+   "x": 67,
+   "y": 130,
+   "z": 7.928,
+   "r": 2.3752,
+   "t": 0,
+   "sprite": "storm_building_owvol_tower_01.y136.s100.t0"
+  },
+  {
+   "m": "storm_building_owvol_tower_01",
+   "x": 68,
+   "y": 70,
+   "z": 7.928,
+   "r": 0.7785,
+   "t": 0,
+   "sprite": "storm_building_owvol_tower_01.y45.s100.t0"
+  },
+  {
+   "m": "storm_building_owvol_tower_01",
+   "x": 180,
+   "y": 70,
+   "z": 7.928,
+   "r": 5.5102,
+   "t": 1,
+   "sprite": "storm_building_owvol_tower_01.y316.s100.t1"
+  },
+  {
+   "m": "storm_building_owvol_tower_01",
+   "x": 181,
+   "y": 130,
+   "z": 7.928,
+   "r": 3.917,
+   "t": 1,
+   "sprite": "storm_building_owvol_tower_01.y224.s100.t1"
+  },
+  {
+   "m": "storm_building_owvol_tower_01",
+   "x": 186,
+   "y": 64,
+   "z": 7.928,
+   "r": 5.5734,
+   "t": 1,
+   "sprite": "storm_building_owvol_tower_01.y319.s100.t1"
+  },
+  {
+   "m": "storm_building_owvol_tower_01",
+   "x": 82,
+   "y": 56,
+   "z": 7.928,
+   "r": 0.814,
+   "t": 0,
+   "sprite": "storm_building_owvol_tower_01.y47.s100.t0"
+  },
+  {
+   "m": "storm_building_owvol_tower_01",
+   "x": 79,
+   "y": 137,
+   "z": 7.928,
+   "r": 1.6452,
+   "t": 0,
+   "sprite": "storm_building_owvol_tower_01.y94.s100.t0"
+  },
+  {
+   "m": "storm_building_owvol_tower_01",
+   "x": 169,
+   "y": 137,
+   "z": 7.928,
+   "r": 4.6376,
+   "t": 1,
+   "sprite": "storm_building_owvol_tower_01.y266.s100.t1"
+  },
+  {
+   "m": "storm_building_owvol_tower_01",
+   "x": 166,
+   "y": 56,
+   "z": 7.928,
+   "r": 5.4687,
+   "t": 1,
+   "sprite": "storm_building_owvol_tower_01.y313.s100.t1"
+  },
+  {
+   "m": "storm_building_owvol_gate",
+   "x": 146,
+   "y": 51,
+   "z": 7.928,
+   "r": 1.3088,
+   "t": 1,
+   "sprite": "storm_building_owvol_gate.y75.s100.t1"
+  },
+  {
+   "m": "storm_building_owvol_gate",
+   "x": 107,
+   "y": 99,
+   "z": 7.928,
+   "r": 1.3088,
+   "t": 0,
+   "sprite": "storm_building_owvol_gate.y75.s100.t0"
+  },
+  {
+   "m": "storm_building_owvol_gate",
+   "x": 103,
+   "y": 138,
+   "z": 7.928,
+   "r": 1.3088,
+   "t": 0,
+   "sprite": "storm_building_owvol_gate.y75.s100.t0"
+  },
+  {
+   "m": "storm_building_owvol_gate",
+   "x": 102,
+   "y": 51,
+   "z": 7.928,
+   "r": 4.974,
+   "t": 0,
+   "sprite": "storm_building_owvol_gate.y285.s100.t0"
+  },
+  {
+   "m": "storm_building_owvol_gate",
+   "x": 141,
+   "y": 99,
+   "z": 7.928,
+   "r": 4.974,
+   "t": 1,
+   "sprite": "storm_building_owvol_gate.y285.s100.t1"
+  },
+  {
+   "m": "storm_building_owvol_gate",
+   "x": 145,
+   "y": 138,
+   "z": 7.928,
+   "r": 4.974,
+   "t": 1,
+   "sprite": "storm_building_owvol_gate.y285.s100.t1"
+  },
+  {
+   "m": "storm_building_owvol_manawell",
+   "x": 151.5,
+   "y": 143.5,
+   "z": 7.928,
+   "r": 5.4975,
+   "t": 1,
+   "sprite": "storm_building_owvol_manawell.y315.s100.t1"
+  },
+  {
+   "m": "storm_building_owvol_manawell",
+   "x": 93.5,
+   "y": 55.5,
+   "z": 7.928,
+   "r": 0.8793,
+   "t": 0,
+   "sprite": "storm_building_owvol_manawell.y50.s100.t0"
+  },
+  {
+   "m": "storm_building_owvol_manawell",
+   "x": 154.5,
+   "y": 55.5,
+   "z": 7.928,
+   "r": 5.4035,
+   "t": 1,
+   "sprite": "storm_building_owvol_manawell.y310.s100.t1"
+  },
+  {
+   "m": "storm_building_owvol_manawell",
+   "x": 96.5,
+   "y": 143.5,
+   "z": 7.928,
+   "r": 0.7854,
+   "t": 0,
+   "sprite": "storm_building_owvol_manawell.y45.s100.t0"
+  },
+  {
+   "m": "storm_building_owvol_manawell",
+   "x": 96.5,
+   "y": 92.5,
+   "z": 7.928,
+   "r": 0.785,
+   "t": 0,
+   "sprite": "storm_building_owvol_manawell.y45.s100.t0"
+  },
+  {
+   "m": "storm_building_owvol_manawell",
+   "x": 151.5,
+   "y": 92.5,
+   "z": 7.928,
+   "r": 5.498,
+   "t": 1,
+   "sprite": "storm_building_owvol_manawell.y315.s100.t1"
+  },
+  {
+   "m": "storm_building_owvol_manawell",
+   "x": 70.5,
+   "y": 88.5,
+   "z": 7.928,
+   "r": 0.9145,
+   "t": 0,
+   "sprite": "storm_building_owvol_manawell.y52.s100.t0"
+  },
+  {
+   "m": "storm_building_owvol_manawell",
+   "x": 195.5,
+   "y": 67.5,
+   "z": 7.928,
+   "r": 5.4978,
+   "t": 1,
+   "sprite": "storm_building_owvol_manawell.y315.s100.t1"
+  },
+  {
+   "m": "storm_building_owvol_manawell",
+   "x": 67.5,
+   "y": 114.5,
+   "z": 7.928,
+   "r": 0.6938,
+   "t": 0,
+   "sprite": "storm_building_owvol_manawell.y40.s100.t0"
+  },
+  {
+   "m": "storm_building_owvol_manawell",
+   "x": 177.5,
+   "y": 88.5,
+   "z": 7.928,
+   "r": 5.4985,
+   "t": 1,
+   "sprite": "storm_building_owvol_manawell.y315.s100.t1"
+  },
+  {
+   "m": "storm_building_owvol_manawell",
+   "x": 180.5,
+   "y": 114.5,
+   "z": 7.928,
+   "r": 5.5888,
+   "t": 1,
+   "sprite": "storm_building_owvol_manawell.y320.s100.t1"
+  },
+  {
+   "m": "storm_building_owvol_manawell",
+   "x": 52.5,
+   "y": 67.5,
+   "z": 7.928,
+   "r": 0.7851,
+   "t": 0,
+   "sprite": "storm_building_owvol_manawell.y45.s100.t0"
+  },
+  {
+   "m": "storm_building_owvol_fort",
+   "x": 90.5,
+   "y": 48.5,
+   "z": 7.928,
+   "r": 1.3088,
+   "t": 0,
+   "sprite": "storm_building_owvol_fort.y75.s100.t0"
+  },
+  {
+   "m": "storm_building_owvol_fort",
+   "x": 157.5,
+   "y": 139.5,
+   "z": 7.928,
+   "r": 4.5378,
+   "t": 1,
+   "sprite": "storm_building_owvol_fort.y260.s100.t1"
+  },
+  {
+   "m": "storm_building_owvol_fort",
+   "x": 157.5,
+   "y": 48.5,
+   "z": 7.928,
+   "r": 4.4504,
+   "t": 1,
+   "sprite": "storm_building_owvol_fort.y255.s100.t1"
+  },
+  {
+   "m": "storm_building_owvol_fort",
+   "x": 90.5,
+   "y": 139.5,
+   "z": 7.928,
+   "r": 1.3962,
+   "t": 0,
+   "sprite": "storm_building_owvol_fort.y80.s100.t0"
+  },
+  {
+   "m": "storm_building_owvol_fort",
+   "x": 96.5,
+   "y": 102.5,
+   "z": 7.928,
+   "r": 1.2233,
+   "t": 0,
+   "sprite": "storm_building_owvol_fort.y70.s100.t0"
+  },
+  {
+   "m": "storm_building_owvol_fort",
+   "x": 151.5,
+   "y": 102.5,
+   "z": 7.928,
+   "r": 4.3632,
+   "t": 1,
+   "sprite": "storm_building_owvol_fort.y250.s100.t1"
+  },
+  {
+   "m": "storm_building_owvol_keep",
+   "x": 65,
+   "y": 96,
+   "z": 7.928,
+   "r": 1.396,
+   "t": 0,
+   "sprite": "storm_building_owvol_keep.y80.s100.t0"
+  },
+  {
+   "m": "storm_building_owvol_keep",
+   "x": 183,
+   "y": 96,
+   "z": 7.928,
+   "r": 4.8752,
+   "t": 1,
+   "sprite": "storm_building_owvol_keep.y279.s100.t1"
+  },
+  {
+   "m": "storm_building_owvol_keep",
+   "x": 60,
+   "y": 119,
+   "z": 7.928,
+   "r": 2.2355,
+   "t": 0,
+   "sprite": "storm_building_owvol_keep.y128.s100.t0"
+  },
+  {
+   "m": "storm_building_owvol_keep",
+   "x": 56,
+   "y": 76,
+   "z": 7.928,
+   "r": 0.7666,
+   "t": 0,
+   "sprite": "storm_building_owvol_keep.y44.s100.t0"
+  },
+  {
+   "m": "storm_building_owvol_keep",
+   "x": 192,
+   "y": 76,
+   "z": 7.928,
+   "r": 5.5087,
+   "t": 1,
+   "sprite": "storm_building_owvol_keep.y316.s100.t1"
+  },
+  {
+   "m": "storm_building_owvol_keep",
+   "x": 188,
+   "y": 119,
+   "z": 7.928,
+   "r": 4.052,
+   "t": 1,
+   "sprite": "storm_building_owvol_keep.y232.s100.t1"
+  },
+  {
+   "m": "storm_building_owvol_wall",
+   "x": 188.5,
+   "y": 62.5,
+   "z": 7.928,
+   "r": 3.9267,
+   "t": 1,
+   "sprite": "storm_building_owvol_wall.y225.s100.t1"
+  },
+  {
+   "m": "storm_building_owvol_wall",
+   "x": 178.5,
+   "y": 72.5,
+   "z": 7.928,
+   "r": 3.665,
+   "t": 1,
+   "sprite": "storm_building_owvol_wall.y210.s100.t1"
+  },
+  {
+   "m": "storm_building_owvol_wall",
+   "x": 147.5,
+   "y": 132,
+   "z": 7.928,
+   "r": 3.4033,
+   "t": 1,
+   "sprite": "storm_building_owvol_wall.y195.s100.t1"
+  },
+  {
+   "m": "storm_building_owvol_wall",
+   "x": 143.5,
+   "y": 92,
+   "z": 7.928,
+   "r": 3.4033,
+   "t": 1,
+   "sprite": "storm_building_owvol_wall.y195.s100.t1"
+  },
+  {
+   "m": "storm_building_owvol_wall",
+   "x": 145.5,
+   "y": 44,
+   "z": 7.928,
+   "r": 3.1413,
+   "t": 1,
+   "sprite": "storm_building_owvol_wall.y180.s100.t1"
+  },
+  {
+   "m": "storm_building_owvol_wall",
+   "x": 169.5,
+   "y": 87,
+   "z": 7.928,
+   "r": 3.1413,
+   "t": 1,
+   "sprite": "storm_building_owvol_wall.y180.s100.t1"
+  },
+  {
+   "m": "storm_building_owvol_wall",
+   "x": 140.5,
+   "y": 106,
+   "z": 7.928,
+   "r": 2.8796,
+   "t": 1,
+   "sprite": "storm_building_owvol_wall.y165.s100.t1"
+  },
+  {
+   "m": "storm_building_owvol_wall",
+   "x": 144.5,
+   "y": 145,
+   "z": 7.928,
+   "r": 2.8796,
+   "t": 1,
+   "sprite": "storm_building_owvol_wall.y165.s100.t1"
+  },
+  {
+   "m": "storm_building_owvol_wall",
+   "x": 169.5,
+   "y": 101,
+   "z": 7.928,
+   "r": 2.8796,
+   "t": 1,
+   "sprite": "storm_building_owvol_wall.y165.s100.t1"
+  },
+  {
+   "m": "storm_building_owvol_wall",
+   "x": 148.5,
+   "y": 58,
+   "z": 7.928,
+   "r": 2.618,
+   "t": 1,
+   "sprite": "storm_building_owvol_wall.y150.s100.t1"
+  },
+  {
+   "m": "storm_building_owvol_wall",
+   "x": 173.5,
+   "y": 121.5,
+   "z": 7.928,
+   "r": 2.356,
+   "t": 1,
+   "sprite": "storm_building_owvol_wall.y135.s100.t1"
+  },
+  {
+   "m": "storm_building_owvol_wall",
+   "x": 183.5,
+   "y": 131.5,
+   "z": 7.928,
+   "r": 2.0942,
+   "t": 1,
+   "sprite": "storm_building_owvol_wall.y120.s100.t1"
+  },
+  {
+   "m": "storm_building_owvol_wall",
+   "x": 64.5,
+   "y": 131.5,
+   "z": 7.928,
+   "r": 0.7851,
+   "t": 0,
+   "sprite": "storm_building_owvol_wall.y45.s100.t0"
+  },
+  {
+   "m": "storm_building_owvol_wall",
+   "x": 74.5,
+   "y": 121.5,
+   "z": 7.928,
+   "r": 0.5234,
+   "t": 0,
+   "sprite": "storm_building_owvol_wall.y30.s100.t0"
+  },
+  {
+   "m": "storm_building_owvol_wall",
+   "x": 99.5,
+   "y": 58,
+   "z": 7.928,
+   "r": 0.2617,
+   "t": 0,
+   "sprite": "storm_building_owvol_wall.y15.s100.t0"
+  },
+  {
+   "m": "storm_building_owvol_wall",
+   "x": 107.5,
+   "y": 106,
+   "z": 7.928,
+   "r": 0,
+   "t": 0,
+   "sprite": "storm_building_owvol_wall.y0.s100.t0"
+  },
+  {
+   "m": "storm_building_owvol_wall",
+   "x": 103.5,
+   "y": 145,
+   "z": 7.928,
+   "r": 0,
+   "t": 0,
+   "sprite": "storm_building_owvol_wall.y0.s100.t0"
+  },
+  {
+   "m": "storm_building_owvol_wall",
+   "x": 78.5,
+   "y": 101,
+   "z": 7.928,
+   "r": 0,
+   "t": 0,
+   "sprite": "storm_building_owvol_wall.y0.s100.t0"
+  },
+  {
+   "m": "storm_building_owvol_wall",
+   "x": 102.5,
+   "y": 44,
+   "z": 7.928,
+   "r": 6.0212,
+   "t": 0,
+   "sprite": "storm_building_owvol_wall.y345.s100.t0"
+  },
+  {
+   "m": "storm_building_owvol_wall",
+   "x": 78.5,
+   "y": 87,
+   "z": 7.928,
+   "r": 6.0212,
+   "t": 0,
+   "sprite": "storm_building_owvol_wall.y345.s100.t0"
+  },
+  {
+   "m": "storm_building_owvol_wall",
+   "x": 104.5,
+   "y": 92,
+   "z": 7.928,
+   "r": 5.7595,
+   "t": 0,
+   "sprite": "storm_building_owvol_wall.y330.s100.t0"
+  },
+  {
+   "m": "storm_building_owvol_wall",
+   "x": 100.5,
+   "y": 132,
+   "z": 7.928,
+   "r": 5.7595,
+   "t": 0,
+   "sprite": "storm_building_owvol_wall.y330.s100.t0"
+  },
+  {
+   "m": "storm_building_owvol_wall",
+   "x": 69.5,
+   "y": 72.5,
+   "z": 7.928,
+   "r": 5.4975,
+   "t": 0,
+   "sprite": "storm_building_owvol_wall.y315.s100.t0"
+  },
+  {
+   "m": "storm_building_owvol_wall",
+   "x": 59.5,
+   "y": 62.5,
+   "z": 7.928,
+   "r": 5.2358,
+   "t": 0,
+   "sprite": "storm_building_owvol_wall.y300.s100.t0"
+  }
+ ]
+}

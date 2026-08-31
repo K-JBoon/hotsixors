@@ -1,6 +1,6 @@
 
 export const HERO_SIGHT = 12;
-export const SIGHT_OVERRIDES = { ChromieTimeTrap: 3.5 };
+export const SIGHT_OVERRIDES = { ChromieTimeTrap: 3.5, AbathurToxicNest: 0 };
 export const SIGHT_WHEN_DEPLOYED = { ZagaraCreepTumor: { afterLoops: 16, sight: 8.5 } };
 export const WISP_UNIT = 'DryadWispUnit';
 export const WISP_BRUSH_VISION = { bonus: 4.5, dwellLoops: 32 };

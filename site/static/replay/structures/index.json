@@ -1,0 +1,135 @@
+{
+ "pitch": 60,
+ "sprites": {
+  "storm_building_kingscrest_core_dragon": {
+   "axis": -0.26,
+   "elongation": 0.241,
+   "w": 304,
+   "h": 313,
+   "worldW": 11.711,
+   "worldH": 12.025,
+   "anchorX": 0.5,
+   "anchorY": 0.6213,
+   "file": "/replay/structures/storm_building_kingscrest_core_dragon.png"
+  },
+  "storm_building_kingscrest_castlesuperior": {
+   "axis": 3.57,
+   "elongation": 0.185,
+   "w": 182,
+   "h": 244,
+   "worldW": 7.003,
+   "worldH": 9.394,
+   "anchorX": 0.442,
+   "anchorY": 0.647,
+   "file": "/replay/structures/storm_building_kingscrest_castlesuperior.png"
+  },
+  "storm_building_kingscrest_tower_02": {
+   "axis": -88.72,
+   "elongation": 0.698,
+   "w": 74,
+   "h": 168,
+   "worldW": 2.828,
+   "worldH": 6.472,
+   "anchorX": 0.5,
+   "anchorY": 0.6421,
+   "file": "/replay/structures/storm_building_kingscrest_tower_02.png"
+  },
+  "storm_building_kingscrest_manawell": {
+   "axis": 3.61,
+   "elongation": 0.732,
+   "w": 111,
+   "h": 139,
+   "worldW": 4.278,
+   "worldH": 5.333,
+   "anchorX": 0.4986,
+   "anchorY": 0.7188,
+   "file": "/replay/structures/storm_building_kingscrest_manawell.png"
+  },
+  "storm_building_kingscrest_gate": {
+   "axis": 0.01,
+   "elongation": 0.993,
+   "w": 165,
+   "h": 57,
+   "worldW": 6.363,
+   "worldH": 2.203,
+   "anchorX": 0.5,
+   "anchorY": 0.8696,
+   "file": "/replay/structures/storm_building_kingscrest_gate.png"
+  },
+  "storm_doodad_kingscrest_fence_stone": {
+   "axis": -80.53,
+   "elongation": 0.944,
+   "w": 54,
+   "h": 124,
+   "worldW": 2.085,
+   "worldH": 4.758,
+   "anchorX": 0.3678,
+   "anchorY": 0.6312,
+   "file": "/replay/structures/storm_doodad_kingscrest_fence_stone.png"
+  },
+  "storm_building_kingscrest_castleupgrade": {
+   "w": 133,
+   "h": 206,
+   "worldW": 5.102,
+   "worldH": 7.917,
+   "anchorX": 0.5,
+   "anchorY": 0.666,
+   "file": "/replay/structures/storm_building_kingscrest_castleupgrade.png"
+  },
+  "storm_building_kingscrest_gate_00": {
+   "w": 173,
+   "h": 81,
+   "worldW": 6.663,
+   "worldH": 3.097,
+   "anchorX": 0.5,
+   "anchorY": 0.8058,
+   "file": "/replay/structures/storm_building_kingscrest_gate_00.png"
+  },
+  "storm_building_kingscrest_tower_01": {
+   "w": 74,
+   "h": 138,
+   "worldW": 2.828,
+   "worldH": 5.312,
+   "anchorX": 0.5,
+   "anchorY": 0.6164,
+   "file": "/replay/structures/storm_building_kingscrest_tower_01.png"
+  },
+  "storm_building_kingscrest_watchtower": {
+   "w": 228,
+   "h": 214,
+   "worldW": 8.767,
+   "worldH": 8.24,
+   "anchorX": 0.4996,
+   "anchorY": 0.5365,
+   "file": "/replay/structures/storm_building_kingscrest_watchtower.png"
+  }
+ },
+ "maps": {
+  "cursed-hollow": {
+   "core": [
+    "storm_building_kingscrest_core_dragon",
+    "storm_building_kingscrest_core_dragon"
+   ],
+   "keep": [
+    "storm_building_kingscrest_castlesuperior",
+    "storm_building_kingscrest_castlesuperior"
+   ],
+   "tower": [
+    "storm_building_kingscrest_tower_02",
+    "storm_building_kingscrest_tower_02"
+   ],
+   "well": [
+    "storm_building_kingscrest_manawell",
+    "storm_building_kingscrest_manawell"
+   ],
+   "gate": [
+    "storm_building_kingscrest_gate",
+    "storm_building_kingscrest_gate"
+   ],
+   "wall": [
+    "storm_doodad_kingscrest_fence_stone",
+    "storm_doodad_kingscrest_fence_stone"
+   ]
+  }
+ }
+}

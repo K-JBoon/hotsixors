@@ -1,0 +1,1789 @@
+{
+ "scale": 16,
+ "pitch": 60,
+ "sprites": {
+  "storm_building_luxoria_capturepoint_ring.y0.s100.tx": {
+   "w": 580,
+   "h": 407,
+   "worldW": 22.318,
+   "worldH": 15.661,
+   "anchorX": 0.5,
+   "anchorY": 0.3548,
+   "file": "/replay/plates/sky-temple/storm_building_luxoria_capturepoint_ring.y0.s100.tx.webp"
+  },
+  "storm_building_luxoria_capturepoint_progress.y0.s117.tx": {
+   "w": 269,
+   "h": 271,
+   "worldW": 10.365,
+   "worldH": 10.433,
+   "anchorX": 0.4963,
+   "anchorY": 0.537,
+   "file": "/replay/plates/sky-temple/storm_building_luxoria_capturepoint_progress.y0.s117.tx.webp"
+  },
+  "storm_building_luxoria_capturepoint_progress.y0.s82.tx": {
+   "w": 191,
+   "h": 192,
+   "worldW": 7.334,
+   "worldH": 7.382,
+   "anchorX": 0.4963,
+   "anchorY": 0.5366,
+   "file": "/replay/plates/sky-temple/storm_building_luxoria_capturepoint_progress.y0.s82.tx.webp"
+  },
+  "storm_building_luxoria_capturepoint_progress.y0.s87.tx": {
+   "w": 202,
+   "h": 203,
+   "worldW": 7.756,
+   "worldH": 7.806,
+   "anchorX": 0.4963,
+   "anchorY": 0.5367,
+   "file": "/replay/plates/sky-temple/storm_building_luxoria_capturepoint_progress.y0.s87.tx.webp"
+  },
+  "storm_building_luxoria_capturepoint_pedestal.y87.s100.tx": {
+   "w": 94,
+   "h": 155,
+   "worldW": 3.625,
+   "worldH": 5.948,
+   "anchorX": 0.6297,
+   "anchorY": 0.7487,
+   "file": "/replay/plates/sky-temple/storm_building_luxoria_capturepoint_pedestal.y87.s100.tx.webp"
+  },
+  "storm_building_luxoria_capturepoint_pedestal.y273.s100.tx": {
+   "w": 94,
+   "h": 155,
+   "worldW": 3.625,
+   "worldH": 5.947,
+   "anchorX": 0.3702,
+   "anchorY": 0.7487,
+   "file": "/replay/plates/sky-temple/storm_building_luxoria_capturepoint_pedestal.y273.s100.tx.webp"
+  },
+  "storm_building_luxoria_capturepoint_pedestal.y272.s100.tx": {
+   "w": 94,
+   "h": 154,
+   "worldW": 3.598,
+   "worldH": 5.922,
+   "anchorX": 0.3692,
+   "anchorY": 0.7491,
+   "file": "/replay/plates/sky-temple/storm_building_luxoria_capturepoint_pedestal.y272.s100.tx.webp"
+  },
+  "storm_building_luxoria_capturepoint_pedestal.y88.s100.tx": {
+   "w": 94,
+   "h": 154,
+   "worldW": 3.599,
+   "worldH": 5.923,
+   "anchorX": 0.6307,
+   "anchorY": 0.7491,
+   "file": "/replay/plates/sky-temple/storm_building_luxoria_capturepoint_pedestal.y88.s100.tx.webp"
+  },
+  "storm_building_luxoria_capturepoint_pedestal.y89.s100.tx": {
+   "w": 92,
+   "h": 152,
+   "worldW": 3.535,
+   "worldH": 5.864,
+   "anchorX": 0.6332,
+   "anchorY": 0.7501,
+   "file": "/replay/plates/sky-temple/storm_building_luxoria_capturepoint_pedestal.y89.s100.tx.webp"
+  },
+  "storm_building_luxoria_capturepoint_pedestal.y271.s100.tx": {
+   "w": 92,
+   "h": 152,
+   "worldW": 3.534,
+   "worldH": 5.863,
+   "anchorX": 0.3668,
+   "anchorY": 0.7501,
+   "file": "/replay/plates/sky-temple/storm_building_luxoria_capturepoint_pedestal.y271.s100.tx.webp"
+  },
+  "storm_building_luxoria_capturepoint_pedestalsmall.y39.s100.tx": {
+   "w": 95,
+   "h": 163,
+   "worldW": 3.667,
+   "worldH": 6.267,
+   "anchorX": 0.6006,
+   "anchorY": 0.7964,
+   "file": "/replay/plates/sky-temple/storm_building_luxoria_capturepoint_pedestalsmall.y39.s100.tx.webp"
+  },
+  "storm_building_luxoria_capturepoint_pedestalsmall.y321.s100.tx": {
+   "w": 95,
+   "h": 163,
+   "worldW": 3.667,
+   "worldH": 6.267,
+   "anchorX": 0.3994,
+   "anchorY": 0.7964,
+   "file": "/replay/plates/sky-temple/storm_building_luxoria_capturepoint_pedestalsmall.y321.s100.tx.webp"
+  },
+  "storm_building_luxoria_capturepoint_pedestalsmall.y43.s100.tx": {
+   "w": 97,
+   "h": 162,
+   "worldW": 3.738,
+   "worldH": 6.238,
+   "anchorX": 0.6076,
+   "anchorY": 0.7938,
+   "file": "/replay/plates/sky-temple/storm_building_luxoria_capturepoint_pedestalsmall.y43.s100.tx.webp"
+  },
+  "storm_building_luxoria_capturepoint_pedestalsmall.y317.s100.tx": {
+   "w": 97,
+   "h": 162,
+   "worldW": 3.738,
+   "worldH": 6.238,
+   "anchorX": 0.3924,
+   "anchorY": 0.7938,
+   "file": "/replay/plates/sky-temple/storm_building_luxoria_capturepoint_pedestalsmall.y317.s100.tx.webp"
+  },
+  "storm_building_luxoria_capturepoint_pedestalsmall.y44.s100.tx": {
+   "w": 98,
+   "h": 162,
+   "worldW": 3.756,
+   "worldH": 6.225,
+   "anchorX": 0.6098,
+   "anchorY": 0.7931,
+   "file": "/replay/plates/sky-temple/storm_building_luxoria_capturepoint_pedestalsmall.y44.s100.tx.webp"
+  },
+  "storm_building_luxoria_capturepoint_pedestalsmall.y316.s100.tx": {
+   "w": 98,
+   "h": 162,
+   "worldW": 3.757,
+   "worldH": 6.225,
+   "anchorX": 0.3901,
+   "anchorY": 0.793,
+   "file": "/replay/plates/sky-temple/storm_building_luxoria_capturepoint_pedestalsmall.y316.s100.tx.webp"
+  },
+  "storm_building_luxbazaar_core.y45.s100.t0": {
+   "w": 262,
+   "h": 318,
+   "worldW": 10.092,
+   "worldH": 12.216,
+   "anchorX": 0.4999,
+   "anchorY": 0.6404,
+   "file": "/replay/plates/sky-temple/storm_building_luxbazaar_core.y45.s100.t0.webp"
+  },
+  "storm_building_luxbazaar_core.y315.s100.t1": {
+   "w": 262,
+   "h": 318,
+   "worldW": 10.092,
+   "worldH": 12.216,
+   "anchorX": 0.4999,
+   "anchorY": 0.6403,
+   "file": "/replay/plates/sky-temple/storm_building_luxbazaar_core.y315.s100.t1.webp"
+  },
+  "storm_building_luxoria_capturepointtemple.y0.s100.tx": {
+   "w": 152,
+   "h": 259,
+   "worldW": 5.864,
+   "worldH": 9.976,
+   "anchorX": 0.5,
+   "anchorY": 0.6935,
+   "file": "/replay/plates/sky-temple/storm_building_luxoria_capturepointtemple.y0.s100.tx.webp"
+  },
+  "storm_building_luxbazaar_tower_00.y92.s100.t0": {
+   "w": 79,
+   "h": 131,
+   "worldW": 3.029,
+   "worldH": 5.057,
+   "anchorX": 0.5,
+   "anchorY": 0.7366,
+   "file": "/replay/plates/sky-temple/storm_building_luxbazaar_tower_00.y92.s100.t0.webp"
+  },
+  "storm_building_luxbazaar_tower_00.y90.s100.t0": {
+   "w": 76,
+   "h": 129,
+   "worldW": 2.919,
+   "worldH": 4.961,
+   "anchorX": 0.5,
+   "anchorY": 0.7412,
+   "file": "/replay/plates/sky-temple/storm_building_luxbazaar_tower_00.y90.s100.t0.webp"
+  },
+  "storm_building_luxbazaar_tower_00.y267.s100.t1": {
+   "w": 79,
+   "h": 131,
+   "worldW": 3.03,
+   "worldH": 5.057,
+   "anchorX": 0.5,
+   "anchorY": 0.7366,
+   "file": "/replay/plates/sky-temple/storm_building_luxbazaar_tower_00.y267.s100.t1.webp"
+  },
+  "storm_building_luxbazaar_tower_00.y270.s100.t1": {
+   "w": 76,
+   "h": 129,
+   "worldW": 2.922,
+   "worldH": 4.963,
+   "anchorX": 0.5,
+   "anchorY": 0.7411,
+   "file": "/replay/plates/sky-temple/storm_building_luxbazaar_tower_00.y270.s100.t1.webp"
+  },
+  "storm_building_luxbazaar_tower_00.y258.s100.t1": {
+   "w": 88,
+   "h": 140,
+   "worldW": 3.392,
+   "worldH": 5.37,
+   "anchorX": 0.5,
+   "anchorY": 0.7228,
+   "file": "/replay/plates/sky-temple/storm_building_luxbazaar_tower_00.y258.s100.t1.webp"
+  },
+  "storm_building_luxbazaar_tower_00.y263.s100.t1": {
+   "w": 84,
+   "h": 136,
+   "worldW": 3.214,
+   "worldH": 5.217,
+   "anchorX": 0.5,
+   "anchorY": 0.7294,
+   "file": "/replay/plates/sky-temple/storm_building_luxbazaar_tower_00.y263.s100.t1.webp"
+  },
+  "storm_building_luxbazaar_tower_00.y256.s100.t1": {
+   "w": 90,
+   "h": 142,
+   "worldW": 3.479,
+   "worldH": 5.446,
+   "anchorX": 0.5,
+   "anchorY": 0.7197,
+   "file": "/replay/plates/sky-temple/storm_building_luxbazaar_tower_00.y256.s100.t1.webp"
+  },
+  "storm_building_luxbazaar_tower_00.y257.s100.t1": {
+   "w": 90,
+   "h": 141,
+   "worldW": 3.456,
+   "worldH": 5.427,
+   "anchorX": 0.5,
+   "anchorY": 0.7205,
+   "file": "/replay/plates/sky-temple/storm_building_luxbazaar_tower_00.y257.s100.t1.webp"
+  },
+  "storm_building_luxbazaar_tower_00.y106.s100.t0": {
+   "w": 92,
+   "h": 143,
+   "worldW": 3.53,
+   "worldH": 5.491,
+   "anchorX": 0.5,
+   "anchorY": 0.7179,
+   "file": "/replay/plates/sky-temple/storm_building_luxbazaar_tower_00.y106.s100.t0.webp"
+  },
+  "storm_building_luxbazaar_tower_00.y108.s100.t0": {
+   "w": 93,
+   "h": 144,
+   "worldW": 3.595,
+   "worldH": 5.546,
+   "anchorX": 0.5,
+   "anchorY": 0.7157,
+   "file": "/replay/plates/sky-temple/storm_building_luxbazaar_tower_00.y108.s100.t0.webp"
+  },
+  "storm_building_luxbazaar_tower_00.y97.s100.t0": {
+   "w": 83,
+   "h": 135,
+   "worldW": 3.207,
+   "worldH": 5.21,
+   "anchorX": 0.5,
+   "anchorY": 0.7296,
+   "file": "/replay/plates/sky-temple/storm_building_luxbazaar_tower_00.y97.s100.t0.webp"
+  },
+  "storm_building_luxbazaar_tower_00.y103.s100.t0": {
+   "w": 90,
+   "h": 141,
+   "worldW": 3.455,
+   "worldH": 5.426,
+   "anchorX": 0.5,
+   "anchorY": 0.7205,
+   "file": "/replay/plates/sky-temple/storm_building_luxbazaar_tower_00.y103.s100.t0.webp"
+  },
+  "storm_building_luxbazaar_tower_01.y226.s100.t1": {
+   "w": 104,
+   "h": 166,
+   "worldW": 4.002,
+   "worldH": 6.39,
+   "anchorX": 0.5,
+   "anchorY": 0.7257,
+   "file": "/replay/plates/sky-temple/storm_building_luxbazaar_tower_01.y226.s100.t1.webp"
+  },
+  "storm_building_luxbazaar_tower_01.y51.s100.t0": {
+   "w": 103,
+   "h": 166,
+   "worldW": 3.98,
+   "worldH": 6.371,
+   "anchorX": 0.5,
+   "anchorY": 0.7263,
+   "file": "/replay/plates/sky-temple/storm_building_luxbazaar_tower_01.y51.s100.t0.webp"
+  },
+  "storm_building_luxbazaar_tower_01.y90.s100.t0": {
+   "w": 76,
+   "h": 142,
+   "worldW": 2.925,
+   "worldH": 5.457,
+   "anchorX": 0.5,
+   "anchorY": 0.7642,
+   "file": "/replay/plates/sky-temple/storm_building_luxbazaar_tower_01.y90.s100.t0.webp"
+  },
+  "storm_building_luxbazaar_tower_01.y88.s100.t0": {
+   "w": 78,
+   "h": 143,
+   "worldW": 2.986,
+   "worldH": 5.51,
+   "anchorX": 0.5,
+   "anchorY": 0.7617,
+   "file": "/replay/plates/sky-temple/storm_building_luxbazaar_tower_01.y88.s100.t0.webp"
+  },
+  "storm_building_luxbazaar_tower_01.y270.s100.t1": {
+   "w": 76,
+   "h": 142,
+   "worldW": 2.926,
+   "worldH": 5.458,
+   "anchorX": 0.5,
+   "anchorY": 0.7642,
+   "file": "/replay/plates/sky-temple/storm_building_luxbazaar_tower_01.y270.s100.t1.webp"
+  },
+  "storm_building_luxbazaar_tower_01.y271.s100.t1": {
+   "w": 78,
+   "h": 143,
+   "worldW": 2.986,
+   "worldH": 5.51,
+   "anchorX": 0.5,
+   "anchorY": 0.7617,
+   "file": "/replay/plates/sky-temple/storm_building_luxbazaar_tower_01.y271.s100.t1.webp"
+  },
+  "storm_building_luxbazaar_tower_01.y134.s100.t0": {
+   "w": 104,
+   "h": 166,
+   "worldW": 4.002,
+   "worldH": 6.39,
+   "anchorX": 0.5,
+   "anchorY": 0.7257,
+   "file": "/replay/plates/sky-temple/storm_building_luxbazaar_tower_01.y134.s100.t0.webp"
+  },
+  "storm_building_luxbazaar_tower_01.y137.s100.t0": {
+   "w": 104,
+   "h": 166,
+   "worldW": 4,
+   "worldH": 6.388,
+   "anchorX": 0.5,
+   "anchorY": 0.7257,
+   "file": "/replay/plates/sky-temple/storm_building_luxbazaar_tower_01.y137.s100.t0.webp"
+  },
+  "storm_building_luxbazaar_tower_01.y36.s100.t0": {
+   "w": 103,
+   "h": 165,
+   "worldW": 3.958,
+   "worldH": 6.351,
+   "anchorX": 0.5,
+   "anchorY": 0.727,
+   "file": "/replay/plates/sky-temple/storm_building_luxbazaar_tower_01.y36.s100.t0.webp"
+  },
+  "storm_building_luxbazaar_tower_01.y324.s100.t1": {
+   "w": 103,
+   "h": 165,
+   "worldW": 3.959,
+   "worldH": 6.353,
+   "anchorX": 0.5,
+   "anchorY": 0.727,
+   "file": "/replay/plates/sky-temple/storm_building_luxbazaar_tower_01.y324.s100.t1.webp"
+  },
+  "storm_building_luxbazaar_tower_01.y223.s100.t1": {
+   "w": 104,
+   "h": 166,
+   "worldW": 4,
+   "worldH": 6.388,
+   "anchorX": 0.5,
+   "anchorY": 0.7257,
+   "file": "/replay/plates/sky-temple/storm_building_luxbazaar_tower_01.y223.s100.t1.webp"
+  },
+  "storm_building_luxbazaar_tower_01.y308.s100.t1": {
+   "w": 103,
+   "h": 166,
+   "worldW": 3.978,
+   "worldH": 6.369,
+   "anchorX": 0.5,
+   "anchorY": 0.7264,
+   "file": "/replay/plates/sky-temple/storm_building_luxbazaar_tower_01.y308.s100.t1.webp"
+  },
+  "storm_building_luxbazaar_tower_01.y269.s100.t1": {
+   "w": 77,
+   "h": 143,
+   "worldW": 2.972,
+   "worldH": 5.498,
+   "anchorX": 0.5,
+   "anchorY": 0.7623,
+   "file": "/replay/plates/sky-temple/storm_building_luxbazaar_tower_01.y269.s100.t1.webp"
+  },
+  "storm_building_luxbazaar_tower_01.y91.s100.t0": {
+   "w": 77,
+   "h": 143,
+   "worldW": 2.972,
+   "worldH": 5.498,
+   "anchorX": 0.5,
+   "anchorY": 0.7623,
+   "file": "/replay/plates/sky-temple/storm_building_luxbazaar_tower_01.y91.s100.t0.webp"
+  },
+  "storm_building_luxbazaar_tower_01.y47.s100.t0": {
+   "w": 104,
+   "h": 166,
+   "worldW": 4,
+   "worldH": 6.388,
+   "anchorX": 0.5,
+   "anchorY": 0.7257,
+   "file": "/replay/plates/sky-temple/storm_building_luxbazaar_tower_01.y47.s100.t0.webp"
+  },
+  "storm_building_luxbazaar_tower_01.y313.s100.t1": {
+   "w": 104,
+   "h": 166,
+   "worldW": 4,
+   "worldH": 6.388,
+   "anchorX": 0.5,
+   "anchorY": 0.7257,
+   "file": "/replay/plates/sky-temple/storm_building_luxbazaar_tower_01.y313.s100.t1.webp"
+  },
+  "storm_building_luxbazaar_gate_00.y75.s100.t1": {
+   "w": 78,
+   "h": 205,
+   "worldW": 2.989,
+   "worldH": 7.886,
+   "anchorX": 0.5,
+   "anchorY": 0.6318,
+   "file": "/replay/plates/sky-temple/storm_building_luxbazaar_gate_00.y75.s100.t1.webp"
+  },
+  "storm_building_luxbazaar_gate_00.y285.s100.t0": {
+   "w": 78,
+   "h": 205,
+   "worldW": 2.987,
+   "worldH": 7.886,
+   "anchorX": 0.5,
+   "anchorY": 0.6318,
+   "file": "/replay/plates/sky-temple/storm_building_luxbazaar_gate_00.y285.s100.t0.webp"
+  },
+  "storm_building_luxbazaar_moonwell.y45.s100.t0": {
+   "w": 157,
+   "h": 196,
+   "worldW": 6.023,
+   "worldH": 7.538,
+   "anchorX": 0.5,
+   "anchorY": 0.6406,
+   "file": "/replay/plates/sky-temple/storm_building_luxbazaar_moonwell.y45.s100.t0.webp"
+  },
+  "storm_building_luxbazaar_moonwell.y315.s100.t1": {
+   "w": 157,
+   "h": 196,
+   "worldW": 6.023,
+   "worldH": 7.538,
+   "anchorX": 0.5,
+   "anchorY": 0.6406,
+   "file": "/replay/plates/sky-temple/storm_building_luxbazaar_moonwell.y315.s100.t1.webp"
+  },
+  "storm_building_luxbazaar_fort.y105.s100.t0": {
+   "w": 183,
+   "h": 230,
+   "worldW": 7.049,
+   "worldH": 8.839,
+   "anchorX": 0.4478,
+   "anchorY": 0.6802,
+   "file": "/replay/plates/sky-temple/storm_building_luxbazaar_fort.y105.s100.t0.webp"
+  },
+  "storm_building_luxbazaar_fort_water.y105.s100.t0": {
+   "w": 80,
+   "h": 122,
+   "worldW": 3.079,
+   "worldH": 4.678,
+   "anchorX": 0.2274,
+   "anchorY": 0.8046,
+   "file": "/replay/plates/sky-temple/storm_building_luxbazaar_fort_water.y105.s100.t0.webp"
+  },
+  "storm_building_luxbazaar_fort.y255.s100.t1": {
+   "w": 183,
+   "h": 230,
+   "worldW": 7.05,
+   "worldH": 8.84,
+   "anchorX": 0.5522,
+   "anchorY": 0.6802,
+   "file": "/replay/plates/sky-temple/storm_building_luxbazaar_fort.y255.s100.t1.webp"
+  },
+  "storm_building_luxbazaar_fort_water.y255.s100.t1": {
+   "w": 80,
+   "h": 122,
+   "worldW": 3.08,
+   "worldH": 4.679,
+   "anchorX": 0.7725,
+   "anchorY": 0.8046,
+   "file": "/replay/plates/sky-temple/storm_building_luxbazaar_fort_water.y255.s100.t1.webp"
+  },
+  "storm_building_luxbazaar_fort.y133.s100.t1": {
+   "w": 205,
+   "h": 257,
+   "worldW": 7.885,
+   "worldH": 9.871,
+   "anchorX": 0.4646,
+   "anchorY": 0.6755,
+   "file": "/replay/plates/sky-temple/storm_building_luxbazaar_fort.y133.s100.t1.webp"
+  },
+  "storm_building_luxbazaar_fort_water.y133.s100.t1": {
+   "w": 95,
+   "h": 129,
+   "worldW": 3.651,
+   "worldH": 4.962,
+   "anchorX": 0.3256,
+   "anchorY": 0.8512,
+   "file": "/replay/plates/sky-temple/storm_building_luxbazaar_fort_water.y133.s100.t1.webp"
+  },
+  "storm_building_luxbazaar_fort.y114.s100.t0": {
+   "w": 195,
+   "h": 242,
+   "worldW": 7.492,
+   "worldH": 9.312,
+   "anchorX": 0.4534,
+   "anchorY": 0.6761,
+   "file": "/replay/plates/sky-temple/storm_building_luxbazaar_fort.y114.s100.t0.webp"
+  },
+  "storm_building_luxbazaar_fort_water.y114.s100.t0": {
+   "w": 87,
+   "h": 126,
+   "worldW": 3.334,
+   "worldH": 4.838,
+   "anchorX": 0.2612,
+   "anchorY": 0.8166,
+   "file": "/replay/plates/sky-temple/storm_building_luxbazaar_fort_water.y114.s100.t0.webp"
+  },
+  "storm_building_luxbazaar_keep.y45.s100.t0": {
+   "w": 245,
+   "h": 304,
+   "worldW": 9.427,
+   "worldH": 11.677,
+   "anchorX": 0.4799,
+   "anchorY": 0.6345,
+   "file": "/replay/plates/sky-temple/storm_building_luxbazaar_keep.y45.s100.t0.webp"
+  },
+  "storm_building_luxbazaar_keep.y315.s100.t1": {
+   "w": 245,
+   "h": 304,
+   "worldW": 9.427,
+   "worldH": 11.677,
+   "anchorX": 0.5201,
+   "anchorY": 0.6345,
+   "file": "/replay/plates/sky-temple/storm_building_luxbazaar_keep.y315.s100.t1.webp"
+  },
+  "storm_building_luxbazaar_keep.y146.s100.t0": {
+   "w": 240,
+   "h": 301,
+   "worldW": 9.246,
+   "worldH": 11.567,
+   "anchorX": 0.4836,
+   "anchorY": 0.6665,
+   "file": "/replay/plates/sky-temple/storm_building_luxbazaar_keep.y146.s100.t0.webp"
+  },
+  "storm_building_luxbazaar_keep.y214.s100.t1": {
+   "w": 240,
+   "h": 301,
+   "worldW": 9.245,
+   "worldH": 11.566,
+   "anchorX": 0.5164,
+   "anchorY": 0.6665,
+   "file": "/replay/plates/sky-temple/storm_building_luxbazaar_keep.y214.s100.t1.webp"
+  },
+  "storm_building_luxoria_townwall.y225.s100.t1": {
+   "w": 149,
+   "h": 159,
+   "worldW": 5.747,
+   "worldH": 6.133,
+   "anchorX": 0.5349,
+   "anchorY": 0.5754,
+   "file": "/replay/plates/sky-temple/storm_building_luxoria_townwall.y225.s100.t1.webp"
+  },
+  "storm_building_luxoria_townwall.y210.s100.t1": {
+   "w": 130,
+   "h": 168,
+   "worldW": 4.988,
+   "worldH": 6.468,
+   "anchorX": 0.5433,
+   "anchorY": 0.5788,
+   "file": "/replay/plates/sky-temple/storm_building_luxoria_townwall.y210.s100.t1.webp"
+  },
+  "storm_building_luxoria_townwall.y180.s100.t1": {
+   "w": 67,
+   "h": 159,
+   "worldW": 2.588,
+   "worldH": 6.107,
+   "anchorX": 0.5782,
+   "anchorY": 0.5994,
+   "file": "/replay/plates/sky-temple/storm_building_luxoria_townwall.y180.s100.t1.webp"
+  },
+  "storm_building_luxoria_townwall.y165.s100.t1": {
+   "w": 102,
+   "h": 168,
+   "worldW": 3.912,
+   "worldH": 6.46,
+   "anchorX": 0.5446,
+   "anchorY": 0.6006,
+   "file": "/replay/plates/sky-temple/storm_building_luxoria_townwall.y165.s100.t1.webp"
+  },
+  "storm_building_luxoria_townwall.y150.s100.t1": {
+   "w": 130,
+   "h": 168,
+   "worldW": 4.989,
+   "worldH": 6.468,
+   "anchorX": 0.527,
+   "anchorY": 0.6059,
+   "file": "/replay/plates/sky-temple/storm_building_luxoria_townwall.y150.s100.t1.webp"
+  },
+  "storm_building_luxoria_townwall.y135.s100.t1": {
+   "w": 149,
+   "h": 159,
+   "worldW": 5.748,
+   "worldH": 6.132,
+   "anchorX": 0.5149,
+   "anchorY": 0.6158,
+   "file": "/replay/plates/sky-temple/storm_building_luxoria_townwall.y135.s100.t1.webp"
+  },
+  "storm_building_luxoria_townwall.y120.s100.t1": {
+   "w": 160,
+   "h": 142,
+   "worldW": 6.135,
+   "worldH": 5.475,
+   "anchorX": 0.505,
+   "anchorY": 0.6322,
+   "file": "/replay/plates/sky-temple/storm_building_luxoria_townwall.y120.s100.t1.webp"
+  },
+  "storm_building_luxoria_townwall.y45.s100.t0": {
+   "w": 149,
+   "h": 159,
+   "worldW": 5.747,
+   "worldH": 6.133,
+   "anchorX": 0.4651,
+   "anchorY": 0.5996,
+   "file": "/replay/plates/sky-temple/storm_building_luxoria_townwall.y45.s100.t0.webp"
+  },
+  "storm_building_luxoria_townwall.y30.s100.t0": {
+   "w": 130,
+   "h": 168,
+   "worldW": 4.988,
+   "worldH": 6.468,
+   "anchorX": 0.4567,
+   "anchorY": 0.5871,
+   "file": "/replay/plates/sky-temple/storm_building_luxoria_townwall.y30.s100.t0.webp"
+  },
+  "storm_building_luxoria_townwall.y15.s100.t0": {
+   "w": 102,
+   "h": 168,
+   "worldW": 3.91,
+   "worldH": 6.459,
+   "anchorX": 0.4446,
+   "anchorY": 0.5796,
+   "file": "/replay/plates/sky-temple/storm_building_luxoria_townwall.y15.s100.t0.webp"
+  },
+  "storm_building_luxoria_townwall.y0.s100.t0": {
+   "w": 67,
+   "h": 159,
+   "worldW": 2.586,
+   "worldH": 6.107,
+   "anchorX": 0.4218,
+   "anchorY": 0.5764,
+   "file": "/replay/plates/sky-temple/storm_building_luxoria_townwall.y0.s100.t0.webp"
+  },
+  "storm_building_luxoria_townwall.y345.s100.t0": {
+   "w": 102,
+   "h": 168,
+   "worldW": 3.912,
+   "worldH": 6.46,
+   "anchorX": 0.4554,
+   "anchorY": 0.5656,
+   "file": "/replay/plates/sky-temple/storm_building_luxoria_townwall.y345.s100.t0.webp"
+  },
+  "storm_building_luxoria_townwall.y315.s100.t0": {
+   "w": 149,
+   "h": 159,
+   "worldW": 5.748,
+   "worldH": 6.132,
+   "anchorX": 0.4851,
+   "anchorY": 0.5592,
+   "file": "/replay/plates/sky-temple/storm_building_luxoria_townwall.y315.s100.t0.webp"
+  },
+  "storm_building_luxoria_townwall.y300.s100.t0": {
+   "w": 160,
+   "h": 142,
+   "worldW": 6.135,
+   "worldH": 5.475,
+   "anchorX": 0.495,
+   "anchorY": 0.5639,
+   "file": "/replay/plates/sky-temple/storm_building_luxoria_townwall.y300.s100.t0.webp"
+  },
+  "storm_building_luxoria_watchtower.y0.s100.tx": {
+   "w": 225,
+   "h": 225,
+   "worldW": 8.673,
+   "worldH": 8.645,
+   "anchorX": 0.5005,
+   "anchorY": 0.534,
+   "file": "/replay/plates/sky-temple/storm_building_luxoria_watchtower.y0.s100.tx.webp"
+  }
+ },
+ "buildings": [
+  {
+   "m": "storm_building_luxoria_capturepoint_ring",
+   "x": 124,
+   "y": 119.5,
+   "z": 7.915,
+   "r": 0,
+   "sprite": "storm_building_luxoria_capturepoint_ring.y0.s100.tx"
+  },
+  {
+   "m": "storm_building_luxoria_capturepoint_ring",
+   "x": 124,
+   "y": 34.5,
+   "z": 7.917,
+   "r": 0,
+   "sprite": "storm_building_luxoria_capturepoint_ring.y0.s100.tx"
+  },
+  {
+   "m": "storm_building_luxoria_capturepoint_ring",
+   "x": 124,
+   "y": 176.5,
+   "z": 7.916,
+   "r": 0,
+   "sprite": "storm_building_luxoria_capturepoint_ring.y0.s100.tx"
+  },
+  {
+   "m": "storm_building_luxoria_capturepoint_progress",
+   "x": 13.645,
+   "y": 123.112,
+   "z": 7.902,
+   "r": 0,
+   "s": 1.169,
+   "sprite": "storm_building_luxoria_capturepoint_progress.y0.s117.tx"
+  },
+  {
+   "m": "storm_building_luxoria_capturepoint_progress",
+   "x": 12.683,
+   "y": 124.695,
+   "z": 7.91,
+   "r": 0,
+   "s": 0.817,
+   "sprite": "storm_building_luxoria_capturepoint_progress.y0.s82.tx"
+  },
+  {
+   "m": "storm_building_luxoria_capturepoint_progress",
+   "x": 14.165,
+   "y": 126.352,
+   "z": 7.91,
+   "r": 0,
+   "s": 0.866,
+   "sprite": "storm_building_luxoria_capturepoint_progress.y0.s87.tx"
+  },
+  {
+   "m": "storm_building_luxoria_capturepoint_pedestal",
+   "x": 115.08,
+   "y": 176.98,
+   "z": 8.172,
+   "r": 1.5222,
+   "sprite": "storm_building_luxoria_capturepoint_pedestal.y87.s100.tx"
+  },
+  {
+   "m": "storm_building_luxoria_capturepoint_pedestal",
+   "x": 132.92,
+   "y": 176.98,
+   "z": 8.172,
+   "r": 4.7607,
+   "sprite": "storm_building_luxoria_capturepoint_pedestal.y273.s100.tx"
+  },
+  {
+   "m": "storm_building_luxoria_capturepoint_pedestal",
+   "x": 132.87,
+   "y": 119.96,
+   "z": 8.166,
+   "r": 4.7514,
+   "sprite": "storm_building_luxoria_capturepoint_pedestal.y272.s100.tx"
+  },
+  {
+   "m": "storm_building_luxoria_capturepoint_pedestal",
+   "x": 115.13,
+   "y": 119.96,
+   "z": 8.166,
+   "r": 1.5314,
+   "sprite": "storm_building_luxoria_capturepoint_pedestal.y88.s100.tx"
+  },
+  {
+   "m": "storm_building_luxoria_capturepoint_pedestal",
+   "x": 114.99,
+   "y": 34.96,
+   "z": 8.171,
+   "r": 1.5534,
+   "sprite": "storm_building_luxoria_capturepoint_pedestal.y89.s100.tx"
+  },
+  {
+   "m": "storm_building_luxoria_capturepoint_pedestal",
+   "x": 133.01,
+   "y": 34.96,
+   "z": 8.171,
+   "r": 4.7294,
+   "sprite": "storm_building_luxoria_capturepoint_pedestal.y271.s100.tx"
+  },
+  {
+   "m": "storm_building_luxoria_capturepoint_pedestalsmall",
+   "x": 118,
+   "y": 183.5,
+   "z": 7.927,
+   "r": 0.6757,
+   "sprite": "storm_building_luxoria_capturepoint_pedestalsmall.y39.s100.tx"
+  },
+  {
+   "m": "storm_building_luxoria_capturepoint_pedestalsmall",
+   "x": 130,
+   "y": 183.5,
+   "z": 7.927,
+   "r": 5.6071,
+   "sprite": "storm_building_luxoria_capturepoint_pedestalsmall.y321.s100.tx"
+  },
+  {
+   "m": "storm_building_luxoria_capturepoint_pedestalsmall",
+   "x": 118,
+   "y": 126,
+   "z": 7.92,
+   "r": 0.7504,
+   "sprite": "storm_building_luxoria_capturepoint_pedestalsmall.y43.s100.tx"
+  },
+  {
+   "m": "storm_building_luxoria_capturepoint_pedestalsmall",
+   "x": 130,
+   "y": 126,
+   "z": 7.92,
+   "r": 5.5324,
+   "sprite": "storm_building_luxoria_capturepoint_pedestalsmall.y317.s100.tx"
+  },
+  {
+   "m": "storm_building_luxoria_capturepoint_pedestalsmall",
+   "x": 117,
+   "y": 40,
+   "z": 7.927,
+   "r": 0.7744,
+   "sprite": "storm_building_luxoria_capturepoint_pedestalsmall.y44.s100.tx"
+  },
+  {
+   "m": "storm_building_luxoria_capturepoint_pedestalsmall",
+   "x": 131,
+   "y": 40,
+   "z": 7.927,
+   "r": 5.5078,
+   "sprite": "storm_building_luxoria_capturepoint_pedestalsmall.y316.s100.tx"
+  },
+  {
+   "m": "storm_building_luxbazaar_core",
+   "x": 45,
+   "y": 116,
+   "z": 7.918,
+   "r": 0.7851,
+   "t": 0,
+   "sprite": "storm_building_luxbazaar_core.y45.s100.t0"
+  },
+  {
+   "m": "storm_building_luxbazaar_core",
+   "x": 203,
+   "y": 116,
+   "z": 7.918,
+   "r": 5.4975,
+   "t": 1,
+   "sprite": "storm_building_luxbazaar_core.y315.s100.t1"
+  },
+  {
+   "m": "storm_building_luxoria_capturepointtemple",
+   "x": 124,
+   "y": 127,
+   "z": 7.918,
+   "r": 0,
+   "sprite": "storm_building_luxoria_capturepointtemple.y0.s100.tx"
+  },
+  {
+   "m": "storm_building_luxoria_capturepointtemple",
+   "x": 124,
+   "y": 42,
+   "z": 7.921,
+   "r": 0,
+   "sprite": "storm_building_luxoria_capturepointtemple.y0.s100.tx"
+  },
+  {
+   "m": "storm_building_luxoria_capturepointtemple",
+   "x": 124,
+   "y": 184,
+   "z": 7.918,
+   "r": 0,
+   "sprite": "storm_building_luxoria_capturepointtemple.y0.s100.tx"
+  },
+  {
+   "m": "storm_building_luxbazaar_tower_00",
+   "x": 106,
+   "y": 106,
+   "z": 7.921,
+   "r": 1.6142,
+   "t": 0,
+   "sprite": "storm_building_luxbazaar_tower_00.y92.s100.t0"
+  },
+  {
+   "m": "storm_building_luxbazaar_tower_00",
+   "x": 106,
+   "y": 98,
+   "z": 7.921,
+   "r": 1.5705,
+   "t": 0,
+   "sprite": "storm_building_luxbazaar_tower_00.y90.s100.t0"
+  },
+  {
+   "m": "storm_building_luxbazaar_tower_00",
+   "x": 142,
+   "y": 106,
+   "z": 7.921,
+   "r": 4.6687,
+   "t": 1,
+   "sprite": "storm_building_luxbazaar_tower_00.y267.s100.t1"
+  },
+  {
+   "m": "storm_building_luxbazaar_tower_00",
+   "x": 142,
+   "y": 98,
+   "z": 7.921,
+   "r": 4.711,
+   "t": 1,
+   "sprite": "storm_building_luxbazaar_tower_00.y270.s100.t1"
+  },
+  {
+   "m": "storm_building_luxbazaar_tower_00",
+   "x": 146,
+   "y": 160,
+   "z": 7.918,
+   "r": 4.5097,
+   "t": 1,
+   "sprite": "storm_building_luxbazaar_tower_00.y258.s100.t1"
+  },
+  {
+   "m": "storm_building_luxbazaar_tower_00",
+   "x": 144,
+   "y": 58,
+   "z": 7.921,
+   "r": 4.5917,
+   "t": 1,
+   "sprite": "storm_building_luxbazaar_tower_00.y263.s100.t1"
+  },
+  {
+   "m": "storm_building_luxbazaar_tower_00",
+   "x": 142,
+   "y": 50,
+   "z": 7.921,
+   "r": 4.4655,
+   "t": 1,
+   "sprite": "storm_building_luxbazaar_tower_00.y256.s100.t1"
+  },
+  {
+   "m": "storm_building_luxbazaar_tower_00",
+   "x": 144,
+   "y": 152,
+   "z": 7.918,
+   "r": 4.477,
+   "t": 1,
+   "sprite": "storm_building_luxbazaar_tower_00.y257.s100.t1"
+  },
+  {
+   "m": "storm_building_luxbazaar_tower_00",
+   "x": 104,
+   "y": 58,
+   "z": 7.921,
+   "r": 1.8457,
+   "t": 0,
+   "sprite": "storm_building_luxbazaar_tower_00.y106.s100.t0"
+  },
+  {
+   "m": "storm_building_luxbazaar_tower_00",
+   "x": 102,
+   "y": 160,
+   "z": 7.918,
+   "r": 1.8823,
+   "t": 0,
+   "sprite": "storm_building_luxbazaar_tower_00.y108.s100.t0"
+  },
+  {
+   "m": "storm_building_luxbazaar_tower_00",
+   "x": 106,
+   "y": 50,
+   "z": 7.921,
+   "r": 1.6882,
+   "t": 0,
+   "sprite": "storm_building_luxbazaar_tower_00.y97.s100.t0"
+  },
+  {
+   "m": "storm_building_luxbazaar_tower_00",
+   "x": 104,
+   "y": 152,
+   "z": 7.918,
+   "r": 1.8056,
+   "t": 0,
+   "sprite": "storm_building_luxbazaar_tower_00.y103.s100.t0"
+  },
+  {
+   "m": "storm_building_luxbazaar_tower_01",
+   "x": 178,
+   "y": 138,
+   "z": 7.918,
+   "r": 3.9482,
+   "t": 1,
+   "sprite": "storm_building_luxbazaar_tower_01.y226.s100.t1"
+  },
+  {
+   "m": "storm_building_luxbazaar_tower_01",
+   "x": 58,
+   "y": 84,
+   "z": 7.921,
+   "r": 0.895,
+   "t": 0,
+   "sprite": "storm_building_luxbazaar_tower_01.y51.s100.t0"
+  },
+  {
+   "m": "storm_building_luxbazaar_tower_01",
+   "x": 79,
+   "y": 106,
+   "z": 7.918,
+   "r": 1.5734,
+   "t": 0,
+   "sprite": "storm_building_luxbazaar_tower_01.y90.s100.t0"
+  },
+  {
+   "m": "storm_building_luxbazaar_tower_01",
+   "x": 79,
+   "y": 114,
+   "z": 7.918,
+   "r": 1.5444,
+   "t": 0,
+   "sprite": "storm_building_luxbazaar_tower_01.y88.s100.t0"
+  },
+  {
+   "m": "storm_building_luxbazaar_tower_01",
+   "x": 169,
+   "y": 106,
+   "z": 7.918,
+   "r": 4.7092,
+   "t": 1,
+   "sprite": "storm_building_luxbazaar_tower_01.y270.s100.t1"
+  },
+  {
+   "m": "storm_building_luxbazaar_tower_01",
+   "x": 169,
+   "y": 114,
+   "z": 7.918,
+   "r": 4.7385,
+   "t": 1,
+   "sprite": "storm_building_luxbazaar_tower_01.y271.s100.t1"
+  },
+  {
+   "m": "storm_building_luxbazaar_tower_01",
+   "x": 70,
+   "y": 138,
+   "z": 7.918,
+   "r": 2.3347,
+   "t": 0,
+   "sprite": "storm_building_luxbazaar_tower_01.y134.s100.t0"
+  },
+  {
+   "m": "storm_building_luxbazaar_tower_01",
+   "x": 64,
+   "y": 144,
+   "z": 7.918,
+   "r": 2.3913,
+   "t": 0,
+   "sprite": "storm_building_luxbazaar_tower_01.y137.s100.t0"
+  },
+  {
+   "m": "storm_building_luxbazaar_tower_01",
+   "x": 64,
+   "y": 90,
+   "z": 7.918,
+   "r": 0.6293,
+   "t": 0,
+   "sprite": "storm_building_luxbazaar_tower_01.y36.s100.t0"
+  },
+  {
+   "m": "storm_building_luxbazaar_tower_01",
+   "x": 184,
+   "y": 90,
+   "z": 7.918,
+   "r": 5.6513,
+   "t": 1,
+   "sprite": "storm_building_luxbazaar_tower_01.y324.s100.t1"
+  },
+  {
+   "m": "storm_building_luxbazaar_tower_01",
+   "x": 184,
+   "y": 144,
+   "z": 7.918,
+   "r": 3.8916,
+   "t": 1,
+   "sprite": "storm_building_luxbazaar_tower_01.y223.s100.t1"
+  },
+  {
+   "m": "storm_building_luxbazaar_tower_01",
+   "x": 190,
+   "y": 84,
+   "z": 7.921,
+   "r": 5.3828,
+   "t": 1,
+   "sprite": "storm_building_luxbazaar_tower_01.y308.s100.t1"
+  },
+  {
+   "m": "storm_building_luxbazaar_tower_01",
+   "x": 167,
+   "y": 155,
+   "z": 7.918,
+   "r": 4.6914,
+   "t": 1,
+   "sprite": "storm_building_luxbazaar_tower_01.y269.s100.t1"
+  },
+  {
+   "m": "storm_building_luxbazaar_tower_01",
+   "x": 81,
+   "y": 155,
+   "z": 7.918,
+   "r": 1.5915,
+   "t": 0,
+   "sprite": "storm_building_luxbazaar_tower_01.y91.s100.t0"
+  },
+  {
+   "m": "storm_building_luxbazaar_tower_01",
+   "x": 81,
+   "y": 59,
+   "z": 7.921,
+   "r": 0.825,
+   "t": 0,
+   "sprite": "storm_building_luxbazaar_tower_01.y47.s100.t0"
+  },
+  {
+   "m": "storm_building_luxbazaar_tower_01",
+   "x": 167,
+   "y": 59,
+   "z": 7.921,
+   "r": 5.4577,
+   "t": 1,
+   "sprite": "storm_building_luxbazaar_tower_01.y313.s100.t1"
+  },
+  {
+   "m": "storm_building_luxbazaar_gate_00",
+   "x": 145,
+   "y": 156,
+   "z": 7.918,
+   "r": 1.3088,
+   "t": 1,
+   "sprite": "storm_building_luxbazaar_gate_00.y75.s100.t1"
+  },
+  {
+   "m": "storm_building_luxbazaar_gate_00",
+   "x": 143,
+   "y": 54,
+   "z": 7.921,
+   "r": 1.3088,
+   "t": 1,
+   "sprite": "storm_building_luxbazaar_gate_00.y75.s100.t1"
+  },
+  {
+   "m": "storm_building_luxbazaar_gate_00",
+   "x": 103,
+   "y": 156,
+   "z": 7.918,
+   "r": 4.974,
+   "t": 0,
+   "sprite": "storm_building_luxbazaar_gate_00.y285.s100.t0"
+  },
+  {
+   "m": "storm_building_luxbazaar_gate_00",
+   "x": 105,
+   "y": 54,
+   "z": 7.921,
+   "r": 4.974,
+   "t": 0,
+   "sprite": "storm_building_luxbazaar_gate_00.y285.s100.t0"
+  },
+  {
+   "m": "storm_building_luxbazaar_moonwell",
+   "x": 99.5,
+   "y": 105.5,
+   "z": 7.921,
+   "r": 0.7851,
+   "t": 0,
+   "sprite": "storm_building_luxbazaar_moonwell.y45.s100.t0"
+  },
+  {
+   "m": "storm_building_luxbazaar_moonwell",
+   "x": 148.5,
+   "y": 105.5,
+   "z": 7.921,
+   "r": 5.4975,
+   "t": 1,
+   "sprite": "storm_building_luxbazaar_moonwell.y315.s100.t1"
+  },
+  {
+   "m": "storm_building_luxbazaar_moonwell",
+   "x": 152.5,
+   "y": 158.5,
+   "z": 7.918,
+   "r": 5.4975,
+   "t": 1,
+   "sprite": "storm_building_luxbazaar_moonwell.y315.s100.t1"
+  },
+  {
+   "m": "storm_building_luxbazaar_moonwell",
+   "x": 96.5,
+   "y": 50.5,
+   "z": 7.921,
+   "r": 0.7851,
+   "t": 0,
+   "sprite": "storm_building_luxbazaar_moonwell.y45.s100.t0"
+  },
+  {
+   "m": "storm_building_luxbazaar_moonwell",
+   "x": 151.5,
+   "y": 50.5,
+   "z": 7.921,
+   "r": 5.4975,
+   "t": 1,
+   "sprite": "storm_building_luxbazaar_moonwell.y315.s100.t1"
+  },
+  {
+   "m": "storm_building_luxbazaar_moonwell",
+   "x": 95.5,
+   "y": 158.5,
+   "z": 7.918,
+   "r": 0.7851,
+   "t": 0,
+   "sprite": "storm_building_luxbazaar_moonwell.y45.s100.t0"
+  },
+  {
+   "m": "storm_building_luxbazaar_moonwell",
+   "x": 68.5,
+   "y": 106.5,
+   "z": 7.918,
+   "r": 0.7851,
+   "t": 0,
+   "sprite": "storm_building_luxbazaar_moonwell.y45.s100.t0"
+  },
+  {
+   "m": "storm_building_luxbazaar_moonwell",
+   "x": 194.5,
+   "y": 89.5,
+   "z": 7.918,
+   "r": 5.4975,
+   "t": 1,
+   "sprite": "storm_building_luxbazaar_moonwell.y315.s100.t1"
+  },
+  {
+   "m": "storm_building_luxbazaar_moonwell",
+   "x": 62.5,
+   "y": 130.5,
+   "z": 7.918,
+   "r": 0.7851,
+   "t": 0,
+   "sprite": "storm_building_luxbazaar_moonwell.y45.s100.t0"
+  },
+  {
+   "m": "storm_building_luxbazaar_moonwell",
+   "x": 179.5,
+   "y": 106.5,
+   "z": 7.918,
+   "r": 5.4975,
+   "t": 1,
+   "sprite": "storm_building_luxbazaar_moonwell.y315.s100.t1"
+  },
+  {
+   "m": "storm_building_luxbazaar_moonwell",
+   "x": 185.5,
+   "y": 130.5,
+   "z": 7.918,
+   "r": 5.4975,
+   "t": 1,
+   "sprite": "storm_building_luxbazaar_moonwell.y315.s100.t1"
+  },
+  {
+   "m": "storm_building_luxbazaar_moonwell",
+   "x": 53.5,
+   "y": 89.5,
+   "z": 7.918,
+   "r": 0.7851,
+   "t": 0,
+   "sprite": "storm_building_luxbazaar_moonwell.y45.s100.t0"
+  },
+  {
+   "m": "storm_building_luxbazaar_fort",
+   "x": 93.5,
+   "y": 101.5,
+   "z": 7.918,
+   "r": 1.8315,
+   "t": 0,
+   "sprite": "storm_building_luxbazaar_fort.y105.s100.t0"
+  },
+  {
+   "m": "storm_building_luxbazaar_fort_water",
+   "x": 93.5,
+   "y": 101.5,
+   "z": 7.918,
+   "r": 1.8315,
+   "t": 0,
+   "sprite": "storm_building_luxbazaar_fort_water.y105.s100.t0"
+  },
+  {
+   "m": "storm_building_luxbazaar_fort_water",
+   "x": 93.5,
+   "y": 101.5,
+   "z": 7.918,
+   "r": 1.8315,
+   "t": 0,
+   "sprite": "storm_building_luxbazaar_fort_water.y105.s100.t0"
+  },
+  {
+   "m": "storm_building_luxbazaar_fort_water",
+   "x": 93.5,
+   "y": 101.5,
+   "z": 7.918,
+   "r": 1.8315,
+   "t": 0,
+   "sprite": "storm_building_luxbazaar_fort_water.y105.s100.t0"
+  },
+  {
+   "m": "storm_building_luxbazaar_fort",
+   "x": 153.5,
+   "y": 98.5,
+   "z": 7.918,
+   "r": 4.4514,
+   "t": 1,
+   "sprite": "storm_building_luxbazaar_fort.y255.s100.t1"
+  },
+  {
+   "m": "storm_building_luxbazaar_fort_water",
+   "x": 153.5,
+   "y": 98.5,
+   "z": 7.918,
+   "r": 4.4514,
+   "t": 1,
+   "sprite": "storm_building_luxbazaar_fort_water.y255.s100.t1"
+  },
+  {
+   "m": "storm_building_luxbazaar_fort_water",
+   "x": 153.5,
+   "y": 98.5,
+   "z": 7.918,
+   "r": 4.4514,
+   "t": 1,
+   "sprite": "storm_building_luxbazaar_fort_water.y255.s100.t1"
+  },
+  {
+   "m": "storm_building_luxbazaar_fort_water",
+   "x": 153.5,
+   "y": 98.5,
+   "z": 7.918,
+   "r": 4.4514,
+   "t": 1,
+   "sprite": "storm_building_luxbazaar_fort_water.y255.s100.t1"
+  },
+  {
+   "m": "storm_building_luxbazaar_fort",
+   "x": 92.5,
+   "y": 56.5,
+   "z": 7.921,
+   "r": 1.8317,
+   "t": 0,
+   "sprite": "storm_building_luxbazaar_fort.y105.s100.t0"
+  },
+  {
+   "m": "storm_building_luxbazaar_fort_water",
+   "x": 92.5,
+   "y": 56.5,
+   "z": 7.921,
+   "r": 1.8317,
+   "t": 0,
+   "sprite": "storm_building_luxbazaar_fort_water.y105.s100.t0"
+  },
+  {
+   "m": "storm_building_luxbazaar_fort_water",
+   "x": 92.5,
+   "y": 56.5,
+   "z": 7.921,
+   "r": 1.8317,
+   "t": 0,
+   "sprite": "storm_building_luxbazaar_fort_water.y105.s100.t0"
+  },
+  {
+   "m": "storm_building_luxbazaar_fort_water",
+   "x": 92.5,
+   "y": 56.5,
+   "z": 7.921,
+   "r": 1.8317,
+   "t": 0,
+   "sprite": "storm_building_luxbazaar_fort_water.y105.s100.t0"
+  },
+  {
+   "m": "storm_building_luxbazaar_fort",
+   "x": 154.5,
+   "y": 149.5,
+   "z": 7.918,
+   "r": 2.3188,
+   "t": 1,
+   "sprite": "storm_building_luxbazaar_fort.y133.s100.t1"
+  },
+  {
+   "m": "storm_building_luxbazaar_fort_water",
+   "x": 154.5,
+   "y": 149.5,
+   "z": 7.918,
+   "r": 2.3188,
+   "t": 1,
+   "sprite": "storm_building_luxbazaar_fort_water.y133.s100.t1"
+  },
+  {
+   "m": "storm_building_luxbazaar_fort_water",
+   "x": 154.5,
+   "y": 149.5,
+   "z": 7.918,
+   "r": 2.3188,
+   "t": 1,
+   "sprite": "storm_building_luxbazaar_fort_water.y133.s100.t1"
+  },
+  {
+   "m": "storm_building_luxbazaar_fort_water",
+   "x": 154.5,
+   "y": 149.5,
+   "z": 7.918,
+   "r": 2.3188,
+   "t": 1,
+   "sprite": "storm_building_luxbazaar_fort_water.y133.s100.t1"
+  },
+  {
+   "m": "storm_building_luxbazaar_fort",
+   "x": 156.5,
+   "y": 56.5,
+   "z": 7.921,
+   "r": 4.4511,
+   "t": 1,
+   "sprite": "storm_building_luxbazaar_fort.y255.s100.t1"
+  },
+  {
+   "m": "storm_building_luxbazaar_fort_water",
+   "x": 156.5,
+   "y": 56.5,
+   "z": 7.921,
+   "r": 4.4511,
+   "t": 1,
+   "sprite": "storm_building_luxbazaar_fort_water.y255.s100.t1"
+  },
+  {
+   "m": "storm_building_luxbazaar_fort_water",
+   "x": 156.5,
+   "y": 56.5,
+   "z": 7.921,
+   "r": 4.4511,
+   "t": 1,
+   "sprite": "storm_building_luxbazaar_fort_water.y255.s100.t1"
+  },
+  {
+   "m": "storm_building_luxbazaar_fort_water",
+   "x": 156.5,
+   "y": 56.5,
+   "z": 7.921,
+   "r": 4.4511,
+   "t": 1,
+   "sprite": "storm_building_luxbazaar_fort_water.y255.s100.t1"
+  },
+  {
+   "m": "storm_building_luxbazaar_fort",
+   "x": 93.5,
+   "y": 149.5,
+   "z": 7.918,
+   "r": 1.982,
+   "t": 0,
+   "sprite": "storm_building_luxbazaar_fort.y114.s100.t0"
+  },
+  {
+   "m": "storm_building_luxbazaar_fort_water",
+   "x": 93.5,
+   "y": 149.5,
+   "z": 7.918,
+   "r": 1.982,
+   "t": 0,
+   "sprite": "storm_building_luxbazaar_fort_water.y114.s100.t0"
+  },
+  {
+   "m": "storm_building_luxbazaar_fort_water",
+   "x": 93.5,
+   "y": 149.5,
+   "z": 7.918,
+   "r": 1.982,
+   "t": 0,
+   "sprite": "storm_building_luxbazaar_fort_water.y114.s100.t0"
+  },
+  {
+   "m": "storm_building_luxbazaar_fort_water",
+   "x": 93.5,
+   "y": 149.5,
+   "z": 7.918,
+   "r": 1.982,
+   "t": 0,
+   "sprite": "storm_building_luxbazaar_fort_water.y114.s100.t0"
+  },
+  {
+   "m": "storm_building_luxbazaar_keep",
+   "x": 64,
+   "y": 115,
+   "z": 7.918,
+   "r": 0.785,
+   "t": 0,
+   "sprite": "storm_building_luxbazaar_keep.y45.s100.t0"
+  },
+  {
+   "m": "storm_building_luxbazaar_keep",
+   "x": 184,
+   "y": 115,
+   "z": 7.918,
+   "r": 5.4978,
+   "t": 1,
+   "sprite": "storm_building_luxbazaar_keep.y315.s100.t1"
+  },
+  {
+   "m": "storm_building_luxbazaar_keep",
+   "x": 54,
+   "y": 133,
+   "z": 7.918,
+   "r": 2.5402,
+   "t": 0,
+   "sprite": "storm_building_luxbazaar_keep.y146.s100.t0"
+  },
+  {
+   "m": "storm_building_luxbazaar_keep",
+   "x": 53,
+   "y": 97,
+   "z": 7.918,
+   "r": 0.7851,
+   "t": 0,
+   "sprite": "storm_building_luxbazaar_keep.y45.s100.t0"
+  },
+  {
+   "m": "storm_building_luxbazaar_keep",
+   "x": 195,
+   "y": 97,
+   "z": 7.918,
+   "r": 5.4978,
+   "t": 1,
+   "sprite": "storm_building_luxbazaar_keep.y315.s100.t1"
+  },
+  {
+   "m": "storm_building_luxbazaar_keep",
+   "x": 194,
+   "y": 133,
+   "z": 7.918,
+   "r": 3.7426,
+   "t": 1,
+   "sprite": "storm_building_luxbazaar_keep.y214.s100.t1"
+  },
+  {
+   "m": "storm_building_luxoria_townwall",
+   "x": 192.5,
+   "y": 82.5,
+   "z": 7.921,
+   "r": 3.9267,
+   "t": 1,
+   "sprite": "storm_building_luxoria_townwall.y225.s100.t1"
+  },
+  {
+   "m": "storm_building_luxoria_townwall",
+   "x": 182.5,
+   "y": 92.5,
+   "z": 7.918,
+   "r": 3.665,
+   "t": 1,
+   "sprite": "storm_building_luxoria_townwall.y210.s100.t1"
+  },
+  {
+   "m": "storm_building_luxoria_townwall",
+   "x": 142.5,
+   "y": 47,
+   "z": 7.921,
+   "r": 3.1413,
+   "t": 1,
+   "sprite": "storm_building_luxoria_townwall.y180.s100.t1"
+  },
+  {
+   "m": "storm_building_luxoria_townwall",
+   "x": 142.5,
+   "y": 95,
+   "z": 7.918,
+   "r": 3.1413,
+   "t": 1,
+   "sprite": "storm_building_luxoria_townwall.y180.s100.t1"
+  },
+  {
+   "m": "storm_building_luxoria_townwall",
+   "x": 169.5,
+   "y": 103,
+   "z": 7.918,
+   "r": 3.1413,
+   "t": 1,
+   "sprite": "storm_building_luxoria_townwall.y180.s100.t1"
+  },
+  {
+   "m": "storm_building_luxoria_townwall",
+   "x": 143.5,
+   "y": 149,
+   "z": 7.918,
+   "r": 2.8796,
+   "t": 1,
+   "sprite": "storm_building_luxoria_townwall.y165.s100.t1"
+  },
+  {
+   "m": "storm_building_luxoria_townwall",
+   "x": 142.5,
+   "y": 109,
+   "z": 7.921,
+   "r": 2.8796,
+   "t": 1,
+   "sprite": "storm_building_luxoria_townwall.y165.s100.t1"
+  },
+  {
+   "m": "storm_building_luxoria_townwall",
+   "x": 169.5,
+   "y": 117,
+   "z": 7.918,
+   "r": 2.8796,
+   "t": 1,
+   "sprite": "storm_building_luxoria_townwall.y165.s100.t1"
+  },
+  {
+   "m": "storm_building_luxoria_townwall",
+   "x": 145.5,
+   "y": 60,
+   "z": 7.921,
+   "r": 2.618,
+   "t": 1,
+   "sprite": "storm_building_luxoria_townwall.y150.s100.t1"
+  },
+  {
+   "m": "storm_building_luxoria_townwall",
+   "x": 147.5,
+   "y": 162,
+   "z": 7.918,
+   "r": 2.618,
+   "t": 1,
+   "sprite": "storm_building_luxoria_townwall.y150.s100.t1"
+  },
+  {
+   "m": "storm_building_luxoria_townwall",
+   "x": 176.5,
+   "y": 135.5,
+   "z": 7.918,
+   "r": 2.356,
+   "t": 1,
+   "sprite": "storm_building_luxoria_townwall.y135.s100.t1"
+  },
+  {
+   "m": "storm_building_luxoria_townwall",
+   "x": 186.5,
+   "y": 145.5,
+   "z": 7.918,
+   "r": 2.0942,
+   "t": 1,
+   "sprite": "storm_building_luxoria_townwall.y120.s100.t1"
+  },
+  {
+   "m": "storm_building_luxoria_townwall",
+   "x": 61.5,
+   "y": 145.5,
+   "z": 7.918,
+   "r": 0.7851,
+   "t": 0,
+   "sprite": "storm_building_luxoria_townwall.y45.s100.t0"
+  },
+  {
+   "m": "storm_building_luxoria_townwall",
+   "x": 71.5,
+   "y": 135.5,
+   "z": 7.918,
+   "r": 0.5234,
+   "t": 0,
+   "sprite": "storm_building_luxoria_townwall.y30.s100.t0"
+  },
+  {
+   "m": "storm_building_luxoria_townwall",
+   "x": 102.5,
+   "y": 60,
+   "z": 7.921,
+   "r": 0.2617,
+   "t": 0,
+   "sprite": "storm_building_luxoria_townwall.y15.s100.t0"
+  },
+  {
+   "m": "storm_building_luxoria_townwall",
+   "x": 100.5,
+   "y": 162,
+   "z": 7.918,
+   "r": 0.2617,
+   "t": 0,
+   "sprite": "storm_building_luxoria_townwall.y15.s100.t0"
+  },
+  {
+   "m": "storm_building_luxoria_townwall",
+   "x": 104.5,
+   "y": 149,
+   "z": 7.918,
+   "r": 0,
+   "t": 0,
+   "sprite": "storm_building_luxoria_townwall.y0.s100.t0"
+  },
+  {
+   "m": "storm_building_luxoria_townwall",
+   "x": 105.5,
+   "y": 109,
+   "z": 7.921,
+   "r": 0,
+   "t": 0,
+   "sprite": "storm_building_luxoria_townwall.y0.s100.t0"
+  },
+  {
+   "m": "storm_building_luxoria_townwall",
+   "x": 78.5,
+   "y": 117,
+   "z": 7.918,
+   "r": 0,
+   "t": 0,
+   "sprite": "storm_building_luxoria_townwall.y0.s100.t0"
+  },
+  {
+   "m": "storm_building_luxoria_townwall",
+   "x": 105.5,
+   "y": 95,
+   "z": 7.918,
+   "r": 6.0212,
+   "t": 0,
+   "sprite": "storm_building_luxoria_townwall.y345.s100.t0"
+  },
+  {
+   "m": "storm_building_luxoria_townwall",
+   "x": 105.5,
+   "y": 47,
+   "z": 7.921,
+   "r": 6.0212,
+   "t": 0,
+   "sprite": "storm_building_luxoria_townwall.y345.s100.t0"
+  },
+  {
+   "m": "storm_building_luxoria_townwall",
+   "x": 78.5,
+   "y": 103,
+   "z": 7.918,
+   "r": 6.0212,
+   "t": 0,
+   "sprite": "storm_building_luxoria_townwall.y345.s100.t0"
+  },
+  {
+   "m": "storm_building_luxoria_townwall",
+   "x": 65.5,
+   "y": 92.5,
+   "z": 7.918,
+   "r": 5.4975,
+   "t": 0,
+   "sprite": "storm_building_luxoria_townwall.y315.s100.t0"
+  },
+  {
+   "m": "storm_building_luxoria_townwall",
+   "x": 55.5,
+   "y": 82.5,
+   "z": 7.921,
+   "r": 5.2358,
+   "t": 0,
+   "sprite": "storm_building_luxoria_townwall.y300.s100.t0"
+  },
+  {
+   "m": "storm_building_luxoria_watchtower",
+   "x": 124,
+   "y": 136,
+   "z": 7.918,
+   "r": 0,
+   "sprite": "storm_building_luxoria_watchtower.y0.s100.tx"
+  }
+ ]
+}
