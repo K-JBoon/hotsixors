@@ -37,7 +37,7 @@
   align-items: center;
   justify-content: center;
   gap: 0.35rem;
-  min-height: min(68vh, 620px);
+  min-height: 80vh;
   border: 2px dashed rgba(140, 160, 220, 0.4);
   border-radius: 16px;
   padding: 2rem;

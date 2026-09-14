@@ -475,6 +475,15 @@ function initGameDataSidebarToggle() {
   applyLayout(mq.matches);
 }
 
+function restripe(items) {
+  let visibleCount = 0;
+  for (const item of items) {
+    if (item.hidden) continue;
+    item.classList.toggle("is-even", visibleCount % 2 === 1);
+    visibleCount++;
+  }
+}
+
 function initHeroTableSort() {
   const tables = document.querySelectorAll(".hero-table");
   for (const table of tables) {
@@ -506,6 +515,7 @@ function initHeroTableSort() {
       rows.sort(cmp);
       if (dir === "descending") rows.reverse();
       for (const row of rows) tbody.appendChild(row);
+      restripe(rows);
     }
 
     for (const header of headers) {
@@ -550,6 +560,31 @@ function initHeroViewToggle() {
   for (const btn of buttons) {
     btn.addEventListener("click", () => setView(btn.dataset.heroView));
   }
+}
+
+function initHeroRoleFilter() {
+  const root = document.querySelector("[data-hero-list]");
+  if (!root) return;
+  const filter = root.querySelector("[data-hero-role-filter]");
+  if (!filter) return;
+  const buttons = [...filter.querySelectorAll("[data-role]")];
+  const cards = [...root.querySelectorAll("[data-hero-role]")];
+
+  function setRole(role) {
+    for (const btn of buttons) {
+      btn.classList.toggle("is-active", btn.dataset.role === role);
+    }
+    for (const card of cards) {
+      card.hidden = role !== "all" && card.dataset.heroRole !== role;
+    }
+    restripe(cards);
+  }
+
+  for (const btn of buttons) {
+    btn.addEventListener("click", () => setRole(btn.dataset.role));
+  }
+
+  setRole("all");
 }
 
 function initBreadcrumbCollapse() {
@@ -705,6 +740,7 @@ if (typeof document !== "undefined") {
     initAbilityDetails();
     initBreadcrumbCollapse();
     initHeroViewToggle();
+    initHeroRoleFilter();
     initHeroTableSort();
     initEffectIndex();
   });

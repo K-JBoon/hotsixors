@@ -1,5 +1,15 @@
 
+{% component heroes.role_icon(role_slug, size=16) %}
+{% if role_slug == "melee-assassin" %}{% set file = "melee" %}
+{% elif role_slug == "ranged-assassin" %}{% set file = "ranged" %}
+{% else %}{% set file = role_slug %}
+{% endif %}
+{{<images.optimized path={"draft/roles/" ~ file ~ ".webp"} class="role-icon" alt="" width={size} height={size} op="fit" display_width={size} display_height={size} loading="lazy" />}}
+{% endcomponent heroes.role_icon %}
+
 {% component heroes.hero_index(pages, show_role=false) %}
+{% set draft = load_data(path="draft/draft-data.json") %}
+{% set draft_by_slug = draft.heroes | group_by(attribute="slug") %}
 <div data-select-search data-hero-list>
   <div class="hero-grid-header">
     <h1>Heroes of the Storm</h1>
@@ -9,23 +19,43 @@
     </div>
     <span class="select-search-hint">Start typing to search</span>
     <span class="select-search-status" aria-live="polite" data-select-search-status></span>
+    <div class="hero-role-filter" role="group" aria-label="Filter by role" data-hero-role-filter>
+      <button type="button" class="hero-role-filter__btn is-active" data-role="all">All</button>
+      {% for r in [
+        {"label": "Tank", "slug": "tank"},
+        {"label": "Bruiser", "slug": "bruiser"},
+        {"label": "Melee Assassin", "slug": "melee-assassin"},
+        {"label": "Ranged Assassin", "slug": "ranged-assassin"},
+        {"label": "Healer", "slug": "healer"},
+        {"label": "Support", "slug": "support"}
+      ] %}
+        <button type="button" class="hero-role-filter__btn role-{{ r.slug }}" data-role="{{ r.slug }}">
+          {{<heroes.role_icon role_slug={r.slug} size={28} />}}
+          {{ r.label }}
+        </button>
+      {% endfor %}
+    </div>
   </div>
 
   <div class="hero-grid" data-hero-view-pane="grid">
     {% for page in pages %}
       {% set portraits = page.extra.portraits %}
-      <a class="hero-card role-{{ page.extra.role | lower }}"
+      {% set draft_hero = draft_by_slug[page.slug] | first %}
+      {% set role = draft_hero.role %}
+      {% set role_slug = role | lower | replace(from=" ", to="-") %}
+      <a class="hero-card role-{{ role_slug }}"
          href="{{ page.permalink }}"
          data-select-search-card
          data-select-search-id="{{ page.slug }}-grid"
-         data-select-search-text="{{ page.extra.hero_name }} {{ page.extra.role }}">
+         data-select-search-text="{{ page.extra.hero_name }} {{ role }}"
+         data-hero-role="{{ role_slug }}">
         {% if portraits.draftScreen %}
           {{<images.optimized path={'images/heroportraits/' ~ portraits.draftScreen} class="hero-card__portrait" alt="" width={180} height={212} op="fit" display_width={180} display_height={212} loading="lazy" />}}
         {% endif %}
         <div class="hero-card__info">
           <span class="hero-card__name">{{ page.extra.hero_name }}</span>
           {% if show_role %}
-            <span class="hero-card__role">{{ page.extra.role }}</span>
+            <span class="hero-card__role">{{ role }}</span>
           {% endif %}
         </div>
       </a>
@@ -36,6 +66,7 @@
     <table class="hero-table">
       <thead>
         <tr>
+          <th scope="col" class="role-col" data-sort="text" data-sort-key="role"><span class="visually-hidden">Role</span></th>
           <th scope="col" data-sort="text" data-sort-key="name">Hero</th>
           <th scope="col" class="num" data-sort="num" data-sort-key="hp">Health</th>
           <th scope="col" class="num" data-sort="num" data-sort-key="dmg">Damage</th>
@@ -49,11 +80,19 @@
           {% set has_stats = hd.stats and page.slug != "gall" and page.slug != "lostvikings" %}
           {% set st = hd.stats | default(value=false) %}
           {% set portraits = page.extra.portraits %}
-          <tr class="hero-row role-{{ page.extra.role | lower }}"
+          {% set draft_hero = draft_by_slug[page.slug] | first %}
+          {% set role = draft_hero.role %}
+          {% set role_slug = role | lower | replace(from=" ", to="-") %}
+          <tr class="hero-row role-{{ role_slug }}"
               data-select-search-card
               data-select-search-id="{{ page.slug }}-row"
-              data-select-search-text="{{ page.extra.hero_name }} {{ page.extra.role }}"
+              data-select-search-text="{{ page.extra.hero_name }} {{ role }}"
+              data-hero-role="{{ role_slug }}"
               onclick="window.location='{{ page.permalink }}'">
+            <td class="role-col" data-sort-value="{{ role }}" title="{{ role }}">
+              {{<heroes.role_icon role_slug={role_slug} size={32} />}}
+              <span class="visually-hidden">{{ role }}</span>
+            </td>
             <th scope="row" class="hero-row__name" data-sort-value="{{ page.extra.hero_name }}">
               <a href="{{ page.permalink }}">
                 {% if portraits.draftScreen %}

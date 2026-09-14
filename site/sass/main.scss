@@ -17,11 +17,24 @@ $role-specialist: #8b1abf;
 $role-multiclass: #bf8b1a;
 $role-unknown:    #4a5568;
 
+$role-bruiser:         #bf8b1a;
+$role-ranged-assassin: #c85f1a;
+$role-healer:          #1abfaf;
+
 $font-display: 'Rajdhani', 'Barlow Condensed', sans-serif;
 $font-body:    'Inter', system-ui, sans-serif;
 
 // ─── Reset & Base ─────────────────────────────────────────────────────────────
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
 
 :root {
   --site-anchor-offset: 5rem;
@@ -580,15 +593,22 @@ html:not(.datamining-enabled) [data-datamining] {
 @mixin role-glow($color) {
   border-color: $color;
   box-shadow: 0 0 12px rgba($color, 0.3), inset 0 0 30px rgba($color, 0.05);
+  --role-color: #{$color};
 }
 
-.role-warrior    { @include role-glow($role-warrior); }
-.role-assassin   { @include role-glow($role-assassin); }
-.role-support    { @include role-glow($role-support); }
-.role-specialist { @include role-glow($role-specialist); }
-.role-multiclass { @include role-glow($role-multiclass); }
-.role-caster     { @include role-glow($role-assassin); }
-.role-unknown    { @include role-glow($role-unknown); }
+.role-warrior         { @include role-glow($role-warrior); }
+.role-assassin        { @include role-glow($role-assassin); }
+.role-support         { @include role-glow($role-support); }
+.role-specialist      { @include role-glow($role-specialist); }
+.role-multiclass      { @include role-glow($role-multiclass); }
+.role-tank            { @include role-glow($role-warrior); }
+.role-autoattacker    { @include role-glow($role-assassin); }
+.role-caster          { @include role-glow($role-multiclass); }
+.role-unknown         { @include role-glow($role-unknown); }
+.role-bruiser         { @include role-glow($role-bruiser); }
+.role-melee-assassin  { @include role-glow($role-assassin); }
+.role-ranged-assassin { @include role-glow($role-ranged-assassin); }
+.role-healer          { @include role-glow($role-healer); }
 
 // ─── Hero Grid ────────────────────────────────────────────────────────────────
 .hero-grid-header {
@@ -600,11 +620,55 @@ html:not(.datamining-enabled) [data-datamining] {
   h1 { font-size: 2rem; color: $accent-gold; }
 }
 
+.hero-role-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  width: 100%;
+  &__btn {
+    appearance: none;
+    border: 1px solid $border-dim;
+    border-radius: 999px;
+    background: $bg-card;
+    color: $text-muted;
+    font-family: $font-display;
+    font-size: 0.78rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 0.3rem 0.75rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    box-shadow: none;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+    &:hover { color: $text-primary; border-color: $border-gold; }
+    &.is-active {
+      color: $accent-gold;
+      border-color: $accent-gold;
+      font-weight: 600;
+    }
+    &:focus-visible {
+      outline: 2px solid $accent-gold;
+      outline-offset: 2px;
+    }
+  }
+}
+
 .hero-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
   gap: 1rem;
   &[hidden] { display: none; }
+}
+
+.hero-card[hidden], .hero-row[hidden] { display: none; }
+
+.role-icon {
+  display: inline-block;
+  vertical-align: middle;
+  flex-shrink: 0;
+  object-fit: contain;
 }
 
 .hero-table-wrap[hidden] { display: none; }
@@ -630,8 +694,9 @@ html:not(.datamining-enabled) [data-datamining] {
     & + & { border-left: 1px solid $border-dim; }
     &:hover { color: $text-primary; background: $bg-card-hover; }
     &.is-active {
-      color: $bg-deep;
-      background: $accent-gold;
+      color: $accent-gold;
+      font-weight: 600;
+      box-shadow: inset 0 -2px 0 $accent-gold;
     }
     &:focus-visible {
       outline: none;
@@ -695,6 +760,8 @@ html:not(.datamining-enabled) [data-datamining] {
 
   th.num, td.num { text-align: right; font-variant-numeric: tabular-nums; }
 
+  th.role-col, td.role-col { text-align: center; width: 2.5rem; }
+
   tbody tr.hero-row {
     cursor: pointer;
     border: 0;
@@ -702,7 +769,7 @@ html:not(.datamining-enabled) [data-datamining] {
     transition: background 0.15s;
     background: $bg-card;
     box-shadow: none;
-    &:nth-child(even) { background: $bg-panel; }
+    &.is-even { background: $bg-panel; }
     &:hover { background: $bg-card-hover; }
     &:last-child { border-bottom: 0; }
   }
