@@ -1,6 +1,6 @@
 import { readdir, readFile, writeFile, mkdir } from "node:fs/promises";
 import * as path from "node:path";
-import type { BattlegroundData, BattlegroundTimer, BattlegroundCodeBlock, BattlegroundMechanic, BattlegroundSummon, BattlegroundSummonVariant, BattlegroundWeapon, BattlegroundAbility, BattlegroundXmlFile, ScalingSummaryRow, Gamestrings } from "./types.ts";
+import type { BattlegroundData, BattlegroundTimer, BattlegroundCodeBlock, BattlegroundMechanic, BattlegroundSummon, BattlegroundSummonVariant, BattlegroundWeapon, BattlegroundAbility, BattlegroundXmlFile, BattlegroundObjective, ScalingSummaryRow, Gamestrings } from "./types.ts";
 import { BATTLEGROUNDS, type BattlegroundConfig, type SummonVariantConfig } from "./lib/battlegrounds-config.ts";
 import { GAMEDATA_DIR, HEROES_IMAGES_DIR, HEROES_DATA_DIR, SITE_CONTENT_BATTLEGROUNDS, SITE_DATA_BATTLEGROUNDS, SITE_STATIC_IMAGES, findLatestVersion } from "./lib/paths.ts";
 import { loadGamestrings, loadMapGamestringPatches, type MapGamestringPatch } from "./lib/heroes-data.ts";
@@ -288,10 +288,18 @@ async function processMap(cfg: BattlegroundConfig, abilityIndex: Map<string, { n
     return true;
   });
 
+  const objectives: BattlegroundObjective[] = cfg.objectives.map(o => ({
+    title: o.title,
+    description: o.description,
+    image: `images/battlegrounds/objectives/${o.image}`,
+  }));
+
   return {
     slug: cfg.slug,
     name: cfg.name,
     franchise: cfg.franchise,
+    description: cfg.description,
+    objectives,
     summary: cfg.summary,
     mechanics,
     timers,

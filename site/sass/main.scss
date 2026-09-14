@@ -2014,7 +2014,7 @@ html:not(.datamining-enabled) [data-datamining] {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    filter: blur(0.5px) brightness(0.7);
+    filter: brightness(0.7);
     transform: scale(1.02);
     transition: filter 0.2s, transform 0.2s;
   }
@@ -2033,6 +2033,47 @@ html:not(.datamining-enabled) [data-datamining] {
   .hero-banner.role-battleground {
     background: $bg-card;
     .hero-banner__info { padding: 1.5rem 2rem; }
+  }
+}
+
+.hero-banner__description {
+  position: relative;
+  z-index: 1;
+  margin: 0.35rem 0 0;
+  color: $text-muted;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.bg-objectives-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+}
+
+.bg-objective-card {
+  border: 1px solid $border-dim;
+  border-radius: 6px;
+  overflow: hidden;
+
+  &__image {
+    display: block;
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+  }
+
+  &__title {
+    margin: 0.75rem 1rem 0.25rem;
+    font-size: 1rem;
+    font-weight: 600;
+  }
+
+  &__desc {
+    margin: 0 1rem 1rem;
+    color: $text-muted;
+    font-size: 0.9rem;
+    line-height: 1.4;
   }
 }
 
@@ -2382,6 +2423,8 @@ html:not(.datamining-enabled) [data-datamining] {
 
   // Tables need horizontal scroll on small screens
   .bg-section { overflow-x: auto; }
+  .bg-section--objectives { overflow-x: visible; }
+  .bg-objectives-grid { grid-template-columns: 1fr; }
 
   // About
   .about-content { padding: 1rem; }

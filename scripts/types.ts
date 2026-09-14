@@ -296,10 +296,18 @@ export interface BattlegroundMechanic {
   codeBlock?: BattlegroundCodeBlock;
 }
 
+export interface BattlegroundObjective {
+  title: string;
+  description: string;
+  image: string; // Zola static path, e.g. "images/battlegrounds/objectives/cursed-hollow-1.jpg"
+}
+
 export interface BattlegroundData {
   slug: string;
   name: string;
   franchise: string;
+  description: string;
+  objectives: BattlegroundObjective[];
   summary: string[];
   mechanics: BattlegroundMechanic[];
   timers: BattlegroundTimer[];

@@ -8,11 +8,30 @@
 <div class="battleground-detail">
 
   <div class="hero-banner role-battleground">
+    {% if page.extra.loading_screen %}
+      {{<images.optimized path={'images/battlegrounds/' ~ page.extra.battleground_slug ~ '.png'} class="hero-banner__loading" alt="" width={340} height={124} op="fit" display_width={340} display_height={124} loading="eager" />}}
+    {% endif %}
     <div class="hero-banner__info">
       <h1 class="hero-banner__name">{{ bg.name }}</h1>
+      {% if bg.description %}<p class="hero-banner__description">{{ bg.description }}</p>{% endif %}
       <a class="hero-wiki-link" href="https://heroesofthestorm.fandom.com/wiki/{{ bg.name | replace(from=" ", to="_") }}" target="_blank" rel="noopener noreferrer">Wiki</a>
     </div>
   </div>
+
+  {% if bg.objectives %}
+  <section class="bg-section bg-section--objectives">
+    <h2>Map Objectives</h2>
+    <div class="bg-objectives-grid">
+      {% for obj in bg.objectives %}
+      <div class="bg-objective-card">
+        {{<images.optimized path={obj.image} class="bg-objective-card__image" alt="" width={340} height={190} op="fit" display_width={340} display_height={190} loading="lazy" />}}
+        <h3 class="bg-objective-card__title">{{ obj.title }}</h3>
+        <p class="bg-objective-card__desc">{{ obj.description }}</p>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
 
   {% if bg.summary %}
   <section class="bg-section bg-section--summary">

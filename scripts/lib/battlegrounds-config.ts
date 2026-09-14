@@ -41,10 +41,21 @@ interface MechanicSpec {
   codeBlockSpec?: MechanicCodeBlockSpec;
 }
 
+export interface ObjectiveConfig {
+  title: string;
+  description: string;
+  /** Filename under site/static/images/battlegrounds/objectives/. */
+  image: string;
+}
+
 export interface BattlegroundConfig {
   slug: string;
   name: string;
   franchise: string;
+  /** Official flavor-text description from blizzard.com. */
+  description: string;
+  /** Official "Map Objectives" cards (image, title, description) from blizzard.com. */
+  objectives: ObjectiveConfig[];
   /** Short overview shown at the top of the page. */
   summary: string[];
   /** .stormmod dirs relative to battlegroundmapmods/ to scan. */
@@ -75,6 +86,12 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
     slug: "battlefield-of-eternity",
     name: "Battlefield of Eternity",
     franchise: "Diablo",
+    description: "Two Immortals are locked in a duel to the death. Help your Immortal prevail, and he’ll devastate your enemy’s forts.",
+    objectives: [
+      { title: "Battling Immortals", description: "The angel lieutenant Ilarian and the demon lord Beleth are locked in an endless war.", image: "battlefield-of-eternity-1.jpg" },
+      { title: "Defeat the Enemy", description: "Aid your immortal ally against his foe to claim victory.", image: "battlefield-of-eternity-2.jpg" },
+      { title: "Devastate Forts", description: "Rally to your immortal as he wreaks havoc on the enemy's forts!", image: "battlefield-of-eternity-3.jpg" },
+    ],
     summary: [
       "An Angelic and Demonic Immortal spawn in the center arena and fight each other.",
       "Heroes damage the enemy Immortal while defending their own. Immortals use Cleave and Explosions, telegraphed by ground indicators.",
@@ -130,6 +147,12 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
     slug: "blackhearts-bay",
     name: "Blackheart's Bay",
     franchise: "Nexus",
+    description: "Collect doubloons and pay the ghost pirate Blackheart to turn his guns on your enemies. If you see a cannonball flying your way… run!",
+    objectives: [
+      { title: "Collect Doubloons", description: "Attack Treasure Chests and Mercenaries to collect Doubloons.", image: "blackhearts-bay-1.jpg" },
+      { title: "Turn in Doubloons", description: "Hand your Doubloons over to Blackheart or you will drop them all when you die!", image: "blackhearts-bay-2.jpg" },
+      { title: "Bombard your Enemies", description: "After receiving enough Doubloons from your Team, Blackheart will bombard your Enemy's forts!", image: "blackhearts-bay-3.jpg" },
+    ],
     summary: [
       "Collect doubloons from treasure chests, mercenary camps, and slain enemy heroes.",
       "Deliver enough doubloons to Blackheart's ghost ship and he bombards enemy structures with cannon fire.",
@@ -176,6 +199,12 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
     slug: "cursed-hollow",
     name: "Cursed Hollow",
     franchise: "Warcraft",
+    description: "It really is a horrible night to have a curse. Gather the Raven Lord’s tribute and make sure it’s the other team and not yours that has to suffer.",
+    objectives: [
+      { title: "Collect Tributes", description: "The Raven Lord will create Tributes periodically. Gather them for your team!", image: "cursed-hollow-1.jpg" },
+      { title: "Curse Your Enemies", description: "Upon capturing three Tributes, the Raven Lord will curse your enemies!", image: "cursed-hollow-2.jpg" },
+      { title: "Cursed Forts and Minions", description: "Cursed Forts will not attack, and cursed Minions are reduced to 1 Health.", image: "cursed-hollow-3.jpg" },
+    ],
     summary: [
       "Collect Tributes offered by the Raven Lord. Only one is up at a time.",
       "Collecting 3 Tributes curses the enemy team for 70 seconds. Their Towers, Forts, and Keeps stop attacking, and their lane minions are reduced to 1 Health.",
@@ -216,6 +245,12 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
     slug: "garden-of-terror",
     name: "Garden of Terror",
     franchise: "Nexus",
+    description: "Horror sprouts in the Garden of Terror. Slay the Shamblers, summon Terrors in every lane, and follow your green thumb to victory!",
+    objectives: [
+      { title: "Seeds Spawn", description: "Queen Nightshade will periodically summon a Seed. Defeat its Shambler Defenders and gather it for your team!", image: "garden-of-terror-1.jpg" },
+      { title: "Collect Seeds", description: "Upon gathering three Seeds, Garden Terrors will immediately burrow to each lane.", image: "garden-of-terror-2.jpg" },
+      { title: "Garden Terrors", description: "Garden Terrors disable enemy towers and forts, so fight alongside them!", image: "garden-of-terror-3.jpg" },
+    ],
     summary: [
       "When the objective activates, one Seed appears somewhere on the map.",
       "The first team to collect 3 Seeds summons three Garden Terrors, one per lane, that push at the same time.",
@@ -273,6 +308,12 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
     slug: "haunted-mines",
     name: "Haunted Mines",
     franchise: "Nexus",
+    description: "Engage in necromancy for fun and profit as you collect the skulls of the undead and use them to raise your very own grave golem.",
+    objectives: [
+      { title: "Venture Underground", description: "The Haunted Mines will periodically open with an Undead Army underneath!", image: "haunted-mines-1.jpg" },
+      { title: "Collect the Skulls", description: "Destroy the Undead and collect their Skulls to power your Golems!", image: "haunted-mines-2.jpg" },
+      { title: "Unleash the Golems", description: "After the Army has been defeated, the Golems will arise for both teams! The more Skulls your team collects, the stronger your Golem!", image: "haunted-mines-3.jpg" },
+    ],
     summary: [
       "Underground mines open periodically. Both teams descend to fight undead monsters and collect Cursed Skulls.",
       "Risen Miners drop 2 Cursed Skulls each; the underground Grave Golem drops up to 38 skulls across its HP thresholds.",
@@ -313,6 +354,12 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
     slug: "infernal-shrines",
     name: "Infernal Shrines",
     franchise: "Diablo",
+    description: "A dark, destructive force threatens the Gardens of Hope, creatures made of equal parts mayhem and destruction. Harness their devastating might, or perish at the hands of the Punishers.",
+    objectives: [
+      { title: "Activate the Shrines", description: "The Infernal Shrines periodically gather power.  Activate them and prepare for a fight.", image: "infernal-shrines-1.jpg" },
+      { title: "Defeat Guardians", description: "Slay 40 Guardians before the enemy team to bring forth a mighty Punisher.", image: "infernal-shrines-2.jpg" },
+      { title: "Beware the Punisher", description: "Punishers have one of three devastating powers. Be careful, they focus on attacking Heroes above all else.", image: "infernal-shrines-3.jpg" },
+    ],
     summary: [
       "One of three Shrine locations activates each round; the next Shrine is almost always in a different location from the previous one.",
       "Both teams race to kill 40 Guardians at the active Shrine. First to 40 captures it.",
@@ -366,6 +413,12 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
     slug: "sky-temple",
     name: "Sky Temple",
     franchise: "StarCraft",
+    description: "Capture the ancient temples, defeat their guardians, and use their awesome power to destroy your enemy’s forts.",
+    objectives: [
+      { title: "Capture the Temples", description: "Temples will periodically activate. Stand within their grounds to capture their power!", image: "sky-temple-1.jpg" },
+      { title: "Hold the Temples", description: "Stand firm and the Temple will unleash a blistering onslaught on your enemy's forts!", image: "sky-temple-2.jpg" },
+      { title: "Defend the Temples", description: "Guardians will try to wrest control of their Temples from your team. Hold them off to keep the Temple's power for yourselves!", image: "sky-temple-3.jpg" },
+    ],
     summary: [
       "Temples activate in a fixed sequence. Depending on the round, 1 or 2 are active at once.",
       "A controlled Temple fires at enemy Structures while held. After 40 shots, the final 5 fire automatically for the team holding it.",
@@ -405,6 +458,12 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
     slug: "tomb-of-the-spider-queen",
     name: "Tomb of the Spider Queen",
     franchise: "Diablo",
+    description: "Slay your enemies and gather gems of magical power. Bring enough to the Spider Queen’s altar, and her skittering Webweavers will devour your foes.",
+    objectives: [
+      { title: "Collect Gems", description: "Enemy spider minions and Heroes drop magical Gems upon death. Gather as many as you can.", image: "tomb-of-the-spider-queen-1.jpg" },
+      { title: "Turn in Gems", description: "Relinquish your Gems at one of the Spider Queen's Altars or you will drop them all when you die!", image: "tomb-of-the-spider-queen-2.jpg" },
+      { title: "Summon Webweavers", description: "Whichever team turns in enough Gems first will unleash the Webweavers to destroy their enemy's defenses.", image: "tomb-of-the-spider-queen-3.jpg" },
+    ],
     summary: [
       "Collect Spider Gems dropped by enemy spider minions and Heroes, then turn them in at the Spider Queen's Altars.",
       "Hitting the gem threshold summons three Webweavers, one per lane.",
@@ -454,6 +513,12 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
     slug: "towers-of-doom",
     name: "Towers of Doom",
     franchise: "Warcraft",
+    description: "Control the Bell Towers, capture the Altars, and break through the enemy Core’s impenetrable shield.",
+    objectives: [
+      { title: "Protected Cores", description: "Both Cores are protected by a barrier that cannot be attacked by Heroes. To be victorious, you must activate Altars.", image: "towers-of-doom-1.jpg" },
+      { title: "Activate Altars", description: "Periodically Altars will rise across the battlefield. Activate them to have your Bell Towers fire upon the enemy's Core.", image: "towers-of-doom-2.jpg" },
+      { title: "Claim Bell Towers", description: "Destroy your enemy's Towers to bring them under your team's control. The more Towers you have, the more damage an altar will do.", image: "towers-of-doom-3.jpg" },
+    ],
     summary: [
       "Neither team can directly attack the enemy Core. Core damage comes from Altars, Sappers, the Headless Horseman, and 6-cap Bell Tower bombardment.",
       "Capturing an Altar deals 1 Core damage, plus 1 more for each Bell Tower your team holds.",
@@ -493,6 +558,12 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
     slug: "volskaya-foundry",
     name: "Volskaya Foundry",
     franchise: "Overwatch",
+    description: "Capture control points to unlock a Protector mech controlled by two players at once.",
+    objectives: [
+      { title: "Capture Points", description: "Control points activate occasionally. Stand within them to capture them. Fully capturing a point grants you control of a giant mech.", image: "volskaya-foundry-1.jpg" },
+      { title: "Control the Protector", description: "The Triglav Protector mech is controlled by two players: one pilot and one gunner. Work together!", image: "volskaya-foundry-2.jpg" },
+      { title: "Destroy Everything", description: "The Protector's abilities deal incredible damage to structures and Heroes alike. Use it to lay waste to your enemy.", image: "volskaya-foundry-3.jpg" },
+    ],
     summary: [
       "Contest a Capture Point that rotates between three locations to earn the Triglav Protector.",
       "The Triglav Protector is a two-person mech: one Hero pilots, another mans the weapons.",
@@ -557,6 +628,12 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
     slug: "warhead-junction",
     name: "Warhead Junction",
     franchise: "StarCraft",
+    description: "Join the arms race of Warhead Junction, build up your stockpile, and rain hell on your enemies!",
+    objectives: [
+      { title: "Warhead Deployment", description: "Multiple Warheads spawn periodically across the battleground.", image: "warhead-junction-1.jpg" },
+      { title: "Collect Warheads", description: "Pick up a Warhead to activate your Nuke. Use it or you will drop it when you die!", image: "warhead-junction-2.jpg" },
+      { title: "Call Down the Thunder", description: "Launch Nukes to devastate the enemy team's fortifications.", image: "warhead-junction-3.jpg" },
+    ],
     summary: [
       "Nuclear warheads spawn across the map. Picking one up takes a 5-second channel.",
       "After pickup, the Nuke is locked out briefly. If a Hero gets crowd-controlled mid-launch, the Nuke goes on a 10-second cooldown.",
@@ -598,6 +675,12 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
     slug: "alterac-pass",
     name: "Alterac Pass",
     franchise: "Warcraft",
+    description: "Capture Prison Camps and unleash Cavalry to destroy the enemy General.",
+    objectives: [
+      { title: "Prison Camps", description: "Capture the enemy Prison Camp to summon your Cavalry. Camps can be retaken by Heroes and Minions, so guard them well!", image: "alterac-pass-1.jpg" },
+      { title: "Cavalry", description: "Cavalry soldiers charge down each lane when summoned granting increased damage and movement speed to nearby Allied Heroes.", image: "alterac-pass-2.jpg" },
+      { title: "Generals", description: "Each team’s Core has been replaced by a General who fights against attacking enemies. Destroying a Keep reduces the General’s Armor.", image: "alterac-pass-3.jpg" },
+    ],
     summary: [
       "Capture the enemy Prison Camp to free your Cavalry.",
       "Heroes channel an enemy Prison Camp for 3 seconds to start the breakout, then defend it until the capture timer completes.",
@@ -665,6 +748,12 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
     slug: "dragon-shire",
     name: "Dragon Shire",
     franchise: "Nexus",
+    description: "He who controls the shrines controls the dragon; he who controls the dragon punts the other team’s puny heroes.",
+    objectives: [
+      { title: "Control the Shrines", description: "There are two Shrines your team needs to control to activate the Dragon Knight's statue!", image: "dragon-shire-1.jpg" },
+      { title: "Free the Dragon Knight", description: "While activated, bring a Hero to the statue to free him from his prison!", image: "dragon-shire-2.jpg" },
+      { title: "Devastate Enemy Forts", description: "Use the Dragon's immense power to level enemy Forts!", image: "dragon-shire-3.jpg" },
+    ],
     summary: [
       "Hold both the Sun Shrine (top) and the Moon Shrine (bottom) at the same time to unlock the Dragon Altar.",
       "Channel the Dragon Altar for 3 seconds to claim the Dragon Knight. Moving, taking damage, or losing a Shrine mid-channel breaks the attempt.",
@@ -715,6 +804,12 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
     slug: "hanamura-temple",
     name: "Hanamura Temple",
     franchise: "Overwatch",
+    description: "On the temple’s grounds, escort the payload to its destination and bombard your enemy!",
+    objectives: [
+      { title: "Single Payload", description: "At regular intervals, a payload spawns at the center of the battleground that can be contested by both teams.", image: "hanamura-temple-1.jpg" },
+      { title: "Escort Payload", description: "Stand next to the payload and move it to its destination. Prevent the enemy from trying to do the same.", image: "hanamura-temple-2.jpg" },
+      { title: "Bombard your Enemy", description: "Once a team escorts the payload to its destination, it will fire upon the enemy’s forts!", image: "hanamura-temple-3.jpg" },
+    ],
     summary: [
       "A single neutral payload spawns in the center. Both teams contest control and escort it toward their own destination.",
       "Up to three allied Heroes near the payload speed it up. Enemy Heroes can contest and halt it.",
