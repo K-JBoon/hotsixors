@@ -231,6 +231,15 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
         },
       },
       {
+        title: "Tribute Spawn Location",
+        body: "Tribute spawn points form a 2x3 grid: a top and bottom point in each of the Left, Middle, and Right columns. The first Tribute always spawns in the Middle column. After that, a Tribute never spawns at the same point as the last one, 3 Tributes in a row never all spawn in the same row, and no two Tributes in the same set of 3 spawn in the same column.",
+        codeBlockSpec: {
+          galaxyFile: MAPM,
+          matchPattern: "point libMapM_gf_MMRavenRandomSpawnPoint ()",
+          contextLines: 75,
+        },
+      },
+      {
         title: "The Curse",
         body: "Three Tributes curse the enemy team for 70 seconds. While cursed, their Towers, Forts, and Keeps stop attacking, and their lane minions drop to 1 Health.",
         codeBlockSpec: {
@@ -452,6 +461,15 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
           contextLines: 10,
         },
       },
+      {
+        title: "Temple Activation Order",
+        body: "Rounds 1-3 are fixed: round 1 activates Top and Middle, round 2 activates Bottom, round 3 activates a random pair (Top+Bottom or Middle+Bottom). From round 4 on, 1 or 2 Temples activate at random each round. The game tracks how often each Temple has activated and favors the ones that have activated less.",
+        codeBlockSpec: {
+          galaxyFile: MLCP,
+          matchPattern: "void libMLCP_gf_MMSkyTempleNextTemplesLogic ()",
+          contextLines: 90,
+        },
+      },
     ],
   },
   {
@@ -550,6 +568,15 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
           galaxyFile: MTOD,
           matchPattern: "void libMTOD_gf_MMToDBossCampFireCannons",
           contextLines: 10,
+        },
+      },
+      {
+        title: "Altar Spawn Patterns",
+        body: "Altars can spawn as: the two Top altars together, Middle alone, Bottom alone, Middle+Bottom, or one of two 3-Altar patterns (Top pair+Middle, or Top pair+Bottom). The two Top altars always spawn together. The 1st and 5th Altar spawns are always a 3-Altar pattern. Other spawns pick a pattern at random, without repeating one until every pattern has come up.",
+        codeBlockSpec: {
+          galaxyFile: MTOD,
+          matchPattern: "void libMTOD_gf_MMToDDefineNextAltarsandCreatePreviews ()",
+          contextLines: 65,
         },
       },
     ],
@@ -696,6 +723,7 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
       { label: "Hero Channel", galaxyConst: "libMMAP_gv_heroTimeToCap_C" },
       { label: "Guard Retake Channel", galaxyConst: "libMMAP_gv_minionTimeToCap_C" },
       { label: "Defender Respawn", galaxyConst: "libMMAP_gv_defenderRespawnTime_C" },
+      { label: "Prison Camp Respawn", galaxyConst: "libMMAP_gv_eventRespawnDurationMin_C", note: "110-150s, shrinks as the game goes on" },
     ],
     summons: [
       {

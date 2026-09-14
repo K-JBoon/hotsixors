@@ -883,9 +883,17 @@ html:not(.datamining-enabled) [data-datamining] {
   &__desc { color: $text-muted; max-width: 60ch; line-height: 1.7; }
 }
 
-.hero-wiki-link {
-  display: inline-block;
+.hero-banner__links {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
   margin-top: 0.5rem;
+}
+
+.hero-wiki-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3em;
   font-size: 0.8rem;
   color: $text-muted;
   border: 1px solid $border-dim;
@@ -893,6 +901,11 @@ html:not(.datamining-enabled) [data-datamining] {
   border-radius: 3px;
   text-decoration: none;
   &:hover { color: $accent-blue; border-color: $accent-blue; }
+}
+
+.hero-wiki-link__icon {
+  width: 0.9em;
+  height: 0.9em;
 }
 
 .hero-ratings { display: flex; gap: 1rem; flex-wrap: wrap; }
@@ -2077,18 +2090,31 @@ html:not(.datamining-enabled) [data-datamining] {
   }
 }
 
-.bg-section {
-  margin-top: 2rem;
+.bg-group {
+  margin-top: 2.5rem;
 
-  h2 {
+  > h2 {
     margin-bottom: 1rem;
     border-bottom: 1px solid $border-dim;
     padding-bottom: 0.5rem;
   }
 }
 
+.bg-section {
+  margin-top: 1.5rem;
+
+  h3 {
+    margin-bottom: 0.75rem;
+  }
+}
+
 .bg-section--summary {
   margin-top: 1.5rem;
+}
+
+.bg-summary-intro {
+  margin: 0 0 0.75rem;
+  line-height: 1.6;
 }
 
 .bg-summary-list {
