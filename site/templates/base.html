@@ -39,10 +39,20 @@
       #}
       <a class="nav-link" href="{{ get_url(path='@/battlegrounds/_index.md') }}">Battlegrounds</a>
       <a class="nav-link" href="{{ get_url(path='@/replay.md') }}">Replay Viewer</a>
-      <a class="nav-link" href="{{ get_url(path='@/lost-in-the-nexus.md') }}">Lost in the Nexus</a>
-      <a class="nav-link" href="{{ get_url(path='@/draft.md') }}">Draft</a>
       <a class="nav-link" href="{{ get_url(path='library') }}">Library</a>
       <a class="nav-link" href="{{ get_url(path='about') }}">About</a>
+      <details class="nav-dropdown" data-nav-dropdown>
+        <summary class="nav-link nav-dropdown__trigger">More</summary>
+        <div class="nav-dropdown__menu">
+          <a class="nav-dropdown__item" href="{{ get_url(path='@/lost-in-the-nexus.md') }}">Lost in the Nexus</a>
+          <a class="nav-dropdown__item" href="{{ get_url(path='@/draft.md') }}">Draft</a>
+          <hr class="nav-dropdown__separator">
+          <label class="nav-dropdown__item datamining-toggle" title="Show XML links, source references, and Game Data navigation">
+            <input type="checkbox" data-datamining-toggle>
+            <span>Dataminer mode</span>
+          </label>
+        </div>
+      </details>
       <div class="site-search" role="search" data-site-search>
         <input class="site-search__input"
                type="search"
@@ -65,10 +75,6 @@
   <footer class="site-footer">
     <p>&copy; {{ now() | date(format="%Y") }} HotSixors</p>
     <p>&copy; 2014 Blizzard Entertainment, Inc. All rights reserved. Heroes of the Storm is a trademark of Blizzard Entertainment, Inc.</p>
-    <label class="datamining-toggle" title="Show XML links, source references, and Game Data navigation">
-      <input type="checkbox" data-datamining-toggle>
-      <span>Show game code</span>
-    </label>
   </footer>
   <script type="module" src="{{ get_url(path='hotsixors.js', cachebust=true) }}"></script>
   {% block scripts %}{% endblock scripts %}

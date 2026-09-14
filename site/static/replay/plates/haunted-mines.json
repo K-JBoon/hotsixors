@@ -218,6 +218,60 @@
    "anchorY": 0.6217,
    "file": "/replay/plates/haunted-mines/storm_building_kingscrest_gate_00.y75.s100.t0.webp"
   },
+  "storm_building_kingscrest_gate_00.y90.s100.t1": {
+   "w": 34,
+   "h": 201,
+   "worldW": 1.294,
+   "worldH": 7.749,
+   "anchorX": 0.5,
+   "anchorY": 0.6222,
+   "file": "/replay/plates/haunted-mines/storm_building_kingscrest_gate_00.y90.s100.t1.webp"
+  },
+  "storm_building_kingscrest_gate_00.y90.s100.t0": {
+   "w": 34,
+   "h": 201,
+   "worldW": 1.294,
+   "worldH": 7.749,
+   "anchorX": 0.5,
+   "anchorY": 0.6222,
+   "file": "/replay/plates/haunted-mines/storm_building_kingscrest_gate_00.y90.s100.t0.webp"
+  },
+  "storm_building_kingscrest_gate_00.y225.s100.t1": {
+   "w": 143,
+   "h": 175,
+   "worldW": 5.502,
+   "worldH": 6.741,
+   "anchorX": 0.5,
+   "anchorY": 0.6405,
+   "file": "/replay/plates/haunted-mines/storm_building_kingscrest_gate_00.y225.s100.t1.webp"
+  },
+  "storm_building_kingscrest_gate_00.y45.s100.t0": {
+   "w": 143,
+   "h": 175,
+   "worldW": 5.502,
+   "worldH": 6.741,
+   "anchorX": 0.5,
+   "anchorY": 0.6405,
+   "file": "/replay/plates/haunted-mines/storm_building_kingscrest_gate_00.y45.s100.t0.webp"
+  },
+  "storm_building_kingscrest_gate_00.y135.s100.t0": {
+   "w": 143,
+   "h": 175,
+   "worldW": 5.5,
+   "worldH": 6.743,
+   "anchorX": 0.5,
+   "anchorY": 0.6405,
+   "file": "/replay/plates/haunted-mines/storm_building_kingscrest_gate_00.y135.s100.t0.webp"
+  },
+  "storm_building_kingscrest_gate_00.y315.s100.t1": {
+   "w": 143,
+   "h": 175,
+   "worldW": 5.5,
+   "worldH": 6.743,
+   "anchorX": 0.5,
+   "anchorY": 0.6405,
+   "file": "/replay/plates/haunted-mines/storm_building_kingscrest_gate_00.y315.s100.t1.webp"
+  },
   "storm_building_kingscrest_manawell.y45.s100.t0": {
    "w": 136,
    "h": 182,
@@ -534,6 +588,78 @@
    "r": 1.3088,
    "t": 0,
    "sprite": "storm_building_kingscrest_gate_00.y75.s100.t0"
+  },
+  {
+   "m": "storm_building_kingscrest_gate_00",
+   "x": 149,
+   "y": 220,
+   "z": 7.913,
+   "r": 1.5705,
+   "t": 1,
+   "sprite": "storm_building_kingscrest_gate_00.y90.s100.t1"
+  },
+  {
+   "m": "storm_building_kingscrest_gate_00",
+   "x": 107,
+   "y": 148,
+   "z": 7.926,
+   "r": 1.5705,
+   "t": 0,
+   "sprite": "storm_building_kingscrest_gate_00.y90.s100.t0"
+  },
+  {
+   "m": "storm_building_kingscrest_gate_00",
+   "x": 80,
+   "y": 181,
+   "z": 7.913,
+   "r": 1.3088,
+   "t": 0,
+   "sprite": "storm_building_kingscrest_gate_00.y75.s100.t0"
+  },
+  {
+   "m": "storm_building_kingscrest_gate_00",
+   "x": 176,
+   "y": 187,
+   "z": 7.926,
+   "r": 1.3088,
+   "t": 1,
+   "sprite": "storm_building_kingscrest_gate_00.y75.s100.t1"
+  },
+  {
+   "m": "storm_building_kingscrest_gate_00",
+   "x": 186,
+   "y": 209,
+   "z": 7.926,
+   "r": 3.9267,
+   "t": 1,
+   "sprite": "storm_building_kingscrest_gate_00.y225.s100.t1"
+  },
+  {
+   "m": "storm_building_kingscrest_gate_00",
+   "x": 70,
+   "y": 157,
+   "z": 7.913,
+   "r": 0.7851,
+   "t": 0,
+   "sprite": "storm_building_kingscrest_gate_00.y45.s100.t0"
+  },
+  {
+   "m": "storm_building_kingscrest_gate_00",
+   "x": 70,
+   "y": 209,
+   "z": 7.913,
+   "r": 2.356,
+   "t": 0,
+   "sprite": "storm_building_kingscrest_gate_00.y135.s100.t0"
+  },
+  {
+   "m": "storm_building_kingscrest_gate_00",
+   "x": 186,
+   "y": 157,
+   "z": 7.926,
+   "r": 5.4975,
+   "t": 1,
+   "sprite": "storm_building_kingscrest_gate_00.y315.s100.t1"
   },
   {
    "m": "storm_building_kingscrest_manawell",

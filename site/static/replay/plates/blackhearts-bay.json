@@ -290,6 +290,60 @@
    "anchorY": 0.6217,
    "file": "/replay/plates/blackhearts-bay/storm_building_kingscrest_gate_00.y285.s100.t0.webp"
   },
+  "storm_building_kingscrest_gate_00.y90.s100.t0": {
+   "w": 34,
+   "h": 201,
+   "worldW": 1.294,
+   "worldH": 7.749,
+   "anchorX": 0.5,
+   "anchorY": 0.6222,
+   "file": "/replay/plates/blackhearts-bay/storm_building_kingscrest_gate_00.y90.s100.t0.webp"
+  },
+  "storm_building_kingscrest_gate_00.y270.s100.t1": {
+   "w": 34,
+   "h": 201,
+   "worldW": 1.294,
+   "worldH": 7.749,
+   "anchorX": 0.5,
+   "anchorY": 0.6222,
+   "file": "/replay/plates/blackhearts-bay/storm_building_kingscrest_gate_00.y270.s100.t1.webp"
+  },
+  "storm_building_kingscrest_gate_00.y225.s100.t1": {
+   "w": 143,
+   "h": 175,
+   "worldW": 5.502,
+   "worldH": 6.741,
+   "anchorX": 0.5,
+   "anchorY": 0.6405,
+   "file": "/replay/plates/blackhearts-bay/storm_building_kingscrest_gate_00.y225.s100.t1.webp"
+  },
+  "storm_building_kingscrest_gate_00.y45.s100.t0": {
+   "w": 143,
+   "h": 175,
+   "worldW": 5.502,
+   "worldH": 6.741,
+   "anchorX": 0.5,
+   "anchorY": 0.6405,
+   "file": "/replay/plates/blackhearts-bay/storm_building_kingscrest_gate_00.y45.s100.t0.webp"
+  },
+  "storm_building_kingscrest_gate_00.y135.s100.t0": {
+   "w": 143,
+   "h": 175,
+   "worldW": 5.5,
+   "worldH": 6.743,
+   "anchorX": 0.5,
+   "anchorY": 0.6405,
+   "file": "/replay/plates/blackhearts-bay/storm_building_kingscrest_gate_00.y135.s100.t0.webp"
+  },
+  "storm_building_kingscrest_gate_00.y315.s100.t1": {
+   "w": 143,
+   "h": 175,
+   "worldW": 5.5,
+   "worldH": 6.743,
+   "anchorX": 0.5,
+   "anchorY": 0.6405,
+   "file": "/replay/plates/blackhearts-bay/storm_building_kingscrest_gate_00.y315.s100.t1.webp"
+  },
   "storm_building_kingscrest_manawell.y45.s100.t0": {
    "w": 136,
    "h": 182,
@@ -732,6 +786,78 @@
    "r": 4.974,
    "t": 0,
    "sprite": "storm_building_kingscrest_gate_00.y285.s100.t0"
+  },
+  {
+   "m": "storm_building_kingscrest_gate_00",
+   "x": 106,
+   "y": 65,
+   "z": 7.912,
+   "r": 1.5705,
+   "t": 0,
+   "sprite": "storm_building_kingscrest_gate_00.y90.s100.t0"
+  },
+  {
+   "m": "storm_building_kingscrest_gate_00",
+   "x": 148,
+   "y": 65,
+   "z": 7.925,
+   "r": 4.7121,
+   "t": 1,
+   "sprite": "storm_building_kingscrest_gate_00.y270.s100.t1"
+  },
+  {
+   "m": "storm_building_kingscrest_gate_00",
+   "x": 178,
+   "y": 110,
+   "z": 7.935,
+   "r": 3.9267,
+   "t": 1,
+   "sprite": "storm_building_kingscrest_gate_00.y225.s100.t1"
+  },
+  {
+   "m": "storm_building_kingscrest_gate_00",
+   "x": 201,
+   "y": 140,
+   "z": 7.935,
+   "r": 3.9267,
+   "t": 1,
+   "sprite": "storm_building_kingscrest_gate_00.y225.s100.t1"
+  },
+  {
+   "m": "storm_building_kingscrest_gate_00",
+   "x": 57,
+   "y": 77,
+   "z": 7.935,
+   "r": 0.7851,
+   "t": 0,
+   "sprite": "storm_building_kingscrest_gate_00.y45.s100.t0"
+  },
+  {
+   "m": "storm_building_kingscrest_gate_00",
+   "x": 76,
+   "y": 110,
+   "z": 7.935,
+   "r": 2.356,
+   "t": 0,
+   "sprite": "storm_building_kingscrest_gate_00.y135.s100.t0"
+  },
+  {
+   "m": "storm_building_kingscrest_gate_00",
+   "x": 53,
+   "y": 140,
+   "z": 7.935,
+   "r": 2.356,
+   "t": 0,
+   "sprite": "storm_building_kingscrest_gate_00.y135.s100.t0"
+  },
+  {
+   "m": "storm_building_kingscrest_gate_00",
+   "x": 197,
+   "y": 77,
+   "z": 7.935,
+   "r": 5.4975,
+   "t": 1,
+   "sprite": "storm_building_kingscrest_gate_00.y315.s100.t1"
   },
   {
    "m": "storm_building_kingscrest_manawell",

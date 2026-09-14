@@ -147,11 +147,27 @@ function initPrimaryNav() {
   });
 
   menu.addEventListener("click", (event) => {
-    if (mq.matches && event.target.closest(".nav-link")) setExpanded(false);
+    if (mq.matches && event.target.closest(".nav-link, .nav-dropdown__item")) setExpanded(false);
   });
 
   mq.addEventListener("change", applyLayout);
   applyLayout();
+}
+
+function initNavDropdowns() {
+  const dropdowns = [...document.querySelectorAll("[data-nav-dropdown]")];
+  if (dropdowns.length === 0) return;
+
+  document.addEventListener("click", (event) => {
+    for (const dropdown of dropdowns) {
+      if (dropdown.open && !dropdown.contains(event.target)) dropdown.open = false;
+    }
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key !== "Escape") return;
+    for (const dropdown of dropdowns) dropdown.open = false;
+  });
 }
 
 
@@ -422,7 +438,7 @@ function initAbilityDetails() {
     toggle.setAttribute("aria-pressed", String(enabled));
   }
 
-  applyState(getStoredBoolean(storage, LS_KEY, false));
+  applyState(getStoredBoolean(storage, LS_KEY, true));
 
   toggle.addEventListener("click", () => {
     const next = toggle.getAttribute("aria-pressed") !== "true";
@@ -677,6 +693,7 @@ function initEffectIndex() {
 if (typeof document !== "undefined") {
   document.addEventListener("DOMContentLoaded", () => {
     initPrimaryNav();
+    initNavDropdowns();
     initDataminingToggle();
     initGlobalSearch();
     initSelectGridSearch();

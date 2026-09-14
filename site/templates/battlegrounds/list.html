@@ -15,6 +15,9 @@
        data-select-search-card
        data-select-search-id="{{ page.slug }}"
        data-select-search-text="{{ page.title }}">
+      {% if page.extra.loading_screen %}
+      <img class="battleground-card__image" src="/images/battlegrounds/{{ page.extra.battleground_slug }}.png" alt="" loading="lazy">
+      {% endif %}
       <span class="battleground-card__name">{{ page.title }}</span>
     </a>
     {% endfor %}

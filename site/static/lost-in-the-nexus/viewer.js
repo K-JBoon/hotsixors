@@ -7,6 +7,8 @@ const shadowBox = document.getElementById('nexus-shadows');
 const SHADOWS = 'hotsixors.nexus.shadows';
 const bloomBox = document.getElementById('nexus-bloom');
 const BLOOM = 'hotsixors.nexus.bloom';
+const particleBox = document.getElementById('nexus-particles');
+const PARTICLES = 'hotsixors.nexus.particles';
 const streamerBox = document.getElementById('nexus-streamer');
 const STREAMER = 'ng-streamer-mode';
 
@@ -24,6 +26,7 @@ const nexus = await createNexusScene({
   pitch: Number(params.get('pitch')) || 55,
   hotkeys: {
     c: () => nexus.swapCamera(),
+    g: () => nexus.hotsCamera(),
     h: () => setShadows(!nexus.shadowsEnabled()),
     r: () => nexus.resetCamera(),
   },
@@ -63,6 +66,16 @@ function setBloom(on) {
   bloomBox.checked = on;
   try {
     localStorage.setItem(BLOOM, String(on));
+  } catch {
+    // Private mode: the choice lasts this visit.
+  }
+}
+
+function setParticles(on) {
+  nexus.setParticles(on);
+  particleBox.checked = on;
+  try {
+    localStorage.setItem(PARTICLES, String(on));
   } catch {
     // Private mode: the choice lasts this visit.
   }
@@ -178,6 +191,12 @@ bloomBox.onchange = () => {
   setBloom(bloomBox.checked);
 };
 
+particleBox.onchange = () => {
+  // Keeping focus would send WASD into the checkbox.
+  particleBox.blur();
+  setParticles(particleBox.checked);
+};
+
 streamerBox.onchange = () => {
   // Keeping focus would send WASD into the checkbox.
   streamerBox.blur();
@@ -228,6 +247,14 @@ try {
   // Private mode: default on.
 }
 setBloom(bloomWanted);
+
+let particlesWanted = false;
+try {
+  particlesWanted = localStorage.getItem(PARTICLES) === 'true';
+} catch {
+  // Private mode: default off.
+}
+setParticles(particlesWanted);
 
 // Everything the guessing game needs loads on demand.
 const gameButton = document.getElementById('nexus-game');

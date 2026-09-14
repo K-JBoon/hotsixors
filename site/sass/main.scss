@@ -191,6 +191,73 @@ h1, h2, h3, h4 {
   }
 }
 
+.nav-dropdown {
+  position: relative;
+}
+
+.nav-dropdown__trigger {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  list-style: none;
+  cursor: pointer;
+
+  &::-webkit-details-marker { display: none; }
+
+  &::after {
+    content: "";
+    width: 0.5em;
+    height: 0.5em;
+    border-right: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    transform: rotate(45deg) translateY(-2px);
+    transition: transform 0.15s;
+  }
+}
+
+.nav-dropdown[open] .nav-dropdown__trigger::after {
+  transform: rotate(-135deg) translateY(2px);
+}
+
+.nav-dropdown__menu {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 12rem;
+  background: $bg-panel;
+  border: 1px solid $border-dim;
+  border-radius: 4px;
+  box-shadow: 0 8px 20px rgba(black, 0.35);
+  padding: 0.4rem;
+  z-index: 110;
+}
+
+.nav-dropdown__item {
+  color: $text-muted;
+  font-family: $font-display;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.6rem 0.6rem;
+  border-radius: 3px;
+  white-space: nowrap;
+
+  &:hover {
+    color: $text-primary;
+    background: $bg-card-hover;
+    text-decoration: none;
+  }
+}
+
+.nav-dropdown__separator {
+  border: none;
+  border-top: 1px solid $border-dim;
+  margin: 0.35rem 0.2rem;
+}
+
 html:not(.datamining-enabled) [data-datamining] {
   display: none !important;
 }
@@ -390,6 +457,24 @@ html:not(.datamining-enabled) [data-datamining] {
     min-width: 0;
     margin: 0.75rem 0 0;
   }
+
+  .nav-dropdown__menu {
+    position: static;
+    border: none;
+    box-shadow: none;
+    background: transparent;
+    padding: 0 0 0 1rem;
+  }
+
+  .nav-dropdown__item {
+    border-bottom: 1px solid rgba($border-dim, 0.65);
+    border-radius: 0;
+
+    &:hover {
+      background: transparent;
+      border-bottom-color: $accent-gold;
+    }
+  }
 }
 
 // ─── Layout ───────────────────────────────────────────────────────────────────
@@ -467,12 +552,6 @@ html:not(.datamining-enabled) [data-datamining] {
   text-align: center;
   color: $text-muted;
   font-size: 0.85rem;
-
-  .datamining-toggle {
-    justify-content: center;
-    margin-top: 0.65rem;
-    padding: 0.2rem 0.35rem 0;
-  }
 }
 
 // ─── Badges ──────────────────────────────────────────────────────────────────
@@ -1885,25 +1964,42 @@ html:not(.datamining-enabled) [data-datamining] {
 }
 
 .battlegrounds-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: 1rem;
   margin-top: 1.5rem;
 }
 
 .battleground-card {
+  position: relative;
   display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  padding: 1rem 1.25rem;
+  align-items: flex-end;
+  flex: 1 1 360px;
+  aspect-ratio: 16 / 9;
+  padding: 1.25rem 1.5rem;
   border: 1px solid $border-dim;
   border-radius: 6px;
+  overflow: hidden;
   text-decoration: none;
   color: inherit;
+  background: $bg-card;
   transition: border-color 0.15s, box-shadow 0.15s, opacity 0.15s, filter 0.15s;
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(#000, 0.85) 0%, rgba(#000, 0.55) 35%, rgba(#000, 0.05) 75%);
+    pointer-events: none;
+  }
 
   &:hover {
     border-color: $accent-blue;
+
+    .battleground-card__image {
+      filter: brightness(0.85);
+      transform: scale(1.04);
+    }
   }
 
   &:focus-visible {
@@ -1912,9 +2008,24 @@ html:not(.datamining-enabled) [data-datamining] {
     text-decoration: none;
   }
 
+  &__image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: blur(0.5px) brightness(0.7);
+    transform: scale(1.02);
+    transition: filter 0.2s, transform 0.2s;
+  }
+
   &__name {
+    position: relative;
+    z-index: 1;
     font-weight: 600;
-    font-size: 1rem;
+    font-size: 1.5rem;
+    color: #fff;
+    text-shadow: 0 1px 3px rgba(#000, 0.8), 0 0 12px rgba(#000, 0.5);
   }
 }
 
@@ -2265,8 +2376,8 @@ html:not(.datamining-enabled) [data-datamining] {
     h1 { font-size: 1.4rem; }
   }
 
-  .battlegrounds-grid {
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  .battleground-card {
+    flex-basis: 150px;
   }
 
   // Tables need horizontal scroll on small screens

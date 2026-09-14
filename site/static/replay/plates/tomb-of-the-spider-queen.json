@@ -290,6 +290,24 @@
    "anchorY": 0.6351,
    "file": "/replay/plates/tomb-of-the-spider-queen/storm_building_luxcrypt_gate_00.y285.s100.t0.webp"
   },
+  "storm_building_luxcrypt_gate_00.y90.s100.t0": {
+   "w": 38,
+   "h": 205,
+   "worldW": 1.48,
+   "worldH": 7.898,
+   "anchorX": 0.5,
+   "anchorY": 0.6366,
+   "file": "/replay/plates/tomb-of-the-spider-queen/storm_building_luxcrypt_gate_00.y90.s100.t0.webp"
+  },
+  "storm_building_luxcrypt_gate_00.y270.s100.t1": {
+   "w": 38,
+   "h": 205,
+   "worldW": 1.48,
+   "worldH": 7.898,
+   "anchorX": 0.5,
+   "anchorY": 0.6365,
+   "file": "/replay/plates/tomb-of-the-spider-queen/storm_building_luxcrypt_gate_00.y270.s100.t1.webp"
+  },
   "storm_building_luxcrypt_gate_00.y45.s100.t1": {
    "w": 144,
    "h": 183,
@@ -299,6 +317,15 @@
    "anchorY": 0.6533,
    "file": "/replay/plates/tomb-of-the-spider-queen/storm_building_luxcrypt_gate_00.y45.s100.t1.webp"
   },
+  "storm_building_luxcrypt_gate_00.y45.s100.t0": {
+   "w": 144,
+   "h": 183,
+   "worldW": 5.541,
+   "worldH": 7.038,
+   "anchorX": 0.4999,
+   "anchorY": 0.6533,
+   "file": "/replay/plates/tomb-of-the-spider-queen/storm_building_luxcrypt_gate_00.y45.s100.t0.webp"
+  },
   "storm_building_luxcrypt_gate_00.y135.s100.t0": {
    "w": 144,
    "h": 183,
@@ -307,6 +334,15 @@
    "anchorX": 0.5001,
    "anchorY": 0.6532,
    "file": "/replay/plates/tomb-of-the-spider-queen/storm_building_luxcrypt_gate_00.y135.s100.t0.webp"
+  },
+  "storm_building_luxcrypt_gate_00.y315.s100.t1": {
+   "w": 144,
+   "h": 183,
+   "worldW": 5.539,
+   "worldH": 7.039,
+   "anchorX": 0.4999,
+   "anchorY": 0.6531,
+   "file": "/replay/plates/tomb-of-the-spider-queen/storm_building_luxcrypt_gate_00.y315.s100.t1.webp"
   },
   "storm_building_luxcrypt_moonwell.y0.s100.t0": {
    "w": 113,
@@ -906,6 +942,24 @@
   },
   {
    "m": "storm_building_luxcrypt_gate_00",
+   "x": 106,
+   "y": 100,
+   "z": 7.916,
+   "r": 1.5705,
+   "t": 0,
+   "sprite": "storm_building_luxcrypt_gate_00.y90.s100.t0"
+  },
+  {
+   "m": "storm_building_luxcrypt_gate_00",
+   "x": 142,
+   "y": 100,
+   "z": 7.916,
+   "r": 4.7121,
+   "t": 1,
+   "sprite": "storm_building_luxcrypt_gate_00.y270.s100.t1"
+  },
+  {
+   "m": "storm_building_luxcrypt_gate_00",
    "x": 180,
    "y": 144,
    "z": 7.913,
@@ -951,12 +1005,30 @@
   },
   {
    "m": "storm_building_luxcrypt_gate_00",
+   "x": 61,
+   "y": 87,
+   "z": 7.916,
+   "r": 0.7851,
+   "t": 0,
+   "sprite": "storm_building_luxcrypt_gate_00.y45.s100.t0"
+  },
+  {
+   "m": "storm_building_luxcrypt_gate_00",
    "x": 78,
    "y": 124,
    "z": 7.913,
    "r": 2.356,
    "t": 0,
    "sprite": "storm_building_luxcrypt_gate_00.y135.s100.t0"
+  },
+  {
+   "m": "storm_building_luxcrypt_gate_00",
+   "x": 187,
+   "y": 87,
+   "z": 7.916,
+   "r": 5.4975,
+   "t": 1,
+   "sprite": "storm_building_luxcrypt_gate_00.y315.s100.t1"
   },
   {
    "m": "storm_building_luxcrypt_moonwell",

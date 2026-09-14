@@ -164,6 +164,96 @@
    "anchorY": 0.6709,
    "file": "/replay/plates/warhead-junction/storm_building_scbraxis_tower_01.y304.s100.t1.webp"
   },
+  "storm_building_scbraxis_gate_00.y255.s100.t1": {
+   "w": 156,
+   "h": 242,
+   "worldW": 6.006,
+   "worldH": 9.297,
+   "anchorX": 0.5,
+   "anchorY": 0.5858,
+   "file": "/replay/plates/warhead-junction/storm_building_scbraxis_gate_00.y255.s100.t1.webp"
+  },
+  "storm_building_scbraxis_gate_00.y255.s100.t0": {
+   "w": 156,
+   "h": 242,
+   "worldW": 6.006,
+   "worldH": 9.297,
+   "anchorX": 0.5,
+   "anchorY": 0.5858,
+   "file": "/replay/plates/warhead-junction/storm_building_scbraxis_gate_00.y255.s100.t0.webp"
+  },
+  "storm_building_scbraxis_gate_00.y105.s100.t0": {
+   "w": 156,
+   "h": 242,
+   "worldW": 6.004,
+   "worldH": 9.296,
+   "anchorX": 0.5,
+   "anchorY": 0.5858,
+   "file": "/replay/plates/warhead-junction/storm_building_scbraxis_gate_00.y105.s100.t0.webp"
+  },
+  "storm_building_scbraxis_gate_00.y285.s100.t1": {
+   "w": 156,
+   "h": 242,
+   "worldW": 6.004,
+   "worldH": 9.296,
+   "anchorX": 0.5,
+   "anchorY": 0.5858,
+   "file": "/replay/plates/warhead-junction/storm_building_scbraxis_gate_00.y285.s100.t1.webp"
+  },
+  "storm_building_scbraxis_gate_00.y90.s100.t0": {
+   "w": 107,
+   "h": 226,
+   "worldW": 4.11,
+   "worldH": 8.675,
+   "anchorX": 0.5,
+   "anchorY": 0.592,
+   "file": "/replay/plates/warhead-junction/storm_building_scbraxis_gate_00.y90.s100.t0.webp"
+  },
+  "storm_building_scbraxis_gate_00.y270.s100.t1": {
+   "w": 107,
+   "h": 226,
+   "worldW": 4.11,
+   "worldH": 8.675,
+   "anchorX": 0.5,
+   "anchorY": 0.592,
+   "file": "/replay/plates/warhead-junction/storm_building_scbraxis_gate_00.y270.s100.t1.webp"
+  },
+  "storm_building_scbraxis_gate_00.y225.s100.t1": {
+   "w": 222,
+   "h": 234,
+   "worldW": 8.53,
+   "worldH": 9.019,
+   "anchorX": 0.5,
+   "anchorY": 0.5884,
+   "file": "/replay/plates/warhead-junction/storm_building_scbraxis_gate_00.y225.s100.t1.webp"
+  },
+  "storm_building_scbraxis_gate_00.y45.s100.t0": {
+   "w": 222,
+   "h": 234,
+   "worldW": 8.53,
+   "worldH": 9.019,
+   "anchorX": 0.5,
+   "anchorY": 0.5884,
+   "file": "/replay/plates/warhead-junction/storm_building_scbraxis_gate_00.y45.s100.t0.webp"
+  },
+  "storm_building_scbraxis_gate_00.y135.s100.t0": {
+   "w": 222,
+   "h": 235,
+   "worldW": 8.529,
+   "worldH": 9.02,
+   "anchorX": 0.5,
+   "anchorY": 0.5884,
+   "file": "/replay/plates/warhead-junction/storm_building_scbraxis_gate_00.y135.s100.t0.webp"
+  },
+  "storm_building_scbraxis_gate_00.y315.s100.t1": {
+   "w": 222,
+   "h": 235,
+   "worldW": 8.529,
+   "worldH": 9.02,
+   "anchorX": 0.5,
+   "anchorY": 0.5884,
+   "file": "/replay/plates/warhead-junction/storm_building_scbraxis_gate_00.y315.s100.t1.webp"
+  },
   "storm_building_scbraxis_moonwell.y315.s100.t1": {
    "w": 129,
    "h": 172,
@@ -705,6 +795,114 @@
    "r": 3.929,
    "t": 1,
    "sprite": "storm_building_scbraxis_tower_01.y225.s100.t1"
+  },
+  {
+   "m": "storm_building_scbraxis_gate_00",
+   "x": 142,
+   "y": 188,
+   "z": 9.904,
+   "r": 4.4504,
+   "t": 1,
+   "sprite": "storm_building_scbraxis_gate_00.y255.s100.t1"
+  },
+  {
+   "m": "storm_building_scbraxis_gate_00",
+   "x": 102,
+   "y": 62,
+   "z": 9.904,
+   "r": 4.4504,
+   "t": 0,
+   "sprite": "storm_building_scbraxis_gate_00.y255.s100.t0"
+  },
+  {
+   "m": "storm_building_scbraxis_gate_00",
+   "x": 106,
+   "y": 188,
+   "z": 9.904,
+   "r": 1.8325,
+   "t": 0,
+   "sprite": "storm_building_scbraxis_gate_00.y105.s100.t0"
+  },
+  {
+   "m": "storm_building_scbraxis_gate_00",
+   "x": 146,
+   "y": 62,
+   "z": 9.904,
+   "r": 4.974,
+   "t": 1,
+   "sprite": "storm_building_scbraxis_gate_00.y285.s100.t1"
+  },
+  {
+   "m": "storm_building_scbraxis_gate_00",
+   "x": 106,
+   "y": 124,
+   "z": 9.904,
+   "r": 1.5705,
+   "t": 0,
+   "sprite": "storm_building_scbraxis_gate_00.y90.s100.t0"
+  },
+  {
+   "m": "storm_building_scbraxis_gate_00",
+   "x": 142,
+   "y": 124,
+   "z": 9.904,
+   "r": 4.7121,
+   "t": 1,
+   "sprite": "storm_building_scbraxis_gate_00.y270.s100.t1"
+  },
+  {
+   "m": "storm_building_scbraxis_gate_00",
+   "x": 184,
+   "y": 158,
+   "z": 9.904,
+   "r": 3.9267,
+   "t": 1,
+   "sprite": "storm_building_scbraxis_gate_00.y225.s100.t1"
+  },
+  {
+   "m": "storm_building_scbraxis_gate_00",
+   "x": 55,
+   "y": 98,
+   "z": 9.904,
+   "r": 0.7851,
+   "t": 0,
+   "sprite": "storm_building_scbraxis_gate_00.y45.s100.t0"
+  },
+  {
+   "m": "storm_building_scbraxis_gate_00",
+   "x": 64,
+   "y": 158,
+   "z": 9.904,
+   "r": 2.356,
+   "t": 0,
+   "sprite": "storm_building_scbraxis_gate_00.y135.s100.t0"
+  },
+  {
+   "m": "storm_building_scbraxis_gate_00",
+   "x": 193,
+   "y": 98,
+   "z": 9.904,
+   "r": 5.4975,
+   "t": 1,
+   "sprite": "storm_building_scbraxis_gate_00.y315.s100.t1"
+  },
+  {
+   "m": "storm_building_scbraxis_gate_00",
+   "x": 75,
+   "y": 127,
+   "z": 9.904,
+   "r": 1.5705,
+   "t": 0,
+   "sprite": "storm_building_scbraxis_gate_00.y90.s100.t0"
+  },
+  {
+   "m": "storm_building_scbraxis_gate_00",
+   "x": 173,
+   "y": 127,
+   "z": 9.904,
+   "r": 4.7121,
+   "t": 1,
+   "sprite": "storm_building_scbraxis_gate_00.y270.s100.t1"
   },
   {
    "m": "storm_building_scbraxis_moonwell",

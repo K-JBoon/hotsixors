@@ -2,12 +2,31 @@ import { readdir, readFile, writeFile, mkdir } from "node:fs/promises";
 import * as path from "node:path";
 import type { BattlegroundData, BattlegroundTimer, BattlegroundCodeBlock, BattlegroundMechanic, BattlegroundSummon, BattlegroundSummonVariant, BattlegroundWeapon, BattlegroundAbility, BattlegroundXmlFile, ScalingSummaryRow, Gamestrings } from "./types.ts";
 import { BATTLEGROUNDS, type BattlegroundConfig, type SummonVariantConfig } from "./lib/battlegrounds-config.ts";
-import { GAMEDATA_DIR, HEROES_DATA_DIR, SITE_CONTENT_BATTLEGROUNDS, SITE_DATA_BATTLEGROUNDS, findLatestVersion } from "./lib/paths.ts";
+import { GAMEDATA_DIR, HEROES_IMAGES_DIR, HEROES_DATA_DIR, SITE_CONTENT_BATTLEGROUNDS, SITE_DATA_BATTLEGROUNDS, SITE_STATIC_IMAGES, findLatestVersion } from "./lib/paths.ts";
 import { loadGamestrings, loadMapGamestringPatches, type MapGamestringPatch } from "./lib/heroes-data.ts";
 import { shouldIncludeGamedataPath } from "./gen-gamedata.ts";
 import { buildAbilityIndex, extractAbilities } from "./lib/ability-text.ts";
+import { copyImageIfExists } from "./lib/hero-entries.ts";
 import { buildConstMap, collectLinks, extractArmor, extractScalingRows, extractUnit, extractWeapon, firstAttrValue, firstNumberAttr, unitChain } from "./lib/battleground-xml.ts";
 import { type ConstEntry, buildConstBlock, extractGalaxyConstsTracked, extractPatternContext, extractTimerContext, formatSeconds, headerToImpl, sanitizeGamedataUrl } from "./lib/galaxy-source.ts";
+
+// Source filenames in heroes-images/loadingscreens, keyed by battleground slug.
+const LOADING_SCREENS: Record<string, string> = {
+  "battlefield-of-eternity": "ui_ingame_mapmechanic_loadscreen_battlefieldofeternity.png",
+  "blackhearts-bay": "ui_ingame_mapmechanic_loadscreen_blackheartsbay.png",
+  "cursed-hollow": "ui_ingame_mapmechanic_loadscreen_cursedhollow.png",
+  "dragon-shire": "ui_ingame_mapmechanic_loadscreen_dragonshire.png",
+  "garden-of-terror": "ui_ingame_mapmechanic_loadscreen_gardenofterror.png",
+  "hanamura-temple": "ui_ingame_mapmechanic_loadscreen_hanamura_rework.png",
+  "haunted-mines": "ui_ingame_mapmechanic_loadscreen_hauntedmines.png",
+  "infernal-shrines": "ui_ingame_mapmechanic_loadscreen_shrines.png",
+  "sky-temple": "ui_ingame_mapmechanic_loadscreen_skytemple.png",
+  "tomb-of-the-spider-queen": "ui_ingame_mapmechanic_loadscreen_tombofthespiderqueen.png",
+  "towers-of-doom": "ui_ingame_mapmechanic_loadscreen_towersofdoom.png",
+  "alterac-pass": "storm_ui_homescreenbackground_wcav.png",
+  "volskaya-foundry": "storm_ui_homescreenbackground_volskaya.png",
+  "warhead-junction": "storm_ui_homescreenbackground_warhead.png",
+};
 
 const BATTLEGROUND_MODS_DIR = path.join(GAMEDATA_DIR, "heroesmapmods/battlegroundmapmods");
 const HEROES_GAMEDATA_DIR = path.join(GAMEDATA_DIR, "heroesdata.stormmod/base.stormdata/gamedata");
@@ -305,7 +324,18 @@ async function main() {
       JSON.stringify(data, null, 2),
     );
 
-    const frontmatter = `+++\ntitle = ${JSON.stringify(cfg.name)}\nslug = ${JSON.stringify(cfg.slug)}\ntemplate = "battlegrounds/single.html"\n\n[extra]\nbattleground_slug = ${JSON.stringify(cfg.slug)}\nfranchise = ${JSON.stringify(cfg.franchise)}\n+++\n`;
+    const loadingScreenSrc = LOADING_SCREENS[cfg.slug];
+    const hasLoadingScreen = loadingScreenSrc
+      ? await copyImageIfExists(
+          path.join(HEROES_IMAGES_DIR, "loadingscreens", loadingScreenSrc),
+          path.join(SITE_STATIC_IMAGES, "battlegrounds", `${cfg.slug}.png`),
+        )
+      : false;
+    if (loadingScreenSrc && !hasLoadingScreen) {
+      console.warn(`  WARNING: loading screen not found: ${loadingScreenSrc}`);
+    }
+
+    const frontmatter = `+++\ntitle = ${JSON.stringify(cfg.name)}\nslug = ${JSON.stringify(cfg.slug)}\ntemplate = "battlegrounds/single.html"\n\n[extra]\nbattleground_slug = ${JSON.stringify(cfg.slug)}\nfranchise = ${JSON.stringify(cfg.franchise)}\nloading_screen = ${JSON.stringify(hasLoadingScreen)}\n+++\n`;
     await writeFile(
       path.join(SITE_CONTENT_BATTLEGROUNDS, `${cfg.slug}.md`),
       frontmatter,

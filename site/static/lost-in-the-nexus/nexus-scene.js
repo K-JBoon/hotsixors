@@ -7,6 +7,7 @@ import { EffectComposer } from '/lost-in-the-nexus/vendor/postprocessing/EffectC
 import { RenderPass } from '/lost-in-the-nexus/vendor/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from '/lost-in-the-nexus/vendor/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from '/lost-in-the-nexus/vendor/postprocessing/OutputPass.js';
+import { emitterMesh } from '/lost-in-the-nexus/nexus-particles.js';
 
 function fetchJson(url) {
   return fetch(url).then((r) => (r.ok ? r.json() : null)).catch(() => null);
@@ -17,15 +18,29 @@ function fetchJson(url) {
 export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys = {} }) {
   const asset = (path) => assets + path;
 
-  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  // Ask for the discrete GPU, and refuse a context that would fall back to a
+  // software rasteriser; only if the browser has nothing else do we take it.
+  function makeRenderer() {
+    const options = { antialias: true, alpha: true, powerPreference: 'high-performance' };
+    try {
+      return new THREE.WebGLRenderer({ ...options, failIfMajorPerformanceCaveat: true });
+    } catch {
+      return new THREE.WebGLRenderer(options);
+    }
+  }
+
+  const renderer = makeRenderer();
   renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
   view.appendChild(renderer.domElement);
 
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(0x0c1018);
-  scene.add(new THREE.HemisphereLight(0xbfd4ff, 0x36302a, 2.2));
+  // Most of the light is the sun. A strong ambient fills every shadow and the
+  // map reads as one flat grey sheet: against the game's own frame the contrast
+  // was half and the ground lost its warmth.
+  scene.add(new THREE.HemisphereLight(0xa8c4f0, 0x6b5a42, 0.6));
   const SUN_DIR = new THREE.Vector3(-60, 90, 60).normalize();
-  const sun = new THREE.DirectionalLight(0xfff3e0, 2.4);
+  const sun = new THREE.DirectionalLight(0xfff0d8, 4.0);
   sun.position.copy(SUN_DIR).multiplyScalar(150);
   sun.castShadow = true;
   sun.shadow.mapSize.set(4096, 4096);
@@ -40,7 +55,8 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
 
   const aspect = () => view.clientWidth / Math.max(view.clientHeight, 1);
   const ortho = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 6000);
-  const persp = new THREE.PerspectiveCamera(50, aspect(), 0.2, 6000);
+  const FREE_FOV = 50;
+  const persp = new THREE.PerspectiveCamera(FREE_FOV, aspect(), 0.2, 6000);
   let camera = persp;
 
   // Glow art is flat cards of bright texture: what makes the game's read as
@@ -49,7 +65,7 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
   const composer = new EffectComposer(renderer);
   const renderPass = new RenderPass(scene, camera);
   composer.addPass(renderPass);
-  const bloom = new UnrealBloomPass(new THREE.Vector2(1, 1), 0.6, 0.45, 0.5);
+  const bloom = new UnrealBloomPass(new THREE.Vector2(1, 1), 0.35, 0.5, 0.85);
   composer.addPass(bloom);
   composer.addPass(new OutputPass());
 
@@ -62,6 +78,9 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
   const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
   const mixers = [];
   const scrollers = [];
+  const emitters = [];  // the particle systems of the loaded map
+  let particlesWanted = false;
+  let emitterSource = null;  // what addEmitters needs to build them on demand
   let span = 100;
   let centre = new THREE.Vector3();
   let loadToken = 0;
@@ -85,6 +104,14 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
   function applyGlow(source) {
     source.traverse((node) => {
       for (const material of [node.material].flat()) {
+        // A lit material can fade its light by view angle too: the raven over
+        // the objective castle is a white card without it.
+        if (material?.userData?.emissiveFresnel) {
+          applyEmissiveFresnel(material, material.userData.emissiveFresnel);
+        }
+        // A mask that could not be baked — it scrolls, or it reads the other
+        // unwrap — is the material's transparency, glow art or not.
+        if (material?.userData?.mask) applyMask(material, material.userData.mask);
         const glow = material?.userData?.glow;
         if (!glow) continue;
         material.toneMapped = false;
@@ -97,7 +124,6 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
         }
         const scroll = material.userData.scroll;
         if (scroll && material.map) scrollers.push({ map: material.map, scroll });
-        if (material.userData.mask) applyMask(material, material.userData.mask);
         if (material.userData.fresnel) applyFresnel(material, material.userData.fresnel);
       }
     });
@@ -109,16 +135,28 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
   // UVs rather than being baked into the art's alpha.
   const textures = new THREE.TextureLoader();
 
-  function applyMask(material, { uri, tiling, scroll }) {
+  function applyMask(material, { uri, tiling, scroll, offset = [0, 0], uv = 0 }) {
     const map = textures.load(asset('/lost-in-the-nexus/models/' + uri));
     map.wrapS = THREE.RepeatWrapping;
     map.wrapT = THREE.RepeatWrapping;
     map.flipY = false; // glTF UVs, and the art it masks comes in that way
     map.repeat.set(tiling[0], tiling[1]);
+    map.offset.set(offset[0], offset[1]);
+    // A mask can read the model's second unwrap while the art reads the first.
+    map.channel = uv;
     material.alphaMap = map;
     material.transparent = true;
     material.needsUpdate = true;
     if (scroll[0] || scroll[1]) scrollers.push({ map, scroll });
+  }
+
+  // three keys its program cache on `onBeforeCompile.toString()`, which is the
+  // same text for every material these injections touch: the first one to
+  // compile then serves the rest, whatever constants it baked in. Each
+  // injection names itself and its numbers instead.
+  function keyProgram(material, tag) {
+    material.programKey = (material.programKey || '') + '|' + tag;
+    material.customProgramCacheKey = () => material.programKey;
   }
 
   // A layer can fade by view angle, and on the game's energy that is the whole
@@ -126,7 +164,10 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
   // wherever it faces the camera, leaving the rim of the portal. Without it the
   // hall wears a lit drum.
   function applyFresnel(material, [inverted, exponent, low, span]) {
-    material.onBeforeCompile = (shader) => {
+    keyProgram(material, `fresnel:${inverted},${exponent},${low},${span}`);
+    const before = material.onBeforeCompile;
+    material.onBeforeCompile = (shader, renderer) => {
+      before?.call(material, shader, renderer);
       shader.vertexShader = `varying vec3 vGlowNormal;
         varying vec3 vGlowEye;
         ${shader.vertexShader}`.replace(
@@ -150,31 +191,69 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
     material.needsUpdate = true;
   }
 
-  // Team colour is a mask in the diffuse alpha; alpha is not used for transparency
-  // on these materials.
+  // The same fade over a lit material's emissive pass. By the emissive stage a
+  // standard material has already resolved `normal`, and it carries the view
+  // vector throughout, so this needs no varyings of its own. `vNormal` would
+  // not do: a flat-shaded material never declares it.
+  function applyEmissiveFresnel(material, [inverted, exponent, low, span]) {
+    // Materials are shared between a model's meshes, so the traversal reaches
+    // one several times; injecting twice redeclares the locals and the shader
+    // will not compile.
+    if (material.userData.emissiveFaded) return;
+    material.userData.emissiveFaded = true;
+    keyProgram(material, `emisFresnel:${inverted},${exponent},${low},${span}`);
+    const before = material.onBeforeCompile;
+    material.onBeforeCompile = (shader, renderer) => {
+      before?.call(material, shader, renderer);
+      shader.fragmentShader = shader.fragmentShader.replace(
+        '#include <emissivemap_fragment>',
+        `#include <emissivemap_fragment>
+         float emisFacing = abs( dot( normal, normalize( vViewPosition ) ) );
+         float emisRim = pow( ${inverted ? '1.0 - emisFacing' : 'emisFacing'}, ${exponent.toFixed(2)} );
+         totalEmissiveRadiance *= clamp( ${low.toFixed(3)} + ${span.toFixed(3)} * emisRim, 0.0, 1.0 );`
+      );
+    };
+    material.needsUpdate = true;
+  }
+
+  // Team colour is a mask in the art's alpha: 1 keeps the art, 0 is all team
+  // colour. Only a material the converter marked asks for it — its layer reads
+  // RGBA — so a gate's ward turns and the stone it hangs in does not.
   const TEAM_COLOURS = [new THREE.Color(0x3f7fd8), new THREE.Color(0xd8452f)];
   const teamMaterials = new Map();
 
   function teamMaterial(source, team) {
-    // Glow art has no team mask, and forcing its alpha opaque would blow it out.
-    if (source.userData?.glow) return source;
+    if (!source?.userData?.team && !source?.userData?.emissiveTeam) return source;
     const key = `${source.uuid}|${team}`;
     const cached = teamMaterials.get(key);
     if (cached) return cached;
     const material = source.clone();
-    material.onBeforeCompile = (shader) => {
-      shader.uniforms.teamColour = { value: TEAM_COLOURS[team] };
-      shader.fragmentShader = 'uniform vec3 teamColour;\n' + shader.fragmentShader.replace(
-        '#include <map_fragment>',
-        `#include <map_fragment>
-         #ifdef USE_MAP
-           float teamMask = 1.0 - texture2D( map, vMapUv ).a;
-           float shade = dot( diffuseColor.rgb, vec3( 0.3333 ) );
-           diffuseColor.rgb = mix( diffuseColor.rgb, teamColour * ( 0.35 + 1.3 * shade ), teamMask );
-         #endif
-         diffuseColor.a = 1.0;`
-      );
-    };
+    material.userData = source.userData;
+    // `clone` copies neither the key nor the injections it stands for.
+    material.programKey = source.programKey || '';
+    material.customProgramCacheKey = () => material.programKey;
+    // `team colour emissive add`: the layer is the shape of the light and the
+    // owner's colour is the light. Untinted it is a grey lamp on every gate.
+    if (source.userData.emissiveTeam && material.emissive) {
+      material.emissive = TEAM_COLOURS[team].clone();
+    }
+    if (source.userData.team) {
+      keyProgram(material, `team:${team}`);
+      const before = source.onBeforeCompile;
+      material.onBeforeCompile = (shader, renderer) => {
+        before?.call(material, shader, renderer);
+        shader.uniforms.teamColour = { value: TEAM_COLOURS[team] };
+        shader.fragmentShader = 'uniform vec3 teamColour;\n' + shader.fragmentShader.replace(
+          '#include <map_fragment>',
+          `#include <map_fragment>
+           #ifdef USE_MAP
+             float teamMask = 1.0 - texture2D( map, vMapUv ).a;
+             float shade = dot( diffuseColor.rgb, vec3( 0.3333 ) );
+             diffuseColor.rgb = mix( diffuseColor.rgb, teamColour * ( 0.35 + 1.3 * shade ), teamMask );
+           #endif`
+        );
+      };
+    }
     material.needsUpdate = true;
     teamMaterials.set(key, material);
     return material;
@@ -282,6 +361,8 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
   function clearWorld() {
     mixers.length = 0;
     scrollers.length = 0;
+    emitters.length = 0;
+    emitterSource = null;
     groundBox = null;
     const geometries = new Set();
     const materials = new Set();
@@ -293,6 +374,10 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
     for (const geometry of geometries) geometry.dispose();
     for (const material of materials) {
       for (const value of Object.values(material)) if (value?.isTexture) value.dispose();
+      // A particle system carries its art in a uniform rather than a slot.
+      for (const uniform of Object.values(material.uniforms || {})) {
+        if (uniform?.value?.isTexture) uniform.value.dispose();
+      }
       material.dispose();
     }
     teamMaterials.clear();
@@ -333,7 +418,9 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
     const wanted = placed.models.filter((name) => !(skip && skip(name)));
     await Promise.all(wanted.map(async (name) => {
       const entry = models.models[name];
-      const gltf = entry && (await loadGltf(asset(entry.gltf)));
+      // An emitter-only model has no geometry at all: a chimney's smoke, the
+      // fireflies over a hedge, the swirl in the Hall of Storms portal.
+      const gltf = entry?.gltf && (await loadGltf(asset(entry.gltf)));
       if (gltf) {
         sources[name] = gltf.scene;
         applyGlow(gltf.scene);
@@ -367,16 +454,68 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
       }
     }
 
+    emitterSource = { instances: placed.instances, models, wanted };
+    if (particlesWanted) addEmitters();
     markShadows();
     return true;
   }
 
+  // One instanced system per emitter, covering every placement of the model it
+  // belongs to, so a map's hundred chimneys are a single draw call.
+  function addEmitters() {
+    if (!emitterSource) return;
+    const { instances, models, wanted } = emitterSource;
+    const placements = new Map();
+    for (const item of instances) {
+      if (!models.models[item.m]?.particles) continue;
+      const list = placements.get(item.m) || placements.set(item.m, []).get(item.m);
+      list.push(item);
+    }
+    for (const [name, list] of placements) {
+      if (!wanted.includes(name)) continue;
+      for (const spec of models.models[name].particles) {
+        const texture = textures.load(asset('/lost-in-the-nexus/models/' + spec.uri));
+        texture.colorSpace = THREE.SRGBColorSpace;
+        texture.flipY = false;
+        const mesh = emitterMesh(spec, texture, list);
+        if (!mesh) continue;
+        world.add(mesh);
+        emitters.push(mesh);
+      }
+    }
+  }
+
+  // Off by default, so a map costs nothing until the reader asks for it. The
+  // systems are built on the first yes and thrown away on a no.
+  function setParticles(on) {
+    if (on === particlesWanted) return;
+    particlesWanted = on;
+    if (on) {
+      addEmitters();
+      return;
+    }
+    for (const mesh of emitters) {
+      world.remove(mesh);
+      mesh.geometry.dispose();
+      for (const uniform of Object.values(mesh.material.uniforms)) {
+        if (uniform?.value?.isTexture) uniform.value.dispose();
+      }
+      mesh.material.dispose();
+    }
+    emitters.length = 0;
+  }
+
   // Translucent surfaces (water, glow planes) would cast an opaque blob.
+  // The game keeps a good half of its art out of the shadow pass and sorts the
+  // rest of a model's translucent parts by hand; both ride in the material.
   function markShadows() {
     world.traverse((node) => {
       if (!node.isMesh) return;
-      node.castShadow = ![node.material].flat().some((m) => m?.transparent);
-      node.receiveShadow = true;
+      const materials = [node.material].flat().filter(Boolean);
+      node.castShadow = !materials.some((m) => m.transparent || m.userData?.noShadow);
+      node.receiveShadow = !materials.some((m) => m.userData?.noShadowReceived);
+      const priority = materials.find((m) => m.userData?.priority)?.userData?.priority;
+      if (priority) node.renderOrder = priority;
     });
   }
 
@@ -430,11 +569,34 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
   }
 
   function resetCamera() {
+    persp.fov = FREE_FOV;
     ortho.position.copy(centre).addScaledVector(eye, 2000);
     persp.position.copy(centre).addScaledVector(eye, span * 1.6);
     ortho.top = span;
     ortho.bottom = -span;
     controls.target.copy(centre);
+    resize();
+    controls.update();
+  }
+
+  // The client's own camera: fixed pitch, fixed height, narrow lens. Distance
+  // and field of view together set how much ground a match shows.
+  const HOTS_PITCH = 60;
+  const HOTS_DIST = 25;
+  const HOTS_FOV = 40;
+  const hotsEye = new THREE.Vector3(
+    0,
+    Math.sin(THREE.MathUtils.degToRad(HOTS_PITCH)),
+    Math.cos(THREE.MathUtils.degToRad(HOTS_PITCH)),
+  );
+
+  // Keeps whatever the reader is looking at, put on the ground, and drops the
+  // game camera over it.
+  function hotsCamera() {
+    if (camera !== persp) swapCamera();
+    controls.target.y = centre.y;
+    persp.fov = HOTS_FOV;
+    persp.position.copy(controls.target).addScaledVector(hotsEye, HOTS_DIST);
     resize();
     controls.update();
   }
@@ -620,7 +782,7 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
   async function renderModel(name, { pxPerUnit = 26, pitch: spritePitch = 60, team, r = 0, s = 0, format = 'image/png', quality = 0.92 } = {}) {
     const models = await modelsIndex();
     const entry = models?.models?.[name];
-    const gltf = entry && (await loadGltf(asset(entry.gltf)));
+    const gltf = entry?.gltf && (await loadGltf(asset(entry.gltf)));
     if (!gltf) return null;
     clearWorld();
     applyGlow(gltf.scene);
@@ -819,6 +981,8 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
     for (const { map, scroll } of scrollers) {
       map.offset.set((map.offset.x + scroll[0] * dt) % 1, (map.offset.y + scroll[1] * dt) % 1);
     }
+    // Particles run off one clock each; their whole motion is a function of it.
+    for (const mesh of emitters) mesh.userData.particles.value += dt;
     controls.update();
     composer.render();
     requestAnimationFrame(render);
@@ -838,8 +1002,10 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
     frame,
     resetCamera,
     swapCamera,
+    hotsCamera,
     setShadows,
     setBloom,
+    setParticles,
     setFlyEnabled,
     getShot,
     applyShot,
@@ -852,6 +1018,7 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
     getCentre: () => centre.clone(),
     shadowsEnabled: () => renderer.shadowMap.enabled,
     bloomEnabled: () => bloom.enabled,
+    particlesEnabled: () => particlesWanted,
     // Lets a headless check confirm the keys move the camera.
     probe: () => controls.target.toArray().map((v) => Math.round(v)),
   };
