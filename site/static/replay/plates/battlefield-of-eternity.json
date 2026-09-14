@@ -509,14 +509,6 @@
  },
  "buildings": [
   {
-   "m": "storm_building_luxoria_watchtower_splat",
-   "x": 34.524,
-   "y": 102.61,
-   "z": 7.923,
-   "r": 0,
-   "sprite": "storm_building_luxoria_watchtower_splat.y0.s100.tx"
-  },
-  {
    "m": "storm_building_heaven_core",
    "x": 49,
    "y": 100,
