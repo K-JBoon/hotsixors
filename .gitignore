@@ -7,6 +7,9 @@ site/content/battlegrounds/[a-z]*
 site/content/battlegrounds/_index.md
 site/content/gamedata/
 site/static/images/
+!site/static/images/battlegrounds/
+!site/static/images/battlegrounds/objectives/
+!site/static/images/battlegrounds/objectives/*
 site/static/processed_images/
 site/static/shortcode-data.json
 site/static/effect-graph/graph.json
