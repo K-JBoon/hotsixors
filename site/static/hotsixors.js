@@ -83,6 +83,11 @@ function setupFolding(lines) {
     foldButton.textContent = collapse ? "Expand all" : "Collapse all";
     for (const start of folder.folds.keys()) syncToggle(lines[start]);
   });
+
+  return (index) => {
+    folder.reveal(index);
+    for (const start of folder.folds.keys()) syncToggle(lines[start]);
+  };
 }
 
 function initGameDataHighlighting() {
@@ -310,7 +315,14 @@ async function initGameDataXref() {
 
   const linkerForLine = createXrefLinker(sidecar, currentPath);
   const lines = renderGamedataLines(pre, "xml", linkerForLine);
-  setupFolding(lines);
+  const revealLine = setupFolding(lines);
+
+  const revealTarget = (element) => {
+    const line = element.closest?.(".line") ?? element;
+    const index = lines.indexOf(line);
+    if (index >= 0) revealLine?.(index);
+    return line;
+  };
 
   const panel = createXrefPanel();
   const body = panel.querySelector(".xref-panel__body");
@@ -430,8 +442,17 @@ async function initGameDataXref() {
     if (!target) return;
     event.preventDefault();
     location.hash = id;
-    target.scrollIntoView({ block: "center" });
+    revealTarget(target).scrollIntoView({ block: "center" });
   });
+
+  // A hash from another file lands on a line that may sit inside a closed fold.
+  const revealHash = () => {
+    const id = location.hash.slice(1);
+    const target = id && document.getElementById(decodeURIComponent(id));
+    if (target) revealTarget(target).scrollIntoView({ block: "center" });
+  };
+  revealHash();
+  window.addEventListener("hashchange", revealHash);
 
   await loadEntryIndex();
   const badgeRow = (line) => {

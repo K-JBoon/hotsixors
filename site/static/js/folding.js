@@ -49,12 +49,32 @@ export function createFolder(lines, folds) {
     }
   }
 
+  // Every fold that encloses the line, outermost first.
+  function unfoldAncestors(index) {
+    for (const [start, end] of folds) {
+      if (start < index && index <= end) unfold(start);
+    }
+  }
+
+  function unfoldSubtree(start) {
+    const end = folds.get(start);
+    if (end === undefined) return;
+    unfold(start);
+    for (let i = start + 1; i <= end; i++) if (folds.has(i)) unfold(i);
+  }
+
   return {
     folds,
     isFolded: (start) => folded.has(start),
     toggle: (start) => (folded.has(start) ? unfold(start) : fold(start)),
     fold,
     unfold,
+    unfoldAncestors,
+    unfoldSubtree,
+    reveal(index) {
+      unfoldAncestors(index);
+      unfoldSubtree(index);
+    },
     foldAll() {
       for (const start of folds.keys()) {
         folded.add(start);

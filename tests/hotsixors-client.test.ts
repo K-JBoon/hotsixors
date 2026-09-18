@@ -68,6 +68,7 @@ test("expands hero aliases with several internal names", () => {
 
   assert.deepEqual(createSearchTerms("Greymane", aliases), ["greymane", "genn", "worgen"]);
   assert.deepEqual(createSearchTerms("genn", aliases), ["genn", "greymane"]);
+  assert.deepEqual(createSearchTerms("grey", aliases), ["grey", "genn", "worgen"]);
   assert.equal(
     matchesSearchEntry(
       { title: "genndata.xml", path: "mods/heroesdata.stormmod/base.stormdata/gamedata/heroes/genndata/genndata-xml" },
@@ -567,4 +568,16 @@ test("unfolding a parent keeps closed children hidden", () => {
   folder.unfold(0);
 
   assert.deepEqual(lines.map((line) => line.hidden), [false, false, false, true, false, false, false]);
+});
+
+test("reveal opens the folds around a line and everything below it", () => {
+  const lines = Array.from({ length: 7 }, () => ({ hidden: false, setAttribute() {}, removeAttribute() {} }));
+  const folder = createFolder(lines, new Map([[0, 5], [1, 4], [2, 3]]));
+
+  folder.foldAll();
+  folder.reveal(1);
+
+  assert.deepEqual(lines.map((line) => line.hidden), [false, false, false, false, false, false, false]);
+  assert.equal(folder.isFolded(0), false);
+  assert.equal(folder.isFolded(2), false);
 });
