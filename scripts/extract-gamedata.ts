@@ -32,7 +32,7 @@ const MINIMAP_TEXTURES = [
   "**/storm_temp_btn-building-terran-bunker.dds",
   "**/storm_temp_war3_btnsacrificialskull.dds",
 ];
-const CASC_FILTERS = [":hdp:", "**/*.galaxy", ...MINIMAP_TEXTURES];
+const CASC_FILTERS = [":hdp:", "**/*.galaxy", "**/*.aitree", ...MINIMAP_TEXTURES];
 
 const PATCH_SERVER = "http://us.patch.battle.net:1119";
 const LIVE_PRODUCT = "hero";

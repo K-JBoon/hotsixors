@@ -1580,7 +1580,7 @@ $gd-hairline: rgba(120, 150, 200, 0.14);
   summary.tree-active { color: $accent-gold; }
 }
 
-@each $ext, $color in (xml: #7dd3fc, galaxy: #f0a668, txt: #9ca3af, json: #c4b5fd) {
+@each $ext, $color in (xml: #7dd3fc, galaxy: #f0a668, aitree: #86efac, txt: #9ca3af, json: #c4b5fd) {
   .file-tree .tree-file[data-ext="#{$ext}"]::before,
   .dir-entry__icon[data-ext="#{$ext}"] { background: $color; }
 }

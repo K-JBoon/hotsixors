@@ -5,10 +5,10 @@ export function gamedataHref(path, id, currentPath) {
   return `/gamedata/${path}/${anchor}`;
 }
 
-// Page urls carry "-xml"/"-galaxy" where the file name has an extension.
+// Page urls carry "-xml"/"-galaxy"/"-aitree" where the file name has an extension.
 export function gamedataFileLabel(path) {
   const name = String(path ?? "").split("/").pop() ?? "";
-  return name.replace(/-(xml|galaxy)$/, ".$1");
+  return name.replace(/-(xml|galaxy|aitree)$/, ".$1");
 }
 
 export function targetsOf(sidecar, id) {

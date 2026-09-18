@@ -148,3 +148,19 @@ test("gamedata HTML is compact escaped source with line anchors", () => {
   assert.doesNotMatch(html, /style="/);
   assert.doesNotMatch(html, /shiki/);
 });
+
+test("gamedata export keeps AI think trees", () => {
+  const results = runGamedataFilter([
+    "mods/heroesdata.stormmod/base.stormdata/ai/wizard.aitree",
+    "mods/heromods/chromie.stormmod/base.stormdata/ai/chromie.aitree",
+    "mods/heroesmapmods/battlegroundmapmods/volskayadata.stormmod/base.stormdata/ai/volskayacorethinktree.aitree",
+    "mods/heroesbrawlmods/arenamodemods/punisherarena.stormmod/base.stormdata/ai/heromap.aitree",
+    "mods/heroes.stormmod/base.stormmaps/maps/heroes/singleplayermaps/(10)trymemode.stormmap/base.stormdata/ai/tutorial.aitree",
+  ]);
+
+  assert.equal(results["mods/heroesdata.stormmod/base.stormdata/ai/wizard.aitree"], true);
+  assert.equal(results["mods/heromods/chromie.stormmod/base.stormdata/ai/chromie.aitree"], true);
+  assert.equal(results["mods/heroesmapmods/battlegroundmapmods/volskayadata.stormmod/base.stormdata/ai/volskayacorethinktree.aitree"], true);
+  assert.equal(results["mods/heroesbrawlmods/arenamodemods/punisherarena.stormmod/base.stormdata/ai/heromap.aitree"], false);
+  assert.equal(results["mods/heroes.stormmod/base.stormmaps/maps/heroes/singleplayermaps/(10)trymemode.stormmap/base.stormdata/ai/tutorial.aitree"], false);
+});

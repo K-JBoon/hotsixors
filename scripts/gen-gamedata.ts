@@ -15,11 +15,12 @@ import { buildXrefSidecars, scanXrefFile, type ScannedFile } from "./lib/gamedat
 
 const SCRIPT_PATH = fileURLToPath(import.meta.url);
 
-const SUPPORTED_EXTS = new Set([".xml", ".galaxy"]);
+const SUPPORTED_EXTS = new Set([".xml", ".galaxy", ".aitree"]);
 const INCLUDED_GAMEDATA_PREFIXES = [
   "mods/heroesdata.stormmod/base.stormdata/gamedata/heroes/",
   "mods/heroesdata.stormmod/base.stormdata/gamedata/maps/",
   "mods/heroesdata.stormmod/base.stormdata/triggerlibs/",
+  "mods/heroesdata.stormmod/base.stormdata/ai/",
 ];
 const INCLUDED_GAMEDATA_FILES = new Set([
   "mods/heroesdata.stormmod/base.stormdata/gamedata/behaviordata.xml",
@@ -91,8 +92,8 @@ function isIncludedGamedataDomain(relPath: string): boolean {
   const candidate = normalizedPath(relPath);
   if (INCLUDED_GAMEDATA_FILES.has(candidate)) return true;
   if (INCLUDED_GAMEDATA_PREFIXES.some((prefix) => candidate.startsWith(prefix))) return true;
-  if (/^mods\/heromods\/[^/]+\/base\.stormdata\/(?:gamedata\/|[^/]+\.galaxy$)/.test(candidate)) return true;
-  if (/^mods\/heroesmapmods\/battlegroundmapmods\/[^/]+\/base\.stormdata\/(?:gamedata\/|[^/]+\.galaxy$)/.test(candidate)) return true;
+  if (/^mods\/heromods\/[^/]+\/base\.stormdata\/(?:gamedata\/|ai\/|[^/]+\.galaxy$)/.test(candidate)) return true;
+  if (/^mods\/heroesmapmods\/battlegroundmapmods\/[^/]+\/base\.stormdata\/(?:gamedata\/|ai\/|[^/]+\.galaxy$)/.test(candidate)) return true;
   return false;
 }
 
@@ -114,8 +115,8 @@ function shouldDescendIntoGamedataPath(relPath: string): boolean {
     prefix.startsWith(candidatePrefix) || candidate.startsWith(prefix)
   )) return true;
 
-  if (/^mods\/heromods(?:\/[^/]+(?:\/base\.stormdata(?:\/gamedata.*)?)?)?$/.test(candidate)) return true;
-  if (/^mods\/heroesmapmods(?:\/battlegroundmapmods(?:\/[^/]+(?:\/base\.stormdata(?:\/gamedata.*)?)?)?)?$/.test(candidate)) return true;
+  if (/^mods\/heromods(?:\/[^/]+(?:\/base\.stormdata(?:\/(?:gamedata|ai).*)?)?)?$/.test(candidate)) return true;
+  if (/^mods\/heroesmapmods(?:\/battlegroundmapmods(?:\/[^/]+(?:\/base\.stormdata(?:\/(?:gamedata|ai).*)?)?)?)?$/.test(candidate)) return true;
   return false;
 }
 
@@ -189,7 +190,8 @@ async function processFile(
   scannedFiles: ScannedFile[]
 ): Promise<void> {
   const ext = path.extname(absPath).toLowerCase();
-  const lang = ext.slice(1);
+  // aitree is XML, and the client highlighter keys off the lang.
+  const lang = ext === ".aitree" ? "xml" : ext.slice(1);
   const content = await readFile(absPath, "utf-8");
   const lines = content.split(/\r?\n/);
   const anchors = extractAnchors(lines);
@@ -198,10 +200,14 @@ async function processFile(
 
   if (ext === ".xml") scannedFiles.push({ path: urlRelPath, scan: scanXrefFile(content) });
 
-  for (const [lineNumber, ids] of anchors) {
-    for (const id of ids) {
-      if (!anchorMap[id]) {
-        anchorMap[id] = { xmlPath: urlRelPath, line: lineNumber };
+  // aitree ids are node hashes local to their tree, so they stay out of the
+  // global id lookup.
+  if (ext !== ".aitree") {
+    for (const [lineNumber, ids] of anchors) {
+      for (const id of ids) {
+        if (!anchorMap[id]) {
+          anchorMap[id] = { xmlPath: urlRelPath, line: lineNumber };
+        }
       }
     }
   }
@@ -220,7 +226,10 @@ async function processFile(
   const parentDir = path.dirname(relPath);
   const zolaPath = "gamedata/" + urlRelPath;
   const allIds: string[] = [];
-  for (const ids of anchors.values()) allIds.push(...ids);
+  // aitree node hashes would add thousands of ids per page.
+  if (ext !== ".aitree") {
+    for (const ids of anchors.values()) allIds.push(...ids);
+  }
 
   const frontmatter = `+++
 title = ${JSON.stringify(slug)}
