@@ -33,11 +33,13 @@ export function refValuesByLine(sidecar) {
 
 export function defsByLine(sidecar) {
   const byLine = new Map();
-  for (const [id, [line, tag, parent]] of Object.entries(sidecar?.defs ?? {})) {
+  const add = (id, line, tag, parent) => {
     const defs = byLine.get(line) ?? [];
     defs.push({ id, tag, parent, refCount: sidecar.refCounts?.[id] ?? 0 });
     byLine.set(line, defs);
-  }
+  };
+  for (const [id, [line, tag, parent]] of Object.entries(sidecar?.defs ?? {})) add(id, line, tag, parent);
+  for (const [id, line, tag] of sidecar?.alts ?? []) add(id, line, tag, null);
   return byLine;
 }
 

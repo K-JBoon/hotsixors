@@ -31,11 +31,15 @@ export type XrefIncoming = [number, number, string, string];
 // [line, targetId, fieldIndex, owningElementId]
 export type XrefOutgoing = [number, string, number, string];
 
+// [id, line, tag] for a repeat definition of an id already in `defs`
+export type XrefAltDef = [string, number, string];
+
 // Loaded with the page: what this file defines and where its refs point.
 export interface XrefSidecar {
   files: string[];
   fields: string[];
   defs: Record<string, [number, string, string | null]>;
+  alts?: XrefAltDef[];
   refs: XrefOutgoing[];
   targets: Record<string, XrefTarget[]>;
   refCounts: Record<string, number>;
@@ -212,8 +216,15 @@ export function buildXrefSidecars(
     const incomingFiles = fileIndexer();
     const indexOfFile = targetFiles.indexOf;
 
+    // One id can be defined by several catalogs in a file (CAbil, CButton,
+    // CUnit). The first holds the id; the rest go to `alts` so every line keeps
+    // its own badge.
     const sidecarDefs: XrefSidecar["defs"] = {};
-    for (const def of scan.defs) sidecarDefs[def.id] = [def.line, def.tag, def.parent];
+    const alts: XrefAltDef[] = [];
+    for (const def of scan.defs) {
+      if (sidecarDefs[def.id]) alts.push([def.id, def.line, def.tag]);
+      else sidecarDefs[def.id] = [def.line, def.tag, def.parent];
+    }
 
     const targets: Record<string, XrefTarget[]> = {};
     const addTarget = (id: string): void => {
@@ -260,6 +271,7 @@ export function buildXrefSidecars(
         files: targetFiles.list,
         fields: fields.list,
         defs: sidecarDefs,
+        ...(alts.length ? { alts } : {}),
         refs: sidecarRefs,
         targets,
         refCounts,
