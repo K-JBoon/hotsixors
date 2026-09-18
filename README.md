@@ -33,22 +33,6 @@ npm run dev          # generate content, then serve on localhost:1111
 | `npm test` | run the test suite |
 | `npm run typecheck` | `tsc` over `scripts/` |
 
-## PTR
-
-[hots-ptr.epixors.com](https://hots-ptr.epixors.com) is this same site built from
-the Public Test Realm build. It is a separate Cloudflare Pages project, built by
-`.github/workflows/ptr-deploy.yml` on its own schedule.
-
-To see it locally, extract the PTR build once, then serve it:
-
-```bash
-npm run extract:ptr   # into .gamedata-ptr/, leaving .gamedata/ alone
-npm run dev:ptr
-```
-
-Both commands read `HOTS_DATA_ROOT`, so live and PTR data can sit side by side.
-`gen` writes to the same output directories either way, so the served site is
-whichever one was generated last.
 
 ## Tests
 
@@ -95,13 +79,14 @@ writes one self-contained tree, whichever build the servers currently carry:
 | `.gamedata/mods/**/*.dds` | the minimap icon textures, converted to PNG during generation |
 | `.gamedata/mods/hdp.info` | the build that was extracted, and whether it is the PTR |
 
-One submodule remains: [heroprotocol](https://github.com/Blizzard/heroprotocol),
-Blizzard's replay decoding tables per build. It is not in CASC.
+
+[heroprotocol](https://github.com/Blizzard/heroprotocol) is used to generate the
+JavaScript-based replay parser from.
 
 A big thank you to the maintainers of HeroesDataParser, and to
 [jamiephan](https://github.com/jamiephan) and
 [HeroesToolChest](https://github.com/HeroesToolChest), whose published
-extractions this project ran on for a long time.
+extractions this project ran on when it first started.
 
 ## Licence
 
