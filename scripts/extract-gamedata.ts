@@ -1,6 +1,7 @@
 // Extracts the game data from Blizzard's CASC servers with HeroesDataParser.
 // `casc-extract` writes `mods`; the parser run writes `data`, `gamestrings` and
-// `images`. --ptr reads the PTR product.
+// `images`. --ptr reads the PTR product, and exits with NO_PTR_BUILD when the
+// PTR product has no build of its own.
 
 import { spawn } from "node:child_process";
 import { access, chmod, mkdir, mkdtemp, rm, rename } from "node:fs/promises";
@@ -11,7 +12,7 @@ import { pipeline } from "node:stream/promises";
 import { Readable } from "node:stream";
 import { fileURLToPath } from "node:url";
 
-import { DATA_ROOT, HDP_INFO, gameVersion, readHdpInfo } from "./lib/paths.ts";
+import { DATA_ROOT, HDP_INFO, gameBuild, gameVersion, readHdpInfo } from "./lib/paths.ts";
 
 const SCRIPT_PATH = fileURLToPath(import.meta.url);
 const REPO_ROOT = path.resolve(path.dirname(SCRIPT_PATH), "..");
@@ -32,6 +33,13 @@ const MINIMAP_TEXTURES = [
   "**/storm_temp_war3_btnsacrificialskull.dds",
 ];
 const CASC_FILTERS = [":hdp:", "**/*.galaxy", ...MINIMAP_TEXTURES];
+
+const PATCH_SERVER = "http://us.patch.battle.net:1119";
+const LIVE_PRODUCT = "hero";
+const PTR_PRODUCT = "herot";
+// The PTR product serves the live build between test cycles. The caller reads
+// this code as "nothing to build", not as a failure.
+const NO_PTR_BUILD = 75;
 
 // map adds the battleground overlays and loading screens.
 const EXTRACTORS = ["hero:i", "unit:i", "map:i", "skin"];
@@ -108,9 +116,53 @@ async function ensureParser(): Promise<string> {
   return binary;
 }
 
+interface ProductBuild {
+  build: number;
+  version: string;
+}
+
+/** The build the patch server serves for a product, from the us region. */
+async function productBuild(product: string): Promise<ProductBuild | undefined> {
+  const response = await fetch(`${PATCH_SERVER}/${product}/versions`);
+  if (!response.ok) {
+    throw new Error(`${product} versions: ${response.status} ${response.statusText}`);
+  }
+  const lines = (await response.text()).split("\n").filter((line) => line && !line.startsWith("#"));
+  const columns = lines.shift()?.split("|").map((column) => column.split("!")[0]) ?? [];
+  const region = columns.indexOf("Region");
+  const build = columns.indexOf("BuildId");
+  const version = columns.indexOf("VersionsName");
+  if (region < 0 || build < 0 || version < 0) return undefined;
+
+  const row = lines.map((line) => line.split("|")).find((fields) => fields[region] === "us");
+  if (!row || !/^\d+$/.test(row[build] ?? "")) return undefined;
+  return { build: Number(row[build]), version: row[version] ?? "" };
+}
+
+/** The PTR build, or undefined while the PTR product trails or mirrors live. */
+async function ptrBuild(): Promise<ProductBuild | undefined> {
+  const [ptr, live] = await Promise.all([productBuild(PTR_PRODUCT), productBuild(LIVE_PRODUCT)]);
+  if (!ptr) return undefined;
+  if (live && ptr.build <= live.build) return undefined;
+  return ptr;
+}
+
 async function main(): Promise<void> {
   const ptr = process.argv.includes("--ptr") || process.env.HOTS_PTR === "1";
   const source = ptr ? ["--download-ptr"] : [];
+
+  let target: ProductBuild | undefined;
+  if (ptr) {
+    target = await ptrBuild().catch((e) => {
+      console.error(`extract-gamedata: cannot read the PTR version: ${e}`);
+      return undefined;
+    });
+    if (!target) {
+      console.log("extract-gamedata: no PTR build to extract");
+      process.exit(NO_PTR_BUILD);
+    }
+    console.log(`extract-gamedata: PTR build ${target.version}`);
+  }
 
   const parser = await ensureParser();
   console.log(`extract-gamedata: ${ptr ? "PTR" : "live"} -> ${DATA_ROOT}`);
@@ -120,7 +172,7 @@ async function main(): Promise<void> {
   await mkdir(DATA_ROOT, { recursive: true });
 
   await mkdir(CASC_CACHE, { recursive: true });
-  await run(parser, [
+  const extract = run(parser, [
     "casc-extract",
     "online",
     ...source,
@@ -129,7 +181,21 @@ async function main(): Promise<void> {
     DATA_ROOT,
   ], CASC_CACHE);
 
+  // A PTR build can leave the CDN while a run reads it.
+  if (ptr) {
+    await extract.catch((e) => {
+      console.error(`extract-gamedata: PTR extract failed: ${e}`);
+      process.exit(NO_PTR_BUILD);
+    });
+  } else {
+    await extract;
+  }
+
   if (!(await exists(HDP_INFO))) {
+    if (ptr) {
+      console.log(`extract-gamedata: casc-extract wrote no ${HDP_INFO}`);
+      process.exit(NO_PTR_BUILD);
+    }
     throw new Error(`casc-extract wrote no ${HDP_INFO}`);
   }
 
@@ -144,6 +210,10 @@ async function main(): Promise<void> {
   ], CASC_CACHE);
 
   const info = await readHdpInfo();
+  if (target && gameBuild(info) !== target.build) {
+    console.log(`extract-gamedata: extracted build ${info.Version}, not PTR ${target.version}`);
+    process.exit(NO_PTR_BUILD);
+  }
   console.log(`extract-gamedata: ${gameVersion(info)} (HDP ${info.HdpVersion})`);
 }
 

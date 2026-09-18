@@ -14,7 +14,6 @@ on:
       - 'submodules/**'
       - 'tsconfig.json'
   schedule:
-    # Each run extracts the current build. This is what finds a new patch.
     - cron: '0 */6 * * *'
   workflow_dispatch:
     inputs:
@@ -34,10 +33,16 @@ permissions:
 jobs:
   build-deploy:
     runs-on: ubuntu-latest
+    # Make sure PTR and main deploys don't run at the same time
+    # to prevent races with commiting the abilLink store to git
+    concurrency:
+      group: build-deploy-${{ github.ref }}
+      cancel-in-progress: false
     env:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       HOTS_PTR: ${{ inputs.ptr && '1' || '0' }}
+      CASC_KEY_PREFIX: casc-${{ inputs.ptr && 'ptr' || 'live' }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -56,10 +61,51 @@ jobs:
           curl -sL https://github.com/getzola/zola/releases/download/v0.23.4/zola-v0.23.4-x86_64-unknown-linux-gnu.tar.gz \
             | tar xz -C /usr/local/bin
 
+      - name: Cache HeroesDataParser
+        uses: actions/cache@v4
+        with:
+          path: |
+            .hdp
+            !.hdp/casc
+          key: hdp-${{ runner.os }}-${{ hashFiles('scripts/extract-gamedata.ts') }}
+
+      # The CASC cache holds the archives the extract downloads. A build shares
+      # most of them with the one before it, so restore the newest entry.
+      - name: Restore CASC cache
+        id: casc
+        uses: actions/cache/restore@v4
+        with:
+          path: .hdp/casc
+          key: ${{ env.CASC_KEY_PREFIX }}-${{ github.run_id }}
+          restore-keys: ${{ env.CASC_KEY_PREFIX }}-
+
+      # Exit code 75 means the PTR product has no build of its own, or its
+      # build went away mid-run. Stop the job without failing it.
       - name: Extract game data
-        run: npm run extract
+        id: extract
+        run: |
+          set +e
+          npm run extract
+          code=$?
+          set -e
+          if [ "$code" -eq 75 ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "No PTR build to deploy." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          [ "$code" -eq 0 ] || exit "$code"
+          version=$(node -p "JSON.parse(require('fs').readFileSync('.gamedata/mods/hdp.info','utf-8')).Version")
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Save CASC cache
+        if: ${{ success() && steps.extract.outputs.skip != 'true' && steps.casc.outputs.cache-matched-key != format('{0}-{1}', env.CASC_KEY_PREFIX, steps.extract.outputs.version) }}
+        uses: actions/cache/save@v4
+        with:
+          path: .hdp/casc
+          key: ${{ env.CASC_KEY_PREFIX }}-${{ steps.extract.outputs.version }}
 
       - name: Generate content & build
+        if: ${{ steps.extract.outputs.skip != 'true' }}
         run: npm run build
         env:
           ZOLA_BASE_URL: ${{ inputs.ptr && 'https://hots-ptr.epixors.com' || '' }}
@@ -67,7 +113,7 @@ jobs:
       # The catalog of a build does not change. Keep it, for live and PTR
       # replays of a build that is no longer current.
       - name: Commit new ability-link catalog
-        if: ${{ github.event_name != 'pull_request' }}
+        if: ${{ github.event_name != 'pull_request' && steps.extract.outputs.skip != 'true' }}
         run: |
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git config user.name "github-actions[bot]"
@@ -82,11 +128,13 @@ jobs:
           git push origin "HEAD:$GITHUB_REF_NAME"
 
       - name: Validate Cloudflare secrets
+        if: ${{ steps.extract.outputs.skip != 'true' }}
         run: |
           test -n "$CLOUDFLARE_API_TOKEN" || { echo "CLOUDFLARE_API_TOKEN is required"; exit 1; }
           test -n "$CLOUDFLARE_ACCOUNT_ID" || { echo "CLOUDFLARE_ACCOUNT_ID is required"; exit 1; }
 
       - name: Deploy to Cloudflare Pages
+        if: ${{ steps.extract.outputs.skip != 'true' }}
         run: |
           npx --yes wrangler@4 pages deploy site/public \
             --project-name="${{ inputs.ptr && 'hotsixors-ptr' || 'hotsixors' }}" \

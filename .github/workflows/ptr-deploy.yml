@@ -1,8 +1,20 @@
 name: PTR Build & Deploy
 
 on:
+  push:
+    branches: [main, master]
+    paths:
+      - '.github/workflows/build-deploy.yml'
+      - '.github/workflows/ptr-deploy.yml'
+      - '.gitmodules'
+      - 'data/**'
+      - 'package-lock.json'
+      - 'package.json'
+      - 'scripts/**'
+      - 'site/**'
+      - 'submodules/**'
+      - 'tsconfig.json'
   schedule:
-    # The PTR serves the live build between test cycles.
     - cron: '30 */6 * * *'
   workflow_dispatch:
 
