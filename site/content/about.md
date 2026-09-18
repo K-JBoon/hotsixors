@@ -3,7 +3,11 @@ title = "About"
 template = "about.html"
 +++
 
-This website serves as a reference tool for Heroes of the Storm. Enable the toggle in the footer to inspect game internals.
+This website serves as a reference tool for Heroes of the Storm.
+
+Enable "Dataminer Mode" in the More dropdown to see the raw game
+data from which this sits gets generated, and enable tools to help
+datamining.
 
 If you see any issues, reach out on the <a href="https://discord.gg/7c4xrWUtqV" rel="noopener">community Discord</a>.
 
