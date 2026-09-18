@@ -32,8 +32,8 @@ function buildSearchTerms(query, aliases) {
   for (const [knownName, internalNames] of Object.entries(aliases)) {
     const normalizedKnown = normalizeSearchValue(knownName);
     const values = aliasValues(internalNames);
-    if (base === normalizedKnown) for (const value of values) terms.add(value);
-    if (values.includes(base)) terms.add(normalizedKnown);
+    if (normalizedKnown.includes(base)) for (const value of values) terms.add(value);
+    if (values.some((value) => value.includes(base))) terms.add(normalizedKnown);
   }
 
   return [...terms].filter(Boolean);
