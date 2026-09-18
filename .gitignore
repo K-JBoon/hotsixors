@@ -12,6 +12,7 @@ site/static/images/
 !site/static/images/battlegrounds/objectives/*
 site/static/processed_images/
 site/static/shortcode-data.json
+site/static/gamedata-xref/
 site/static/effect-graph/graph.json
 site/static/effect-graph/heroes-index.json
 site/static/effect-graph/mechanics-index.json

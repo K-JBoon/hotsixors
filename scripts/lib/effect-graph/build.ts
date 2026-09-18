@@ -50,7 +50,7 @@ export const REF_FIELDS = [
 const REF_FIELDS_SET = new Set(REF_FIELDS);
 
 // Backref tags point at earlier effects and do not add forward edges.
-const BACKREF_TAG_RE = /^(?:Which[A-Z]\w*|Target|ImpactLocation|LaunchLocation)$/;
+export const BACKREF_TAG_RE = /^(?:Which[A-Z]\w*|Target|ImpactLocation|LaunchLocation)$/;
 
 function isGameplayCatalogTag(tag: string): boolean {
   return /^(?:CEffect|CAbil|CBehavior|CTalent|CValidator|CWeapon|CUnit)/.test(tag);
@@ -63,7 +63,7 @@ function gameplayTagRank(tag: string): number {
   return 0;
 }
 
-function normalizeRefValue(field: string, value: string): string {
+export function normalizeRefValue(field: string, value: string): string {
   return field === "Abil" || field === "AbilCmd"
     ? value.replace(/^Abil\//, "").split(",")[0]
     : value;

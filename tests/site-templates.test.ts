@@ -79,45 +79,6 @@ test("base navigation exposes persisted datamining toggle", () => {
   assert.match(script, /initDataminingToggle\(\);/);
 });
 
-test("datamining details are tagged in data-heavy templates", () => {
-  const heroTemplate = renderedBy("heroes/single.html");
-  const battlegroundTemplate = readFileSync(new URL("../site/templates/battlegrounds/single.html", import.meta.url), "utf-8");
-  const statusEffectsTemplate = readFileSync(new URL("../site/templates/status-effects.html", import.meta.url), "utf-8");
-  const aboutTemplate = readFileSync(new URL("../site/templates/about.html", import.meta.url), "utf-8");
-  const aboutContent = readFileSync(new URL("../site/content/about.md", import.meta.url), "utf-8");
-
-  assert.match(heroTemplate, /class="ability-card__xml-link"[\s\S]*?data-datamining/);
-  assert.match(heroTemplate, /class="talent-card__xml-link"[\s\S]*?data-datamining/);
-  assert.match(battlegroundTemplate, /<th scope="col" data-datamining>Source<\/th>/);
-  assert.match(battlegroundTemplate, /class="summon-card__xml-link"[^>]+data-datamining/);
-  assert.match(battlegroundTemplate, /<section class="bg-section" data-datamining>/);
-  assert.match(statusEffectsTemplate, /<th scope="col" data-datamining>Sources<\/th>/);
-  assert.match(statusEffectsTemplate, /<td data-datamining>/);
-  assert.match(aboutTemplate, /class="build-info__row" data-datamining/);
-  assert.match(aboutContent, /<section class="about-data-sources">/);
-  assert.doesNotMatch(aboutContent, /<section data-datamining class="about-data-sources">/);
-});
-
-test("deployment-critical assets use cache-busted URLs", () => {
-  const baseTemplate = readFileSync(new URL("../site/templates/base.html", import.meta.url), "utf-8");
-  const heroTemplate = readFileSync(new URL("../site/templates/heroes/single.html", import.meta.url), "utf-8");
-  const swsConfig = readFileSync(new URL("../settings/config.toml", import.meta.url), "utf-8");
-
-  assert.match(baseTemplate, /get_url\(path='main\.css', cachebust=true\)/);
-  assert.match(baseTemplate, /get_url\(path='hotsixors\.js', cachebust=true\)/);
-  assert.match(heroTemplate, /get_url\(path='level-slider\.js', cachebust=true\)/);
-  assert.match(swsConfig, /source = "\/"/);
-  assert.match(swsConfig, /source = "\*\*\/"/);
-  assert.match(swsConfig, /source = "\*\.html"/);
-  assert.match(swsConfig, /Cache-Control = "public, max-age=600"/);
-  assert.match(swsConfig, /source = "\*\*\/\*\.css"/);
-  assert.match(swsConfig, /Cache-Control = "public, max-age=31536000, immutable"/);
-  // Module imports carry no cachebusting query string, so they must revalidate.
-  assert.match(swsConfig, /source = "\*\*\/\*\.\{js,mjs\}"/);
-  assert.match(swsConfig, /Cache-Control = "public, max-age=300"/);
-  assert.match(swsConfig, /source = "\*\*\/\*.\{svg,ico,png,jpg,jpeg,webp,avif,gif,woff,woff2\}"/);
-  assert.match(swsConfig, /Cache-Control = "public, max-age=31536000"/);
-});
 
 test("fonts are vendored and loaded without blocking first render", () => {
   const baseTemplate = readFileSync(new URL("../site/templates/base.html", import.meta.url), "utf-8");

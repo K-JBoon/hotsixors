@@ -19,19 +19,21 @@ export function createSearchTerms(query, aliases = {}) {
   return terms.slice();
 }
 
+function aliasValues(value) {
+  return (Array.isArray(value) ? value : [value]).map(normalizeSearchValue).filter(Boolean);
+}
+
 function buildSearchTerms(query, aliases) {
   const base = normalizeSearchValue(query);
   if (!base) return [];
 
   const terms = new Set([base]);
-  const alias = aliases[base];
-  if (alias) terms.add(normalizeSearchValue(alias));
 
-  for (const [knownName, internalName] of Object.entries(aliases)) {
+  for (const [knownName, internalNames] of Object.entries(aliases)) {
     const normalizedKnown = normalizeSearchValue(knownName);
-    const normalizedInternal = normalizeSearchValue(internalName);
-    if (base === normalizedKnown) terms.add(normalizedInternal);
-    if (base === normalizedInternal) terms.add(normalizedKnown);
+    const values = aliasValues(internalNames);
+    if (base === normalizedKnown) for (const value of values) terms.add(value);
+    if (values.includes(base)) terms.add(normalizedKnown);
   }
 
   return [...terms].filter(Boolean);

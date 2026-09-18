@@ -2,8 +2,20 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import {
+  chainOf,
+  childrenOf,
+  computeFolds,
+  createFolder,
   createSearchTerms,
+  createXmlHighlighter,
+  createXrefLinker,
+  defsByLine,
+  gamedataFileLabel,
   highlightGameDataLine,
+  incomingGroups,
+  jumpHistory,
+  normalizeLinkValue,
+  outlineDefs,
   isDataminingSearchEntry,
   matchesSearchEntry,
   orderSelectGridSearchEntries,
@@ -45,6 +57,21 @@ test("expands game data searches through hero aliases", () => {
     matchesSearchEntry(
       { title: "faeriedragondata.xml", path: "mods/heromods/faeriedragon.stormmod/base.stormdata/gamedata/faeriedragondata-xml" },
       "Brightwing",
+      aliases
+    ),
+    true
+  );
+});
+
+test("expands hero aliases with several internal names", () => {
+  const aliases = { greymane: ["genn", "worgen"] };
+
+  assert.deepEqual(createSearchTerms("Greymane", aliases), ["greymane", "genn", "worgen"]);
+  assert.deepEqual(createSearchTerms("genn", aliases), ["genn", "greymane"]);
+  assert.equal(
+    matchesSearchEntry(
+      { title: "genndata.xml", path: "mods/heroesdata.stormmod/base.stormdata/gamedata/heroes/genndata/genndata-xml" },
+      "greymane",
       aliases
     ),
     true
@@ -344,4 +371,200 @@ test("stored booleans fall back when browser storage is denied", () => {
   assert.equal(getAvailableStorage(deniedOwner), null);
   assert.equal(getStoredBoolean(deniedStorage, "hotsixors.details", true), true);
   assert.equal(setStoredBoolean(deniedStorage, "hotsixors.details", false), false);
+});
+
+const XREF_SIDECAR = {
+  files: ["mods/effectdata-xml", "mods/behaviordata-xml"],
+  defs: { AlarakDiscordStrikeApply: [3, "CEffectApplyBehavior", "AlarakBase"] },
+  refs: [[3, "AlarakBase"], [4, "AlarakDiscordStrikeBehavior"]],
+  targets: {
+    AlarakBase: [[1, 2, "CBehaviorBuff"]],
+    AlarakDiscordStrikeBehavior: [[1, 3, "CBehaviorBuff"]],
+  },
+  refCounts: { AlarakDiscordStrikeApply: 2 },
+  chains: { AlarakDiscordStrikeApply: ["AlarakBase"] },
+};
+
+test("links only ref values the build scan recorded on that line", () => {
+  const linkerForLine = createXrefLinker(XREF_SIDECAR, "mods/effectdata-xml");
+
+  const linkFor = linkerForLine(4);
+  assert.equal(linkFor("AlarakBase"), null);
+  assert.deepEqual(linkFor("AlarakDiscordStrikeBehavior"), {
+    id: "AlarakDiscordStrikeBehavior",
+    href: "/gamedata/mods/behaviordata-xml/#AlarakDiscordStrikeBehavior",
+    title: "CBehaviorBuff — behaviordata.xml:3",
+    count: 1,
+  });
+  assert.equal(linkerForLine(9), null);
+});
+
+test("links stay in-page when the definition is in the same file", () => {
+  const sidecar = {
+    ...XREF_SIDECAR,
+    files: ["mods/effectdata-xml"],
+    refs: [[5, "AlarakDiscordStrikeApply"]],
+    targets: { AlarakDiscordStrikeApply: [[0, 3, "CEffectApplyBehavior"]] },
+  };
+
+  const linkFor = createXrefLinker(sidecar, "mods/effectdata-xml")(5);
+
+  assert.equal(linkFor("AlarakDiscordStrikeApply").href, "#AlarakDiscordStrikeApply");
+});
+
+test("Abil ref values resolve without their catalog prefix", () => {
+  assert.equal(normalizeLinkValue("Abil/AlarakDiscordStrike,Execute"), "AlarakDiscordStrike");
+  assert.equal(normalizeLinkValue("AlarakBase"), "AlarakBase");
+});
+
+test("highlighting wraps linked attribute values in xref anchors", () => {
+  const linkFor = createXrefLinker(XREF_SIDECAR, "mods/effectdata-xml")(4);
+  const html = highlightGameDataLine('    <Behavior value="AlarakDiscordStrikeBehavior"/>', "xml", linkFor);
+
+  assert.match(html, /<a class="xref-link" href="\/gamedata\/mods\/behaviordata-xml\/#AlarakDiscordStrikeBehavior"/);
+  assert.match(html, /data-xref-id="AlarakDiscordStrikeBehavior">AlarakDiscordStrikeBehavior<\/a>/);
+});
+
+test("highlighting leaves unlinked values untouched", () => {
+  const html = highlightGameDataLine('    <Behavior value="Unknown"/>', "xml", () => null);
+
+  assert.match(html, /<span class="syntax-string">&quot;Unknown&quot;<\/span>/);
+  assert.equal(html.includes("xref-link"), false);
+});
+
+test("definition markers carry the reference count per line", () => {
+  const byLine = defsByLine(XREF_SIDECAR);
+
+  assert.deepEqual(byLine.get(3), [
+    { id: "AlarakDiscordStrikeApply", tag: "CEffectApplyBehavior", parent: "AlarakBase", refCount: 2 },
+  ]);
+});
+
+test("inheritance chain resolves each ancestor to its definition", () => {
+  assert.deepEqual(chainOf(XREF_SIDECAR, "AlarakDiscordStrikeApply"), [
+    { id: "AlarakBase", targets: [{ path: "mods/behaviordata-xml", line: 2, tag: "CBehaviorBuff" }] },
+  ]);
+});
+
+test("incoming references group by field", () => {
+  const incomingFile = {
+    files: ["mods/effectdata-xml", "mods/abildata-xml"],
+    incoming: {
+      AlarakBase: [
+        [0, 3, "parent", "AlarakDiscordStrikeApply"],
+        [1, 9, "Effect", "AlarakDiscordStrike"],
+        [0, 12, "parent", "AlarakLightningSurgeApply"],
+      ],
+    },
+  };
+
+  assert.deepEqual(incomingGroups(incomingFile, "AlarakBase"), [
+    { field: "Effect", items: [{ path: "mods/abildata-xml", line: 9, from: "AlarakDiscordStrike" }] },
+    {
+      field: "parent",
+      items: [
+        { path: "mods/effectdata-xml", line: 3, from: "AlarakDiscordStrikeApply" },
+        { path: "mods/effectdata-xml", line: 12, from: "AlarakLightningSurgeApply" },
+      ],
+    },
+  ]);
+  assert.deepEqual(incomingGroups(incomingFile, "Missing"), []);
+});
+
+test("jump history moves back and forward over visited anchors", () => {
+  const history = jumpHistory();
+  history.visit("/gamedata/a/#One");
+  history.visit("/gamedata/b/#Two");
+  history.visit("/gamedata/c/#Three");
+
+  assert.equal(history.back(), "/gamedata/b/#Two");
+  assert.equal(history.back(), "/gamedata/a/#One");
+  assert.equal(history.back(), null);
+  assert.equal(history.forward(), "/gamedata/b/#Two");
+
+  history.visit("/gamedata/d/#Four");
+  assert.equal(history.forward(), null);
+  assert.equal(history.back(), "/gamedata/b/#Two");
+});
+
+test("file labels restore the extension the page url hides", () => {
+  assert.equal(gamedataFileLabel("mods/heromods/alarak.stormmod/base.stormdata/gamedata/alarakdata-xml"), "alarakdata.xml");
+  assert.equal(gamedataFileLabel("mods/heromods/alarak.stormmod/base.stormdata/libhala-galaxy"), "libhala.galaxy");
+});
+
+test("tree children keep document order and carry their ref field", () => {
+  const sidecar = {
+    files: ["mods/effectdata-xml"],
+    fields: ["Effect", "EffectArray"],
+    defs: {},
+    refs: [
+      [3, "Prepare", 0, "AlarakDiscordStrike"],
+      [4, "CastSet", 1, "AlarakDiscordStrike"],
+      [4, "CastSet", 1, "AlarakDiscordStrike"],
+      [9, "Other", 0, "SomethingElse"],
+    ],
+    targets: {
+      Prepare: [[0, 12, "CEffectSet"]],
+      CastSet: [[0, 20, "CEffectSet"]],
+      Other: [[0, 30, "CEffectSet"]],
+    },
+    refCounts: {},
+    chains: {},
+  };
+
+  assert.deepEqual(childrenOf(sidecar, "AlarakDiscordStrike"), [
+    { id: "Prepare", field: "Effect", path: "mods/effectdata-xml", line: 12, tag: "CEffectSet" },
+    { id: "CastSet", field: "EffectArray", path: "mods/effectdata-xml", line: 20, tag: "CEffectSet" },
+  ]);
+  assert.deepEqual(childrenOf(sidecar, "Unknown"), []);
+});
+
+test("outline falls back to abilities and talents, then to every definition", () => {
+  const withAbilities = outlineDefs({
+    defs: { E1: [5, "CEffectSet"], A1: [2, "CAbilEffectTarget"], T1: [9, "CTalent"] },
+  });
+  assert.deepEqual(withAbilities.items.map((def) => def.id), ["A1", "T1"]);
+  assert.equal(withAbilities.total, 2);
+
+  const effectsOnly = outlineDefs({ defs: { E2: [8, "CEffectDamage"], E1: [3, "CEffectSet"] } }, 1);
+  assert.deepEqual(effectsOnly.items.map((def) => def.id), ["E1"]);
+  assert.equal(effectsOnly.total, 2);
+});
+
+test("xml highlighting carries comments and tags across lines", () => {
+  const highlight = createXmlHighlighter();
+
+  assert.match(highlight("<!-- note", null), /syntax-comment">&lt;!-- note<\/span>$/);
+  assert.match(highlight("still note -->", null), /^<span class="syntax-comment">still note --&gt;<\/span>$/);
+  assert.match(highlight('<CEffectDamage id="X"', null), /syntax-tag">&lt;CEffectDamage<\/span>/);
+
+  const continuation = highlight('  Amount="5"/>', null);
+  assert.match(continuation, /syntax-attr">Amount<\/span>/);
+  assert.equal(continuation.includes("syntax-tag"), false);
+  assert.match(continuation, /syntax-punctuation">\/&gt;<\/span>$/);
+});
+
+test("computeFolds nests by indentation", () => {
+  const folds = computeFolds([
+    "<Catalog>",
+    "  <CAbil id=\"A\">",
+    "    <Cost>",
+    "      <Vital value=\"50\" />",
+    "    </Cost>",
+    "  </CAbil>",
+    "</Catalog>",
+  ]);
+
+  assert.deepEqual([...folds.entries()], [[0, 5], [1, 4], [2, 3]]);
+});
+
+test("unfolding a parent keeps closed children hidden", () => {
+  const lines = Array.from({ length: 7 }, () => ({ hidden: false, setAttribute() {}, removeAttribute() {} }));
+  const folder = createFolder(lines, new Map([[0, 5], [1, 4], [2, 3]]));
+
+  folder.fold(2);
+  folder.fold(0);
+  folder.unfold(0);
+
+  assert.deepEqual(lines.map((line) => line.hidden), [false, false, false, true, false, false, false]);
 });

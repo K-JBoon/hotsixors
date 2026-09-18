@@ -101,7 +101,7 @@ async function main(): Promise<void> {
 
   try {
     const data = JSON.parse(await readFile(path.join(SITE_DATA, "mechanics.json"), "utf-8")) as {
-      mechanics: Array<{ name: string; category: string; summary: string; primaryBehavior: string; sourceIds: string[] }>;
+      mechanics: Array<{ name: string; category: string; description: string; summary: string; primaryBehavior: string; sourceIds: string[] }>;
     };
     entries.push({
       title: "Status Effects",
@@ -111,6 +111,7 @@ async function main(): Promise<void> {
         .map((mechanic) => [
           mechanic.name,
           mechanic.category,
+          mechanic.description,
           mechanic.summary,
           mechanic.primaryBehavior,
           mechanic.sourceIds.join(" "),
@@ -122,7 +123,7 @@ async function main(): Promise<void> {
         title: mechanic.name,
         url: `/status-effects/#${slugify(mechanic.name)}`,
         type: "Reference",
-        text: [mechanic.category, mechanic.summary, mechanic.primaryBehavior, mechanic.sourceIds.join(" ")].join(" "),
+        text: [mechanic.category, mechanic.description, mechanic.summary, mechanic.primaryBehavior, mechanic.sourceIds.join(" ")].join(" "),
       });
     }
   } catch {

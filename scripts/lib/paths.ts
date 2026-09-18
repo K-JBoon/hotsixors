@@ -39,17 +39,28 @@ export function compareVersions(a: string, b: string): number {
   return Number(isPtrA) - Number(isPtrB);
 }
 
-// Find the newest heroes-data version.
+function isPtrVersion(version: string): boolean {
+  return version.endsWith("_ptr");
+}
+
+// Find the newest released heroes-data version. PTR builds are skipped: they
+// carry unreleased heroes the rest of the site has no data for.
 export async function findLatestVersion(heroesDataDir: string): Promise<string> {
   try {
     const index = JSON.parse(await readFile(path.join(heroesDataDir, ".version.json"), "utf-8"));
-    if (typeof index.latest === "string" && index.latest.length > 0) return index.latest;
+    if (typeof index.latest === "string" && index.latest.length > 0 && !isPtrVersion(index.latest)) {
+      return index.latest;
+    }
+    if (Array.isArray(index.versions)) {
+      const released = (index.versions as string[]).filter((v) => !isPtrVersion(v)).sort(compareVersions);
+      if (released.length > 0) return released[released.length - 1];
+    }
   } catch {
     // Fall through to a directory scan.
   }
   const entries = await readdir(heroesDataDir);
-  const versions = entries.filter((e) => /^\d/.test(e)).sort(compareVersions);
-  if (versions.length === 0) throw new Error("No version directories found in heroes-data");
+  const versions = entries.filter((e) => /^\d/.test(e) && !isPtrVersion(e)).sort(compareVersions);
+  if (versions.length === 0) throw new Error("No released version directories found in heroes-data");
   return versions[versions.length - 1];
 }
 

@@ -1,0 +1,13 @@
+<aside class="gd-explorer" id="gamedata-sidebar" aria-label="Game data files">
+  <div class="gd-explorer__head">
+    <span class="gd-explorer__title">Explorer</span>
+    <kbd class="gd-kbd">/</kbd>
+  </div>
+  <div class="gd-search gamedata-tree-search">
+    <input type="search" placeholder="Filter files" aria-label="Search game data tree" aria-controls="gamedata-tree" autocomplete="off" spellcheck="false" data-gamedata-search-input>
+    <button type="button" aria-label="Clear search" data-gamedata-search-clear hidden>&times;</button>
+  </div>
+  <div class="gd-tree file-tree" id="gamedata-tree" data-gamedata-tree data-current-path="{{ current_path }}">
+    <p class="gd-tree__loading">Loading tree…</p>
+  </div>
+</aside>

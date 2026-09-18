@@ -5,7 +5,9 @@ template = "about.html"
 
 This website serves as a reference tool for Heroes of the Storm. Enable the toggle in the footer to inspect game internals.
 
-If you see any issues, reach out to me on Discord @ epixors
+If you see any issues, reach out on the <a href="https://discord.gg/7c4xrWUtqV" rel="noopener">community Discord</a>.
+
+This project is open source. You can check the code and contribute on <a href="https://github.com/K-JBoon/hotsixors/" target="_blank" rel="noopener">GitHub</a>.
 
 <section class="about-resources">
   <h2>Resources</h2>
@@ -41,5 +43,7 @@ If you see any issues, reach out to me on Discord @ epixors
     <li><strong><a href="https://github.com/HeroesToolChest/heroes-data2">heroes-data2</a></strong> by <a href="https://github.com/HeroesToolChest">HeroesToolChest</a></li>
     <li><strong><a href="https://github.com/HeroesToolChest/heroes-images">heroes-images</a></strong> by <a href="https://github.com/HeroesToolChest">HeroesToolChest</a></li>
     <li><strong><a href="https://github.com/jamiephan/HeroesOfTheStorm_Gamedata">HeroesOfTheStorm_Gamedata</a></strong> by <a href="https://github.com/jamiephan">jamiephan</a></li>
+    <li><strong><a href="https://github.com/Blizzard/heroprotocol">heroprotocol</a></strong> by <a href="https://github.com/Blizzard">Blizzard</a></li>
+    <li><strong><a href="https://github.com/jamiephan/HeroesOfTheStorm_S2MA">HeroesOfTheStorm_S2MA</a></strong> by <a href="https://github.com/jamiephan">jamiephan</a></li>
   </ul>
 </section>

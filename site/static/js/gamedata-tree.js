@@ -30,7 +30,8 @@ function renderGameDataTreeNode(node, currentPath) {
 
   const isActive = currentPath === treeNodeContentPath(node);
   const fileClass = isActive ? "tree-file tree-active" : "tree-file";
-  return `<a class="${fileClass}" href="/gamedata/${nodePath}/" data-tree-node data-tree-path="${nodePath}" data-tree-search="${searchText}">${name}</a>`;
+  const ext = escapeHtml((node.name.split(".").pop() ?? "").toLowerCase());
+  return `<a class="${fileClass}" href="/gamedata/${nodePath}/" data-ext="${ext}" data-tree-node data-tree-path="${nodePath}" data-tree-search="${searchText}">${name}</a>`;
 }
 
 export function renderGameDataTree(tree, currentPath = "") {

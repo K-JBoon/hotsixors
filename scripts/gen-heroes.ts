@@ -1,4 +1,4 @@
-import { readFile, writeFile, mkdir, copyFile, stat } from "node:fs/promises";
+import { readFile, readdir, writeFile, mkdir, copyFile, stat } from "node:fs/promises";
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
 import type { HeroData, HeroUnitData, HeroAbility, HeroTalent, AnchorMap, ShortcodeData, ShortcodeEntry, AbilityStats, HeroStats, HeroUnitStats, HeroResourceData, HeroLifeData, HeroWeaponData } from "./types.ts";
@@ -292,6 +292,7 @@ async function resolveHeroUnits(
 
 function heroPageToml(hero: HeroData, heroName: string, slug: string, displayName: string, gs: Gamestrings): string {
   const role = getRoleFromPlaystyles(hero.playstyles ?? []);
+  const inGameRole = gs.hero.expandedRole?.[heroName] ?? "";
   const description = getHeroDescription(gs, heroName, hero.variationSkinIds ?? []);
   return `+++
 title = ${JSON.stringify(displayName)}
@@ -306,6 +307,7 @@ internal_name = ${JSON.stringify(heroName)}
 unit_id = ${JSON.stringify(hero.unitId)}
 franchise = ${JSON.stringify(hero.franchise ?? "")}
 role = ${JSON.stringify(role)}
+in_game_role = ${JSON.stringify(inGameRole)}
 rarity = ${JSON.stringify(hero.rarity ?? "")}
 release_date = ${JSON.stringify(hero.releaseDate ?? "")}
 ratings = ${toTomlInlineTable(hero.ratings ?? {})}
@@ -314,16 +316,40 @@ portraits = ${toTomlInlineTable(hero.portraits ?? {})}
 `;
 }
 
+const GAMEDATA_HEROES_DIR = path.join(GAMEDATA_DIR, "heroesdata.stormmod/base.stormdata/gamedata/heroes");
+
+function addAlias(aliases: Record<string, string[]>, name: string, internalName: string): void {
+  if (name === internalName) return;
+  const values = aliases[name] ??= [];
+  if (!values.includes(internalName)) values.push(internalName);
+}
+
 // Display name -> the heromods directory name, for the heroes whose two differ
 // ("brightwing" -> "faeriedragon").
-function buildHeroAliases(heroData: Record<string, HeroData>): Record<string, string> {
-  const aliases: Record<string, string> = {};
+function buildHeroAliases(heroData: Record<string, HeroData>): Record<string, string[]> {
+  const aliases: Record<string, string[]> = {};
   for (const [heroName, hero] of Object.entries(heroData)) {
-    const slug = heroPageSlug(heroName, hero);
-    const keyLower = heroName.toLowerCase();
-    if (keyLower !== slug) aliases[slug] = keyLower;
+    addAlias(aliases, heroPageSlug(heroName, hero), heroName.toLowerCase());
   }
   return aliases;
+}
+
+// CHero id -> the gamedata directory name, which sometimes keeps an older
+// internal id ("greymane" lives in "genndata").
+async function addGamedataAliases(aliases: Record<string, string[]>): Promise<void> {
+  const dirs = await readdir(GAMEDATA_HEROES_DIR, { withFileTypes: true });
+  for (const dir of dirs) {
+    if (!dir.isDirectory() || !dir.name.endsWith("data")) continue;
+    const base = dir.name.slice(0, -"data".length);
+    let xml: string;
+    try {
+      xml = await readFile(path.join(GAMEDATA_HEROES_DIR, dir.name, `${dir.name}.xml`), "utf-8");
+    } catch {
+      continue;
+    }
+    const heroId = xml.match(/<CHero id="([^"]+)"/)?.[1];
+    if (heroId) addAlias(aliases, heroId.toLowerCase(), base);
+  }
 }
 
 async function main(): Promise<void> {
@@ -397,6 +423,7 @@ async function main(): Promise<void> {
   }
 
   const heroAliases = buildHeroAliases(heroData);
+  await addGamedataAliases(heroAliases);
   await writeFile(path.join(SITE_STATIC, "hero-aliases.json"), JSON.stringify(heroAliases, null, 2), "utf-8");
   console.log(`gen-heroes: wrote hero-aliases.json with ${Object.keys(heroAliases).length} entries`);
   console.log("gen-heroes: done");

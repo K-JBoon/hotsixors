@@ -50,7 +50,7 @@ const GALAXY_TYPES = new Set([
   "wave",
 ]);
 
-function highlightXmlAttributes(value) {
+function highlightXmlAttributes(value, linkFor) {
   const pattern = /([A-Za-z_:$][\w:.$-]*)(\s*=\s*)("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|[^\s"'=<>`]+)?/g;
   let html = "";
   let index = 0;
@@ -60,60 +60,39 @@ function highlightXmlAttributes(value) {
     html += escapeHtml(value.slice(index, match.index));
     html += `<span class="syntax-attr">${escapeHtml(match[1])}</span>`;
     html += escapeHtml(match[2]);
-    if (match[3]) html += `<span class="syntax-string">${escapeHtml(match[3])}</span>`;
+    if (match[3]) html += highlightAttrValue(match[3], linkFor);
     index = pattern.lastIndex;
   }
 
   return html + escapeHtml(value.slice(index));
 }
 
-function highlightXmlTag(value) {
-  const close = value.endsWith("?>") ? "?>" : value.endsWith("/>") ? "/>" : ">";
-  const body = value.slice(0, -close.length);
-  const match = body.match(/^(<\/?|<\?)([A-Za-z_:$][\w:.$-]*)([\s\S]*)$/);
+function highlightAttrValue(raw, linkFor) {
+  const quoted = /^["']/.test(raw) && raw.length > 1;
+  const inner = quoted ? raw.slice(1, -1) : raw;
+  const link = linkFor ? linkFor(inner) : null;
+  if (!link) return `<span class="syntax-string">${escapeHtml(raw)}</span>`;
 
+  const quote = quoted ? raw[0] : "";
+  const anchor = `<a class="xref-link" href="${escapeHtml(link.href)}" data-xref-id="${escapeHtml(link.id)}">${escapeHtml(inner)}</a>`;
+  return `<span class="syntax-string">${escapeHtml(quote)}${anchor}${escapeHtml(quote)}</span>`;
+}
+
+function highlightXmlTag(value, linkFor, opening = true) {
+  const close = value.endsWith("?>") ? "?>" : value.endsWith("/>") ? "/>" : value.endsWith(">") ? ">" : "";
+  const body = close ? value.slice(0, -close.length) : value;
+  const closeHtml = close ? `<span class="syntax-punctuation">${escapeHtml(close)}</span>` : "";
+
+  if (!opening) return highlightXmlAttributes(body, linkFor) + closeHtml;
+
+  const match = body.match(/^(<\/?|<\?)([A-Za-z_:$][\w:.$-]*)([\s\S]*)$/);
   if (!match) return escapeHtml(value);
 
   return [
     `<span class="syntax-tag">${escapeHtml(match[1] + match[2])}</span>`,
-    highlightXmlAttributes(match[3]),
-    `<span class="syntax-punctuation">${escapeHtml(close)}</span>`,
+    highlightXmlAttributes(match[3], linkFor),
+    closeHtml,
   ].join("");
-}
-
-function highlightXmlLine(value) {
-  const text = String(value || "");
-  let html = "";
-  let index = 0;
-
-  while (index < text.length) {
-    const tagStart = text.indexOf("<", index);
-    if (tagStart === -1) {
-      html += escapeHtml(text.slice(index));
-      break;
-    }
-
-    html += escapeHtml(text.slice(index, tagStart));
-
-    if (text.startsWith("<!--", tagStart)) {
-      const commentEnd = text.indexOf("-->", tagStart + 4);
-      const end = commentEnd === -1 ? text.length : commentEnd + 3;
-      html += `<span class="syntax-comment">${escapeHtml(text.slice(tagStart, end))}</span>`;
-      index = end;
-      continue;
-    }
-
-    const tagEnd = text.indexOf(">", tagStart + 1);
-    if (tagEnd === -1) {
-      html += escapeHtml(text.slice(tagStart));
-      break;
-    }
-
-    html += highlightXmlTag(text.slice(tagStart, tagEnd + 1));
-    index = tagEnd + 1;
-  }
-
-  return html;
 }
 
 export function highlightGalaxyCode(value) {
@@ -147,8 +126,81 @@ export function highlightGalaxyCode(value) {
   return html + escapeHtml(text.slice(index));
 }
 
-export function highlightGameDataLine(value, lang) {
-  if (lang === "xml") return highlightXmlLine(value);
+// Stateful XML highlighting: comments and tags may span several lines, and
+// each line is rendered into its own element.
+export function createXmlHighlighter() {
+  let mode = "text";
+
+  const consumeComment = (text, start) => {
+    const end = text.indexOf("-->", start);
+    const stop = end === -1 ? text.length : end + 3;
+    mode = end === -1 ? "comment" : "text";
+    return { html: `<span class="syntax-comment">${escapeHtml(text.slice(start, stop))}</span>`, next: stop };
+  };
+
+  // A tag fragment: the opening line carries the tag name, later lines only attributes.
+  const consumeTag = (text, start, linkFor, opening) => {
+    let index = start;
+    let quote = "";
+    while (index < text.length) {
+      const char = text[index];
+      if (quote) {
+        if (char === quote) quote = "";
+      } else if (char === '"' || char === "'") {
+        quote = char;
+      } else if (char === ">") {
+        index += 1;
+        mode = "text";
+        return { html: highlightXmlTag(text.slice(start, index), linkFor, opening), next: index };
+      }
+      index += 1;
+    }
+    mode = "tag";
+    return { html: highlightXmlTag(text.slice(start), linkFor, opening), next: text.length };
+  };
+
+  return function highlightLine(value, linkFor) {
+    const text = String(value ?? "");
+    let html = "";
+    let index = 0;
+
+    if (mode === "comment") {
+      const { html: commentHtml, next } = consumeComment(text, 0);
+      html += commentHtml;
+      index = next;
+    } else if (mode === "tag") {
+      const { html: tagHtml, next } = consumeTag(text, 0, linkFor, false);
+      html += tagHtml;
+      index = next;
+    }
+
+    while (index < text.length) {
+      const tagStart = text.indexOf("<", index);
+      if (tagStart === -1) {
+        html += escapeHtml(text.slice(index));
+        break;
+      }
+
+      html += escapeHtml(text.slice(index, tagStart));
+
+      if (text.startsWith("<!--", tagStart)) {
+        const { html: commentHtml, next } = consumeComment(text, tagStart);
+        html += commentHtml;
+        index = next;
+        continue;
+      }
+
+      const { html: tagHtml, next } = consumeTag(text, tagStart, linkFor, true);
+      html += tagHtml;
+      index = next;
+    }
+
+    return html;
+  };
+}
+
+export function highlightGameDataLine(value, lang, linkFor) {
+  if (lang === "xml") return createXmlHighlighter()(value, linkFor);
   if (lang === "galaxy") return highlightGalaxyCode(value);
   return escapeHtml(value);
 }

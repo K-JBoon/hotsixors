@@ -27,7 +27,8 @@
             <thead>
               <tr>
                 <th scope="col">Status</th>
-                <th scope="col">Implementation</th>
+                <th scope="col">Description</th>
+                <th scope="col" data-datamining>Implementation</th>
                 <th scope="col" data-datamining>Sources</th>
               </tr>
             </thead>
@@ -38,7 +39,8 @@
                   <a class="mechanics-table__status" href="{{ get_url(path='effect-index') }}?effects={{ mechanic.slug }}">{{ mechanic.name }}</a>
                   <code data-datamining>{{ mechanic.primaryBehavior }}</code>
                 </th>
-                <td>{{ mechanic.summary }}</td>
+                <td>{{ mechanic.description }}</td>
+                <td data-datamining>{{ mechanic.summary }}</td>
                 <td data-datamining>
                   <ul class="mechanics-source-list">
                     {% for source in mechanic.sources %}

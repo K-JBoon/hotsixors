@@ -11,6 +11,7 @@ import {
 } from "./lib/paths.ts";
 import { sanitizeGamedataUrl } from "./lib/galaxy-source.ts";
 import { escapeHtml } from "./lib/gamestrings.ts";
+import { buildXrefSidecars, scanXrefFile, type ScannedFile } from "./lib/gamedata-xref.ts";
 
 const SCRIPT_PATH = fileURLToPath(import.meta.url);
 
@@ -125,8 +126,13 @@ function isLocaleDir(name: string): boolean {
   return m ? LOCALE_CODES.has(m[1].toLowerCase()) : false;
 }
 
-export function renderGamedataHtml(content: string, anchors: Map<number, string[]>, lang: string): string {
-  const lines = content.split("\n");
+export function renderGamedataHtml(
+  content: string,
+  anchors: Map<number, string[]>,
+  lang: string,
+  urlPath?: string
+): string {
+  const lines = content.split(/\r?\n/);
   const renderedLines = lines.map((line, index) => {
     const lineNumber = index + 1;
     const lineAnchors = anchors.get(lineNumber) ?? [];
@@ -137,7 +143,8 @@ export function renderGamedataHtml(content: string, anchors: Map<number, string[
     return `<span class="line"${attrs}>${hiddenAnchors}${escapeHtml(line)}</span>`;
   });
 
-  return `<pre class="gamedata-code" data-lang="${escapeHtml(lang)}"><code>${renderedLines.join("\n")}</code></pre>`;
+  const xrefAttr = urlPath ? ` data-xref-path="${escapeHtml(urlPath)}"` : "";
+  return `<pre class="gamedata-code" data-lang="${escapeHtml(lang)}"${xrefAttr}><code>${renderedLines.join("\n")}</code></pre>`;
 }
 
 function extractAnchors(lines: string[]): Map<number, string[]> {
@@ -161,15 +168,18 @@ function extractAnchors(lines: string[]): Map<number, string[]> {
 async function processFile(
   absPath: string,
   relPath: string,
-  anchorMap: AnchorMap
+  anchorMap: AnchorMap,
+  scannedFiles: ScannedFile[]
 ): Promise<void> {
   const ext = path.extname(absPath).toLowerCase();
   const lang = ext.slice(1);
   const content = await readFile(absPath, "utf-8");
-  const lines = content.split("\n");
+  const lines = content.split(/\r?\n/);
   const anchors = extractAnchors(lines);
 
   const urlRelPath = sanitizeGamedataUrl(relPath);
+
+  if (ext === ".xml") scannedFiles.push({ path: urlRelPath, scan: scanXrefFile(content) });
 
   for (const [lineNumber, ids] of anchors) {
     for (const id of ids) {
@@ -179,7 +189,7 @@ async function processFile(
     }
   }
 
-  const html = renderGamedataHtml(content, anchors, lang);
+  const html = renderGamedataHtml(content, anchors, lang, ext === ".xml" ? urlRelPath : undefined);
 
   const slug = path.basename(relPath);
   const parentDir = path.dirname(relPath);
@@ -213,7 +223,8 @@ async function walkDir(
   dir: string,
   relBase: string,
   anchorMap: AnchorMap,
-  tree: FileTreeNode
+  tree: FileTreeNode,
+  scannedFiles: ScannedFile[]
 ): Promise<void> {
   const entries = await readdir(dir, { withFileTypes: true });
   entries.sort((a, b) => a.name.localeCompare(b.name));
@@ -227,7 +238,7 @@ async function walkDir(
       if (!shouldDescendIntoGamedataPath(relPath)) continue;
       const childNode: FileTreeNode = { name: entry.name, path: relPath, type: "dir", children: [] };
       tree.children!.push(childNode);
-      await walkDir(absPath, relPath, anchorMap, childNode);
+      await walkDir(absPath, relPath, anchorMap, childNode, scannedFiles);
 
       const sectionPath = path.join(SITE_CONTENT_GAMEDATA, relPath, "_index.md");
       await mkdir(path.dirname(sectionPath), { recursive: true });
@@ -247,7 +258,7 @@ async function walkDir(
           lang: ext.slice(1),
         };
         tree.children!.push(fileNode);
-        await processFile(absPath, relPath, anchorMap);
+        await processFile(absPath, relPath, anchorMap, scannedFiles);
       }
     }
   }
@@ -260,6 +271,23 @@ function pruneEmptyDirs(node: FileTreeNode): boolean {
   return node.children.length > 0;
 }
 
+async function writeXrefSidecars(scannedFiles: ScannedFile[]): Promise<void> {
+  const outDir = path.join(SITE_STATIC, "gamedata-xref");
+  await rm(outDir, { recursive: true, force: true });
+  const sidecars = buildXrefSidecars(scannedFiles);
+  let bytes = 0;
+  for (const [urlPath, { sidecar, incoming }] of sidecars) {
+    const outPath = path.join(outDir, `${urlPath}.json`);
+    await mkdir(path.dirname(outPath), { recursive: true });
+    for (const [file, payload] of [[outPath, sidecar], [outPath.replace(/\.json$/, ".refs.json"), incoming]] as const) {
+      const json = JSON.stringify(payload);
+      bytes += json.length;
+      await writeFile(file, json, "utf-8");
+    }
+  }
+  console.log(`gen-gamedata: wrote ${sidecars.size} xref sidecars (${(bytes / 1e6).toFixed(1)} MB)`);
+}
+
 async function main(): Promise<void> {
   console.log("gen-gamedata: starting");
   await rm(SITE_CONTENT_GAMEDATA, { recursive: true, force: true });
@@ -268,8 +296,11 @@ async function main(): Promise<void> {
 
   const anchorMap: AnchorMap = {};
   const tree: FileTreeNode = { name: "mods", path: "mods", type: "dir", children: [] };
+  const scannedFiles: ScannedFile[] = [];
 
-  await walkDir(GAMEDATA_DIR, "mods", anchorMap, tree);
+  await walkDir(GAMEDATA_DIR, "mods", anchorMap, tree, scannedFiles);
+
+  await writeXrefSidecars(scannedFiles);
 
   pruneEmptyDirs(tree);
 
