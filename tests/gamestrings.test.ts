@@ -48,3 +48,31 @@ test("game string renderer converts color-valued style tags", () => {
 
   assert.match(html, /<span class="storm-style storm-style--bfd4fd" data-storm-style="bfd4fd" style="color: #bfd4fd">30 seconds<\/span>/);
 });
+
+function abilityNames(names, cases) {
+  const script = `
+    import { getAbilityName } from "./scripts/lib/gamestrings.ts";
+    const gs = { ability: { name: ${JSON.stringify(names)} }, talent: { name: {} } };
+    const cases = ${JSON.stringify(cases)};
+    console.log(JSON.stringify(cases.map(([linkId, fallback]) => getAbilityName(gs, linkId, fallback))));
+  `;
+  const output = execFileSync(
+    process.execPath,
+    ["--import", "tsx", "--input-type=module", "-e", script],
+    { cwd: new URL("..", import.meta.url), encoding: "utf-8" }
+  );
+  return JSON.parse(output);
+}
+
+test("ability names fall back to the parent ability for cancel buttons", () => {
+  const names = { "XalatathVoidEruption|XalatathVoidEruption|Heroic": "Void Eruption" };
+  const [direct, cancel, unknown] = abilityNames(names, [
+    ["XalatathVoidEruption|XalatathVoidEruption|Heroic", "XalatathVoidEruption"],
+    ["XalatathVoidEruptionCancel|XalatathVoidEruptionCancel|Heroic", "XalatathVoidEruptionCancel"],
+    ["SomeMissingAbility|SomeMissingAbility|Q", "SomeMissingAbility"],
+  ]);
+
+  assert.equal(direct, "Void Eruption");
+  assert.equal(cancel, "Cancel Void Eruption");
+  assert.equal(unknown, "Some Missing Ability");
+});

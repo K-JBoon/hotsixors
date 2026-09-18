@@ -1,18 +1,23 @@
 import * as path from "node:path";
-import { readdir, readFile } from "node:fs/promises";
+import { readFile } from "node:fs/promises";
 
 const REPO_ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), "../..");
 
-export const HEROES_DATA_DIR = path.join(REPO_ROOT, "submodules/heroes-data2/heroesdata");
-export const HEROES_IMAGES_DIR = path.join(REPO_ROOT, "submodules/heroes-images/heroesimages");
-export const GAMEDATA_DIR = path.join(REPO_ROOT, "submodules/HeroesOfTheStorm_Gamedata/mods");
-export const HEROES_DATA_REPO = path.join(REPO_ROOT, "submodules/heroes-data2");
-export const HEROES_IMAGES_REPO = path.join(REPO_ROOT, "submodules/heroes-images");
-export const GAMEDATA_REPO = path.join(REPO_ROOT, "submodules/HeroesOfTheStorm_Gamedata");
+// scripts/extract-gamedata.ts writes this root in HeroesDataParser's layout.
+export const DATA_ROOT = process.env.HOTS_DATA_ROOT
+  ? path.resolve(process.env.HOTS_DATA_ROOT)
+  : path.join(REPO_ROOT, ".gamedata");
+
+export const GAMEDATA_DIR = path.join(DATA_ROOT, "mods");
+export const HEROES_DATA_DIR = path.join(DATA_ROOT, "data");
+export const GAMESTRINGS_DIR = path.join(DATA_ROOT, "gamestrings");
+export const HEROES_IMAGES_DIR = path.join(DATA_ROOT, "images");
+export const HDP_INFO = path.join(GAMEDATA_DIR, "hdp.info");
+// Packaged maps and mods, named by content hash.
+export const DEPOTCACHE_DIR = path.join(GAMEDATA_DIR, "core.stormmod/base.stormdata/depotcache");
+
 export const HEROPROTOCOL_VERSIONS = path.join(REPO_ROOT, "submodules/heroprotocol/heroprotocol/versions");
-export const S2MA_MAPS_DIR = path.join(REPO_ROOT, "submodules/HeroesOfTheStorm_S2MA/maps");
 export const ABILLINK_STORE = path.join(REPO_ROOT, "data/replay-abillinks");
-export const MINIMAP_ICONS_DIR = path.join(REPO_ROOT, "data/minimapicons");
 export const SITE_CONTENT = path.join(REPO_ROOT, "site/content");
 export const SITE_CONTENT_HEROES = path.join(REPO_ROOT, "site/content/heroes");
 export const SITE_CONTENT_BATTLEGROUNDS = path.join(REPO_ROOT, "site/content/battlegrounds");
@@ -23,56 +28,43 @@ export const SITE_STATIC = path.join(REPO_ROOT, "site/static");
 export const SITE_STATIC_REPLAY = path.join(REPO_ROOT, "site/static/replay");
 export const SITE_DATA = path.join(REPO_ROOT, "site/data");
 
-export function compareVersions(a: string, b: string): number {
-  // Strip optional _ptr suffix.
-  const isPtrA = a.endsWith("_ptr");
-  const isPtrB = b.endsWith("_ptr");
-  const cleanA = isPtrA ? a.slice(0, -4) : a;
-  const cleanB = isPtrB ? b.slice(0, -4) : b;
-  const partsA = cleanA.split(".").map(Number);
-  const partsB = cleanB.split(".").map(Number);
-  for (let i = 0; i < Math.max(partsA.length, partsB.length); i++) {
-    const diff = (partsA[i] ?? 0) - (partsB[i] ?? 0);
-    if (diff !== 0) return diff;
+/** `mods/hdp.info`, written by `heroesdataparser casc-extract`. */
+export interface HdpInfo {
+  Version: string;
+  IsPtr: boolean;
+  HdpVersion: string;
+  ExtractedDate: string;
+}
+
+function parseHdpInfo(raw: string): HdpInfo {
+  const info = JSON.parse(raw) as HdpInfo;
+  if (!/^\d+(\.\d+)+$/.test(info.Version ?? "")) {
+    throw new Error(`${HDP_INFO}: unusable version "${info.Version}"`);
   }
-  // Same numeric version: release sorts after ptr.
-  return Number(isPtrA) - Number(isPtrB);
+  return info;
 }
 
-function isPtrVersion(version: string): boolean {
-  return version.endsWith("_ptr");
-}
+const missing = () =>
+  new Error(`No extracted game data at ${DATA_ROOT}. Run \`npm run extract\` first.`);
 
-// Find the newest released heroes-data version. PTR builds are skipped: they
-// carry unreleased heroes the rest of the site has no data for.
-export async function findLatestVersion(heroesDataDir: string): Promise<string> {
+export async function readHdpInfo(): Promise<HdpInfo> {
   try {
-    const index = JSON.parse(await readFile(path.join(heroesDataDir, ".version.json"), "utf-8"));
-    if (typeof index.latest === "string" && index.latest.length > 0 && !isPtrVersion(index.latest)) {
-      return index.latest;
-    }
-    if (Array.isArray(index.versions)) {
-      const released = (index.versions as string[]).filter((v) => !isPtrVersion(v)).sort(compareVersions);
-      if (released.length > 0) return released[released.length - 1];
-    }
-  } catch {
-    // Fall through to a directory scan.
+    return parseHdpInfo(await readFile(HDP_INFO, "utf-8"));
+  } catch (e) {
+    throw (e as NodeJS.ErrnoException).code === "ENOENT" ? missing() : e;
   }
-  const entries = await readdir(heroesDataDir);
-  const versions = entries.filter((e) => /^\d/.test(e) && !isPtrVersion(e)).sort(compareVersions);
-  if (versions.length === 0) throw new Error("No released version directories found in heroes-data");
-  return versions[versions.length - 1];
 }
 
-// Game version from the gamedata schema files.
-export async function latestGamedataVersion(): Promise<string> {
-  const entries = await readdir(path.join(GAMEDATA_REPO, "xsd"));
-  const versions = entries
-    .filter((entry) => /^\d/.test(entry) && entry.endsWith(".xsd"))
-    .map((entry) => entry.replace(/\.xsd$/, ""))
-    .sort(compareVersions);
-  if (versions.length === 0) throw new Error("No game versions found in HeroesOfTheStorm_Gamedata/xsd");
-  return versions[versions.length - 1];
+/** Version, with the `_ptr` suffix a PTR extract carries. */
+export function gameVersion(info: HdpInfo): string {
+  return info.IsPtr ? `${info.Version}_ptr` : info.Version;
+}
+
+/** Build number, e.g. 2.55.17.98025 -> 98025. A replay names the same build. */
+export function gameBuild(info: HdpInfo): number {
+  const build = /\.(\d+)$/.exec(info.Version);
+  if (!build) throw new Error(`cannot read build from game version ${info.Version}`);
+  return Number(build[1]);
 }
 
 export function gamedataPathToContentPath(relPath: string): string {

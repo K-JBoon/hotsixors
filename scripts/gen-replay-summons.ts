@@ -2,7 +2,7 @@
 
 import { copyFile, mkdir, writeFile } from "node:fs/promises";
 import * as path from "node:path";
-import { HEROES_DATA_DIR, HEROES_IMAGES_DIR, SITE_STATIC, SITE_STATIC_IMAGES, findLatestVersion } from "./lib/paths.ts";
+import { HEROES_IMAGES_DIR, SITE_STATIC, SITE_STATIC_IMAGES } from "./lib/paths.ts";
 import { loadDataFile } from "./lib/heroes-data.ts";
 
 interface UnitEntry {
@@ -38,8 +38,7 @@ export function collectSummons(units: Record<string, UnitEntry>): Record<string,
 
 async function main(): Promise<void> {
   console.log("gen-replay-summons: starting");
-  const version = await findLatestVersion(HEROES_DATA_DIR);
-  const unitData = await loadDataFile<Record<string, UnitEntry>>("unitdata", version);
+  const unitData = await loadDataFile<Record<string, UnitEntry>>("unitdata");
   const summons = collectSummons(unitData.items);
 
   const portraitDir = path.join(SITE_STATIC_IMAGES, "unitportraits");

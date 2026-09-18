@@ -2,7 +2,7 @@ import { readdir, readFile, writeFile, mkdir } from "node:fs/promises";
 import * as path from "node:path";
 import type { BattlegroundData, BattlegroundTimer, BattlegroundCodeBlock, BattlegroundMechanic, BattlegroundSummon, BattlegroundSummonVariant, BattlegroundWeapon, BattlegroundAbility, BattlegroundXmlFile, BattlegroundObjective, ScalingSummaryRow, Gamestrings } from "./types.ts";
 import { BATTLEGROUNDS, type BattlegroundConfig, type SummonVariantConfig } from "./lib/battlegrounds-config.ts";
-import { GAMEDATA_DIR, HEROES_IMAGES_DIR, HEROES_DATA_DIR, SITE_CONTENT_BATTLEGROUNDS, SITE_DATA_BATTLEGROUNDS, SITE_STATIC_IMAGES, findLatestVersion } from "./lib/paths.ts";
+import { GAMEDATA_DIR, HEROES_IMAGES_DIR, SITE_CONTENT_BATTLEGROUNDS, SITE_DATA_BATTLEGROUNDS, SITE_STATIC_IMAGES } from "./lib/paths.ts";
 import { loadGamestrings, loadMapGamestringPatches, type MapGamestringPatch } from "./lib/heroes-data.ts";
 import { shouldIncludeGamedataPath } from "./gen-gamedata.ts";
 import { buildAbilityIndex, extractAbilities } from "./lib/ability-text.ts";
@@ -314,9 +314,8 @@ async function main() {
   await mkdir(SITE_CONTENT_BATTLEGROUNDS, { recursive: true });
   await mkdir(SITE_DATA_BATTLEGROUNDS, { recursive: true });
 
-  const version = await findLatestVersion(HEROES_DATA_DIR);
-  const gsFile = await loadGamestrings<Gamestrings>(version);
-  const mapPatches = await loadMapGamestringPatches(version);
+  const gsFile = await loadGamestrings<Gamestrings>();
+  const mapPatches = await loadMapGamestringPatches();
   const abilityIndex = buildAbilityIndex(gsFile.items, mapPatches);
 
   await writeFile(

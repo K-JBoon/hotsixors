@@ -165,10 +165,27 @@ function extractAnchors(lines: string[]): Map<number, string[]> {
   return result;
 }
 
+// Ability and talent ids also name a CButton and sometimes a unit, so the
+// anchor for the CAbil or CTalent declaration is tracked apart from the
+// first-wins generic map.
+function extractDeclAnchors(lines: string[]): Map<string, number> {
+  const result = new Map<string, number>();
+  const declRe = /<(CAbil\w*|CTalent)\b[^>]*\bid="([^"]+)"/g;
+  for (let i = 0; i < lines.length; i++) {
+    declRe.lastIndex = 0;
+    let m: RegExpExecArray | null;
+    while ((m = declRe.exec(lines[i])) !== null) {
+      if (!result.has(m[2])) result.set(m[2], i + 1);
+    }
+  }
+  return result;
+}
+
 async function processFile(
   absPath: string,
   relPath: string,
   anchorMap: AnchorMap,
+  declAnchorMap: AnchorMap,
   scannedFiles: ScannedFile[]
 ): Promise<void> {
   const ext = path.extname(absPath).toLowerCase();
@@ -185,6 +202,14 @@ async function processFile(
     for (const id of ids) {
       if (!anchorMap[id]) {
         anchorMap[id] = { xmlPath: urlRelPath, line: lineNumber };
+      }
+    }
+  }
+
+  if (ext === ".xml") {
+    for (const [id, lineNumber] of extractDeclAnchors(lines)) {
+      if (!declAnchorMap[id]) {
+        declAnchorMap[id] = { xmlPath: urlRelPath, line: lineNumber };
       }
     }
   }
@@ -223,6 +248,7 @@ async function walkDir(
   dir: string,
   relBase: string,
   anchorMap: AnchorMap,
+  declAnchorMap: AnchorMap,
   tree: FileTreeNode,
   scannedFiles: ScannedFile[]
 ): Promise<void> {
@@ -238,7 +264,7 @@ async function walkDir(
       if (!shouldDescendIntoGamedataPath(relPath)) continue;
       const childNode: FileTreeNode = { name: entry.name, path: relPath, type: "dir", children: [] };
       tree.children!.push(childNode);
-      await walkDir(absPath, relPath, anchorMap, childNode, scannedFiles);
+      await walkDir(absPath, relPath, anchorMap, declAnchorMap, childNode, scannedFiles);
 
       const sectionPath = path.join(SITE_CONTENT_GAMEDATA, relPath, "_index.md");
       await mkdir(path.dirname(sectionPath), { recursive: true });
@@ -258,7 +284,7 @@ async function walkDir(
           lang: ext.slice(1),
         };
         tree.children!.push(fileNode);
-        await processFile(absPath, relPath, anchorMap, scannedFiles);
+        await processFile(absPath, relPath, anchorMap, declAnchorMap, scannedFiles);
       }
     }
   }
@@ -295,10 +321,11 @@ async function main(): Promise<void> {
   await mkdir(SITE_DATA, { recursive: true });
 
   const anchorMap: AnchorMap = {};
+  const declAnchorMap: AnchorMap = {};
   const tree: FileTreeNode = { name: "mods", path: "mods", type: "dir", children: [] };
   const scannedFiles: ScannedFile[] = [];
 
-  await walkDir(GAMEDATA_DIR, "mods", anchorMap, tree, scannedFiles);
+  await walkDir(GAMEDATA_DIR, "mods", anchorMap, declAnchorMap, tree, scannedFiles);
 
   await writeXrefSidecars(scannedFiles);
 
@@ -307,6 +334,12 @@ async function main(): Promise<void> {
   await writeFile(
     path.join(SITE_DATA, "anchor-map.json"),
     JSON.stringify(anchorMap, null, 2),
+    "utf-8"
+  );
+
+  await writeFile(
+    path.join(SITE_DATA, "decl-anchor-map.json"),
+    JSON.stringify(declAnchorMap, null, 2),
     "utf-8"
   );
 

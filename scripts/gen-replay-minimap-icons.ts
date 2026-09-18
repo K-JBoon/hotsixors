@@ -1,14 +1,12 @@
 // Builds the replay viewer's unit type -> minimap icon lookup and converts the
 // game's DDS icon art to PNG.
 
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readdir, readFile, writeFile } from "node:fs/promises";
 import * as path from "node:path";
 import {
-  HEROES_DATA_DIR,
-  MINIMAP_ICONS_DIR,
+  GAMEDATA_DIR,
   SITE_STATIC,
   SITE_STATIC_IMAGES,
-  findLatestVersion,
 } from "./lib/paths.ts";
 import { loadDataFile } from "./lib/heroes-data.ts";
 import { decodeDds } from "./lib/dds.ts";
@@ -49,22 +47,34 @@ export function collectMinimapIcons(
   return out;
 }
 
+// The data names the icons by file name only, and they sit in more than one
+// mod. Index the extracted textures by name.
+async function indexDdsFiles(dir: string, out: Map<string, string> = new Map()): Promise<Map<string, string>> {
+  for (const entry of await readdir(dir, { withFileTypes: true })) {
+    const child = path.join(dir, entry.name);
+    if (entry.isDirectory()) await indexDdsFiles(child, out);
+    else if (entry.name.toLowerCase().endsWith(".dds")) out.set(entry.name.toLowerCase(), child);
+  }
+  return out;
+}
+
 async function main(): Promise<void> {
   console.log("gen-replay-minimap-icons: starting");
-  const version = await findLatestVersion(HEROES_DATA_DIR);
   const [heroData, unitData] = await Promise.all([
-    loadDataFile<Record<string, HeroEntry>>("herodata", version),
-    loadDataFile<Record<string, UnitEntry>>("unitdata", version),
+    loadDataFile<Record<string, HeroEntry>>("herodata"),
+    loadDataFile<Record<string, UnitEntry>>("unitdata"),
   ]);
   const icons = collectMinimapIcons(heroData.items, unitData.items);
 
   const iconDir = path.join(SITE_STATIC_IMAGES, "minimapicons");
   await mkdir(iconDir, { recursive: true });
+  const sources = await indexDdsFiles(GAMEDATA_DIR);
   const converted = new Map<string, boolean>();
   for (const [unit, file] of Object.entries(icons)) {
     if (!converted.has(file)) {
-      const source = path.join(MINIMAP_ICONS_DIR, file.replace(/\.png$/, ".dds"));
+      const source = sources.get(file.replace(/\.png$/, ".dds").toLowerCase());
       try {
+        if (!source) throw new Error(`no extracted texture for ${file}`);
         const png = encodePngAlpha(decodeDds(await readFile(source)));
         await writeFile(path.join(iconDir, file), png);
         converted.set(file, true);
@@ -79,6 +89,13 @@ async function main(): Promise<void> {
   await mkdir(path.dirname(dest), { recursive: true });
   await writeFile(dest, JSON.stringify(icons), "utf-8");
   const written = [...converted.values()].filter(Boolean).length;
+  const unresolved = [...converted].filter(([, ok]) => !ok).map(([file]) => file);
+  if (unresolved.length > 0) {
+    console.warn(
+      `gen-replay-minimap-icons: ${unresolved.length} icon(s) not extracted, widen MINIMAP_TEXTURES in ` +
+        `scripts/extract-gamedata.ts: ${unresolved.sort().join(", ")}`
+    );
+  }
   console.log(
     `gen-replay-minimap-icons: ${Object.keys(icons).length} unit types, ${written} icons -> ${path.relative(process.cwd(), dest)}`
   );

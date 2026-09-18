@@ -26,7 +26,7 @@
 
 import { readFile, readdir, stat, mkdir, writeFile, copyFile } from "node:fs/promises";
 import * as path from "node:path";
-import { ABILLINK_STORE, GAMEDATA_DIR, SITE_STATIC, latestGamedataVersion } from "./lib/paths.ts";
+import { ABILLINK_STORE, GAMEDATA_DIR, SITE_STATIC, gameBuild, readHdpInfo } from "./lib/paths.ts";
 
 const CORE_MODS = ["core.stormmod", "heroes.stormmod", "heroesdata.stormmod"];
 const INCLUDES = path.join(GAMEDATA_DIR, "heroesdata.stormmod/base.stormdata/includes.xml");
@@ -301,15 +301,6 @@ export async function buildAbilCatalog(): Promise<{ entries: CatalogEntry[]; pos
   return { entries, pos };
 }
 
-// Build number of the checked-out gamedata, e.g. 2.55.17.97605 -> 97605.
-// Replays name the same build in their header.
-async function gamedataBuild(): Promise<number> {
-  const version = await latestGamedataVersion();
-  const build = /\.(\d+)$/.exec(version);
-  if (!build) throw new Error(`cannot read build from gamedata version ${version}`);
-  return Number(build[1]);
-}
-
 async function storedBuilds(): Promise<number[]> {
   let files: string[] = [];
   try {
@@ -325,7 +316,7 @@ async function storedBuilds(): Promise<number[]> {
 
 async function main() {
   console.log("gen-replay-abillinks: starting");
-  const build = await gamedataBuild();
+  const build = gameBuild(await readHdpInfo());
   await mkdir(ABILLINK_STORE, { recursive: true });
   const storePath = path.join(ABILLINK_STORE, `${build}.json`);
 

@@ -4,12 +4,12 @@ import { readdir, readFile, writeFile, mkdir } from "node:fs/promises";
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
 import {
+  DATA_ROOT,
   GAMEDATA_DIR,
-  GAMEDATA_REPO,
   SITE_DATA,
   SITE_STATIC,
-  HEROES_DATA_DIR,
-  findLatestVersion,
+  gameVersion,
+  readHdpInfo,
 } from "./lib/paths.ts";
 import { shouldIncludeGamedataPath } from "./gen-gamedata.ts";
 import {
@@ -153,11 +153,11 @@ async function main(): Promise<void> {
   const files = await Promise.all(
     relPaths.map(async (rel) => ({
       path: rel,
-      content: await readFile(path.join(GAMEDATA_REPO, rel), "utf-8"),
+      content: await readFile(path.join(DATA_ROOT, rel), "utf-8"),
     })),
   );
 
-  const generatedFrom = await findLatestVersion(HEROES_DATA_DIR);
+  const generatedFrom = gameVersion(await readHdpInfo());
   const result = buildCrossReferences(
     files,
     shortcodeData,

@@ -25,6 +25,13 @@
 </head>
 <body>
   <a class="skip-link" href="#main-content">Skip to content</a>
+  {% set build_info = load_data(path="data/build-info.json", required=false) %}
+  {% if build_info and build_info.is_ptr %}
+  <div class="ptr-banner" role="status">
+    PTR build {{ build_info.game_version }}.
+    <a href="https://hots.epixors.com">Go to the live site</a>.
+  </div>
+  {% endif %}
   <nav class="site-nav" aria-label="Primary">
     <a class="nav-logo" href="{{ get_url(path='/') }}">HotSixors</a>
     <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav-menu" aria-label="Open menu" data-nav-toggle>
@@ -46,6 +53,12 @@
         <div class="nav-dropdown__menu">
           <a class="nav-dropdown__item" href="{{ get_url(path='@/lost-in-the-nexus.md') }}">Lost in the Nexus</a>
           <a class="nav-dropdown__item" href="{{ get_url(path='@/draft.md') }}">Draft</a>
+          <hr class="nav-dropdown__separator">
+          {% if build_info and build_info.is_ptr %}
+          <a class="nav-dropdown__item" href="https://hots.epixors.com">Live site</a>
+          {% else %}
+          <a class="nav-dropdown__item" href="https://hots-ptr.epixors.com">PTR site</a>
+          {% endif %}
           <hr class="nav-dropdown__separator">
           <label class="nav-dropdown__item datamining-toggle" title="Show XML links, source references, and Game Data navigation">
             <input type="checkbox" data-datamining-toggle>

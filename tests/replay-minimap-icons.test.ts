@@ -48,11 +48,13 @@ test("hero unit entries that are not objects are ignored", () => {
   assert.deepEqual(out, {});
 });
 
+const TEXTURES = new URL("../.gamedata/mods/heroes.stormmod/base.stormassets/assets/textures/", import.meta.url);
+
 function decode(file) {
   const script = `
     import { readFileSync } from "node:fs";
     import { decodeDds } from "./scripts/lib/dds.ts";
-    const { width, height, rgba } = decodeDds(readFileSync("data/minimapicons/${file}"));
+    const { width, height, rgba } = decodeDds(readFileSync(new URL(${JSON.stringify(String(new URL(file, TEXTURES)))})));
     console.log(JSON.stringify({ width, height, rgba: [...rgba] }));
   `;
   return JSON.parse(
@@ -68,7 +70,7 @@ for (const [file, format] of [
   ["storm_ui_minimapicon_alarak.dds", "an uncompressed"],
   ["storm_ui_minimapicon_dragonknight.dds", "a DXT5"],
 ]) {
-  test(`${format} icon decodes to a 32x32 disc`, () => {
+  test(`${format} icon decodes to a 32x32 disc`, { skip: !existsSync(new URL(file, TEXTURES)) }, () => {
     const { width, height, rgba } = decode(file);
     assert.equal(width, 32);
     assert.equal(height, 32);

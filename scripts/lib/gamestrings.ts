@@ -12,8 +12,27 @@ function textSection(gs: Gamestrings, linkId: string): GamestringsAbilityText {
   return linkId.split("|").length > 3 ? gs.talent : gs.ability;
 }
 
+const abilIdNames = new WeakMap<Gamestrings, Record<string, string>>();
+
+function nameByAbilId(gs: Gamestrings, abilId: string): string | undefined {
+  let index = abilIdNames.get(gs);
+  if (!index) {
+    index = {};
+    for (const [key, value] of Object.entries(gs.ability.name)) {
+      const id = key.split("|")[0];
+      index[id] ??= value;
+    }
+    abilIdNames.set(gs, index);
+  }
+  return index[abilId];
+}
+
 export function getAbilityName(gs: Gamestrings, linkId: string, fallback = linkId): string {
-  return textSection(gs, linkId).name[linkId] ?? fallback;
+  const name = textSection(gs, linkId).name[linkId];
+  if (name) return name;
+  const base = fallback.replace(/Cancel$/, "");
+  const parent = base === fallback ? undefined : nameByAbilId(gs, base);
+  return parent ? `Cancel ${parent}` : splitCamelCase(fallback);
 }
 
 export function getAbilityShortDesc(gs: Gamestrings, linkId: string): string {
@@ -85,7 +104,7 @@ function renderTextSegment(text: string): string {
   return html + escapeHtml(text.slice(index));
 }
 
-const SCALE_TAG_BRIDGE = /(\d+(?:\.\d+)?)(%?)<\/c>\s*<c[^>]*>~~([0-9.]+)~~/g;
+const SCALE_TAG_BRIDGE = /(\d+(?:\.\d+)?)(%?)<\/[cs]>\s*<[cs][^>]*>~~([0-9.]+)~~/g;
 
 export function renderGameStringMarkup(text: string): string {
   text = text.replace(SCALE_TAG_BRIDGE, (_, base, pct, scale) => `${base}${pct}~~${scale}~~`);

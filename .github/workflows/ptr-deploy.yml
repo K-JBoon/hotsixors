@@ -1,0 +1,17 @@
+name: PTR Build & Deploy
+
+on:
+  schedule:
+    # The PTR serves the live build between test cycles.
+    - cron: '30 */6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  ptr:
+    uses: ./.github/workflows/build-deploy.yml
+    with:
+      ptr: true
+    secrets: inherit

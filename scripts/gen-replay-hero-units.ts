@@ -3,7 +3,7 @@
 
 import { mkdir, writeFile } from "node:fs/promises";
 import * as path from "node:path";
-import { HEROES_DATA_DIR, SITE_STATIC, findLatestVersion } from "./lib/paths.ts";
+import { SITE_STATIC } from "./lib/paths.ts";
 import { loadDataFile } from "./lib/heroes-data.ts";
 
 interface HeroEntry {
@@ -28,8 +28,7 @@ export function collectHeroUnits(heroes: Record<string, HeroEntry>): Record<stri
 
 async function main(): Promise<void> {
   console.log("gen-replay-hero-units: starting");
-  const version = await findLatestVersion(HEROES_DATA_DIR);
-  const heroData = await loadDataFile<Record<string, HeroEntry>>("herodata", version);
+  const heroData = await loadDataFile<Record<string, HeroEntry>>("herodata");
   const heroUnits = collectHeroUnits(heroData.items);
 
   const dest = path.join(SITE_STATIC, "replay", "hero-units.json");

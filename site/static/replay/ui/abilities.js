@@ -4,6 +4,9 @@ const GENERIC_SLOTS = {
   attack: 'A', stop: 'S', HoldFire: 'S', move: null,
   Mount: 'Z', Dismount: 'Z', Hearthstone: 'B',
 };
+// Heroes with custom auto-attacks get a per-hero attack-click link instead of
+// the generic `attack` one.
+const ATTACK_CLICK_RE = /TargetingAttackClick$/;
 const ABILITY_ID_ALIASES = {
   LostVikingsControlAll: 'LostVikingSelectAll',
   LostVikingsControlErik: 'LostVikingSelectErik',
@@ -53,8 +56,8 @@ export function humanizeNameId(nameId, heroId) {
 export function resolveLink(shortcodeData, abilLinkIndex, heroSlug, heroId, link) {
   const nameId = abilLinkIndex[link];
   if (!nameId) return { nameId: null, entry: null, slot: null, label: `Ability #${link}`, icon: null };
-  if (nameId in GENERIC_SLOTS) {
-    const slot = GENERIC_SLOTS[nameId];
+  if (nameId in GENERIC_SLOTS || ATTACK_CLICK_RE.test(nameId)) {
+    const slot = nameId in GENERIC_SLOTS ? GENERIC_SLOTS[nameId] : 'A';
     return { nameId, entry: null, slot, label: (slot && SLOT_LABELS[slot]) || nameId, icon: null };
   }
   const entry = abilityEntryFor(shortcodeData, heroSlug, ABILITY_ID_ALIASES[nameId] || nameId);

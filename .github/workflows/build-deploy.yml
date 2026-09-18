@@ -11,10 +11,25 @@ on:
       - 'package.json'
       - 'scripts/**'
       - 'site/**'
-      - 'submodules/*'
       - 'submodules/**'
       - 'tsconfig.json'
+  schedule:
+    # Each run extracts the current build. This is what finds a new patch.
+    - cron: '0 */6 * * *'
   workflow_dispatch:
+    inputs:
+      ptr:
+        description: 'Build the PTR site instead of live'
+        type: boolean
+        default: false
+  workflow_call:
+    inputs:
+      ptr:
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
 
 jobs:
   build-deploy:
@@ -22,6 +37,7 @@ jobs:
     env:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      HOTS_PTR: ${{ inputs.ptr && '1' || '0' }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -40,8 +56,30 @@ jobs:
           curl -sL https://github.com/getzola/zola/releases/download/v0.23.4/zola-v0.23.4-x86_64-unknown-linux-gnu.tar.gz \
             | tar xz -C /usr/local/bin
 
+      - name: Extract game data
+        run: npm run extract
+
       - name: Generate content & build
         run: npm run build
+        env:
+          ZOLA_BASE_URL: ${{ inputs.ptr && 'https://hots-ptr.epixors.com' || '' }}
+
+      # The catalog of a build does not change. Keep it, for live and PTR
+      # replays of a build that is no longer current.
+      - name: Commit new ability-link catalog
+        if: ${{ github.event_name != 'pull_request' }}
+        run: |
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+          git add data/replay-abillinks
+          if git diff --cached --quiet; then
+            echo "No new ability-link catalog."
+            exit 0
+          fi
+          git commit -m "chore: add ability-link catalog for new build"
+          # The live and PTR workflows share this store.
+          git pull --rebase origin "$GITHUB_REF_NAME"
+          git push origin "HEAD:$GITHUB_REF_NAME"
 
       - name: Validate Cloudflare secrets
         run: |
@@ -51,6 +89,6 @@ jobs:
       - name: Deploy to Cloudflare Pages
         run: |
           npx --yes wrangler@4 pages deploy site/public \
-            --project-name=hotsixors \
+            --project-name="${{ inputs.ptr && 'hotsixors-ptr' || 'hotsixors' }}" \
             --branch="${GITHUB_REF_NAME}" \
             --commit-hash="${GITHUB_SHA}"

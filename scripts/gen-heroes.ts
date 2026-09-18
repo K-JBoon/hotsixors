@@ -4,14 +4,14 @@ import { fileURLToPath } from "node:url";
 import type { HeroData, HeroUnitData, HeroAbility, HeroTalent, AnchorMap, ShortcodeData, ShortcodeEntry, AbilityStats, HeroStats, HeroUnitStats, HeroResourceData, HeroLifeData, HeroWeaponData } from "./types.ts";
 import type { Gamestrings } from "./types.ts";
 import {
-  HEROES_DATA_DIR,
   HEROES_IMAGES_DIR,
   GAMEDATA_DIR,
   SITE_CONTENT_HEROES,
   SITE_STATIC_IMAGES,
   SITE_STATIC,
   SITE_DATA,
-  findLatestVersion,
+  gameVersion,
+  readHdpInfo,
 } from "./lib/paths.ts";
 import { loadDataFile, loadGamestrings } from "./lib/heroes-data.ts";
 import { parseAbilityStats } from "./lib/abilityxml.ts";
@@ -355,14 +355,15 @@ async function addGamedataAliases(aliases: Record<string, string[]>): Promise<vo
 async function main(): Promise<void> {
   console.log("gen-heroes: starting");
 
-  const version = await findLatestVersion(HEROES_DATA_DIR);
-  console.log(`gen-heroes: using version ${version}`);
-  const heroData = (await loadDataFile<Record<string, HeroData>>("herodata", version)).items;
-  const gs = (await loadGamestrings<Gamestrings>(version)).items;
+  console.log(`gen-heroes: using version ${gameVersion(await readHdpInfo())}`);
+  const heroData = (await loadDataFile<Record<string, HeroData>>("herodata")).items;
+  const gs = (await loadGamestrings<Gamestrings>()).items;
 
   let anchorMap: AnchorMap = {};
+  let declAnchorMap: AnchorMap = {};
   try {
     anchorMap = JSON.parse(await readFile(path.join(SITE_DATA, "anchor-map.json"), "utf-8"));
+    declAnchorMap = JSON.parse(await readFile(path.join(SITE_DATA, "decl-anchor-map.json"), "utf-8"));
   } catch {
     console.warn("gen-heroes: anchor-map.json not found — XML links will be omitted");
   }
@@ -377,7 +378,7 @@ async function main(): Promise<void> {
     await mkdir(dir, { recursive: true });
   }
 
-  const { resolveEntry, shortcodeData, abilityDescriptions, missingIcons } = createEntryResolver(gs, anchorMap);
+  const { resolveEntry, shortcodeData, abilityDescriptions, missingIcons } = createEntryResolver(gs, anchorMap, declAnchorMap);
 
   for (const [heroName, hero] of Object.entries(heroData)) {
     const slug = heroPageSlug(heroName, hero);

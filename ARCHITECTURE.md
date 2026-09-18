@@ -1,7 +1,9 @@
 # Architecture
 
-The `gen-*.ts` scripts produce various data files based on the includes submodules
-that are used to build the site.
+`extract-gamedata.ts` pulls the current game build from Blizzard's CASC content
+servers into `.gamedata/`, and the `gen-*.ts` scripts produce the data files the
+site is built from. Extraction is a separate step: it is the only one that needs
+the network, and it only has to rerun when a new build ships.
 
 Output may be written to any of:
 
@@ -40,8 +42,10 @@ depend on output of previous scripts.
 
 `scripts/lib/` contains some shared utilities.
 
-- `heroes-data.ts`: this handles applying the JSON patch structure that the `heroes-data2`
-submodule uses to record patch changes.
+- `heroes-data.ts`: reads the parsed hero, unit and gamestring JSON out of
+`.gamedata/`, keyed by the build in `mods/hdp.info`.
+- `paths.ts`: every input and output location, plus the extracted build's
+version. `HOTS_DATA_ROOT` moves the extraction root.
 - `catalog-xml.ts`: Regex helpers for reading the XML catalogs. Eventually this
 should probably get replaced with a proper XML parser.
 - `battleground-xml.ts`: helpers to extract map-specific unit data across

@@ -14,18 +14,41 @@ Needs [Zola](https://www.getzola.org/) and [Node](https://nodejs.org/en/download
 git clone --recurse-submodules https://github.com/K-JBoon/hotsixors
 cd hotsixors
 npm install
+npm run extract      # download and parse the game data (~7 minutes, ~600 MB)
 npm run dev          # generate content, then serve on localhost:1111
 ```
+
+`extract` only needs rerunning when a new game build ships.
 
 
 | Command | What it does |
 |---|---|
-| `npm run gen` | generate `site/content/`, `site/data/` and `site/static/` from the submodules |
+| `npm run extract` | download and parse the current live build into `.gamedata/` |
+| `npm run extract:ptr` | the same for the PTR build, into `.gamedata-ptr/` |
+| `npm run gen` | generate `site/content/`, `site/data/` and `site/static/` from `.gamedata/` |
 | `npm run build` | `gen`, then `zola build` |
 | `npm run dev` | `gen`, then `zola serve` |
+| `npm run dev:ptr` | the same, from `.gamedata-ptr/`. See [PTR](#ptr) |
 | `npm run clean` | delete everything `gen` writes |
 | `npm test` | run the test suite |
 | `npm run typecheck` | `tsc` over `scripts/` |
+
+## PTR
+
+[hots-ptr.epixors.com](https://hots-ptr.epixors.com) is this same site built from
+the Public Test Realm build. It is a separate Cloudflare Pages project, built by
+`.github/workflows/ptr-deploy.yml` on its own schedule.
+
+To see it locally, extract the PTR build once, then serve it:
+
+```bash
+npm run extract:ptr   # into .gamedata-ptr/, leaving .gamedata/ alone
+npm run dev:ptr
+```
+
+Both commands read `HOTS_DATA_ROOT`, so live and PTR data can sit side by side.
+`gen` writes to the same output directories either way, so the served site is
+whichever one was generated last.
 
 ## Tests
 
@@ -49,7 +72,8 @@ site/             the Zola site
   templates/      Tera templates
   static/         client-side JS, CSS and generated JSON
   sass/           styles
-submodules/       the data sources
+submodules/       heroprotocol, the one external source left
+.gamedata/        extracted game data (generated, ignored)
 tests/            node:test suites
 ```
 
@@ -58,17 +82,26 @@ scripts do and how the site is built from their output.
 
 ## Data sources
 
-This project relies on a few submodules that provide extracted and/or parsed
-game data, as well as the official replay protocol. A big thank you to the
-maintainers of these listed projects!
+`npm run extract` reads Blizzard's CASC content servers directly, using
+[HeroesDataParser](https://github.com/HeroesToolChest/HeroesDataParser). It
+writes one self-contained tree, whichever build the servers currently carry:
 
-| Submodule | Provides |
+| Path | Holds |
 |---|---|
-| [heroes-data2](https://github.com/HeroesToolChest/heroes-data) | hero, ability and talent JSON per game version |
-| [heroes-images](https://github.com/HeroesToolChest/heroes-images) | ability, talent and portrait art |
-| [HeroesOfTheStorm_Gamedata](https://github.com/SquishyBrick/HeroesOfTheStorm_Gamedata) | the raw XML and GalaxyScript catalogs |
-| [heroprotocol](https://github.com/Blizzard/heroprotocol) | Blizzard's replay decoding tables, per build |
-| [HeroesOfTheStorm_S2MA](https://github.com/jamiephan/HeroesOfTheStorm_S2MA) | packaged `.stormmap` files, source for minimap art and terrain |
+| `.gamedata/mods/` | the raw XML and GalaxyScript catalogs, plus the packaged maps under `core.stormmod/base.stormdata/depotcache/` |
+| `.gamedata/data/` | hero, unit and map JSON |
+| `.gamedata/gamestrings/` | resolved tooltip text, with the per-battleground overlays under `maps/` |
+| `.gamedata/images/` | ability, talent, portrait and loading screen art |
+| `.gamedata/mods/**/*.dds` | the minimap icon textures, converted to PNG during generation |
+| `.gamedata/mods/hdp.info` | the build that was extracted, and whether it is the PTR |
+
+One submodule remains: [heroprotocol](https://github.com/Blizzard/heroprotocol),
+Blizzard's replay decoding tables per build. It is not in CASC.
+
+A big thank you to the maintainers of HeroesDataParser, and to
+[jamiephan](https://github.com/jamiephan) and
+[HeroesToolChest](https://github.com/HeroesToolChest), whose published
+extractions this project ran on for a long time.
 
 ## Licence
 

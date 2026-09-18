@@ -2,7 +2,7 @@
 
 import { readFile, readdir, writeFile, mkdir } from "node:fs/promises";
 import * as path from "node:path";
-import { GAMEDATA_DIR, GAMEDATA_REPO, SITE_STATIC } from "./lib/paths.ts";
+import { DATA_ROOT, GAMEDATA_DIR, SITE_STATIC } from "./lib/paths.ts";
 import { shouldIncludeGamedataPath } from "./gen-gamedata.ts";
 import { buildEffectGraph } from "./lib/effect-graph.ts";
 import type { EffectGraph } from "./lib/effect-graph.ts";
@@ -104,7 +104,7 @@ async function main(): Promise<void> {
   const relPaths: string[] = [];
   await collectGamedataFiles(GAMEDATA_DIR, "", relPaths);
   const files = await Promise.all(
-    relPaths.map(async (rel) => ({ path: rel, content: await readFile(path.join(GAMEDATA_REPO, rel), "utf-8") })),
+    relPaths.map(async (rel) => ({ path: rel, content: await readFile(path.join(DATA_ROOT, rel), "utf-8") })),
   );
   const graph = buildEffectGraph(files);
 

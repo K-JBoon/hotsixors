@@ -1,20 +1,9 @@
-import { execFile } from "node:child_process";
-import { readdir, writeFile, mkdir } from "node:fs/promises";
+import { writeFile, mkdir } from "node:fs/promises";
 import * as path from "node:path";
-import { promisify } from "node:util";
 import { fileURLToPath } from "node:url";
-import {
-  GAMEDATA_REPO,
-  HEROES_DATA_DIR,
-  HEROES_DATA_REPO,
-  HEROES_IMAGES_REPO,
-  SITE_DATA,
-  compareVersions,
-  findLatestVersion,
-} from "./lib/paths.ts";
+import { SITE_DATA, gameVersion, readHdpInfo } from "./lib/paths.ts";
 
 const SCRIPT_PATH = fileURLToPath(import.meta.url);
-const execFileAsync = promisify(execFile);
 
 interface SourceVersion {
   name: string;
@@ -27,6 +16,8 @@ interface SourceVersion {
 interface BuildInfo {
   build_date: string;
   build_date_display: string;
+  game_version: string;
+  is_ptr: boolean;
   sources: SourceVersion[];
 }
 
@@ -55,69 +46,31 @@ function formatBuildDate(date: Date): string {
   return date.toISOString().replace("T", " ").replace(/\.\d{3}Z$/, " UTC");
 }
 
-async function gitDescribe(repoPath: string): Promise<string> {
-  try {
-    const { stdout } = await execFileAsync("git", ["-C", repoPath, "describe", "--tags", "--always", "--dirty"]);
-    return stdout.trim();
-  } catch {
-    return "unknown";
-  }
-}
-
-async function latestGamedataVersion(): Promise<string> {
-  const xsdDir = path.join(GAMEDATA_REPO, "xsd");
-  const entries = await readdir(xsdDir);
-  const versions = entries
-    .filter((entry) => /^\d/.test(entry) && entry.endsWith(".xsd"))
-    .map((entry) => entry.replace(/\.xsd$/, ""))
-    .sort(compareVersions);
-
-  if (versions.length === 0) {
-    throw new Error("No game versions found in HeroesOfTheStorm_Gamedata/xsd");
-  }
-
-  return versions[versions.length - 1];
-}
-
 async function main(): Promise<void> {
   console.log("gen-build-info: starting");
 
   const date = buildDate();
-  const [
-    heroesDataGameVersion,
-    gamedataGameVersion,
-    heroesDataSourceVersion,
-    heroesImagesSourceVersion,
-    gamedataSourceVersion,
-  ] = await Promise.all([
-    findLatestVersion(HEROES_DATA_DIR),
-    latestGamedataVersion(),
-    gitDescribe(HEROES_DATA_REPO),
-    gitDescribe(HEROES_IMAGES_REPO),
-    gitDescribe(GAMEDATA_REPO),
-  ]);
+  const info = await readHdpInfo();
+  const version = gameVersion(info);
 
   const buildInfo: BuildInfo = {
     build_date: date.toISOString(),
     build_date_display: formatBuildDate(date),
+    game_version: version,
+    is_ptr: info.IsPtr,
     sources: [
       {
-        name: "heroes-data2",
-        url: "https://github.com/HeroesToolChest/heroes-data2",
-        game_version: heroesDataGameVersion,
-        source_version: heroesDataSourceVersion,
+        name: "Heroes of the Storm",
+        url: "https://heroesofthestorm.blizzard.com",
+        game_version: version,
+        source_version: `extracted ${info.ExtractedDate.slice(0, 10)}`,
+        note: info.IsPtr ? "Public Test Realm build: unreleased and subject to change" : undefined,
       },
       {
-        name: "heroes-images",
-        url: "https://github.com/HeroesToolChest/heroes-images",
-        game_version: heroesDataGameVersion,
-        source_version: heroesImagesSourceVersion,
-      },
-      {
-        name: "HeroesOfTheStorm_Gamedata",
-        url: "https://github.com/jamiephan/HeroesOfTheStorm_Gamedata",
-        game_version: gamedataGameVersion,
-        source_version: gamedataSourceVersion,
+        name: "HeroesDataParser",
+        url: "https://github.com/HeroesToolChest/HeroesDataParser",
+        game_version: version,
+        source_version: `v${info.HdpVersion}`,
       },
     ],
   };
@@ -125,7 +78,7 @@ async function main(): Promise<void> {
   await mkdir(SITE_DATA, { recursive: true });
   await writeFile(path.join(SITE_DATA, "build-info.json"), JSON.stringify(buildInfo, null, 2) + "\n", "utf-8");
 
-  console.log("gen-build-info: wrote build-info.json");
+  console.log(`gen-build-info: wrote build-info.json for ${version}`);
 }
 
 if (path.resolve(process.argv[1] ?? "") === SCRIPT_PATH) {

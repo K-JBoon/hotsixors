@@ -38,12 +38,9 @@ This project is open source. You can check the code and contribute on <a href="h
 
 <section class="about-data-sources">
   <h2>Data Sources</h2>
-  <p>All data used to build this site is sourced from these projects:</p>
+  <p>The game data is extracted from Blizzard's content servers with these projects:</p>
   <ul>
-    <li><strong><a href="https://github.com/HeroesToolChest/heroes-data2">heroes-data2</a></strong> by <a href="https://github.com/HeroesToolChest">HeroesToolChest</a></li>
-    <li><strong><a href="https://github.com/HeroesToolChest/heroes-images">heroes-images</a></strong> by <a href="https://github.com/HeroesToolChest">HeroesToolChest</a></li>
-    <li><strong><a href="https://github.com/jamiephan/HeroesOfTheStorm_Gamedata">HeroesOfTheStorm_Gamedata</a></strong> by <a href="https://github.com/jamiephan">jamiephan</a></li>
-    <li><strong><a href="https://github.com/Blizzard/heroprotocol">heroprotocol</a></strong> by <a href="https://github.com/Blizzard">Blizzard</a></li>
-    <li><strong><a href="https://github.com/jamiephan/HeroesOfTheStorm_S2MA">HeroesOfTheStorm_S2MA</a></strong> by <a href="https://github.com/jamiephan">jamiephan</a></li>
+    <li><strong><a href="https://github.com/HeroesToolChest/HeroesDataParser">HeroesDataParser</a></strong> by <a href="https://github.com/HeroesToolChest">HeroesToolChest</a> — extracts and parses the game data</li>
+    <li><strong><a href="https://github.com/Blizzard/heroprotocol">heroprotocol</a></strong> by <a href="https://github.com/Blizzard">Blizzard</a> — replay decoding tables</li>
   </ul>
 </section>

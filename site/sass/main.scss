@@ -3349,3 +3349,13 @@ html:not(.datamining-enabled) .mechanics-table {
   // Footer
   .site-footer { padding: 1rem; font-size: 0.8rem; }
 }
+
+.ptr-banner {
+  padding: 0.5rem 1rem;
+  background: #7a4b00;
+  color: #fff;
+  font-size: 0.9rem;
+  text-align: center;
+
+  a { color: #fff; text-decoration: underline; }
+}

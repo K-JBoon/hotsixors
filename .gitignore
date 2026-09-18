@@ -1,4 +1,7 @@
 node_modules/
+.gamedata*/
+.hdp/
+cache/
 site/public/
 site/content/heroes/[^_]*
 site/content/heroes/[a-z]*

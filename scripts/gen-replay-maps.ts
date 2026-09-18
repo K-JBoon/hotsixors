@@ -6,13 +6,13 @@
 // regions each team permanently sees.
 
 import { createHash } from "node:crypto";
-import { mkdirSync, readFileSync, writeFileSync, readdirSync, unlinkSync } from "node:fs";
-import { join } from "node:path";
+import { mkdirSync, readFileSync, writeFileSync, readdirSync, statSync, unlinkSync } from "node:fs";
+import { basename, join } from "node:path";
 import zlib from "node:zlib";
 
 import { MPQArchive } from "../site/static/replay/mpq.js";
 import { encodePng, type Bitmap } from "./lib/png.ts";
-import { S2MA_MAPS_DIR, SITE_STATIC_REPLAY, slugify } from "./lib/paths.ts";
+import { DEPOTCACHE_DIR, SITE_STATIC_REPLAY, slugify } from "./lib/paths.ts";
 import {
   baseRegions,
   brushMask,
@@ -300,11 +300,18 @@ function renderVisionMask(g: Grids): Bitmap {
 // -------------------------------------------------------------------- main
 
 function openMap(buf: Buffer, baseActors: ReturnType<typeof loadBaseDoodadActors>) {
-  const archive = new MPQArchive(
-    buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength),
-    { inflate: (d: Uint8Array) => zlib.inflateSync(d) }
-  );
-  const info = parseMapInfo(archive.readFile("MapInfo"));
+  let archive: InstanceType<typeof MPQArchive>;
+  try {
+    archive = new MPQArchive(
+      buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength),
+      { inflate: (d: Uint8Array) => zlib.inflateSync(d) }
+    );
+  } catch {
+    return null; // not an archive
+  }
+  const mapInfo = readMember(archive, "MapInfo");
+  if (!mapInfo) return null; // a mod, not a map
+  const info = parseMapInfo(mapInfo);
   const pnp = archive.readFile("CellAttribute_Pnp");
   if (!pnp) throw new Error("no CellAttribute_Pnp");
   const pcl = readMember(archive, "CellAttribute_Pcl");
@@ -323,20 +330,33 @@ function openMap(buf: Buffer, baseActors: ReturnType<typeof loadBaseDoodadActors
   return { archive, info, grids };
 }
 
+// The packaged maps and mods are named by content hash.
+function depotArchives(dir: string, out: string[] = []): string[] {
+  for (const entry of readdirSync(dir)) {
+    const child = join(dir, entry);
+    if (statSync(child).isDirectory()) depotArchives(child, out);
+    else if (entry.endsWith(".s2ma")) out.push(child);
+  }
+  return out;
+}
+
 async function main(): Promise<void> {
   mkdirSync(OUT_DIR, { recursive: true });
   for (const stale of readdirSync(OUT_DIR)) unlinkSync(join(OUT_DIR, stale));
 
-  const listing = readdirSync(S2MA_MAPS_DIR).filter((n) => n.endsWith(".stormmap"));
+  const listing = depotArchives(DEPOTCACHE_DIR);
   const baseActors = loadBaseDoodadActors();
   const index: Record<string, MapEntry> = {};
 
   for (const file of listing) {
-    const name = file.replace(/\.stormmap$/, "");
-    const slug = slugify(name);
+    let name = basename(file, ".s2ma");
     try {
-      const buf = readFileSync(join(S2MA_MAPS_DIR, file));
-      const { archive, info, grids } = openMap(buf, baseActors);
+      const buf = readFileSync(file);
+      const opened = openMap(buf, baseActors);
+      if (!opened) continue;
+      const { archive, info, grids } = opened;
+      name = localizedMapNames(archive)[0] ?? name;
+      const slug = slugify(name);
       const image = renderSchematic(grids);
       writeFileSync(join(OUT_DIR, `${slug}.png`), encodePng(image));
       writeFileSync(join(OUT_DIR, `${slug}.vision.png`), encodePng(renderVisionMask(grids)));

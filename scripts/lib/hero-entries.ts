@@ -89,14 +89,18 @@ function anchorXmlPathToAbsPath(xmlPath: string): string {
   return path.join(GAMEDATA_DIR, xmlPath.replace(/^mods\//, "").replace(/-xml$/, ".xml"));
 }
 
-export function createEntryResolver(gs: Gamestrings, anchorMap: AnchorMap) {
+export function createEntryResolver(gs: Gamestrings, anchorMap: AnchorMap, declAnchorMap: AnchorMap = {}) {
   const shortcodeData: ShortcodeData = {};
   const abilityDescriptions: Record<string, string> = {};
   const missingIcons = new Set<string>();
   const xmlFileCache = new Map<string, string>();
 
+  function declAnchor(nameId: string) {
+    return declAnchorMap[nameId] ?? anchorMap[nameId];
+  }
+
   async function loadXmlForAbility(nameId: string): Promise<{ xml: string; xmlPath: string } | null> {
-    const anchor = anchorMap[nameId];
+    const anchor = declAnchor(nameId);
     if (!anchor) return null;
     const absPath = anchorXmlPathToAbsPath(anchor.xmlPath);
     if (!xmlFileCache.has(absPath)) {
@@ -144,7 +148,7 @@ export function createEntryResolver(gs: Gamestrings, anchorMap: AnchorMap) {
     const xmlData = type === "ability" ? await loadXmlForAbility(nameId) : null;
     const stats = xmlData ? parseAbilityStats(xmlData.xml, nameId, xmlData.xmlPath) : null;
 
-    const anchor = anchorMap[nameId];
+    const anchor = declAnchor(nameId);
     addShortcodeEntry(nameId, {
       name,
       buttonId: entry.buttonId,
