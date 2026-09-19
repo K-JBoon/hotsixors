@@ -24,6 +24,7 @@ depend on output of previous scripts.
 
 | Script | Writes | Notes |
 | --- | --- | --- |
+| `gen-fonts` | `static/fonts/*.woff2` | instances `data/fonts/` to the weights `main.scss` declares; see below |
 | `gen-gamedata` | `content/gamedata/**`, `data/anchor-map.json`, `data/gamedata-tree.json`, `static/gamedata-tree.json`, `static/id-lookup.json` | a page per XML/Galaxy file, plus an ID/file index |
 | `gen-mechanics` | `data/mechanics.json` | the gameplay mechanics the effect index is built around |
 | `gen-heroes` | `content/heroes/*.md`, `data/heroes/*.json`, `static/shortcode-data.json`, `static/hero-aliases.json`, `static/images/` | |
@@ -37,6 +38,50 @@ depend on output of previous scripts.
 | `gen-build-info` | `data/build-info.json` | |
 
 `npm run clean` deletes all generated data.
+
+### Webfonts
+
+`data/fonts/` holds the unsubset sources; `gen-fonts` instances each one to the
+single weight its `@font-face` declares and subsets it to that face's
+`unicode-range`.
+
+Google Fonts' Rajdhani ships ~50 glyphs per weight whose `glyf` bounding boxes
+disagree with their control points, which makes Firefox log
+`glyf: Glyph bbox was incorrect; adjusting`. The vendored copies are repaired,
+so re-downloading Rajdhani reintroduces it. To repair again:
+
+```python
+from fontTools.ttLib import TTFont
+f = TTFont(path)
+for name in f.getGlyphOrder():
+    f['glyf'][name].recalcBounds(f['glyf'])
+f.flavor = 'woff2'
+f.save(path)
+```
+
+Inter needs no such repair. harfbuzz carries corrected bounds through subsetting.
+
+## The client bundle
+
+`npm run build` runs `bundle-client.ts` between `gen` and Zola. esbuild bundles
+three entry points (`hotsixors.js`, `replay/replay-ui.js`, `draft/draft.js`) as
+ES modules with code splitting, plus the two classic scripts
+(`level-slider.js`, `underdog-calc.js`) as IIFEs, into `static/bundle/`.
+
+Output names carry a content hash, so `_headers` caches the whole directory
+immutably. Templates resolve an entry through `data/bundles.json`, which the
+bundler writes alongside `data/bundle-sources.json`; `prune-bundled-sources.ts`
+reads the latter to delete the now-duplicated module sources from `site/public`
+after Zola copies `static/`.
+
+`hotsixors.js` only holds what every page needs (nav, site search, grid filter,
+hero list controls). The game data explorer, the talent builder and the effect
+index live in `js/*-page.js` and are `import()`ed when their markup is present,
+so an ordinary page never downloads them. `js/index.js` re-exports every client
+module for the Node tests and is never served.
+
+`gen-og-card.ts` renders the fallback social card. It is not part of `gen`: run
+`npm run gen:og-card` when the site name or tagline changes.
 
 ### Shared generator code
 

@@ -15,13 +15,14 @@
 /*.css
   Cache-Control: public, max-age=31536000, immutable
 
-# Only the entry scripts get a cachebusting query string from Zola. The modules
-# they import do not, so immutable would pin those for a year while the entry
-# updates, leaving the browser with a mismatched bundle after a deploy.
-/*.js
-  Cache-Control: public, max-age=300
+# Every file under /bundle/ carries a content hash in its name, entry scripts
+# included, so a deploy never reuses a stale URL.
+/bundle/*
+  Cache-Control: public, max-age=31536000, immutable
 
-/*.mjs
+# The 3D viewer's modules load by plain path, with no cachebusting. Scoped to
+# .js so it does not overlap the /*.html, /*.css and image rules below.
+/lost-in-the-nexus/*.js
   Cache-Control: public, max-age=300
 
 /*.svg

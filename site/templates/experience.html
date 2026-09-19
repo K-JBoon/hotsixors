@@ -19,7 +19,7 @@
     <div class="mechanics-section__header">
       <h2>XP per Level</h2>
     </div>
-    <div class="minions-table-wrap">
+    <div class="minions-table-wrap" tabindex="0" role="region" aria-label="XP per level table">
       <table class="minions-table experience-levels-table">
         <thead>
           <tr>
@@ -62,7 +62,7 @@
     <p>
       <code>delta = flat bonus + fraction × 0.1 × fraction multiplier</code>
     </p>
-    <div class="minions-table-wrap">
+    <div class="minions-table-wrap" tabindex="0" role="region" aria-label="Kill XP and underdog XP table">
       <table class="minions-table experience-underdog-table">
         <thead>
           <tr>
@@ -120,5 +120,6 @@
 {% endblock content %}
 
 {% block scripts %}
-<script src="{{ get_url(path='underdog-calc.js', cachebust=true) }}"></script>
+{% set bundles = load_data(path="data/bundles.json") %}
+<script src="{{ get_url(path=bundles['underdog-calc.js']) }}"></script>
 {% endblock scripts %}

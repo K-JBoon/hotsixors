@@ -11,6 +11,6 @@
        height="{{ display_height }}"
        alt="{{ alt }}"
        loading="{{ loading }}"
-       decoding="async">
+       {% if loading == "eager" %}fetchpriority="high" {% endif %}decoding="async">
   {%- endif -%}
 {%- endcomponent images.optimized -%}

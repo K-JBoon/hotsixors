@@ -5,6 +5,10 @@
 {% endblock title %}
 
 {% block main_class %} site-main--flush{% endblock main_class %}
+{% block head %}
+  <link rel="stylesheet" href="{{ get_url(path='gamedata.css', cachebust=true) }}">
+{% endblock head %}
+
 
 {% block content %}
 {% if section.extra.dir_path %}
@@ -24,6 +28,7 @@
 
   <section class="gd-editor">
     <header class="gd-toolbar" data-gd-file-path="{{ section.extra.dir_path | default(value='') }}">
+      <h1 class="visually-hidden">{% if section.extra.dir_path %}{{ section.extra.dir_path }}{% else %}Game Data{% endif %}</h1>
       <span class="gd-filechip" data-ext="dir">{{ dir_name }}</span>
       <nav class="gd-path breadcrumb" aria-label="Breadcrumb">
         <a href="/gamedata/">root</a>
@@ -47,7 +52,9 @@
     </header>
 
     <div class="gd-dir">
-      <p class="gd-dir__meta">{{ section.subsections | length }} folders · {{ section.pages | length }} files</p>
+      {% set folder_count = section.subsections | length %}
+      {% set file_count = section.pages | length %}
+      <p class="gd-dir__meta">{{ folder_count }} folder{% if folder_count != 1 %}s{% endif %} · {{ file_count }} file{% if file_count != 1 %}s{% endif %}</p>
       <ul class="dir-listing">
         {% for s in section.subsections %}
           {% set sub = get_section(path=s) %}

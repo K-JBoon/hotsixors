@@ -3,6 +3,9 @@
 {% block title %}Lost in the Nexus — {{ config.title }}{% endblock title %}
 
 {% block head %}
+  {% if config.extra.nexus_assets %}
+  <link rel="preconnect" href="{{ config.extra.nexus_assets }}" crossorigin>
+  {% endif %}
   <link rel="stylesheet" href="{{ get_url(path='lost-in-the-nexus/viewer.css', cachebust=true) }}">
   <script type="importmap">
     { "imports": { "three": "/lost-in-the-nexus/vendor/three.module.min.js" } }

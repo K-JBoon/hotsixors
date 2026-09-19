@@ -7,7 +7,7 @@
 
 <div class="effect-index-page">
   <div class="effect-index-layout">
-    <aside class="effect-index-sidebar" aria-label="Effect groups">
+    <aside class="effect-index-sidebar">
       <nav class="effect-index-sidebar__nav" aria-label="Effect groups">
         <ul>
           {% set_global sidebar_category = "" %}
@@ -21,7 +21,7 @@
       </nav>
     </aside>
 
-    <main class="effect-index-main">
+    <div class="effect-index-main">
       <h1>Effect Index</h1>
 
       <div class="effect-index-controls">
@@ -72,7 +72,7 @@
           {% endif %}
         </section>
       {% endfor %}
-    </main>
+    </div>
   </div>
 </div>
 {% endblock content %}

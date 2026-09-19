@@ -46,7 +46,7 @@ function updateMyUrl(lobbyCode) {
 
 async function bootstrap() {
   try {
-    const r = await fetch(new URL("draft-data.json", import.meta.url));
+    const r = await fetch("/draft/draft-data.json");
     draftData = await r.json();
   } catch (e) {
     root.innerHTML = "<p>Failed to load draft data. Refresh to retry.</p>";

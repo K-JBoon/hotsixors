@@ -30,5 +30,6 @@
     <div class="replay-drop-overlay__inner"><strong>Drop to add replays</strong></div>
   </div>
 </div>
-<script type="module" src="{{ get_url(path='replay/replay-ui.js', cachebust=true) }}"></script>
+{% set bundles = load_data(path="data/bundles.json") %}
+<script type="module" src="{{ get_url(path=bundles['replay/replay-ui.js']) }}"></script>
 {% endblock content %}

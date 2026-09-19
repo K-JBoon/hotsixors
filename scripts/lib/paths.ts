@@ -25,6 +25,9 @@ export const SITE_DATA_BATTLEGROUNDS = path.join(REPO_ROOT, "site/data/battlegro
 export const SITE_CONTENT_GAMEDATA = path.join(REPO_ROOT, "site/content/gamedata");
 export const SITE_STATIC_IMAGES = path.join(REPO_ROOT, "site/static/images");
 export const SITE_STATIC = path.join(REPO_ROOT, "site/static");
+export const SITE_SASS = path.join(REPO_ROOT, "site/sass");
+/** Unsubset webfonts; `gen-fonts.ts` instances them into site/static/fonts. */
+export const FONT_SOURCES = path.join(REPO_ROOT, "data/fonts");
 export const SITE_STATIC_REPLAY = path.join(REPO_ROOT, "site/static/replay");
 export const SITE_DATA = path.join(REPO_ROOT, "site/data");
 

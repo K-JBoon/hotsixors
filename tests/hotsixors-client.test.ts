@@ -36,7 +36,7 @@ import {
   talentTierHasChoice,
   toggleOptionalTalent,
   toggleRecommendedTalent,
-} from "../site/static/hotsixors.js";
+} from "../site/static/js/index.js";
 
 const DECKARD_TALENT_ROWS = [
   { tier: "level1", talentIds: ["DeckardScrollOfIdentify", "DeckardFieldStudy", "DeckardSapphire"] },

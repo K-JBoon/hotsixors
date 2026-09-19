@@ -391,6 +391,15 @@ async function main(): Promise<void> {
     "utf-8"
   );
 
+  // walkDir starts inside mods/, so it never writes that directory's own
+  // section the way it does for every directory below it.
+  await mkdir(path.join(SITE_CONTENT_GAMEDATA, "mods"), { recursive: true });
+  await writeFile(
+    path.join(SITE_CONTENT_GAMEDATA, "mods", "_index.md"),
+    `+++\ntitle = "mods"\ntemplate = "gamedata/list.html"\n\n[extra]\ndir_path = "mods"\n+++\n`,
+    "utf-8"
+  );
+
   console.log(`gen-gamedata: wrote anchor-map.json with ${Object.keys(anchorMap).length} entries`);
   console.log("gen-gamedata: done");
 }

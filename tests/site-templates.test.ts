@@ -83,18 +83,18 @@ test("base navigation exposes persisted datamining toggle", () => {
 test("fonts are vendored and loaded without blocking first render", () => {
   const baseTemplate = readFileSync(new URL("../site/templates/base.html", import.meta.url), "utf-8");
   const styles = readFileSync(new URL("../site/sass/main.scss", import.meta.url), "utf-8");
-  const fontStyles = readFileSync(new URL("../site/static/fonts.css", import.meta.url), "utf-8");
 
-  assert.match(baseTemplate, /get_url\(path='fonts\.css', cachebust=true\)/);
-  assert.match(baseTemplate, /rel="preload"[^>]+as="style"/);
-  assert.match(baseTemplate, /media="print" onload="this\.media='all'"/);
-  assert.match(baseTemplate, /<noscript><link rel="stylesheet" href="\{\{ get_url\(path='fonts\.css', cachebust=true\) \}\}"><\/noscript>/);
+  assert.match(baseTemplate, /rel="preload" href="\{\{ get_url\(path='fonts\/inter-latin-400-500\.woff2'\) \}\}" as="font" type="font\/woff2" crossorigin/);
+  assert.match(baseTemplate, /rel="preload" href="\{\{ get_url\(path='fonts\/rajdhani-latin-600\.woff2'\) \}\}" as="font" type="font\/woff2" crossorigin/);
+  assert.doesNotMatch(baseTemplate, /fonts\.css/);
 
   assert.doesNotMatch(styles, /fonts\.googleapis|fonts\.gstatic|@import url/);
   assert.doesNotMatch(baseTemplate, /fonts\.googleapis|fonts\.gstatic/);
-  assert.doesNotMatch(fontStyles, /fonts\.googleapis|fonts\.gstatic/);
-  assert.match(fontStyles, /url\("\/fonts\/inter-latin-400-500\.woff2"\)/);
-  assert.match(fontStyles, /url\("\/fonts\/rajdhani-latin-700\.woff2"\)/);
+  assert.match(styles, /url\("\/fonts\/inter-latin-400-500\.woff2"\)/);
+  assert.match(styles, /url\("\/fonts\/rajdhani-latin-700\.woff2"\)/);
+  for (const face of styles.match(/@font-face \{[^}]*\}/g) ?? []) {
+    assert.match(face, /font-display: swap;/);
+  }
 });
 
 test("site images are routed through Zola resize_image", () => {
@@ -243,32 +243,32 @@ test("hero banner loading images cap width and crop from the left", () => {
   assert.match(styles, /&__loading\s*\{[^}]*object-position:\s*right\s+center/s);
 });
 
-test("hero and battleground lists expose typeahead select search hooks without search bars", () => {
+test("hero and battleground lists expose a filter field plus typeahead hooks", () => {
   const heroTemplate = renderedBy("heroes/list.html");
   const homeTemplate = renderedBy("index.html");
   const battlegroundTemplate = renderedBy("battlegrounds/list.html");
   const styles = readFileSync(new URL("../site/sass/main.scss", import.meta.url), "utf-8");
+  const script = readFileSync(new URL("../site/static/hotsixors.js", import.meta.url), "utf-8");
 
-  assert.match(heroTemplate, /data-select-search/);
-  assert.match(heroTemplate, /Start typing to search/);
-  assert.match(heroTemplate, /class="select-search-hint"/);
-  assert.match(heroTemplate, /data-select-search-card/);
+  for (const template of [heroTemplate, homeTemplate, battlegroundTemplate]) {
+    assert.match(template, /data-select-search/);
+    assert.match(template, /data-select-search-card/);
+    assert.match(template, /data-select-search-input/);
+    assert.match(template, /data-select-search-count/);
+    assert.match(template, /type="search"/);
+    assert.match(template, /class="visually-hidden" for="[a-z-]+-filter"/);
+  }
   assert.match(heroTemplate, /data-select-search-text="\{\{\s*page\.extra\.hero_name/);
-  assert.doesNotMatch(heroTemplate, /data-select-search-input/);
-  assert.doesNotMatch(heroTemplate, /type="search"/);
-  assert.match(homeTemplate, /data-select-search/);
-  assert.match(homeTemplate, /Start typing to search/);
-  assert.match(homeTemplate, /class="select-search-hint"/);
-  assert.doesNotMatch(homeTemplate, /data-select-search-input/);
-  assert.doesNotMatch(homeTemplate, /type="search"/);
-  assert.match(battlegroundTemplate, /data-select-search/);
-  assert.doesNotMatch(battlegroundTemplate, /Start typing to search/);
-  assert.doesNotMatch(battlegroundTemplate, /class="select-search-hint"/);
-  assert.match(battlegroundTemplate, /data-select-search-card/);
   assert.match(battlegroundTemplate, /data-select-search-text="\{\{\s*page\.title/);
-  assert.doesNotMatch(battlegroundTemplate, /data-select-search-input/);
-  assert.doesNotMatch(battlegroundTemplate, /type="search"/);
-  assert.match(styles, /\.select-search-hint/);
+
+  // A hero appears as a card and a table row; the count must not double it.
+  assert.match(heroTemplate, /data-select-search-key="\{\{ page\.slug \}\}"/);
+
+  // Typing anywhere still filters, but it now lands in the visible field.
+  assert.match(script, /input\.focus\(\);/);
+
+  assert.match(styles, /\.select-search__input/);
+  assert.match(styles, /\.select-search__count/);
   assert.match(styles, /\.select-search-status/);
   assert.match(styles, /\.select-search-card--match/);
   assert.match(styles, /\.select-search-card--dim/);

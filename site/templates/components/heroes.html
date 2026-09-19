@@ -10,17 +10,27 @@
 {% component heroes.hero_index(pages, show_role=false) %}
 {% set draft = load_data(path="draft/draft-data.json") %}
 {% set draft_by_slug = draft.heroes | group_by(attribute="slug") %}
-<div data-select-search data-hero-list>
+<div data-select-search data-select-search-noun="heroes" data-hero-list>
   <div class="hero-grid-header">
     <h1>Heroes of the Storm</h1>
     <div class="hero-view-toggle" role="tablist" aria-label="View mode" data-hero-view-toggle>
-      <button type="button" role="tab" class="hero-view-toggle__btn is-active" data-hero-view="grid" aria-selected="true">Grid</button>
-      <button type="button" role="tab" class="hero-view-toggle__btn" data-hero-view="table" aria-selected="false">Table</button>
+      <button type="button" role="tab" id="hero-view-tab-grid" aria-controls="hero-view-panel-grid" aria-selected="true" class="hero-view-toggle__btn is-active" data-hero-view="grid">Grid</button>
+      <button type="button" role="tab" id="hero-view-tab-table" aria-controls="hero-view-panel-table" aria-selected="false" tabindex="-1" class="hero-view-toggle__btn" data-hero-view="table">Table</button>
     </div>
-    <span class="select-search-hint">Start typing to search</span>
+    <div class="select-search" role="search" aria-label="Heroes">
+      <label class="visually-hidden" for="hero-filter">Filter heroes by name or role</label>
+      <input class="select-search__input"
+             id="hero-filter"
+             type="search"
+             placeholder="Filter heroes"
+             autocomplete="off"
+             spellcheck="false"
+             data-select-search-input>
+      <span class="select-search__count" data-select-search-count></span>
+    </div>
     <span class="select-search-status" aria-live="polite" data-select-search-status></span>
     <div class="hero-role-filter" role="group" aria-label="Filter by role" data-hero-role-filter>
-      <button type="button" class="hero-role-filter__btn is-active" data-role="all">All</button>
+      <button type="button" class="hero-role-filter__btn is-active" aria-pressed="true" data-role="all">All</button>
       {% for r in [
         {"label": "Tank", "slug": "tank"},
         {"label": "Bruiser", "slug": "bruiser"},
@@ -29,15 +39,16 @@
         {"label": "Healer", "slug": "healer"},
         {"label": "Support", "slug": "support"}
       ] %}
-        <button type="button" class="hero-role-filter__btn role-{{ r.slug }}" data-role="{{ r.slug }}">
+        <button type="button" class="hero-role-filter__btn role-{{ r.slug }}" aria-pressed="false" data-role="{{ r.slug }}">
           {{<heroes.role_icon role_slug={r.slug} size={28} />}}
           {{ r.label }}
         </button>
       {% endfor %}
     </div>
+    <span class="visually-hidden" aria-live="polite" data-hero-role-status></span>
   </div>
 
-  <div class="hero-grid" data-hero-view-pane="grid">
+  <div class="hero-grid" id="hero-view-panel-grid" role="tabpanel" aria-labelledby="hero-view-tab-grid" data-hero-view-pane="grid">
     {% for page in pages %}
       {% set portraits = page.extra.portraits %}
       {% set draft_hero = draft_by_slug[page.slug] | first %}
@@ -47,6 +58,7 @@
          href="{{ page.permalink }}"
          data-select-search-card
          data-select-search-id="{{ page.slug }}-grid"
+         data-select-search-key="{{ page.slug }}"
          data-select-search-text="{{ page.extra.hero_name }} {{ role }}"
          data-hero-role="{{ role_slug }}">
         {% if portraits.draftScreen %}
@@ -62,7 +74,7 @@
     {% endfor %}
   </div>
 
-  <div class="hero-table-wrap" data-hero-view-pane="table" hidden>
+  <div class="hero-table-wrap" id="hero-view-panel-table" role="tabpanel" aria-labelledby="hero-view-tab-table" data-hero-view-pane="table" hidden>
     <table class="hero-table">
       <thead>
         <tr>
@@ -86,6 +98,7 @@
           <tr class="hero-row role-{{ role_slug }}"
               data-select-search-card
               data-select-search-id="{{ page.slug }}-row"
+              data-select-search-key="{{ page.slug }}"
               data-select-search-text="{{ page.extra.hero_name }} {{ role }}"
               data-hero-role="{{ role_slug }}"
               onclick="window.location='{{ page.permalink }}'">

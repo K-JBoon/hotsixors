@@ -3,6 +3,10 @@
 {% block title %}{{ page.extra.file_path | split(pat="/") | last }} — Game Data — {{ config.title }}{% endblock title %}
 
 {% block main_class %} site-main--flush{% endblock main_class %}
+{% block head %}
+  <link rel="stylesheet" href="{{ get_url(path='gamedata.css', cachebust=true) }}">
+{% endblock head %}
+
 
 {% block content %}
 {% set current_path = "content/gamedata/" ~ page.extra.url_path ~ ".md" %}
@@ -20,6 +24,7 @@
 
   <section class="gd-editor">
     <header class="gd-toolbar" data-gd-file-path="{{ page.extra.file_path }}">
+      <h1 class="visually-hidden">{{ page.extra.file_path | default(value=file_name) }}</h1>
       <span class="gd-filechip" data-ext="{{ page.extra.file_ext | default(value='xml') }}">{{ file_name }}</span>
       <nav class="gd-path breadcrumb" aria-label="Breadcrumb">
         <a href="/gamedata/">root</a>

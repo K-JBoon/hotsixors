@@ -1,0 +1,835 @@
+// Only /gamedata/ pages load this; base.html keeps main.css for the shell.
+@import "tokens";
+
+// ─── Game Data Browser ────────────────────────────────────────────────────────
+$gd-chrome:   #0e1420;
+$gd-surface:  #0b1018;
+$gd-gutter:   #7c8aa0;
+$gd-hairline: rgba(120, 150, 200, 0.14);
+
+.breadcrumb {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 0.25rem;
+  font-size: 0.85rem; color: $text-muted;
+  a { color: $accent-blue; }
+}
+
+.breadcrumb-sep { color: $border-dim; }
+.breadcrumb-current { color: $text-primary; }
+
+.gamedata-header {
+  h1 { font-size: 2rem; color: $accent-gold; margin-bottom: 0.75rem; }
+}
+
+.site-main--flush { padding: 0; max-width: none; }
+
+.gd-shell {
+  --gd-nav-h: 3.5rem;
+  --gd-explorer-w: 20rem;
+  display: grid;
+  grid-template-columns: var(--gd-explorer-w) minmax(0, 1fr) auto;
+  height: calc(100vh - var(--gd-nav-h));
+  min-height: 32rem;
+  overflow: hidden;
+  background: $gd-surface;
+  font-family: $font-body;
+
+  // Grid items default to min-height:auto, which would let the panes grow past
+  // the row instead of scrolling inside it.
+  > * { min-width: 0; min-height: 0; }
+}
+
+// ─── Explorer ─────────────────────────────────────────────────────────────────
+.gd-explorer {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+  background: linear-gradient(180deg, $gd-chrome 0%, darken($gd-chrome, 2%) 100%);
+  border-right: 1px solid $gd-hairline;
+  resize: horizontal;
+}
+
+.gd-explorer__head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.7rem 0.85rem 0.45rem;
+}
+
+.gd-explorer__title {
+  font-family: $font-display;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: $text-muted;
+}
+
+.gd-kbd {
+  margin-left: auto;
+  padding: 0 0.35rem;
+  border: 1px solid $gd-hairline;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.03);
+  color: $gd-gutter;
+  font-family: ui-monospace, monospace;
+  font-size: 0.68rem;
+  line-height: 1.4;
+}
+
+.gd-search {
+  display: none;
+  position: relative;
+  padding: 0 0.85rem 0.6rem;
+
+  .js & { display: block; }
+
+  input {
+    width: 100%;
+    padding: 0.4rem 1.8rem 0.4rem 0.6rem;
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid $gd-hairline;
+    border-radius: 6px;
+    color: $text-primary;
+    font-family: ui-monospace, monospace;
+    font-size: 0.78rem;
+
+    &::placeholder { color: rgba(124, 138, 160, 0.8); }
+    &:focus {
+      outline: none;
+      border-color: rgba($accent-blue, 0.7);
+      box-shadow: 0 0 0 3px rgba($accent-blue, 0.15);
+    }
+  }
+
+  button {
+    position: absolute;
+    right: 1.2rem;
+    top: 50%;
+    transform: translateY(-60%);
+    background: none;
+    border: 0;
+    color: $gd-gutter;
+    font-size: 1rem;
+    line-height: 1;
+    cursor: pointer;
+
+    &:hover { color: $text-primary; }
+  }
+}
+
+.gd-tree {
+  flex: 1;
+  overflow: auto;
+  padding: 0 0.35rem 1.5rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.78rem;
+  line-height: 1.55;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(120, 150, 200, 0.25) transparent;
+}
+
+.gd-tree__loading { color: $gd-gutter; padding: 0.5rem 0.65rem; }
+
+.file-tree {
+  details > summary {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    // WCAG 2.5.8: keep every tree row at least 24px tall.
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+    cursor: pointer;
+    list-style: none;
+    color: $text-primary;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    &::-webkit-details-marker { display: none; }
+    &::before {
+      content: "";
+      flex: 0 0 auto;
+      width: 0;
+      height: 0;
+      border-left: 4px solid rgba($accent-blue, 0.85);
+      border-top: 3.5px solid transparent;
+      border-bottom: 3.5px solid transparent;
+      transition: transform 0.12s ease;
+    }
+    &:hover { background: rgba($accent-blue, 0.1); }
+  }
+
+  details[open] > summary::before { transform: rotate(90deg) translateX(1px); }
+
+  .tree-children {
+    list-style: none;
+    margin: 0 0 0 0.75rem;
+    padding-left: 0.5rem;
+    border-left: 1px solid rgba(120, 150, 200, 0.12);
+  }
+
+  .tree-file,
+  .tree-dir__view {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+    color: $text-muted;
+    text-decoration: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    &:hover { background: rgba($accent-blue, 0.1); color: $text-primary; text-decoration: none; }
+  }
+
+  .tree-file::before {
+    content: "";
+    flex: 0 0 auto;
+    width: 6px;
+    height: 6px;
+    border-radius: 2px;
+    background: $gd-gutter;
+  }
+
+  .tree-dir__view {
+    color: rgba($accent-blue, 0.75);
+    font-style: italic;
+    &::before { content: "↗"; font-style: normal; font-size: 0.75em; }
+  }
+
+  .tree-active {
+    background: rgba($accent-gold, 0.12);
+    box-shadow: inset 2px 0 0 $accent-gold;
+    color: $accent-gold;
+    font-weight: 600;
+  }
+
+  summary.tree-active { color: $accent-gold; }
+}
+
+@each $ext, $color in (xml: #7dd3fc, galaxy: #f0a668, aitree: #86efac, txt: #9ca3af, json: #c4b5fd) {
+  .file-tree .tree-file[data-ext="#{$ext}"]::before,
+  .dir-entry__icon[data-ext="#{$ext}"] { background: $color; }
+}
+
+// ─── Editor pane ──────────────────────────────────────────────────────────────
+.gd-editor {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+  background: $gd-surface;
+}
+
+.gd-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0.9rem;
+  background: $gd-chrome;
+  border-bottom: 1px solid $gd-hairline;
+}
+
+.gd-filechip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.18rem 0.55rem;
+  background: rgba($accent-gold, 0.1);
+  border: 1px solid rgba($accent-gold, 0.3);
+  border-radius: 5px;
+  color: $accent-gold;
+  font-family: ui-monospace, monospace;
+  font-size: 0.78rem;
+  font-weight: 600;
+
+  &::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 2px;
+    background: currentColor;
+  }
+}
+
+.gd-path {
+  flex: 1 1 auto;
+  min-width: 0;
+  flex-wrap: nowrap;
+  font-family: ui-monospace, monospace;
+  font-size: 0.74rem;
+  white-space: nowrap;
+  color: $gd-gutter;
+  gap: 0.15rem;
+
+  overflow-x: auto;
+  scrollbar-width: none;
+  mask-image: linear-gradient(to right, #000 calc(100% - 2rem), transparent 100%);
+
+  &::-webkit-scrollbar { display: none; }
+  a, .breadcrumb-current { flex: 0 0 auto; }
+
+  a { color: rgba($accent-blue, 0.85); }
+  a:hover { color: $accent-blue; }
+  .breadcrumb-current { color: $text-muted; }
+}
+
+.gd-toolbar__actions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 0.4rem;
+  margin-left: auto;
+}
+
+.gd-btn {
+  padding: 0.25rem 0.6rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid $gd-hairline;
+  border-radius: 5px;
+  color: $text-muted;
+  font-family: $font-body;
+  font-size: 0.72rem;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+
+  &:hover { background: rgba($accent-blue, 0.14); color: $text-primary; border-color: rgba($accent-blue, 0.45); }
+  &[aria-pressed="true"] { background: rgba($accent-blue, 0.2); color: #cfe6ff; border-color: rgba($accent-blue, 0.6); }
+}
+
+// ─── Code viewer ──────────────────────────────────────────────────────────────
+.gd-code {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(120, 150, 200, 0.25) transparent;
+}
+
+.code-viewer {
+  background: $gd-surface;
+
+  pre { background: transparent; margin: 0; padding: 0.5rem 0; border: 0; overflow: visible; }
+  // Newlines between the per-line spans would otherwise render as blank rows.
+  code {
+    display: block;
+    min-width: max-content;
+    background: transparent;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.8rem;
+    line-height: 0;
+  }
+
+  .line {
+    display: block;
+    padding-right: 1.5rem;
+    line-height: 1.7;
+    white-space: pre;
+    border-left: 2px solid transparent;
+  }
+
+  .line[hidden] { display: none; }
+
+  .line:hover { background: rgba(255, 255, 255, 0.035); }
+  .line:target {
+    background: rgba($accent-gold, 0.13);
+    border-left-color: $accent-gold;
+  }
+
+  // Zero-width so the chevron paints in the gutter margin without shifting code.
+  .fold-toggle {
+    display: inline-block;
+    position: relative;
+    width: 0;
+    height: 1em;
+    vertical-align: middle;
+    padding: 0;
+    background: none;
+    border: 0;
+    color: rgba($gd-gutter, 0.85);
+    cursor: pointer;
+
+    &::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      right: 0.55rem;
+      width: 0;
+      height: 0;
+      border-top: 4px solid currentColor;
+      border-left: 3.5px solid transparent;
+      border-right: 3.5px solid transparent;
+      transform: translateY(-50%);
+    }
+
+    &[aria-expanded="false"]::before {
+      border-top: 3.5px solid transparent;
+      border-bottom: 3.5px solid transparent;
+      border-left: 4px solid $accent-gold;
+      border-right: 0;
+    }
+
+    // Click target: the chevron itself is a few pixels wide.
+    &::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      right: -0.1rem;
+      width: 1.2rem;
+      height: 1.7em;
+      transform: translateY(-50%);
+    }
+
+    &:hover { color: $accent-blue; }
+  }
+
+  .line[data-folded="true"] {
+    background: rgba($accent-gold, 0.07);
+
+    &::after {
+      content: "⋯";
+      margin-left: 0.5rem;
+      padding: 0 0.35rem;
+      border: 1px solid rgba($accent-gold, 0.35);
+      border-radius: 999px;
+      color: $accent-gold;
+      font-size: 0.7rem;
+      line-height: 1.2;
+    }
+  }
+
+  .line-anchor {
+    display: inline-block;
+    position: relative;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+  }
+}
+
+.code-viewer.is-wrapped {
+  code { min-width: 0; }
+  .line { white-space: pre-wrap; overflow-wrap: anywhere; }
+}
+
+.line-numbers {
+  counter-reset: line-counter 0;
+
+  .line { counter-increment: line-counter; }
+  .line::before {
+    content: counter(line-counter);
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    display: inline-block;
+    width: 4.25rem;
+    padding-right: 1rem;
+    margin-right: 1rem;
+    background: $gd-chrome;
+    border-right: 1px solid $gd-hairline;
+    color: rgba($gd-gutter, 0.7);
+    font-size: 0.72rem;
+    text-align: right;
+    user-select: none;
+  }
+  .line:hover::before { color: $text-muted; }
+}
+
+.syntax-comment { color: #7d8799; font-style: italic; }
+.syntax-tag,
+.syntax-keyword { color: #7dd3fc; }
+.syntax-attr,
+.syntax-type { color: #fbbf24; }
+.syntax-string { color: #86efac; }
+.syntax-number { color: #c4b5fd; }
+.syntax-punctuation { color: #7c8aa0; }
+
+.code-viewer .xref-link {
+  color: #86efac;
+  text-decoration: none;
+  border-bottom: 1px dotted rgba(134, 239, 172, 0.45);
+  cursor: pointer;
+
+  &:hover { color: #bbf7d0; border-bottom-color: #bbf7d0; background: rgba(134, 239, 172, 0.1); }
+}
+
+.code-viewer .xref-defrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-left: 0.75rem;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.code-viewer .xref-defchip {
+  display: inline-block;
+  white-space: nowrap;
+  margin-left: 0.75rem;
+  padding: 0 0.4rem;
+  background: rgba($accent-gold, 0.12);
+  border: 1px solid rgba($accent-gold, 0.3);
+  border-radius: 999px;
+  color: $accent-gold;
+  font-family: $font-body;
+  font-size: 0.68rem;
+  vertical-align: middle;
+
+  img { border-radius: 50%; vertical-align: -3px; margin-right: 0.25rem; }
+}
+
+.code-viewer .xref-defmark {
+  padding: 0 0.4rem;
+  background: rgba($accent-blue, 0.12);
+  border: 1px solid rgba($accent-blue, 0.3);
+  border-radius: 999px;
+  color: #9ecbff;
+  font-family: $font-body;
+  font-size: 0.68rem;
+  vertical-align: middle;
+  cursor: pointer;
+
+  &:hover { background: rgba($accent-blue, 0.28); color: #fff; }
+}
+
+// ─── Directory listing ────────────────────────────────────────────────────────
+.gd-dir { flex: 1; overflow: auto; padding: 1rem 1.25rem 3rem; }
+
+.gd-dir__meta {
+  margin-bottom: 0.75rem;
+  color: $gd-gutter;
+  font-family: ui-monospace, monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+}
+
+.dir-listing {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0;
+}
+
+.dir-entry a {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.45rem 0.7rem;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid $gd-hairline;
+  border-radius: 6px;
+  color: $text-muted;
+  font-family: ui-monospace, monospace;
+  font-size: 0.8rem;
+
+  &:hover { background: rgba($accent-blue, 0.1); border-color: rgba($accent-blue, 0.45); color: $text-primary; text-decoration: none; }
+}
+
+.dir-entry__icon {
+  flex: 0 0 auto;
+  width: 7px;
+  height: 7px;
+  border-radius: 2px;
+  background: $gd-gutter;
+}
+
+.dir-entry--dir a { color: $text-primary; }
+.dir-entry__icon[data-ext="dir"] { background: $accent-gold; border-radius: 1px; }
+
+// ─── Cross-reference panel ────────────────────────────────────────────────────
+.xref-panel {
+  display: flex;
+  flex-direction: column;
+  width: 24rem;
+  min-width: 0;
+  background: $gd-chrome;
+  border-left: 1px solid $gd-hairline;
+  font-size: 0.78rem;
+
+  &[hidden] { display: none; }
+}
+
+.xref-panel__header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid $gd-hairline;
+}
+
+.xref-panel__title {
+  min-width: 0;
+  color: $accent-gold;
+  font-family: ui-monospace, monospace;
+  font-size: 0.78rem;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.xref-panel__back {
+  flex: 0 0 auto;
+  padding: 0.15rem 0.45rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid $gd-hairline;
+  border-radius: 5px;
+  color: #9ecbff;
+  font-size: 0.7rem;
+  cursor: pointer;
+
+  &:hover { background: rgba($accent-blue, 0.18); }
+}
+
+.xref-panel__close {
+  margin-left: auto;
+  background: none;
+  border: 0;
+  color: $gd-gutter;
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+
+  &:hover { color: $text-primary; }
+}
+
+.xref-panel__chain {
+  padding: 0.4rem 0.75rem;
+  border-bottom: 1px solid $gd-hairline;
+  color: $gd-gutter;
+  font-family: ui-monospace, monospace;
+  font-size: 0.7rem;
+  word-break: break-all;
+
+  &:empty { display: none; }
+  a { color: #9ecbff; }
+}
+
+.xref-panel__chain-label {
+  margin-right: 0.3rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.62rem;
+  color: rgba($gd-gutter, 0.8);
+}
+
+.xref-panel__body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.35rem 0.6rem 2rem;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(120, 150, 200, 0.25) transparent;
+
+  h4 {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin: 0.6rem 0 0.25rem;
+    padding: 0.25rem 0.15rem;
+    background: $gd-chrome;
+    color: $text-muted;
+    font-family: $font-display;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+
+    span {
+      padding: 0 0.35rem;
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 999px;
+      color: $gd-gutter;
+      font-family: ui-monospace, monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0;
+    }
+  }
+
+  ul { list-style: none; margin: 0; padding: 0; }
+
+  > section > ul > li { border-bottom: 1px solid rgba(120, 150, 200, 0.08); }
+
+  > section > ul > li > a {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.35rem 0.4rem;
+    border-radius: 5px;
+    color: $text-primary;
+    text-decoration: none;
+
+    &:hover { background: rgba($accent-blue, 0.12); color: #cfe6ff; text-decoration: none; }
+  }
+}
+
+.xref-panel__tier {
+  margin: 0.5rem 0 0.15rem;
+  padding-left: 0.15rem;
+  color: $gd-gutter;
+  font-family: ui-monospace, monospace;
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.xref-panel__id { display: block; word-break: break-all; }
+.xref-panel__loc { display: block; color: $gd-gutter; font-family: ui-monospace, monospace; font-size: 0.68rem; }
+.xref-panel__sub { display: block; color: $gd-gutter; font-size: 0.68rem; word-break: break-all; }
+.xref-panel__empty { color: $gd-gutter; padding: 0.4rem 0.15rem; }
+.xref-panel__icon { flex: 0 0 auto; width: 20px; height: 20px; border-radius: 50%; }
+.xref-panel__rowtext { min-width: 0; }
+
+.xref-tree { list-style: none; margin: 0; padding: 0; }
+
+.xref-tree__children {
+  list-style: none;
+  margin: 0;
+  padding-left: 0.75rem;
+  border-left: 1px solid rgba(120, 150, 200, 0.14);
+}
+
+.xref-tree__row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.35rem;
+  padding: 0.18rem 0.25rem;
+  border-radius: 5px;
+  line-height: 1.35;
+
+  &:hover { background: rgba($accent-blue, 0.1); }
+}
+
+.xref-tree__toggle {
+  flex: 0 0 auto;
+  width: 0.9rem;
+  margin-top: 0.15rem;
+  background: none;
+  border: 0;
+  color: rgba($accent-blue, 0.85);
+  font-size: 0.6rem;
+  line-height: 1;
+  padding: 0;
+  cursor: pointer;
+
+  &::before { content: "\25B8"; }
+  &[aria-expanded="true"]::before { content: "\25BE"; }
+}
+
+.xref-tree__toggle--leaf { color: rgba($gd-gutter, 0.5); cursor: default; &::before { content: ""; } }
+
+.xref-tree__icon { flex: 0 0 auto; width: 18px; height: 18px; margin-top: 0.1rem; border-radius: 50%; }
+
+.xref-tree__name {
+  flex: 1 1 auto;
+  min-width: 0;
+  color: $text-primary;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+
+  &:hover { color: #cfe6ff; text-decoration: none; }
+}
+
+.xref-tree__sub { display: block; color: $gd-gutter; font-family: ui-monospace, monospace; font-size: 0.66rem; overflow-wrap: anywhere; }
+
+.xref-tree__field {
+  flex: 0 0 auto;
+  margin-top: 0.15rem;
+  padding: 0 0.3rem;
+  background: rgba($accent-blue, 0.1);
+  border-radius: 999px;
+  color: #9ecbff;
+  font-family: ui-monospace, monospace;
+  font-size: 0.62rem;
+  white-space: nowrap;
+}
+
+.xref-tree__empty { color: $gd-gutter; padding: 0.15rem 0 0.15rem 1.25rem; }
+
+// ─── Explorer toggle (narrow screens) ─────────────────────────────────────────
+.gd-explorer-toggle {
+  display: none;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.55rem 0.9rem;
+  background: $gd-chrome;
+  border: 0;
+  border-bottom: 1px solid $gd-hairline;
+  color: $text-muted;
+  font-family: $font-body;
+  font-size: 0.75rem;
+  text-align: left;
+  cursor: pointer;
+
+  &__label { text-transform: uppercase; letter-spacing: 0.1em; font-size: 0.68rem; }
+  &__file { color: $accent-gold; font-family: ui-monospace, monospace; }
+  &::after {
+    content: "";
+    margin-left: auto;
+    border-left: 5px solid rgba($accent-blue, 0.85);
+    border-top: 4px solid transparent;
+    border-bottom: 4px solid transparent;
+    transition: transform 0.12s ease;
+  }
+  &[aria-expanded="true"]::after { transform: rotate(90deg); }
+}
+
+@media (max-width: 1200px) {
+  .gd-shell { grid-template-columns: var(--gd-explorer-w) minmax(0, 1fr); }
+
+  .xref-panel {
+    position: fixed;
+    top: var(--gd-nav-h);
+    right: 0;
+    bottom: 0;
+    z-index: 95;
+    width: min(24rem, 100vw);
+    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+  }
+}
+
+@media (max-width: 900px) {
+  .gd-shell {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto minmax(0, 1fr);
+    height: auto;
+    min-height: calc(100vh - var(--gd-nav-h));
+  }
+
+  .gd-explorer-toggle { display: flex; }
+
+  .gd-explorer {
+    max-height: 45vh;
+    border-right: 0;
+    border-bottom: 1px solid $gd-hairline;
+    resize: none;
+
+    &[hidden] { display: none; }
+  }
+
+  .gd-explorer__head { display: none; }
+
+  .gd-shell { overflow: visible; }
+  .gd-code { flex: 0 0 auto; height: 70vh; }
+
+  .xref-panel {
+    top: auto;
+    width: 100%;
+    height: 65vh;
+    border-left: 0;
+    border-top: 1px solid $gd-hairline;
+  }
+
+  .gd-path { display: none; }
+  .code-viewer code { font-size: 0.74rem; }
+  .line-numbers .line::before { width: 2.75rem; padding-right: 0.5rem; margin-right: 0.6rem; font-size: 0.68rem; }
+}

@@ -46,3 +46,5 @@ site/static/replay/movement-abilities.json
 site/static/lost-in-the-nexus/models/
 site/static/lost-in-the-nexus/terrain/
 site/static/lost-in-the-nexus/maps3d/
+site/static/bundle/
+site/static/fonts/

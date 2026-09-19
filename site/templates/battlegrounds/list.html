@@ -3,9 +3,20 @@
 {% block title %}Battlegrounds — {{ config.title }}{% endblock title %}
 
 {% block content %}
-<div class="battlegrounds-list" data-select-search>
+<div class="battlegrounds-list" data-select-search data-select-search-noun="battlegrounds">
   <div class="battlegrounds-list__header">
     <h1 class="page-title">Battlegrounds</h1>
+    <div class="select-search" role="search" aria-label="Battlegrounds">
+      <label class="visually-hidden" for="battleground-filter">Filter battlegrounds by name</label>
+      <input class="select-search__input"
+             id="battleground-filter"
+             type="search"
+             placeholder="Filter battlegrounds"
+             autocomplete="off"
+             spellcheck="false"
+             data-select-search-input>
+      <span class="select-search__count" data-select-search-count></span>
+    </div>
     <span class="select-search-status" aria-live="polite" data-select-search-status></span>
   </div>
   <div class="battlegrounds-grid">
@@ -16,7 +27,7 @@
        data-select-search-id="{{ page.slug }}"
        data-select-search-text="{{ page.title }}">
       {% if page.extra.loading_screen %}
-      <img class="battleground-card__image" src="/images/battlegrounds/{{ page.extra.battleground_slug }}.png" alt="" loading="lazy">
+      {{<images.optimized path={'images/battlegrounds/' ~ page.extra.battleground_slug ~ '.png'} class="battleground-card__image" alt="" width={480} height={270} op="fill" display_width={480} display_height={270} loading="lazy" />}}
       {% endif %}
       <span class="battleground-card__name">{{ page.title }}</span>
     </a>

@@ -1,13 +1,5 @@
-
-export function escapeHtml(value) {
-  return String(value || "").replace(/[&<>"']/g, (char) => ({
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    '"': "&quot;",
-    "'": "&#39;",
-  })[char]);
-}
+import { escapeHtml } from "./escape.js";
+export { escapeHtml };
 
 const GALAXY_KEYWORDS = new Set([
   "break",

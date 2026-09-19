@@ -2,6 +2,8 @@
 
 {% block title %}{{ page.extra.hero_name }} — {{ config.title }}{% endblock title %}
 
+{% block og_image %}{% if page.extra.portraits.loading %}{% set card = resize_image(path='images/heroportraits/' ~ page.extra.portraits.loading, width=1200, height=630, op="fill", format="jpg", quality=82) %}{{ card.url }}{% else %}{{ get_url(path='og-default.png') }}{% endif %}{% endblock og_image %}
+
 {% block content %}
 {% set hero = page.extra %}
 {% set hero_data = load_data(path="data/heroes/" ~ page.slug ~ ".json") %}
@@ -149,7 +151,7 @@
       {% endif %}
     {% endfor %}
     <div class="talent-build-actions" data-share-build-actions>
-      <input class="build-code-preview" type="text" data-build-code-preview value="[T0000000,{{ hero.hero_name }}]" size="22" disabled hidden>
+      <input class="build-code-preview" type="text" aria-label="Talent build code" data-build-code-preview value="[T0000000,{{ hero.hero_name }}]" size="22" disabled hidden>
       <button class="share-build-button" type="button" data-copy-build-code hidden>Copy Build Code</button>
       <button class="share-build-button talent-build-actions__share-url" type="button" data-share-build hidden>Copy Build URL</button>
       <span class="share-build-status" data-share-build-status aria-live="polite"></span>
@@ -160,5 +162,6 @@
 {% endblock content %}
 
 {% block scripts %}
-<script src="{{ get_url(path='level-slider.js', cachebust=true) }}"></script>
+{% set bundles = load_data(path="data/bundles.json") %}
+<script src="{{ get_url(path=bundles['level-slider.js']) }}"></script>
 {% endblock scripts %}

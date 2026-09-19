@@ -15,5 +15,6 @@
     <p>Loading draft…</p>
   </div>
 </div>
-<script type="module" src="{{ get_url(path='draft/draft.js', cachebust=true) }}"></script>
+{% set bundles = load_data(path="data/bundles.json") %}
+<script type="module" src="{{ get_url(path=bundles['draft/draft.js']) }}"></script>
 {% endblock content %}

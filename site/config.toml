@@ -1,19 +1,15 @@
 base_url = "https://hots.epixors.com"
 title = "HotSixors"
+description = "Heroes of the Storm hero data, talent builds, battlegrounds, a replay viewer and a mock draft tool, built from the game's own files."
 compile_sass = true
 generate_feeds = false
-build_search_index = true
+# The site ships its own index (static/site-search.json); Zola's elasticlunr
+# bundle is never fetched.
+build_search_index = false
 minify_html = true
 # Generated pages carry game strings that can contain Tera-looking braces; only
 # hand-written guides are templated.
 skip_content_templating = ["heroes/**", "gamedata/**", "battlegrounds/**"]
-
-[search]
-index_format = "elasticlunr_javascript"
-include_title = true
-include_description = true
-include_path = false
-include_content = false
 
 [extra]
 role_colors = { Warrior = "#1a6bbf", Assassin = "#bf1a1a", Support = "#1abf6b", Specialist = "#8b1abf", Multiclass = "#bf8b1a" }
