@@ -668,7 +668,9 @@ function initPrimaryNav() {
   });
 
   menu.addEventListener("click", (event) => {
-    if (mq.matches && event.target.closest(".nav-link, .nav-dropdown__item")) setExpanded(false);
+    if (!mq.matches) return;
+    if (event.target.closest(".nav-dropdown__trigger, .datamining-toggle")) return;
+    if (event.target.closest(".nav-link, .nav-dropdown__item")) setExpanded(false);
   });
 
   mq.addEventListener("change", applyLayout);
