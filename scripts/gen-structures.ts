@@ -61,15 +61,6 @@ const groupsConfig: GroupDef[] = [
     ],
   },
   {
-    id: "healing-fountains",
-    title: "Healing Fountains",
-    units: [
-      structure("TownMoonwell", "Healing Fountain", "Fountain"),
-      structure("TownMoonwellL2", "Fort Healing Fountain", "Fountain"),
-      structure("TownMoonwellL3", "Keep Healing Fountain", "Fountain"),
-    ],
-  },
-  {
     id: "gates",
     title: "Gates",
     units: [
