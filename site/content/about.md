@@ -3,15 +3,11 @@ title = "About"
 template = "about.html"
 +++
 
-This website serves as a reference tool for Heroes of the Storm.
+This site is a free, <a href="https://github.com/K-JBoon/hotsixors"
+target="_blank" rel="noopener">open-source</a> tool for learning about
+Heroes of the Storm, sharing builds, datamining and more.
 
-Enable "Dataminer Mode" in the More dropdown to see the raw game
-data from which this sits gets generated, and enable tools to help
-datamining.
-
-If you see any issues, reach out on the <a href="https://discord.gg/7c4xrWUtqV" rel="noopener">community Discord</a>.
-
-This project is open source. You can check the code and contribute on <a href="https://github.com/K-JBoon/hotsixors/" target="_blank" rel="noopener">GitHub</a>.
+If you see any issues, please reach out on the <a href="https://discord.gg/7c4xrWUtqV" rel="noopener">community Discord</a>.
 
 <section class="about-resources">
   <h2>Resources</h2>
