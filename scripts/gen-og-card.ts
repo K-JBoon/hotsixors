@@ -8,7 +8,7 @@ import { FONT_SOURCES, SITE_STATIC } from "./lib/paths.ts";
 const OUT = path.join(SITE_STATIC, "og-default.png");
 
 const TAGLINE =
-  "Heroes of the Storm hero data, talent builds, battlegrounds, a replay viewer and a mock draft tool, built from the game's own files.";
+  "Heroes of the Storm data browser, replay viewer and datamining tool";
 
 async function embed(file: string): Promise<string> {
   const font = await readFile(path.join(FONT_SOURCES, file));
