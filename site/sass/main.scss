@@ -1006,38 +1006,6 @@ html:not(.datamining-enabled) [data-datamining] {
   h2 { font-size: 1.4rem; color: $accent-gold; border-bottom: 1px solid $border-dim; padding-bottom: 0.5rem; margin-bottom: 1rem; }
 }
 
-// The abilities section header wraps h2 + the Detailed toggle, so the border
-// moves to the wrapper and is removed from h2 itself.
-.abilities-section__header {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  border-bottom: 1px solid $border-dim;
-  padding-bottom: 0.5rem;
-  margin-bottom: 1rem;
-  h2 { border-bottom: none; padding-bottom: 0; margin-bottom: 0; }
-}
-
-.ability-details-toggle {
-  display: none; // shown only with JS
-  padding: 0.2em 0.7em;
-  font-family: $font-display;
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  background: transparent;
-  border: 1px solid $border-dim;
-  border-radius: 3px;
-  color: $text-muted;
-  cursor: pointer;
-  transition: border-color 0.15s, color 0.15s;
-  &[aria-pressed="true"] { border-color: $accent-gold; color: $accent-gold; }
-  &:hover { border-color: $accent-blue; color: $accent-blue; }
-  &:focus-visible { border-color: $accent-gold; color: $accent-gold; }
-}
-.js .ability-details-toggle { display: inline-flex; align-items: center; }
-
 .abilities-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 0.75rem; }
 
 .ability-card {
@@ -1061,17 +1029,12 @@ html:not(.datamining-enabled) [data-datamining] {
     font-size: 0.68rem; opacity: 0.7; margin-right: 0.15rem;
   }
   &__stats {
-    display: none;
     margin: 0;
     margin-top: 0.6rem;
     padding-top: 0.5rem;
     border-top: 1px solid $border-dim;
   }
 }
-
-.abilities-section--detailed .ability-card__stats { display: block; }
-.hero-unit-section--secondary { display: none; }
-.abilities-section--detailed .hero-unit-section--secondary { display: block; }
 
 .ability-stat {
   display: grid;
@@ -2612,25 +2575,22 @@ html:not(.datamining-enabled) .mechanics-table {
   min-width: 0;
 }
 
-.effect-index-intro {
-  color: $text-muted;
-  margin-bottom: 0.75rem;
-}
-
-.effect-index-note {
-  color: $text-muted;
-  margin-bottom: 1.5rem;
-}
-
 .effect-index-controls {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.85rem;
   margin-bottom: 2rem;
 }
 
+.effect-index-controls__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+}
+
 .effect-index-search {
-  width: 100%;
+  flex: 1 1 18rem;
   max-width: 32rem;
   padding: 0.55rem 0.75rem;
   background: $bg-card;
@@ -2645,22 +2605,51 @@ html:not(.datamining-enabled) .mechanics-table {
 
 .effect-index-chips {
   display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid $border-dim;
+  border-radius: 8px;
+  background: $bg-card;
+}
+
+.effect-index-chip-group {
+  display: grid;
+  grid-template-columns: 9.5rem minmax(0, 1fr);
+  align-items: baseline;
+  gap: 0.5rem 1rem;
+  padding: 0.5rem 0;
+
+  & + & { border-top: 1px solid $border-dim; }
+}
+
+.effect-index-chip-group__label {
+  color: $text-muted;
+  font-family: $font-display;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.effect-index-chip-group__chips {
+  display: flex;
   flex-wrap: wrap;
-  gap: 0.4rem;
+  gap: 0.35rem;
 }
 
 .effect-index-bulk-actions {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem;
+  gap: 0.35rem;
+  margin-left: auto;
 }
 
 .effect-index-filter-button {
-  padding: 0.3rem 0.7rem;
+  padding: 0.4rem 0.85rem;
   background: transparent;
   border: 1px solid $border-dim;
-  border-radius: 4px;
-  color: $text-primary;
+  border-radius: 6px;
+  color: $text-muted;
   font: inherit;
   font-size: 0.8rem;
   cursor: pointer;
@@ -2677,17 +2666,26 @@ html:not(.datamining-enabled) .mechanics-table {
 }
 
 .effect-index-chip {
-  padding: 0.3rem 0.7rem;
-  background: $bg-card;
+  padding: 0.25rem 0.65rem;
+  background: transparent;
   border: 1px solid $border-dim;
   border-radius: 999px;
   color: $text-muted;
   font: inherit;
-  font-size: 0.8rem;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  white-space: nowrap;
   cursor: pointer;
 
-  &[aria-pressed="true"] { border-color: $accent-gold; color: $accent-gold; }
-  &[aria-pressed="false"] { opacity: 0.55; text-decoration: line-through; }
+  &:hover { border-color: $accent-gold; color: $text-primary; }
+
+  &[aria-pressed="true"] {
+    border-color: rgba($accent-gold, 0.6);
+    background: rgba($accent-gold, 0.12);
+    color: $accent-gold;
+  }
+
+  &[aria-pressed="false"] { opacity: 0.45; }
   &:focus-visible { outline: 2px solid $accent-gold; outline-offset: 1px; }
 }
 
@@ -2790,6 +2788,15 @@ html:not(.datamining-enabled) .mechanics-table {
     flex-direction: row;
     flex-wrap: wrap;
     gap: 0.4rem 0.8rem;
+  }
+
+  .effect-index-chip-group {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.35rem;
+  }
+
+  .effect-index-bulk-actions {
+    margin-left: 0;
   }
 }
 

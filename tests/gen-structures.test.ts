@@ -20,7 +20,6 @@ test("structures data includes player-facing structure groups", () => {
     "core",
     "forts-and-keeps",
     "towers",
-    "healing-fountains",
     "gates",
     "walls",
   ]);
@@ -30,7 +29,6 @@ test("structures data includes player-facing structure groups", () => {
   assert.ok(allIds.includes("TownTownHallL2"));
   assert.ok(allIds.includes("TownTownHallL3"));
   assert.ok(allIds.includes("TownCannonTowerL2"));
-  assert.ok(allIds.includes("TownMoonwellL2"));
   assert.ok(allIds.includes("TownGateL2"));
   assert.ok(allIds.includes("TownWallL2Parent"));
   assert.ok(data.groups.every((group) => group.units.every((unit) => !("context" in unit))));

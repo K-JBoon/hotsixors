@@ -50,11 +50,8 @@
   </section>
   {% endif %}
 
-  <section class="abilities-section" data-ability-section>
-    <div class="abilities-section__header">
-      <h2>Abilities</h2>
-      <button class="ability-details-toggle" data-ability-details-toggle type="button" aria-pressed="false" aria-label="Toggle detailed ability stats">Detailed</button>
-    </div>
+  <section class="abilities-section">
+    <h2>Abilities</h2>
     <div class="abilities-grid">
       {% for ab in hero_data.abilities %}
         {% if ab.category == "basic" or ab.category == "heroic" or ab.category == "trait" or ab.category == "activable" %}

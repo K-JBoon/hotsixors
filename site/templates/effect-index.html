@@ -24,26 +24,27 @@
     <main class="effect-index-main">
       <h1>Effect Index</h1>
 
-      <p class="effect-index-intro">
-        Which hero abilities and talents apply each status effect.
-
-        See <a href="{{ get_url(path='status-effects') }}">Status Effects</a> for how each one works.
-        <span data-datamining>Generated dynamically from build {{ data.generatedFrom }}.</span>
-      </p>
-      <p class="effect-index-note">
-        <b>NOTE:</b> this page is a work-in-progress and will likely contain missing or miscategorized items.
-      </p>
-
       <div class="effect-index-controls">
-        <input type="search" class="effect-index-search" data-effect-search
-               placeholder="Filter by hero, ability, or talent…" aria-label="Filter entries">
-        <div class="effect-index-bulk-actions" role="group" aria-label="Enable or disable all mechanics">
-          <button type="button" class="effect-index-filter-button" data-effect-enable-all>Show all</button>
-          <button type="button" class="effect-index-filter-button" data-effect-disable-all>Hide all</button>
+        <div class="effect-index-controls__bar">
+          <input type="search" class="effect-index-search" data-effect-search
+                 placeholder="Filter by hero, ability, or talent…" aria-label="Filter entries">
+          <div class="effect-index-bulk-actions" role="group" aria-label="Enable or disable all mechanics">
+            <button type="button" class="effect-index-filter-button" data-effect-enable-all>Show all</button>
+            <button type="button" class="effect-index-filter-button" data-effect-disable-all>Hide all</button>
+          </div>
         </div>
-        <div class="effect-index-chips" data-effect-chips role="group" aria-label="Filter by mechanic">
+        <div class="effect-index-chips" data-effect-chips>
+          {% set_global chip_category = "" %}
           {% for mechanic in data.mechanics %}
-          <button type="button" class="effect-index-chip" data-effect-chip="{{ mechanic.slug }}" aria-pressed="true">{{ mechanic.name }}</button>
+            {% if mechanic.category != chip_category %}
+              {% if not loop.first %}</div></div>{% endif %}
+              {% set_global chip_category = mechanic.category %}
+              <div class="effect-index-chip-group" role="group" aria-label="Filter by {{ mechanic.category }}">
+              <span class="effect-index-chip-group__label">{{ mechanic.category }}</span>
+              <div class="effect-index-chip-group__chips">
+            {% endif %}
+            <button type="button" class="effect-index-chip" data-effect-chip="{{ mechanic.slug }}" aria-pressed="true">{{ mechanic.name }}</button>
+            {% if loop.last %}</div></div>{% endif %}
           {% endfor %}
         </div>
       </div>

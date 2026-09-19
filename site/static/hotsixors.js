@@ -957,28 +957,6 @@ function initTalentBuilds() {
   applyState();
 }
 
-function initAbilityDetails() {
-  const section = document.querySelector("[data-ability-section]");
-  const toggle = document.querySelector("[data-ability-details-toggle]");
-  if (!section || !toggle) return;
-
-  const LS_KEY = "hotsixors.details";
-  const storage = getAvailableStorage(window);
-
-  function applyState(enabled) {
-    section.classList.toggle("abilities-section--detailed", enabled);
-    toggle.setAttribute("aria-pressed", String(enabled));
-  }
-
-  applyState(getStoredBoolean(storage, LS_KEY, true));
-
-  toggle.addEventListener("click", () => {
-    const next = toggle.getAttribute("aria-pressed") !== "true";
-    setStoredBoolean(storage, LS_KEY, next);
-    applyState(next);
-  });
-}
-
 function initGameDataSidebarToggle() {
   const toggle = document.querySelector("[data-gamedata-sidebar-toggle]");
   const sidebar = document.getElementById("gamedata-sidebar");
@@ -1272,7 +1250,6 @@ if (typeof document !== "undefined") {
     initBattlegroundHighlighting();
     initTalentBuilds();
     initGameDataSidebarToggle();
-    initAbilityDetails();
     initBreadcrumbCollapse();
     initHeroViewToggle();
     initHeroRoleFilter();
