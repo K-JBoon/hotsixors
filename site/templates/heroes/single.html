@@ -52,39 +52,45 @@
 
   <section class="abilities-section">
     <h2>Abilities</h2>
+    {% set main_cats = ["basic", "heroic", "trait", "activable"] %}
+    {% set unit_cats = ["basic", "heroic", "trait"] %}
     <div class="abilities-grid">
       {% for ab in hero_data.abilities %}
-        {% if ab.category == "basic" or ab.category == "heroic" or ab.category == "trait" or ab.category == "activable" %}
+        {% if ab.category in main_cats %}
         {{<heroes.ability_card ab={ab} sc={sc} show_stats={true} />}}
         {% endif %}
       {% endfor %}
     </div>
 
-    {% for group in hero_data.subAbilityGroups %}
-    <div class="hero-unit-section{% if group.isSecondary %} hero-unit-section--secondary{% endif %}">
-      <h3 class="hero-unit-section__label">{{ group.parentLabel }}</h3>
-      <div class="abilities-grid">
-        {% for ab in group.abilities %}
-          {% if ab.category == "basic" or ab.category == "heroic" or ab.category == "trait" or ab.category == "activable" %}
+    <div class="ability-groups">
+      {% for group in hero_data.subAbilityGroups %}
+      {% set shown = [ab for ab in group.abilities if ab.category in main_cats] %}
+      {% if shown | length > 0 %}
+      <div class="hero-unit-section hero-unit-section--span-{{ shown | length }}{% if group.isSecondary %} hero-unit-section--secondary{% endif %}">
+        <h3 class="hero-unit-section__label">{{ group.parentLabel }}</h3>
+        <div class="abilities-grid">
+          {% for ab in shown %}
           {{<heroes.ability_card ab={ab} sc={sc} show_stats={true} />}}
-          {% endif %}
-        {% endfor %}
+          {% endfor %}
+        </div>
       </div>
-    </div>
-    {% endfor %}
+      {% endif %}
+      {% endfor %}
 
-    {% for unit in hero_data.heroUnitAbilities %}
-    <div class="hero-unit-section">
-      <h3 class="hero-unit-section__label">{{ unit.heroUnitName }} (Alternate Form)</h3>
-      <div class="abilities-grid">
-        {% for ab in unit.abilities %}
-          {% if ab.category == "basic" or ab.category == "heroic" or ab.category == "trait" %}
+      {% for unit in hero_data.heroUnitAbilities %}
+      {% set shown = [ab for ab in unit.abilities if ab.category in unit_cats] %}
+      {% if shown | length > 0 %}
+      <div class="hero-unit-section hero-unit-section--span-{{ shown | length }}">
+        <h3 class="hero-unit-section__label">{{ unit.heroUnitName }} (Alternate Form)</h3>
+        <div class="abilities-grid">
+          {% for ab in shown %}
           {{<heroes.ability_card ab={ab} sc={sc} show_stats={true} />}}
-          {% endif %}
-        {% endfor %}
+          {% endfor %}
+        </div>
       </div>
+      {% endif %}
+      {% endfor %}
     </div>
-    {% endfor %}
   </section>
 
   <section class="talents-section" data-talent-hero="{{ hero.hero_name }}">

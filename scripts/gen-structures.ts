@@ -1,6 +1,6 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import * as path from "node:path";
-import type { StructureGroup, StructureStats, StructureWeapon } from "./types.ts";
+import type { ScalingSummaryRow, StructureGroup, StructureStats, StructureWeapon } from "./types.ts";
 import { GAMEDATA_DIR, SITE_CONTENT, SITE_DATA } from "./lib/paths.ts";
 import {
   STRUCTURE_SCALING_FIELDS,
@@ -9,7 +9,6 @@ import {
   links,
   numberTag,
   readCached,
-  summarizeArmor,
   summarizeScaling,
   summarizeScalingRows,
 } from "./lib/catalog-xml.ts";
@@ -23,13 +22,19 @@ type StructureDef = {
 type GroupDef = Omit<StructureGroup, "units"> & { units: StructureDef[] };
 
 const heroesData = path.join(GAMEDATA_DIR, "heroesdata.stormmod/base.stormdata/gamedata");
+const mapMods = path.join(GAMEDATA_DIR, "heroesmapmods/battlegroundmapmods");
 const source = {
   unitXml: path.join(heroesData, "unitdata.xml"),
   behaviorXml: path.join(heroesData, "behaviordata.xml"),
   weaponXml: path.join(heroesData, "weapondata.xml"),
   effectXml: path.join(heroesData, "effectdata.xml"),
-  armorXml: path.join(heroesData, "unitdata.xml"),
+  galaxy: path.join(GAMEDATA_DIR, "heroesdata.stormmod/base.stormdata/triggerlibs/heroeslib_h.galaxy"),
 };
+
+// Map mods that re-declare a town structure with its own KillXP.
+const killXpOverrides = [
+  { label: "Towers of Doom", unitXml: path.join(mapMods, "towersofdoom.stormmod/base.stormdata/gamedata/unitdata.xml") },
+];
 
 function structure(id: string, name: string, role: string): StructureDef {
   return { id, name, role };
@@ -109,27 +114,59 @@ function weapon(xml: string, id: string, effectXml: string): StructureWeapon {
   };
 }
 
+function galaxyConst(galaxy: string, name: string) {
+  const value = new RegExp(`const fixed ${name} = ([\\d.]+);`).exec(galaxy)?.[1];
+  if (!value) throw new Error(`gen-structures: ${name} not found in heroeslib_h.galaxy`);
+  return Number.parseFloat(value);
+}
+
+// Town halls award no kill XP off Towers of Doom; each one lost raises the
+// enemy team's passive trickle instead.
+function trickleNote(galaxy: string) {
+  const perTick = galaxyConst(galaxy, "libCore_gv_data_XP_TrickleAmount_C");
+  const period = galaxyConst(galaxy, "libCore_gv_data_XP_TricklePeriod_C");
+  const mod = galaxyConst(galaxy, "libCore_gv_data_XP_TrickleTownHallMod_C");
+  const bonus = Number(((perTick * mod) / period).toFixed(2));
+  return `Each one destroyed adds +${mod} to the enemy team's XP trickle multiplier (+${bonus} XP/s). Towers of Doom uses kill XP instead.`;
+}
+
+async function killXpRows(def: StructureDef, baseKillXp: number | null): Promise<ScalingSummaryRow[]> {
+  const overrides = await Promise.all(killXpOverrides.map(async (map) => {
+    const unitBlock = block(await readCached(map.unitXml), "CUnit", def.id);
+    return { label: map.label, value: unitBlock ? numberTag(unitBlock, "KillXP") : null };
+  }));
+  const differing = overrides.filter((map) => map.value != null && map.value !== baseKillXp);
+  if (!differing.length) return [];
+  return [
+    { label: "Most maps", summary: baseKillXp == null ? "None" : String(baseKillXp) },
+    ...differing.map((map) => ({ label: map.label, summary: String(map.value) })),
+  ];
+}
+
 async function processStructure(def: StructureDef): Promise<StructureStats> {
-  const [unitXml, behaviorXml, weaponXml, effectXml, armorXml] = await Promise.all([
+  const [unitXml, behaviorXml, weaponXml, effectXml, galaxy] = await Promise.all([
     readCached(source.unitXml),
     readCached(source.behaviorXml),
     readCached(source.weaponXml),
     readCached(source.effectXml),
-    readCached(source.armorXml),
+    readCached(source.galaxy),
   ]);
   const unitBlock = block(unitXml, "CUnit", def.id);
-  const empty = { id: def.id, name: def.name, role: def.role, hp: null, shields: null, killXp: null, scaling: null, scalingRows: [], armor: null, weapons: [] };
+  const empty = { id: def.id, name: def.name, role: def.role, hp: null, shields: null, killXp: null, killXpRows: [], killXpNote: null, scaling: null, scalingRows: [], weapons: [] };
   if (!unitBlock) return empty;
   const scalingLinks = links(unitBlock, "BehaviorArray", "Link").filter((id) => /scaling/i.test(id));
   const weaponLinks = links(unitBlock, "WeaponArray", "Link");
+  const isTownHall = /<FlagArray\b[^>]*index="TownStructureTownHall"[^>]*value="1"/i.test(unitBlock);
+  const killXp = numberTag(unitBlock, "KillXP");
   return {
     ...empty,
     hp: numberTag(unitBlock, "LifeMax"),
     shields: numberTag(unitBlock, "ShieldsMax"),
-    killXp: numberTag(unitBlock, "KillXP"),
+    killXp,
+    killXpRows: await killXpRows(def, killXp),
+    killXpNote: isTownHall ? trickleNote(galaxy) : null,
     scaling: summarizeScaling(behaviorXml, scalingLinks, STRUCTURE_SCALING_FIELDS),
     scalingRows: summarizeScalingRows(behaviorXml, scalingLinks, STRUCTURE_SCALING_FIELDS),
-    armor: summarizeArmor(unitBlock, armorXml),
     weapons: weaponLinks.map((id) => weapon(weaponXml, id, effectXml)),
   };
 }

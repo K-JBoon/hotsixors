@@ -1066,8 +1066,32 @@ html:not(.datamining-enabled) [data-datamining] {
   }
 }
 
-.hero-unit-section {
+@mixin ability-group-cols($cols) {
+  .ability-groups { grid-template-columns: repeat($cols, minmax(0, 1fr)); }
+  @for $i from 1 through 6 {
+    $span: if($i > $cols, $cols, $i);
+    .hero-unit-section--span-#{$i} {
+      grid-column: span $span;
+      .abilities-grid { grid-template-columns: repeat($span, minmax(0, 1fr)); }
+    }
+  }
+}
+
+.ability-groups {
+  display: grid;
+  grid-auto-flow: dense;
+  gap: 1.5rem 0.75rem;
   margin-top: 1.5rem;
+}
+
+@include ability-group-cols(4);
+@media (max-width: 1200px) { @include ability-group-cols(3); }
+@media (max-width: 900px) { @include ability-group-cols(1); }
+
+.hero-unit-section {
+  display: flex;
+  flex-direction: column;
+  .abilities-grid { flex: 1; }
   &__label {
     font-family: $font-display;
     font-size: 1rem;
@@ -2436,7 +2460,15 @@ $gd-hairline: rgba(120, 150, 200, 0.14);
 }
 
 .structures-table {
-  min-width: 1160px;
+  min-width: 1040px;
+
+  &__note {
+    max-width: 22rem;
+    margin: 0.45rem 0 0;
+    color: $text-muted;
+    font-size: 0.8rem;
+    line-height: 1.4;
+  }
 }
 
 .mechanics-table {
@@ -3330,7 +3362,7 @@ html:not(.datamining-enabled) .mechanics-table {
   }
 
   .structures-table {
-    min-width: 980px;
+    min-width: 880px;
   }
 
   // Gamedata / guides

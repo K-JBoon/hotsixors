@@ -69,3 +69,38 @@ test("structures data resolves fort and tower stats from XML", () => {
   assert.equal(fortTower.killXp, 125);
   assert.ok(fortTower.weapons.some((weapon) => weapon.id === "GuardTowerL2Weapon" && weapon.damage === 250 && weapon.range === 7.75));
 });
+
+test("structures data reports per-map kill XP and the town hall trickle bonus", () => {
+  const data = generateStructuresData();
+  const forts = data.groups.find((group) => group.id === "forts-and-keeps");
+  const towers = data.groups.find((group) => group.id === "towers");
+
+  const fort = forts.units.find((unit) => unit.id === "TownTownHallL2");
+  assert.equal(fort.killXp, null);
+  assert.deepEqual(fort.killXpRows, [
+    { label: "Most maps", summary: "None" },
+    { label: "Towers of Doom", summary: "1200" },
+  ]);
+  assert.match(fort.killXpNote, /\+0\.2 to the enemy team's XP trickle multiplier \(\+4\.6 XP\/s per hero\)/);
+
+  const keep = forts.units.find((unit) => unit.id === "TownTownHallL3");
+  assert.deepEqual(keep.killXpRows, [
+    { label: "Most maps", summary: "None" },
+    { label: "Towers of Doom", summary: "2050" },
+  ]);
+
+  const keepTower = towers.units.find((unit) => unit.id === "TownCannonTowerL3");
+  assert.deepEqual(keepTower.killXpRows, [
+    { label: "Most maps", summary: "400" },
+    { label: "Towers of Doom", summary: "800" },
+  ]);
+  assert.equal(keepTower.killXpNote, null);
+
+  const gate = data.groups.find((group) => group.id === "gates").units.find((unit) => unit.id === "TownGateL2");
+  assert.deepEqual(gate.killXpRows, []);
+});
+
+test("structures data omits the unused armor column", () => {
+  const data = generateStructuresData();
+  assert.ok(data.groups.every((group) => group.units.every((unit) => !("armor" in unit))));
+});

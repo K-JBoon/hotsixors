@@ -368,9 +368,10 @@ export interface StructureStats {
   hp: number | null;
   shields: number | null;
   killXp: number | null;
+  killXpRows: ScalingSummaryRow[];
+  killXpNote: string | null;
   scaling: string | null;
   scalingRows: ScalingSummaryRow[];
-  armor: string | null;
   weapons: StructureWeapon[];
 }
 

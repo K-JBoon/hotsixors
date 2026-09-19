@@ -21,7 +21,6 @@
             <th scope="col">Structure</th>
             <th scope="col">HP</th>
             <th scope="col">Shields</th>
-            <th scope="col">Armor</th>
             <th scope="col">Scaling</th>
             <th scope="col">XP</th>
             <th scope="col">Weapons</th>
@@ -37,7 +36,6 @@
             </th>
             <td>{% if unit.hp %}{{ unit.hp }}{% else %}&mdash;{% endif %}</td>
             <td>{% if unit.shields %}{{ unit.shields }}{% else %}&mdash;{% endif %}</td>
-            <td>{% if unit.armor %}{{ unit.armor }}{% else %}&mdash;{% endif %}</td>
             <td>
               {% if unit.scalingRows %}
               <dl class="scaling-summary">
@@ -54,7 +52,23 @@
               &mdash;
               {% endif %}
             </td>
-            <td>{% if unit.killXp %}{{ unit.killXp }}{% else %}&mdash;{% endif %}</td>
+            <td>
+              {% if unit.killXpRows %}
+              <dl class="scaling-summary">
+                {% for row in unit.killXpRows %}
+                <div>
+                  <dt>{{ row.label }}</dt>
+                  <dd>{{ row.summary }}</dd>
+                </div>
+                {% endfor %}
+              </dl>
+              {% elif unit.killXp %}
+              {{ unit.killXp }}
+              {% else %}
+              &mdash;
+              {% endif %}
+              {% if unit.killXpNote %}<p class="structures-table__note">{{ unit.killXpNote }}</p>{% endif %}
+            </td>
             <td>
               {% if unit.weapons %}
               <ul class="minions-weapons">

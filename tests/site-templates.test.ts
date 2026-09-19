@@ -193,6 +193,15 @@ test("structures table does not render context column", () => {
   assert.doesNotMatch(template, /unit\.context/);
 });
 
+test("structures table drops armor and renders per-map kill XP", () => {
+  const template = readFileSync(new URL("../site/templates/structures.html", import.meta.url), "utf-8");
+
+  assert.doesNotMatch(template, />Armor<\/th>/);
+  assert.doesNotMatch(template, /unit\.armor/);
+  assert.match(template, /unit\.killXpRows/);
+  assert.match(template, /unit\.killXpNote/);
+});
+
 test("about page renders generated build and source version metadata", () => {
   const template = readFileSync(new URL("../site/templates/about.html", import.meta.url), "utf-8");
 
