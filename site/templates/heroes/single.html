@@ -163,5 +163,5 @@
 
 {% block scripts %}
 {% set bundles = load_data(path="data/bundles.json") %}
-<script src="{{ get_url(path=bundles['level-slider.js']) }}"></script>
+<script defer src="{{ get_url(path=bundles['level-slider.js']) }}"></script>
 {% endblock scripts %}

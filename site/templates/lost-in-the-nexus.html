@@ -60,5 +60,8 @@
     </div>
   </div>
 </div>
-<script type="module" src="{{ get_url(path='lost-in-the-nexus/viewer.js', cachebust=true) }}"></script>
 {% endblock content %}
+
+{% block scripts %}
+<script type="module" src="{{ get_url(path='lost-in-the-nexus/viewer.js', cachebust=true) }}"></script>
+{% endblock scripts %}

@@ -121,5 +121,5 @@
 
 {% block scripts %}
 {% set bundles = load_data(path="data/bundles.json") %}
-<script src="{{ get_url(path=bundles['underdog-calc.js']) }}"></script>
+<script defer src="{{ get_url(path=bundles['underdog-calc.js']) }}"></script>
 {% endblock scripts %}

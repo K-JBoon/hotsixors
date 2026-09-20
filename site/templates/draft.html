@@ -15,6 +15,9 @@
     <p>Loading draft…</p>
   </div>
 </div>
+{% endblock content %}
+
+{% block scripts %}
 {% set bundles = load_data(path="data/bundles.json") %}
 <script type="module" src="{{ get_url(path=bundles['draft/draft.js']) }}"></script>
-{% endblock content %}
+{% endblock scripts %}
