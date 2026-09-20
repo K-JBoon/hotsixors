@@ -1,5 +1,4 @@
 import { escapeHtml } from "./escape.js";
-export { escapeHtml };
 
 const GALAXY_KEYWORDS = new Set([
   "break",

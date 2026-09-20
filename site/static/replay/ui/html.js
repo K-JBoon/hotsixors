@@ -1,10 +1,8 @@
-
 import { LOOPS_PER_SECOND } from '../analyze/stat-events.js';
 import { state, TEAM_COLORS } from './state.js';
+import { escapeHtml } from '../../js/escape.js';
 
-export function escapeHtml(s) {
-  return s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-}
+export { escapeHtml };
 
 export const heroUrl = (p) => (p.heroSlug ? `/heroes/${p.heroSlug}/` : null);
 export const talentUrl = (p, nameId) => (p.heroSlug ? `/heroes/${p.heroSlug}/#talent-${nameId}` : null);

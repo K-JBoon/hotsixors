@@ -1,6 +1,6 @@
 
 import { matchesSearchEntry } from './search.js';
-import { escapeHtml } from './highlight.js';
+import { escapeHtml } from './escape.js';
 
 export function treeNodeContentPath(node) {
   return node.type === "dir"
