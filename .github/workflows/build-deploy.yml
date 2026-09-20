@@ -54,12 +54,47 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # The patch server names the build before anything downloads, so a run
+      # that would redeploy a build this commit already deployed can stop here.
+      - name: Resolve the served build
+        id: target
+        run: |
+          set +e
+          build=$(npm run -s extract:print-build)
+          code=$?
+          set -e
+          if [ "$code" -eq 75 ]; then
+            echo "SKIP=true" >> "$GITHUB_ENV"
+            echo "No PTR build to deploy." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          [ "$code" -eq 0 ] || exit "$code"
+          echo "build=$build" >> "$GITHUB_OUTPUT"
+
+      # A manual run always rebuilds.
+      - name: Look for an earlier deploy
+        id: deployed
+        if: ${{ env.SKIP != 'true' && github.event_name != 'workflow_dispatch' }}
+        uses: actions/cache/restore@v4
+        with:
+          path: .deployed
+          key: deployed-${{ env.CASC_KEY_PREFIX }}-${{ steps.target.outputs.build }}-${{ github.sha }}
+          lookup-only: true
+
+      - name: Skip an unchanged build
+        if: ${{ steps.deployed.outputs.cache-hit == 'true' }}
+        run: |
+          echo "SKIP=true" >> "$GITHUB_ENV"
+          echo "Build ${{ steps.target.outputs.build }} is already deployed from this commit." >> "$GITHUB_STEP_SUMMARY"
+
       - name: Install Zola
+        if: ${{ env.SKIP != 'true' }}
         run: |
           curl -sL https://github.com/getzola/zola/releases/download/v0.23.4/zola-v0.23.4-x86_64-unknown-linux-gnu.tar.gz \
             | tar xz -C /usr/local/bin
 
       - name: Cache HeroesDataParser
+        if: ${{ env.SKIP != 'true' }}
         uses: actions/cache@v4
         with:
           path: |
@@ -71,6 +106,7 @@ jobs:
       # most of them with the one before it, so restore the newest entry.
       - name: Restore CASC cache
         id: casc
+        if: ${{ env.SKIP != 'true' }}
         uses: actions/cache/restore@v4
         with:
           path: .hdp/casc
@@ -81,13 +117,14 @@ jobs:
       # build went away mid-run. Stop the job without failing it.
       - name: Extract game data
         id: extract
+        if: ${{ env.SKIP != 'true' }}
         run: |
           set +e
           npm run extract
           code=$?
           set -e
           if [ "$code" -eq 75 ]; then
-            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "SKIP=true" >> "$GITHUB_ENV"
             echo "No PTR build to deploy." >> "$GITHUB_STEP_SUMMARY"
             exit 0
           fi
@@ -96,14 +133,14 @@ jobs:
           echo "version=$version" >> "$GITHUB_OUTPUT"
 
       - name: Save CASC cache
-        if: ${{ success() && steps.extract.outputs.skip != 'true' && steps.casc.outputs.cache-matched-key != format('{0}-{1}', env.CASC_KEY_PREFIX, steps.extract.outputs.version) }}
+        if: ${{ success() && env.SKIP != 'true' && steps.casc.outputs.cache-matched-key != format('{0}-{1}', env.CASC_KEY_PREFIX, steps.extract.outputs.version) }}
         uses: actions/cache/save@v4
         with:
           path: .hdp/casc
           key: ${{ env.CASC_KEY_PREFIX }}-${{ steps.extract.outputs.version }}
 
       - name: Generate content & build
-        if: ${{ steps.extract.outputs.skip != 'true' }}
+        if: ${{ env.SKIP != 'true' }}
         run: npm run build
         env:
           ZOLA_BASE_URL: ${{ inputs.ptr && 'https://hots-ptr.epixors.com' || '' }}
@@ -111,7 +148,7 @@ jobs:
       # The catalog of a build does not change. Keep it, for live and PTR
       # replays of a build that is no longer current.
       - name: Commit new ability-link catalog
-        if: ${{ github.event_name != 'pull_request' && steps.extract.outputs.skip != 'true' }}
+        if: ${{ github.event_name != 'pull_request' && env.SKIP != 'true' }}
         run: |
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git config user.name "github-actions[bot]"
@@ -133,15 +170,30 @@ jobs:
           exit 1
 
       - name: Validate Cloudflare secrets
-        if: ${{ steps.extract.outputs.skip != 'true' }}
+        if: ${{ env.SKIP != 'true' }}
         run: |
           test -n "$CLOUDFLARE_API_TOKEN" || { echo "CLOUDFLARE_API_TOKEN is required"; exit 1; }
           test -n "$CLOUDFLARE_ACCOUNT_ID" || { echo "CLOUDFLARE_ACCOUNT_ID is required"; exit 1; }
 
       - name: Deploy to Cloudflare Pages
-        if: ${{ steps.extract.outputs.skip != 'true' }}
+        if: ${{ env.SKIP != 'true' }}
         run: |
           npx --yes wrangler@4 pages deploy site/public \
             --project-name="${{ inputs.ptr && 'hotsixors-ptr' || 'hotsixors' }}" \
             --branch="${GITHUB_REF_NAME}" \
             --commit-hash="${GITHUB_SHA}"
+
+      # Keyed on HEAD, which the catalog step may have moved: the next run
+      # checks out that commit and matches.
+      - name: Record the deploy
+        if: ${{ env.SKIP != 'true' }}
+        run: |
+          echo "DEPLOY_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+          git rev-parse HEAD > .deployed
+
+      - name: Save the deploy marker
+        if: ${{ env.SKIP != 'true' }}
+        uses: actions/cache/save@v4
+        with:
+          path: .deployed
+          key: deployed-${{ env.CASC_KEY_PREFIX }}-${{ steps.target.outputs.build }}-${{ env.DEPLOY_SHA }}

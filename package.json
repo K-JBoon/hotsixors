@@ -8,6 +8,7 @@
   "scripts": {
     "extract": "tsx scripts/extract-gamedata.ts",
     "extract:ptr": "HOTS_DATA_ROOT=.gamedata-ptr tsx scripts/extract-gamedata.ts --ptr",
+    "extract:print-build": "tsx scripts/extract-gamedata.ts --print-build",
     "gen": "tsx scripts/gen-fonts.ts && tsx scripts/gen-gamedata.ts && tsx scripts/gen-mechanics.ts && tsx scripts/gen-heroes.ts && tsx scripts/gen-gamedata-entries.ts && tsx scripts/gen-cross-references.ts && tsx scripts/gen-battlegrounds.ts && tsx scripts/gen-draft-data.ts && tsx scripts/gen-minions.ts && tsx scripts/gen-structures.ts && tsx scripts/gen-replay-footprints.ts && tsx scripts/gen-replay-summons.ts && tsx scripts/gen-replay-hero-units.ts && tsx scripts/gen-replay-minimap-icons.ts && tsx scripts/gen-replay-abillinks.ts && tsx scripts/gen-replay-protocols.ts && tsx scripts/gen-replay-movement.ts && tsx scripts/gen-replay-maps.ts && tsx scripts/gen-experience.ts && tsx scripts/gen-search.ts && tsx scripts/gen-build-info.ts",
     "build": "npm run gen && npm run bundle && zola --root site build ${ZOLA_BASE_URL:+--base-url $ZOLA_BASE_URL} && npm run build:prune-nexus && npm run build:prune-sources",
     "build:prune-nexus": "rm -rf site/public/lost-in-the-nexus/models site/public/lost-in-the-nexus/terrain site/public/lost-in-the-nexus/maps3d",

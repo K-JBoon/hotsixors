@@ -1,4 +1,5 @@
 node_modules/
+.deployed
 .gamedata*/
 .hdp/
 cache/

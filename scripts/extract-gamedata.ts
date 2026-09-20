@@ -1,7 +1,8 @@
 // Extracts the game data from Blizzard's CASC servers with HeroesDataParser.
 // `casc-extract` writes `mods`; the parser run writes `data`, `gamestrings` and
 // `images`. --ptr reads the PTR product, and exits with NO_PTR_BUILD when the
-// PTR product has no build of its own.
+// PTR product has no build of its own. --print-build prints the build the patch
+// server serves and downloads nothing.
 
 import { spawn } from "node:child_process";
 import { access, chmod, mkdir, mkdtemp, rm, rename } from "node:fs/promises";
@@ -149,6 +150,7 @@ async function ptrBuild(): Promise<ProductBuild | undefined> {
 
 async function main(): Promise<void> {
   const ptr = process.argv.includes("--ptr") || process.env.HOTS_PTR === "1";
+  const printBuild = process.argv.includes("--print-build");
   const source = ptr ? ["--download-ptr"] : [];
 
   let target: ProductBuild | undefined;
@@ -158,11 +160,20 @@ async function main(): Promise<void> {
       return undefined;
     });
     if (!target) {
-      console.log("extract-gamedata: no PTR build to extract");
+      console.error("extract-gamedata: no PTR build to extract");
       process.exit(NO_PTR_BUILD);
     }
-    console.log(`extract-gamedata: PTR build ${target.version}`);
   }
+
+  // --print-build names the build the patch server serves, without a download.
+  if (printBuild) {
+    const serving = target ?? (await productBuild(LIVE_PRODUCT));
+    if (!serving) throw new Error(`${LIVE_PRODUCT}: the patch server names no build`);
+    console.log(serving.build);
+    return;
+  }
+
+  if (target) console.log(`extract-gamedata: PTR build ${target.version}`);
 
   const parser = await ensureParser();
   console.log(`extract-gamedata: ${ptr ? "PTR" : "live"} -> ${DATA_ROOT}`);
