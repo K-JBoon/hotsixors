@@ -382,6 +382,8 @@ function initHeroRoleFilter() {
   if (!filter) return;
   const buttons = [...filter.querySelectorAll("[data-role]")];
   const cards = [...root.querySelectorAll("[data-hero-role]")];
+  // Only the table stripes, and its rows are a subset of the cards.
+  const rows = cards.filter((card) => card.matches("tr.hero-row"));
   const status = root.querySelector("[data-hero-role-status]");
   // A hero appears once per view pane; count the hero, not the card.
   const keyOf = (card) => card.dataset.selectSearchKey || card.dataset.selectSearchId || "";
@@ -399,7 +401,7 @@ function initHeroRoleFilter() {
       card.hidden = hidden;
       if (!hidden) shown.add(keyOf(card));
     }
-    restripe(cards);
+    restripe(rows);
     if (status) {
       const label = buttons.find((btn) => btn.dataset.role === role)?.textContent.trim() ?? role;
       status.textContent = role === "all"
@@ -413,6 +415,19 @@ function initHeroRoleFilter() {
   }
 
   setRole("all");
+}
+
+// The name cell holds the real link; this makes the rest of the row follow it
+// without an inline handler on every row.
+function initHeroRowLinks() {
+  const tbody = document.querySelector(".hero-table tbody");
+  if (!tbody) return;
+
+  tbody.addEventListener("click", (event) => {
+    if (event.target.closest("a")) return;
+    const href = event.target.closest("tr[data-href]")?.dataset.href;
+    if (href) window.location = href;
+  });
 }
 
 function initBreadcrumbCollapse() {
@@ -476,6 +491,7 @@ if (typeof document !== "undefined") {
     initHeroViewToggle();
     initHeroRoleFilter();
     initHeroTableSort();
+    initHeroRowLinks();
     initPageModules();
   });
 }

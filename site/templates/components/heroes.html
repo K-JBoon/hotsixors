@@ -101,7 +101,7 @@
               data-select-search-key="{{ page.slug }}"
               data-select-search-text="{{ page.extra.hero_name }} {{ role }}"
               data-hero-role="{{ role_slug }}"
-              onclick="window.location='{{ page.permalink }}'">
+              data-href="{{ page.permalink }}">
             <td class="role-col" data-sort-value="{{ role }}" title="{{ role }}">
               {{<heroes.role_icon role_slug={role_slug} size={32} />}}
               <span class="visually-hidden">{{ role }}</span>
