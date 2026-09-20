@@ -1,5 +1,6 @@
 
-import { layoutObjectivePhases, LOOPS_PER_SECOND } from '../analyze.js';
+import { layoutObjectivePhases } from '../analyze/phases.js';
+import { LOOPS_PER_SECOND } from '../analyze/stat-events.js';
 import { castLabel } from './abilities.js';
 import { clockText, escapeHtml, formatLoop, killerNames, portraitHtml } from './html.js';
 import { icon } from './icons.js';

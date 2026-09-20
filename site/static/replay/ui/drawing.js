@@ -1,5 +1,7 @@
 
-import { isAliveAt, isDeadAt, LOOPS_PER_SECOND, minionPositionAt, objectiveOwnerAt, objectivePositionAt } from '../analyze.js';
+import { objectiveOwnerAt, objectivePositionAt } from '../analyze/objective-sites.js';
+import { LOOPS_PER_SECOND } from '../analyze/stat-events.js';
+import { isAliveAt, isDeadAt, minionPositionAt } from '../analyze/timeline.js';
 import { brushPatchAt, castVisibility, pointInShapes } from '../vision.js';
 import { cameraAt, cameraQuad } from './camera.js';
 import { drawDeathCross, drawIcon, iconImages } from './icons.js';

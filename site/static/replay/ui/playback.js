@@ -1,5 +1,5 @@
 
-import { LOOPS_PER_SECOND } from '../analyze.js';
+import { LOOPS_PER_SECOND } from '../analyze/stat-events.js';
 import { draw } from './drawing.js';
 import { buildFeed, renderFeed, syncFeed } from './feed.js';
 import { icon } from './icons.js';

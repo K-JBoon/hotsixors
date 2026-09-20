@@ -1,5 +1,5 @@
 
-import { LOOPS_PER_SECOND, XP_SOURCES } from '../analyze.js';
+import { LOOPS_PER_SECOND, XP_SOURCES } from '../analyze/stat-events.js';
 import { abilityEntryFor } from './abilities.js';
 import { clockText, escapeHtml, externalLink, heroUrl, portraitHtml, talentUrl } from './html.js';
 import { seekTo } from './playback.js';

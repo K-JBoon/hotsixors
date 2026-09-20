@@ -1,7 +1,6 @@
 
 import { fetchJson, getAvailableStorage, getStoredString, setStoredString } from '../js/storage.js';
-import { MPQArchive } from './mpq.js';
-import { analyzeReplay, buildPositionTimeline } from './analyze.js';
+import { buildPositionTimeline } from './analyze/timeline.js';
 import { buildVisionGrid } from './vision.js';
 import { buildWalkGrid, routeUnitsThroughTerrain } from './pathing.js';
 import { buildLanePaths, routeUnitsAlongLanes } from './lanes.js';
@@ -30,6 +29,15 @@ import { BASE_CANVAS_WIDTH, dropStatus, dropZone, fileInput, root, setState, sta
 import { nameStructures, structureStyle } from './ui/structures.js';
 import { hasPlate, loadPlate } from './ui/plates.js';
 import { canvasAspect, fitCanvas, onCanvasPointerDown, onCanvasPointerMove, onCanvasPointerUp, onCanvasWheel, resetView, toggleFullscreen } from './ui/viewport.js';
+
+// The MPQ reader, its bzip2 and protocol decoders and the analysis passes are
+// only reachable once a replay arrives; the idle page is a drop zone.
+let parserPromise = null;
+function loadParser() {
+  parserPromise ||= Promise.all([import('./mpq.js'), import('./analyze.js')])
+    .then(([mpq, analyze]) => ({ MPQArchive: mpq.MPQArchive, analyzeReplay: analyze.analyzeReplay }));
+  return parserPromise;
+}
 
 const MAP_STYLE_KEY = 'hotsixors.replay.mapstyle';
 const MAP_STYLES = ['rendered', 'schematic'];
@@ -127,6 +135,7 @@ async function handleFiles(files) {
     try {
       const [data, buffer] = await Promise.all([staticData(), file.arrayBuffer()]);
       const hash = await contentHash(buffer);
+      const { analyzeReplay, MPQArchive } = await loadParser();
       const model = await analyzeReplay(new MPQArchive(buffer));
       const abilLinkIndex = await loadAbilLinkIndex(model.baseBuild ?? model.build ?? 0);
       if (!findEntry(entry.id)) continue; // removed while it was parsing

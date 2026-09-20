@@ -1,5 +1,5 @@
 
-import { LOOPS_PER_SECOND } from '../analyze.js';
+import { LOOPS_PER_SECOND } from '../analyze/stat-events.js';
 import { state, TEAM_COLORS } from './state.js';
 
 export function escapeHtml(s) {
