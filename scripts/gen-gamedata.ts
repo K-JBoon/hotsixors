@@ -224,23 +224,6 @@ async function main(): Promise<void> {
   await writeJson(path.join(SITE_DATA, "gamedata-tree.json"), tree, 2);
   await writeJson(path.join(SITE_STATIC, "gamedata-tree.json"), tree);
 
-  // Client-side click-to-definition. File paths are deduplicated into an
-  // indexed array to keep the lookup small enough to load on any page.
-  const files: string[] = [];
-  const fileIndex = new Map<string, number>();
-  const ids: Record<string, [number, number]> = {};
-  for (const [elemId, info] of Object.entries(anchorMap)) {
-    let index = fileIndex.get(info.xmlPath);
-    if (index === undefined) {
-      index = files.length;
-      fileIndex.set(info.xmlPath, index);
-      files.push(info.xmlPath);
-    }
-    ids[elemId] = [index, info.line];
-  }
-  await writeJson(path.join(SITE_STATIC, "id-lookup.json"), { files, ids });
-  console.log(`gen-gamedata: wrote id-lookup.json with ${files.length} files and ${Object.keys(ids).length} IDs`);
-
   await writeText(path.join(SITE_CONTENT_GAMEDATA, "_index.md"), sectionPage("Game Data", ""));
   // walkDir starts inside mods/, so it never writes that directory's own
   // section the way it does for every directory below it.
