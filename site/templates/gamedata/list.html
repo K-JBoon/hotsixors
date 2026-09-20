@@ -17,12 +17,10 @@
   {% set current_path = "content/gamedata/_index.md" %}
 {% endif %}
 {% set dir_name = section.extra.dir_path | default(value="Game Data") | split(pat="/") | last %}
+{% set dir_path = section.extra.dir_path | default(value="") %}
 
 <div class="gd-shell" data-gd-shell>
-  <button class="gd-explorer-toggle" type="button" aria-expanded="false" aria-controls="gamedata-sidebar" data-gamedata-sidebar-toggle hidden>
-    <span class="gd-explorer-toggle__label">Explorer</span>
-    <span class="gd-explorer-toggle__file">{{ dir_name }}</span>
-  </button>
+  {{<gd.explorer_toggle label={dir_name} />}}
 
   {% include "gamedata/explorer.html" %}
 
@@ -30,22 +28,7 @@
     <header class="gd-toolbar" data-gd-file-path="{{ section.extra.dir_path | default(value='') }}">
       <h1 class="visually-hidden">{% if section.extra.dir_path %}{{ section.extra.dir_path }}{% else %}Game Data{% endif %}</h1>
       <span class="gd-filechip" data-ext="dir">{{ dir_name }}</span>
-      <nav class="gd-path breadcrumb" aria-label="Breadcrumb">
-        <a href="/gamedata/">root</a>
-        {% if section.extra.dir_path %}
-          {% set parts = section.extra.dir_path | split(pat="/") %}
-          {% for i in range(end=parts | length) %}
-            {% set part = parts[i] %}
-            {% set crumb_path = parts[:i+1] | join(sep="/") %}
-            <span class="breadcrumb-sep">/</span>
-            {% if loop.last %}
-              <span class="breadcrumb-current">{{ part }}</span>
-            {% else %}
-              <a href="/gamedata/{{ crumb_path }}/">{{ part }}</a>
-            {% endif %}
-          {% endfor %}
-        {% endif %}
-      </nav>
+      {{<gd.breadcrumb display_path={dir_path} url_path={dir_path} />}}
       <div class="gd-toolbar__actions" data-gd-actions>
         <button class="gd-btn" type="button" data-gd-copy-path>Copy path</button>
       </div>

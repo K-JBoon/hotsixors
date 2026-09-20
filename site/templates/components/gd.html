@@ -1,0 +1,28 @@
+{% component gd.explorer_toggle(label) %}
+<button class="gd-explorer-toggle" type="button" aria-expanded="false" aria-controls="gamedata-sidebar" data-gamedata-sidebar-toggle hidden>
+  <span class="gd-explorer-toggle__label">Explorer</span>
+  <span class="gd-explorer-toggle__file">{{ label }}</span>
+</button>
+{% endcomponent gd.explorer_toggle %}
+
+{#- Labels come from the on-disk path, hrefs from the slugified one; a directory
+    listing passes the same path twice. Empty means the gamedata root. -#}
+{% component gd.breadcrumb(display_path, url_path) %}
+<nav class="gd-path breadcrumb" aria-label="Breadcrumb">
+  <a href="/gamedata/">root</a>
+  {% if display_path %}
+    {% set display_parts = display_path | split(pat="/") %}
+    {% set url_parts = url_path | split(pat="/") %}
+    {% for i in range(end=display_parts | length) %}
+      {% set part = display_parts[i] %}
+      {% set crumb_path = url_parts[:i+1] | join(sep="/") %}
+      <span class="breadcrumb-sep">/</span>
+      {% if loop.last %}
+        <span class="breadcrumb-current">{{ part }}</span>
+      {% else %}
+        <a href="/gamedata/{{ crumb_path }}/">{{ part }}</a>
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+</nav>
+{% endcomponent gd.breadcrumb %}
