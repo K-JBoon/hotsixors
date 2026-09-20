@@ -39,48 +39,74 @@ function buildSearchTerms(query, aliases) {
   return [...terms].filter(Boolean);
 }
 
+// Entry objects outlive a keystroke, so their normalized form is built once.
+const haystacks = new WeakMap();
+
+function entryHaystack(entry) {
+  let haystack = haystacks.get(entry);
+  if (haystack === undefined) {
+    haystack = normalizeSearchValue([
+      entry.title,
+      entry.name,
+      entry.path,
+      entry.url,
+      entry.type,
+      entry.hero,
+      entry.text,
+    ].filter(Boolean).join(" "));
+    haystacks.set(entry, haystack);
+  }
+  return haystack;
+}
+
 export function matchesSearchEntry(entry, query, aliases = {}) {
   const terms = createSearchTerms(query, aliases);
   if (terms.length === 0) return true;
 
-  const haystack = normalizeSearchValue([
-    entry.title,
-    entry.name,
-    entry.path,
-    entry.url,
-    entry.type,
-    entry.hero,
-    entry.text,
-  ].filter(Boolean).join(" "));
-
+  const haystack = entryHaystack(entry);
   return terms.some((term) => haystack.includes(term));
+}
+
+const scoreFields = new WeakMap();
+
+function entryScoreFields(entry) {
+  let fields = scoreFields.get(entry);
+  if (fields === undefined) {
+    fields = {
+      title: normalizeSearchValue(entry.title || entry.name || ""),
+      path: normalizeSearchValue(entry.path || entry.url || ""),
+      type: normalizeSearchValue(entry.type || ""),
+      hero: normalizeSearchValue(entry.hero || ""),
+      text: normalizeSearchValue(entry.text || ""),
+    };
+    scoreFields.set(entry, fields);
+  }
+  return fields;
 }
 
 export function searchSiteIndex(index, query, aliases = {}, limit = 12) {
   const terms = createSearchTerms(query, aliases);
   if (terms.length === 0) return [];
 
-  return index
-    .map((entry) => {
-      const title = normalizeSearchValue(entry.title || entry.name || "");
-      const path = normalizeSearchValue(entry.path || entry.url || "");
-      const type = normalizeSearchValue(entry.type || "");
-      const hero = normalizeSearchValue(entry.hero || "");
-      const text = normalizeSearchValue(entry.text || "");
-      let score = 0;
+  // Scored in place: only the entries that survive are materialized.
+  const hits = [];
+  for (const entry of index) {
+    const { title, path, type, hero, text } = entryScoreFields(entry);
+    let score = 0;
 
-      for (const term of terms) {
-        if (title === term) score += 100;
-        else if (title.includes(term)) score += 70;
-        if (hero.includes(term)) score += 55;
-        if (type.includes(term)) score += 25;
-        if (path.includes(term)) score += 20;
-        if (text.includes(term)) score += 10;
-      }
+    for (const term of terms) {
+      if (title === term) score += 100;
+      else if (title.includes(term)) score += 70;
+      if (hero.includes(term)) score += 55;
+      if (type.includes(term)) score += 25;
+      if (path.includes(term)) score += 20;
+      if (text.includes(term)) score += 10;
+    }
 
-      return { ...entry, score };
-    })
-    .filter((entry) => entry.score > 0)
+    if (score > 0) hits.push({ ...entry, score });
+  }
+
+  return hits
     .sort((a, b) => b.score - a.score || String(a.title).localeCompare(String(b.title)))
     .slice(0, limit);
 }

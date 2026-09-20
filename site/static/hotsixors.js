@@ -1,4 +1,4 @@
-import { createSearchTerms, searchSiteIndex, selectGridSearchState, orderSelectGridSearchEntries, updateSelectGridSearchQuery } from './js/search.js';
+import { createSearchTerms, searchSiteIndex, selectGridSearchState, updateSelectGridSearchQuery } from './js/search.js';
 import { applyDataminingState, DATAMINING_STORAGE_KEY, getAvailableStorage, getStoredBoolean, getStoredString, isDataminingEnabled, isDataminingSearchEntry, loadAliases, loadSiteIndex, setStoredBoolean, setStoredString } from './js/storage.js';
 import { escapeHtml } from './js/escape.js';
 
@@ -228,7 +228,13 @@ async function initSelectGridSearch() {
           ? `Filtering by ${query}. ${matched.size} of ${total} matches.`
           : "";
       }
-      const order = orderSelectGridSearchEntries(entries, query, aliases).map((entry) => entry.element);
+      // Ordering reuses the match pass above rather than running a second one.
+      const order = hasQuery
+        ? entries
+            .map((entry, index) => ({ element: entry.element, matches: state[index].matches, index }))
+            .sort((a, b) => Number(b.matches) - Number(a.matches) || a.index - b.index)
+            .map((item) => item.element)
+        : entries.map((entry) => entry.element);
       if (!appliedOrder || order.some((element, index) => appliedOrder[index] !== element)) {
         appliedOrder = order;
         for (const element of order) element.parentElement?.appendChild(element);
