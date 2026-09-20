@@ -1036,7 +1036,7 @@ html:not(.datamining-enabled) [data-datamining] {
   }
   &__info { flex: 1; }
   &__name { font-size: 2.5rem; line-height:2.4rem; color: $accent-gold; }
-  &__meta { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.75rem; }
+  &__meta { display: flex; gap: 0.5rem; flex-wrap: wrap; margin: 0.5rem 0 0.75rem; }
   &__desc { color: $text-muted; max-width: 60ch; line-height: 1.7; }
 }
 
@@ -2508,7 +2508,7 @@ html:not(.datamining-enabled) .mechanics-table {
       max-width: 100%;
       height: 200px;
       border-radius: 0;
-      object-position: top center;
+      object-position: right center;
     }
 
     &__info { padding: 1rem; }

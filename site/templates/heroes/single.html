@@ -17,6 +17,10 @@
     {% endif %}
     <div class="hero-banner__info">
       <h1 class="hero-banner__name">{{ hero.hero_name }}</h1>
+      <div class="hero-banner__meta">
+        {% if hero.in_game_role %}<span class="badge badge--role">{{ hero.in_game_role }}</span>{% endif %}
+        {% if hero.franchise %}<span class="badge badge--franchise">{{ hero.franchise }}</span>{% endif %}
+      </div>
       {% if page.description %}
         <p class="hero-banner__desc">{{ page.description }}</p>
       {% endif %}
