@@ -84,13 +84,13 @@ test("fonts are vendored and loaded without blocking first render", () => {
   const baseTemplate = readFileSync(new URL("../site/templates/base.html", import.meta.url), "utf-8");
   const styles = readFileSync(new URL("../site/sass/main.scss", import.meta.url), "utf-8");
 
-  assert.match(baseTemplate, /rel="preload" href="\{\{ get_url\(path='fonts\/inter-latin-400-500\.woff2'\) \}\}" as="font" type="font\/woff2" crossorigin/);
+  assert.match(baseTemplate, /rel="preload" href="\{\{ get_url\(path='fonts\/inter-latin-400\.woff2'\) \}\}" as="font" type="font\/woff2" crossorigin/);
   assert.match(baseTemplate, /rel="preload" href="\{\{ get_url\(path='fonts\/rajdhani-latin-600\.woff2'\) \}\}" as="font" type="font\/woff2" crossorigin/);
   assert.doesNotMatch(baseTemplate, /fonts\.css/);
 
   assert.doesNotMatch(styles, /fonts\.googleapis|fonts\.gstatic|@import url/);
   assert.doesNotMatch(baseTemplate, /fonts\.googleapis|fonts\.gstatic/);
-  assert.match(styles, /url\("\/fonts\/inter-latin-400-500\.woff2"\)/);
+  assert.match(styles, /url\("\/fonts\/inter-latin-400\.woff2"\)/);
   assert.match(styles, /url\("\/fonts\/rajdhani-latin-700\.woff2"\)/);
   for (const face of styles.match(/@font-face \{[^}]*\}/g) ?? []) {
     assert.match(face, /font-display: swap;/);

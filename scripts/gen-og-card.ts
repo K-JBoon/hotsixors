@@ -18,7 +18,7 @@ async function embed(file: string): Promise<string> {
 const html = `<!doctype html><meta charset="utf-8"><style>
 @font-face{font-family:Rajdhani;src:${await embed("rajdhani-latin-700.woff2")};font-weight:700}
 @font-face{font-family:Rajdhani;src:${await embed("rajdhani-latin-600.woff2")};font-weight:600}
-@font-face{font-family:Inter;src:${await embed("inter-latin-400-500.woff2")};font-weight:400}
+@font-face{font-family:Inter;src:${await embed("inter-latin-400.woff2")};font-weight:400}
 *{margin:0;padding:0;box-sizing:border-box}
 body{width:1200px;height:630px;background:#0a0e1a;display:flex;flex-direction:column;
      justify-content:center;padding:0 96px;font-family:Inter,sans-serif;color:#e0e6f0;
