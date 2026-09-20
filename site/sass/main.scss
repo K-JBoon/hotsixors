@@ -1066,16 +1066,6 @@ html:not(.datamining-enabled) [data-datamining] {
   height: 0.9em;
 }
 
-.hero-ratings { display: flex; gap: 1rem; flex-wrap: wrap; }
-
-.rating-bar { flex: 1; min-width: 120px; display: flex; flex-direction: column; gap: 0.3rem; }
-
-.rating-label { font-family: $font-display; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.06em; color: $text-muted; }
-
-.rating-track { background: $bg-panel; border-radius: 2px; height: 6px; border: 1px solid $border-dim; }
-
-.rating-fill { height: 100%; background: linear-gradient(90deg, $accent-blue, $accent-gold); border-radius: 2px; }
-
 // ─── Abilities ────────────────────────────────────────────────────────────────
 .abilities-section, .talents-section {
   h2 { font-size: 1.4rem; color: $accent-gold; border-bottom: 1px solid $border-dim; padding-bottom: 0.5rem; margin-bottom: 1rem; }
@@ -1734,25 +1724,6 @@ html:not(.datamining-enabled) .mechanics-table {
   }
 }
 
-.experience-battlegrounds-table {
-  min-width: 900px;
-}
-
-.experience-battleground-notes {
-  margin: 0.35rem 0 0;
-  padding: 0;
-  list-style: none;
-  color: $text-muted;
-  font-weight: 400;
-  font-size: 0.78rem;
-  line-height: 1.4;
-
-  li {
-    margin-top: 0.2rem;
-  }
-}
-
-.minions-stat-list,
 .minions-weapons,
 .mechanics-source-list {
   display: flex;
@@ -2569,9 +2540,6 @@ html:not(.datamining-enabled) .mechanics-table {
     max-width: 100%;
     flex: 1 1 100%;
   }
-
-  .hero-ratings { flex-direction: column; }
-  .rating-bar { min-width: 0; }
 
   // Battlegrounds
   .battlegrounds-list__header {
