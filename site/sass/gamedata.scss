@@ -797,7 +797,7 @@ $gd-hairline: rgba(120, 150, 200, 0.14);
   }
 }
 
-@media (max-width: 900px) {
+@media (max-width: $bp-compact) {
   .gd-shell {
     grid-template-columns: minmax(0, 1fr);
     grid-template-rows: auto auto minmax(0, 1fr);

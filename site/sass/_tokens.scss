@@ -17,6 +17,11 @@ $role-specialist: #8b1abf;
 $role-multiclass: #bf8b1a;
 $role-unknown:    #4a5568;
 
+// Breakpoints that JS also matches on. main.scss publishes them as custom
+// properties so the two cannot drift.
+$bp-nav:     760px;
+$bp-compact: 900px;
+
 $role-bruiser:         #bf8b1a;
 $role-ranged-assassin: #c85f1a;
 $role-healer:          #1abfaf;

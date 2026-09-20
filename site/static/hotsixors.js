@@ -1,6 +1,7 @@
 import { createSearchTerms, searchSiteIndex, selectGridSearchState, updateSelectGridSearchQuery } from './js/search.js';
 import { applyDataminingState, DATAMINING_STORAGE_KEY, getAvailableStorage, getStoredBoolean, getStoredString, isDataminingEnabled, isDataminingSearchEntry, loadAliases, loadSiteIndex, setStoredBoolean, setStoredString } from './js/storage.js';
 import { escapeHtml } from './js/escape.js';
+import { below } from './js/breakpoints.js';
 
 function initGlobalSearch() {
   const root = document.querySelector("[data-site-search]");
@@ -131,7 +132,7 @@ function initPrimaryNav() {
   const menu = document.querySelector("[data-nav-menu]");
   if (!toggle || !menu) return;
 
-  const mq = window.matchMedia("(max-width: 760px)");
+  const mq = below("--bp-nav");
 
   function setExpanded(expanded) {
     toggle.setAttribute("aria-expanded", String(expanded));
@@ -454,7 +455,7 @@ function initBreadcrumbCollapse() {
     ellipsis.hidden = !collapsed;
   }
 
-  const mq = window.matchMedia("(max-width: 900px)");
+  const mq = below("--bp-compact");
   applyCollapse(mq.matches);
   mq.addEventListener("change", e => applyCollapse(e.matches));
 }

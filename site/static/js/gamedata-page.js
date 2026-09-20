@@ -1,4 +1,5 @@
 import { escapeHtml } from "./escape.js";
+import { above, below } from './breakpoints.js';
 import { createXmlHighlighter, highlightGalaxyCode, highlightGameDataLine } from "./highlight.js";
 import { filterTreeNode, renderGameDataTree, restoreTree } from "./gamedata-tree.js";
 import { computeFolds, createFolder } from "./folding.js";
@@ -417,7 +418,7 @@ async function initGameDataXref() {
     outlineButton.setAttribute("aria-pressed", "false");
     setStoredBoolean(storage, XREF_PANEL_KEY, false);
   });
-  const wideEnough = window.matchMedia("(min-width: 901px)").matches;
+  const wideEnough = above("--bp-compact").matches;
   if (wideEnough && getStoredBoolean(storage, XREF_PANEL_KEY, true)) {
     outlineButton.setAttribute("aria-pressed", "true");
     showOutline();
@@ -608,7 +609,7 @@ function initGameDataSidebarToggle() {
   const sidebar = document.getElementById("gamedata-sidebar");
   if (!toggle || !sidebar) return;
 
-  const mq = window.matchMedia("(max-width: 900px)");
+  const mq = below("--bp-compact");
 
   function applyLayout(mobile) {
     if (mobile) {

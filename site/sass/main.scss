@@ -50,6 +50,8 @@
 
 :root {
   --site-anchor-offset: 5rem;
+  --bp-nav: #{$bp-nav};
+  --bp-compact: #{$bp-compact};
   scroll-padding-top: var(--site-anchor-offset);
 }
 
@@ -501,7 +503,7 @@ html:not(.datamining-enabled) [data-datamining] {
   img { opacity: 0.45; }
 }
 
-@media (max-width: 760px) {
+@media (max-width: $bp-nav) {
   .site-nav {
     flex-wrap: wrap;
     gap: 0.75rem;
@@ -1159,7 +1161,7 @@ html:not(.datamining-enabled) [data-datamining] {
 
 @include ability-group-cols(4);
 @media (max-width: 1200px) { @include ability-group-cols(3); }
-@media (max-width: 900px) { @include ability-group-cols(1); }
+@media (max-width: $bp-compact) { @include ability-group-cols(1); }
 
 .hero-unit-section {
   display: flex;
@@ -2505,7 +2507,7 @@ html:not(.datamining-enabled) .mechanics-table {
 }
 
 // ─── Responsive: Tablet ───────────────────────────────────────────────────────
-@media (max-width: 900px) {
+@media (max-width: $bp-compact) {
   .hero-banner {
     &__loading { flex: 0 1 40%; width: 40%; max-width: 40%; height: 220px; }
     &__name { font-size: 2rem; }
