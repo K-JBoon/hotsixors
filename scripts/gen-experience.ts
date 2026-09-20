@@ -1,7 +1,10 @@
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { readFile } from "node:fs/promises";
 import * as path from "node:path";
 import type { ExperienceData, UnderdogTableRow } from "./types.ts";
 import { GAMEDATA_DIR, SITE_CONTENT, SITE_DATA } from "./lib/paths.ts";
+import { writeJson, writeText } from "./lib/fs.ts";
+import { frontmatter } from "./lib/frontmatter.ts";
+import { runScript } from "./lib/script.ts";
 import { buildLevels, parseLevelXpValues } from "./lib/experience.ts";
 
 const MAX_LEVEL = 30;
@@ -19,10 +22,6 @@ const UNDERDOG_TABLE: UnderdogTableRow[] = [
 ];
 
 async function main() {
-  console.log("gen-experience: starting");
-  await mkdir(SITE_DATA, { recursive: true });
-  await mkdir(SITE_CONTENT, { recursive: true });
-
   const behaviorXml = await readFile(behaviorXmlPath, "utf-8");
   const levels = buildLevels(parseLevelXpValues(behaviorXml, MAX_LEVEL));
 
@@ -34,12 +33,12 @@ async function main() {
     clamp: { min: 0.05, max: 3.0 },
   };
 
-  await writeFile(path.join(SITE_DATA, "experience.json"), JSON.stringify(data, null, 2), "utf-8");
-  await writeFile(path.join(SITE_CONTENT, "experience.md"), `+++\ntitle = "Experience"\ntemplate = "experience.html"\n+++\n`, "utf-8");
+  await writeJson(path.join(SITE_DATA, "experience.json"), data, 2);
+  await writeText(
+    path.join(SITE_CONTENT, "experience.md"),
+    frontmatter({ title: "Experience", template: "experience.html" }),
+  );
   console.log(`gen-experience: wrote ${levels.length} levels`);
 }
 
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+runScript(import.meta.url, main);

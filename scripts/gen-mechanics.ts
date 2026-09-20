@@ -1,7 +1,8 @@
-import { readFile, writeFile, mkdir } from "node:fs/promises";
 import * as path from "node:path";
 import type { AnchorMap } from "./types.ts";
 import { SITE_DATA } from "./lib/paths.ts";
+import { readJson, writeJson } from "./lib/fs.ts";
+import { runScript } from "./lib/script.ts";
 import { sanitizeGamedataUrl } from "./lib/galaxy-source.ts";
 
 interface MechanicSource {
@@ -595,23 +596,14 @@ function sourceUrl(source: MechanicSource, anchorMap: AnchorMap): MechanicLink {
 }
 
 async function main(): Promise<void> {
-  const anchorMap = JSON.parse(await readFile(path.join(SITE_DATA, "anchor-map.json"), "utf-8")) as AnchorMap;
+  const anchorMap = await readJson<AnchorMap>(path.join(SITE_DATA, "anchor-map.json"));
   const mechanics: MechanicEntry[] = MECHANICS.map((mechanic) => ({
     ...mechanic,
     sources: mechanic.sources.map((source) => sourceUrl(source, anchorMap)),
   }));
 
-  await mkdir(SITE_DATA, { recursive: true });
-  await writeFile(
-    path.join(SITE_DATA, "mechanics.json"),
-    JSON.stringify({ mechanics }, null, 2),
-    "utf-8"
-  );
-
+  await writeJson(path.join(SITE_DATA, "mechanics.json"), { mechanics }, 2);
   console.log(`gen-mechanics: wrote mechanics.json with ${mechanics.length} mechanics`);
 }
 
-main().catch((error) => {
-  console.error(error);
-  process.exit(1);
-});
+runScript(import.meta.url, main);

@@ -1,7 +1,8 @@
-import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
+import { readFile, readdir } from "node:fs/promises";
 import * as path from "node:path";
 import subsetFont from "subset-font";
 import { SITE_STATIC, SITE_SASS, FONT_SOURCES } from "./lib/paths.ts";
+import { writeBinary } from "./lib/fs.ts";
 
 const OUT_DIR = path.join(SITE_STATIC, "fonts");
 
@@ -36,8 +37,6 @@ function expandRange(range: string): string {
 const faces = readFaces(await readFile(path.join(SITE_SASS, "main.scss"), "utf-8"));
 const sources = new Set(await readdir(FONT_SOURCES));
 
-await mkdir(OUT_DIR, { recursive: true });
-
 for (const face of faces) {
   if (!sources.has(face.file)) throw new Error(`No source font for ${face.file} in ${FONT_SOURCES}`);
   const input = await readFile(path.join(FONT_SOURCES, face.file));
@@ -47,6 +46,6 @@ for (const face of faces) {
     targetFormat: "woff2",
     variationAxes: { wght: face.weight },
   }).catch(() => subsetFont(input, face.chars, { targetFormat: "woff2" }));
-  await writeFile(path.join(OUT_DIR, face.file), output);
+  await writeBinary(path.join(OUT_DIR, face.file), output);
   console.log(`${face.file}: ${(input.length / 1024).toFixed(1)} KB -> ${(output.length / 1024).toFixed(1)} KB`);
 }

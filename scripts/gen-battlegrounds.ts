@@ -1,13 +1,16 @@
-import { readdir, readFile, writeFile, mkdir } from "node:fs/promises";
+import { readdir } from "node:fs/promises";
 import * as path from "node:path";
-import type { BattlegroundData, BattlegroundTimer, BattlegroundCodeBlock, BattlegroundMechanic, BattlegroundSummon, BattlegroundSummonVariant, BattlegroundWeapon, BattlegroundAbility, BattlegroundXmlFile, BattlegroundObjective, ScalingSummaryRow, Gamestrings } from "./types.ts";
+import type { BattlegroundData, BattlegroundTimer, BattlegroundCodeBlock, BattlegroundMechanic, BattlegroundSummon, BattlegroundSummonVariant, BattlegroundWeapon, BattlegroundAbility, BattlegroundXmlFile, BattlegroundObjective, Gamestrings } from "./types.ts";
 import { BATTLEGROUNDS, type BattlegroundConfig, type SummonVariantConfig } from "./lib/battlegrounds-config.ts";
 import { GAMEDATA_DIR, HEROES_IMAGES_DIR, SITE_CONTENT_BATTLEGROUNDS, SITE_DATA_BATTLEGROUNDS, SITE_STATIC_IMAGES } from "./lib/paths.ts";
-import { loadGamestrings, loadMapGamestringPatches, type MapGamestringPatch } from "./lib/heroes-data.ts";
-import { shouldIncludeGamedataPath } from "./gen-gamedata.ts";
+import { loadGamestrings, loadMapGamestringPatches } from "./lib/heroes-data.ts";
+import { shouldIncludeGamedataPath } from "./lib/gamedata-paths.ts";
+import { readFileSafe, writeJson, writeText } from "./lib/fs.ts";
+import { frontmatter } from "./lib/frontmatter.ts";
+import { runScript } from "./lib/script.ts";
 import { buildAbilityIndex, extractAbilities } from "./lib/ability-text.ts";
 import { copyImageIfExists } from "./lib/hero-entries.ts";
-import { buildConstMap, collectLinks, extractArmor, extractScalingRows, extractUnit, extractWeapon, firstAttrValue, firstNumberAttr, unitChain } from "./lib/battleground-xml.ts";
+import { buildConstMap, collectLinks, extractArmor, extractScalingRows, extractUnit, extractWeapon, firstNumberAttr, unitChain } from "./lib/battleground-xml.ts";
 import { type ConstEntry, buildConstBlock, extractGalaxyConstsTracked, extractPatternContext, extractTimerContext, formatSeconds, headerToImpl, sanitizeGamedataUrl } from "./lib/galaxy-source.ts";
 
 // Source filenames in heroes-images/loadingscreens, keyed by battleground slug.
@@ -31,10 +34,6 @@ const LOADING_SCREENS: Record<string, string> = {
 const BATTLEGROUND_MODS_DIR = path.join(GAMEDATA_DIR, "heroesmapmods/battlegroundmapmods");
 const HEROES_GAMEDATA_DIR = path.join(GAMEDATA_DIR, "heroesdata.stormmod/base.stormdata/gamedata");
 
-
-async function readFileSafe(p: string): Promise<string | null> {
-  try { return await readFile(p, "utf-8"); } catch { return null; }
-}
 
 async function processMap(cfg: BattlegroundConfig, abilityIndex: Map<string, { name: string; full: string }>): Promise<BattlegroundData> {
   console.log(`  Processing: ${cfg.name}`);
@@ -310,26 +309,19 @@ async function processMap(cfg: BattlegroundConfig, abilityIndex: Map<string, { n
 }
 
 async function main() {
-  console.log("gen-battlegrounds: starting");
-  await mkdir(SITE_CONTENT_BATTLEGROUNDS, { recursive: true });
-  await mkdir(SITE_DATA_BATTLEGROUNDS, { recursive: true });
-
   const gsFile = await loadGamestrings<Gamestrings>();
   const mapPatches = await loadMapGamestringPatches();
   const abilityIndex = buildAbilityIndex(gsFile.items, mapPatches);
 
-  await writeFile(
+  await writeText(
     path.join(SITE_CONTENT_BATTLEGROUNDS, "_index.md"),
-    `+++\ntitle = "Battlegrounds"\ntemplate = "battlegrounds/list.html"\nsort_by = "title"\n+++\n`,
+    frontmatter({ title: "Battlegrounds", template: "battlegrounds/list.html", sort_by: "title" }),
   );
 
   for (const cfg of BATTLEGROUNDS) {
     const data = await processMap(cfg, abilityIndex);
 
-    await writeFile(
-      path.join(SITE_DATA_BATTLEGROUNDS, `${cfg.slug}.json`),
-      JSON.stringify(data, null, 2),
-    );
+    await writeJson(path.join(SITE_DATA_BATTLEGROUNDS, `${cfg.slug}.json`), data, 2);
 
     const loadingScreenSrc = LOADING_SCREENS[cfg.slug];
     const hasLoadingScreen = loadingScreenSrc
@@ -342,14 +334,16 @@ async function main() {
       console.warn(`  WARNING: loading screen not found: ${loadingScreenSrc}`);
     }
 
-    const frontmatter = `+++\ntitle = ${JSON.stringify(cfg.name)}\nslug = ${JSON.stringify(cfg.slug)}\ntemplate = "battlegrounds/single.html"\n\n[extra]\nbattleground_slug = ${JSON.stringify(cfg.slug)}\nfranchise = ${JSON.stringify(cfg.franchise)}\nloading_screen = ${JSON.stringify(hasLoadingScreen)}\n+++\n`;
-    await writeFile(
+    await writeText(
       path.join(SITE_CONTENT_BATTLEGROUNDS, `${cfg.slug}.md`),
-      frontmatter,
+      frontmatter(
+        { title: cfg.name, slug: cfg.slug, template: "battlegrounds/single.html" },
+        { battleground_slug: cfg.slug, franchise: cfg.franchise, loading_screen: hasLoadingScreen },
+      ),
     );
   }
 
   console.log(`gen-battlegrounds: wrote ${BATTLEGROUNDS.length} battlegrounds`);
 }
 
-main().catch(console.error);
+runScript(import.meta.url, main);

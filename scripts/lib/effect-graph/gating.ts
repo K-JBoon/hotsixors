@@ -1,7 +1,7 @@
 // Talent-gating resolution.
 
 import type { EffectGraph, GraphNode, AnchorIndex, Element } from "./types.ts";
-import { parentChain, behaviorRefsBehavior } from "./walk.ts";
+import { parentChain } from "./walk.ts";
 import { resolvedNumber } from "./xml.ts";
 import { descendantsOf, findAll, findFirst } from "./traverse.ts";
 
@@ -44,12 +44,21 @@ export function bucketBehaviorIdsForTalent(talentNode: GraphNode): string[] {
   return out;
 }
 
-function talentIdsGrantingBehavior(
-  graph: EffectGraph,
-  anchorToEntry: AnchorIndex,
-  behaviorId: string,
-): string[] {
-  const out: string[] = [];
+// Which talents grant which behaviors. A talent's behavior refs do not depend
+// on the behavior being asked about, so they are resolved once and inverted.
+// Anchors go in per Object.entries order, which is the order callers expect.
+const grantIndexes = new WeakMap<EffectGraph, WeakMap<AnchorIndex, Map<string, string[]>>>();
+
+function talentGrantIndex(graph: EffectGraph, anchorToEntry: AnchorIndex): Map<string, string[]> {
+  let byIndex = grantIndexes.get(graph);
+  if (!byIndex) {
+    byIndex = new WeakMap();
+    grantIndexes.set(graph, byIndex);
+  }
+  const hit = byIndex.get(anchorToEntry);
+  if (hit) return hit;
+
+  const index = new Map<string, string[]>();
   for (const [anchor, entry] of Object.entries(anchorToEntry)) {
     if (entry.kind !== "talent") continue;
     const node = graph.nodes.get(anchor);
@@ -57,10 +66,32 @@ function talentIdsGrantingBehavior(
     const behaviorBucketRefs = (node.refs["Abil"] ?? []).filter(
       (id) => !anchorToEntry[id] && graph.nodes.get(id)?.tag.startsWith("CBehavior"),
     );
-    const talentBehaviorRefs = [...(node.refs["BehaviorArray"] ?? []), ...behaviorBucketRefs];
-    if (talentBehaviorRefs.some((id) => behaviorRefsBehavior(graph, id, behaviorId))) out.push(anchor);
+    // behaviorRefsBehavior matches the ref itself, or any behavior it inherits
+    // from, so a ref grants every id along its parent chain.
+    const granted = new Set<string>();
+    for (const id of [...(node.refs["BehaviorArray"] ?? []), ...behaviorBucketRefs]) {
+      granted.add(id);
+      if (graph.nodes.get(id)?.tag.startsWith("CBehavior")) {
+        for (const ancestor of parentChain(graph, id)) granted.add(ancestor);
+      }
+    }
+    for (const behaviorId of granted) {
+      const bucket = index.get(behaviorId);
+      if (bucket) bucket.push(anchor);
+      else index.set(behaviorId, [anchor]);
+    }
   }
-  return out;
+
+  byIndex.set(anchorToEntry, index);
+  return index;
+}
+
+function talentIdsGrantingBehavior(
+  graph: EffectGraph,
+  anchorToEntry: AnchorIndex,
+  behaviorId: string,
+): string[] {
+  return talentGrantIndex(graph, anchorToEntry).get(behaviorId) ?? [];
 }
 
 function isTriviallyPassableValidator(

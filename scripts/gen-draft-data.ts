@@ -1,7 +1,9 @@
-import { access, readdir, readFile, writeFile, mkdir } from "node:fs/promises";
+import { readdir, readFile } from "node:fs/promises";
 import * as path from "node:path";
 import type { DraftHero, DraftBattleground, DraftDataFile } from "./types.ts";
 import { SITE_CONTENT_HEROES, SITE_DATA_BATTLEGROUNDS, SITE_STATIC } from "./lib/paths.ts";
+import { displayPath, exists, readJson, writeJson } from "./lib/fs.ts";
+import { runScript } from "./lib/script.ts";
 import { frontmatterValue } from "./lib/frontmatter.ts";
 
 const OUTPUT_DIR = path.join(SITE_STATIC, "draft");
@@ -11,18 +13,15 @@ const EXTRA_DRAFT_BATTLEGROUNDS: Array<Pick<DraftBattleground, "slug" | "name">>
   { slug: "braxis-holdout", name: "Braxis Holdout" },
 ];
 
-async function fileExists(file: string): Promise<boolean> {
-  try {
-    await access(file);
-    return true;
-  } catch {
-    return false;
-  }
-}
-
 function extractPortrait(frontmatter: string): string | null {
   const m = frontmatter.match(/draftScreen\s*=\s*"([^"]+)"/);
   return m ? m[1] : null;
+}
+
+/** The map background the draft tool shows, when one was rendered. */
+async function mapBackground(slug: string): Promise<{ background?: string }> {
+  const file = path.join(MAP_BACKGROUNDS_DIR, `${slug}.webp`);
+  return await exists(file) ? { background: `/draft/maps/${slug}.webp` } : {};
 }
 
 async function readHeroes(): Promise<DraftHero[]> {
@@ -52,17 +51,12 @@ async function readBattlegrounds(): Promise<DraftBattleground[]> {
   const out: DraftBattleground[] = [];
   for (const file of files) {
     const slug = file.replace(/\.json$/, "");
-    const data = JSON.parse(await readFile(path.join(SITE_DATA_BATTLEGROUNDS, file), "utf8"));
-    const name = typeof data.name === "string" ? data.name : slug;
-    const backgroundFile = path.join(MAP_BACKGROUNDS_DIR, `${slug}.webp`);
-    const background = await fileExists(backgroundFile) ? `/draft/maps/${slug}.webp` : undefined;
-    out.push({ slug, name, ...(background ? { background } : {}) });
+    const data = await readJson<{ name?: string }>(path.join(SITE_DATA_BATTLEGROUNDS, file));
+    out.push({ slug, name: data.name ?? slug, ...(await mapBackground(slug)) });
   }
   for (const bg of EXTRA_DRAFT_BATTLEGROUNDS) {
     if (out.some(existing => existing.slug === bg.slug)) continue;
-    const backgroundFile = path.join(MAP_BACKGROUNDS_DIR, `${bg.slug}.webp`);
-    const background = await fileExists(backgroundFile) ? `/draft/maps/${bg.slug}.webp` : undefined;
-    out.push({ ...bg, ...(background ? { background } : {}) });
+    out.push({ ...bg, ...(await mapBackground(bg.slug)) });
   }
   out.sort((a, b) => a.name.localeCompare(b.name, "en", { sensitivity: "base" }));
   return out;
@@ -70,10 +64,8 @@ async function readBattlegrounds(): Promise<DraftBattleground[]> {
 
 async function main(): Promise<void> {
   const [heroes, battlegrounds] = await Promise.all([readHeroes(), readBattlegrounds()]);
-  const output: DraftDataFile = { heroes, battlegrounds };
-  await mkdir(OUTPUT_DIR, { recursive: true });
-  await writeFile(OUTPUT_FILE, JSON.stringify(output));
-  console.log(`gen-draft-data: ${heroes.length} heroes, ${battlegrounds.length} battlegrounds → ${OUTPUT_FILE}`);
+  await writeJson(OUTPUT_FILE, { heroes, battlegrounds } satisfies DraftDataFile);
+  console.log(`gen-draft-data: ${heroes.length} heroes, ${battlegrounds.length} battlegrounds -> ${displayPath(OUTPUT_FILE)}`);
 }
 
-main().catch(err => { console.error(err); process.exit(1); });
+runScript(import.meta.url, main);

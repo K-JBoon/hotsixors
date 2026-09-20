@@ -6,8 +6,9 @@
 // regions each team permanently sees.
 
 import { createHash } from "node:crypto";
-import { mkdirSync, readFileSync, writeFileSync, readdirSync, statSync, unlinkSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync, readdirSync, statSync, unlinkSync } from "node:fs";
 import { basename, join } from "node:path";
+import { runScript } from "./lib/script.ts";
 import zlib from "node:zlib";
 
 import { MPQArchive } from "../site/static/replay/mpq.js";
@@ -30,6 +31,7 @@ import {
 } from "./lib/stormmap.ts";
 
 const OUT_DIR = join(SITE_STATIC_REPLAY, "maps");
+const INDEX_FILE = join(SITE_STATIC_REPLAY, "maps.json");
 
 /** Schematic pixels per game unit. The viewer reads this back out of maps.json. */
 const IMAGE_SCALE = 4;
@@ -340,18 +342,54 @@ function depotArchives(dir: string, out: string[] = []): string[] {
   return out;
 }
 
+/**
+ * Entries from the last run, by archive hash. An archive whose bytes are
+ * unchanged renders to the same pictures, so its entry is reused instead of
+ * re-rendered. `MAPS_FORCE` renders everything again.
+ */
+function cachedByHash(): Map<string, [string, MapEntry]> {
+  const cache = new Map<string, [string, MapEntry]>();
+  if (process.env.MAPS_FORCE) return cache;
+  let previous: Record<string, MapEntry>;
+  try {
+    previous = JSON.parse(readFileSync(INDEX_FILE, "utf-8"));
+  } catch {
+    return cache;
+  }
+  for (const [name, entry] of Object.entries(previous)) {
+    const files = [`${entry.slug}.png`, `${entry.slug}.vision.png`];
+    if (entry.hash && files.every((file) => existsSync(join(OUT_DIR, file)))) {
+      cache.set(entry.hash, [name, entry]);
+    }
+  }
+  return cache;
+}
+
 async function main(): Promise<void> {
   mkdirSync(OUT_DIR, { recursive: true });
-  for (const stale of readdirSync(OUT_DIR)) unlinkSync(join(OUT_DIR, stale));
 
   const listing = depotArchives(DEPOTCACHE_DIR);
-  const baseActors = loadBaseDoodadActors();
+  const cached = cachedByHash();
   const index: Record<string, MapEntry> = {};
+  // Reading the doodad catalogs costs more than a fully cached run, so the
+  // table is built only once a map actually has to be rendered.
+  let baseActors: ReturnType<typeof loadBaseDoodadActors> | null = null;
+  let reused = 0;
 
   for (const file of listing) {
     let name = basename(file, ".s2ma");
     try {
       const buf = readFileSync(file);
+      const hash = createHash("sha256").update(buf).digest("hex");
+
+      const hit = cached.get(hash);
+      if (hit) {
+        index[hit[0]] = hit[1];
+        reused++;
+        continue;
+      }
+
+      baseActors ??= loadBaseDoodadActors();
       const opened = openMap(buf, baseActors);
       if (!opened) continue;
       const { archive, info, grids } = opened;
@@ -366,7 +404,7 @@ async function main(): Promise<void> {
         image: `/replay/maps/${slug}.png`,
         imageScale: IMAGE_SCALE,
         vision: `/replay/maps/${slug}.vision.png`,
-        hash: createHash("sha256").update(buf).digest("hex"),
+        hash,
         names: localizedMapNames(archive),
         // image pixel for world (x,y): px = x*imageScale, py = (mapHeight-y)*imageScale
         mapWidth: info.width,
@@ -392,8 +430,14 @@ async function main(): Promise<void> {
     }
   }
 
-  writeFileSync(join(OUT_DIR, "..", "maps.json"), JSON.stringify(index, null, 1));
-  console.log(`\nwrote ${Object.keys(index).length} maps to ${OUT_DIR}`);
+  // Pictures of maps this build no longer ships.
+  const keep = new Set(Object.values(index).flatMap((e) => [`${e.slug}.png`, `${e.slug}.vision.png`]));
+  for (const file of readdirSync(OUT_DIR)) {
+    if (!keep.has(file)) unlinkSync(join(OUT_DIR, file));
+  }
+
+  writeFileSync(INDEX_FILE, JSON.stringify(index, null, 1));
+  console.log(`\nwrote ${Object.keys(index).length} maps to ${OUT_DIR} (${reused} reused)`);
 }
 
-await main();
+runScript(import.meta.url, main);

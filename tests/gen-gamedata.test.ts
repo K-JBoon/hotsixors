@@ -4,7 +4,7 @@ import test from "node:test";
 
 function runGamedataFilter(paths) {
   const script = `
-    import { shouldIncludeGamedataPath } from "./scripts/gen-gamedata.ts";
+    import { shouldIncludeGamedataPath } from "./scripts/lib/gamedata-paths.ts";
     const paths = ${JSON.stringify(paths)};
     console.log(JSON.stringify(paths.map((p) => [p, shouldIncludeGamedataPath(p)])));
   `;

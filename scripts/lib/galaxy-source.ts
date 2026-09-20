@@ -1,8 +1,5 @@
 // Extracts readable excerpts from GalaxyScript for timers and mechanics.
 
-import { esc } from "./catalog-xml.ts";
-
-
 export function sanitizeGamedataUrl(relPath: string): string {
   return relPath.replace(/\.(xml|galaxy|aitree)$/i, (m) => "-" + m.slice(1));
 }

@@ -2,8 +2,32 @@
 
 import type { EffectGraph, GraphNode, ReverseRef, AnchorIndex } from "./types.ts";
 
+// A graph never changes once built, so the walks below are pure in it. Every
+// mechanic re-walks the same chains, so they are worth keeping.
+interface GraphCache {
+  parentChains: Map<string, string[]>;
+  targetBehaviors: Map<string, string | null>;
+  applyEffects?: ApplyEffectIndex;
+}
+
+const caches = new WeakMap<EffectGraph, GraphCache>();
+
+function cacheFor(graph: EffectGraph): GraphCache {
+  let cache = caches.get(graph);
+  if (!cache) {
+    cache = { parentChains: new Map(), targetBehaviors: new Map() };
+    caches.set(graph, cache);
+  }
+  return cache;
+}
+
 // The id itself, then each ancestor reachable via parent="...".
+// The result is shared between callers; treat it as read-only.
 export function parentChain(graph: EffectGraph, id: string): string[] {
+  const cache = cacheFor(graph).parentChains;
+  const hit = cache.get(id);
+  if (hit) return hit;
+
   const out: string[] = [];
   const seen = new Set<string>();
   let cur: string | null = id;
@@ -14,16 +38,26 @@ export function parentChain(graph: EffectGraph, id: string): string[] {
     const next = node?.parentAttr ?? null;
     cur = next && graph.nodes.has(next) ? next : null;
   }
+  cache.set(id, out);
   return out;
 }
 
 // The behavior id this CEffectApplyBehavior applies.
 export function targetBehaviorOf(graph: EffectGraph, effectId: string): string | null {
+  const cache = cacheFor(graph).targetBehaviors;
+  const hit = cache.get(effectId);
+  if (hit !== undefined) return hit;
+
+  let out: string | null = null;
   for (const id of parentChain(graph, effectId)) {
     const b = graph.nodes.get(id)?.refs["Behavior"]?.[0];
-    if (b) return b;
+    if (b) {
+      out = b;
+      break;
+    }
   }
-  return null;
+  cache.set(effectId, out);
+  return out;
 }
 
 export function buildReverseRefs(graph: EffectGraph): Map<string, ReverseRef[]> {
@@ -111,6 +145,40 @@ export function rootAbilityAnchorIds(
   return out;
 }
 
+// Every CEffectApplyBehavior that can resolve to a given behavior, with the
+// chains that decide whether it really does. This narrows a query to a handful
+// of candidates instead of walking all ~60k nodes once per behavior. Buckets
+// are filled in graph order, which is the order callers rely on.
+interface ApplyEffect {
+  id: string;
+  target: string | null;
+  targetChain: readonly string[];
+}
+
+type ApplyEffectIndex = Map<string, ApplyEffect[]>;
+
+function applyEffectIndex(graph: EffectGraph): ApplyEffectIndex {
+  const cache = cacheFor(graph);
+  if (cache.applyEffects) return cache.applyEffects;
+
+  const byBehavior: ApplyEffectIndex = new Map();
+  for (const node of graph.nodes.values()) {
+    if (node.tag !== "CEffectApplyBehavior") continue;
+    const target = targetBehaviorOf(graph, node.id);
+    const targetChain = target ? parentChain(graph, target) : [];
+    const effect: ApplyEffect = { id: node.id, target, targetChain };
+    // Either chain can be the one that names the behavior being looked up.
+    for (const behaviorId of new Set([...parentChain(graph, node.id), ...targetChain])) {
+      const bucket = byBehavior.get(behaviorId);
+      if (bucket) bucket.push(effect);
+      else byBehavior.set(behaviorId, [effect]);
+    }
+  }
+
+  cache.applyEffects = byBehavior;
+  return byBehavior;
+}
+
 // All CEffectApplyBehavior ids whose applied behavior resolves to behaviorId.
 export function effectsApplyingBehavior(
   graph: EffectGraph,
@@ -120,18 +188,16 @@ export function effectsApplyingBehavior(
   const includeBehaviorDescendants = options.includeBehaviorDescendants ?? true;
   const excludedBehaviorDescendants = options.excludeBehaviorDescendants ?? [];
   const out: string[] = [];
-  for (const node of graph.nodes.values()) {
-    if (node.tag !== "CEffectApplyBehavior") continue;
-    if (parentChain(graph, node.id).includes(behaviorId)) {
-      out.push(node.id);
+  for (const effect of applyEffectIndex(graph).get(behaviorId) ?? []) {
+    if (parentChain(graph, effect.id).includes(behaviorId)) {
+      out.push(effect.id);
       continue;
     }
-    const target = targetBehaviorOf(graph, node.id);
-    if (!target) continue;
-    const chain = parentChain(graph, target);
+    if (!effect.target) continue;
+    const chain = effect.targetChain;
     if (excludedBehaviorDescendants.some((id) => chain.includes(id))) continue;
-    if (target === behaviorId || (includeBehaviorDescendants && chain.includes(behaviorId))) {
-      out.push(node.id);
+    if (effect.target === behaviorId || (includeBehaviorDescendants && chain.includes(behaviorId))) {
+      out.push(effect.id);
     }
   }
   return out;

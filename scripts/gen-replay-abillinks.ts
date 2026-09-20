@@ -24,9 +24,11 @@
 //
 // TODO: SAMURO_CLONE_SLOTS should get figured out eventually (see comment below)
 
-import { readFile, readdir, stat, mkdir, writeFile, copyFile } from "node:fs/promises";
+import { readFile, readdir, copyFile } from "node:fs/promises";
 import * as path from "node:path";
 import { ABILLINK_STORE, GAMEDATA_DIR, SITE_STATIC, gameBuild, readHdpInfo } from "./lib/paths.ts";
+import { displayPath, exists, writeJson } from "./lib/fs.ts";
+import { runScript } from "./lib/script.ts";
 
 const CORE_MODS = ["core.stormmod", "heroes.stormmod", "heroesdata.stormmod"];
 const INCLUDES = path.join(GAMEDATA_DIR, "heroesdata.stormmod/base.stormdata/includes.xml");
@@ -47,15 +49,6 @@ async function resolveCI(root: string, parts: string[]): Promise<string | null> 
     cur = path.join(cur, hit);
   }
   return cur;
-}
-
-async function exists(p: string): Promise<boolean> {
-  try {
-    await stat(p);
-    return true;
-  } catch {
-    return false;
-  }
 }
 
 // Implicit per-catalog files (abildata.xml, behaviordata.xml, …) load ahead of
@@ -315,34 +308,26 @@ async function storedBuilds(): Promise<number[]> {
 }
 
 async function main() {
-  console.log("gen-replay-abillinks: starting");
   const build = gameBuild(await readHdpInfo());
-  await mkdir(ABILLINK_STORE, { recursive: true });
   const storePath = path.join(ABILLINK_STORE, `${build}.json`);
 
   if (!(await exists(storePath)) || process.env.ABILLINK_FORCE) {
     const { entries, pos } = await buildAbilCatalog();
     const out: Record<string, string> = {};
     for (const [id, index] of pos) out[String(index)] = id;
-    await writeFile(storePath, JSON.stringify(out), "utf-8");
+    await writeJson(storePath, out);
     console.log(`gen-replay-abillinks: build ${build}, ${entries.length} catalog slots, ${pos.size} named abilities`);
   } else {
-    console.log(`gen-replay-abillinks: build ${build} already in ${path.relative(process.cwd(), ABILLINK_STORE)}`);
+    console.log(`gen-replay-abillinks: build ${build} already in ${displayPath(ABILLINK_STORE)}`);
   }
 
   // Every stored build ships: a replay decodes against the catalog of its own
   // build, or the closest older one.
   const destDir = path.join(SITE_STATIC, "replay", "abillinks");
-  await mkdir(destDir, { recursive: true });
   const builds = await storedBuilds();
+  await writeJson(path.join(destDir, "index.json"), { builds });
   for (const b of builds) await copyFile(path.join(ABILLINK_STORE, `${b}.json`), path.join(destDir, `${b}.json`));
-  await writeFile(path.join(destDir, "index.json"), JSON.stringify({ builds }), "utf-8");
-  console.log(`gen-replay-abillinks: ${builds.length} build(s) -> ${path.relative(process.cwd(), destDir)}`);
+  console.log(`gen-replay-abillinks: ${builds.length} build(s) -> ${displayPath(destDir)}`);
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
-  main().catch((error) => {
-    console.error(error);
-    process.exitCode = 1;
-  });
-}
+runScript(import.meta.url, main);

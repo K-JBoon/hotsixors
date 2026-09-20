@@ -1,8 +1,10 @@
 // Builds the replay viewer's summoned-unit table.
 
-import { copyFile, mkdir, writeFile } from "node:fs/promises";
+import { copyFile, mkdir } from "node:fs/promises";
 import * as path from "node:path";
 import { HEROES_IMAGES_DIR, SITE_STATIC, SITE_STATIC_IMAGES } from "./lib/paths.ts";
+import { displayPath, writeJson } from "./lib/fs.ts";
+import { runScript } from "./lib/script.ts";
 import { loadDataFile } from "./lib/heroes-data.ts";
 
 interface UnitEntry {
@@ -37,7 +39,6 @@ export function collectSummons(units: Record<string, UnitEntry>): Record<string,
 }
 
 async function main(): Promise<void> {
-  console.log("gen-replay-summons: starting");
   const unitData = await loadDataFile<Record<string, UnitEntry>>("unitdata");
   const summons = collectSummons(unitData.items);
 
@@ -56,16 +57,10 @@ async function main(): Promise<void> {
   }
 
   const dest = path.join(SITE_STATIC, "replay", "summons.json");
-  await mkdir(path.dirname(dest), { recursive: true });
-  await writeFile(dest, JSON.stringify(summons), "utf-8");
+  await writeJson(dest, summons);
   console.log(
-    `gen-replay-summons: ${Object.keys(summons).length} summoned units with vision, ${copied} portraits -> ${path.relative(process.cwd(), dest)}`
+    `gen-replay-summons: ${Object.keys(summons).length} summoned units with vision, ${copied} portraits -> ${displayPath(dest)}`
   );
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
-  main().catch((error) => {
-    console.error(error);
-    process.exitCode = 1;
-  });
-}
+runScript(import.meta.url, main);

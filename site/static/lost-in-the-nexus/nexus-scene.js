@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { GLTFLoader } from '/lost-in-the-nexus/vendor/GLTFLoader.js';
 import { OrbitControls } from '/lost-in-the-nexus/vendor/OrbitControls.js';
-import { clone as cloneSkinned } from '/lost-in-the-nexus/vendor/SkeletonUtils.js';
+import { clone as cloneSkinned } from '/lost-in-the-nexus/utils/SkeletonUtils.js';
 import { MeshoptDecoder } from '/lost-in-the-nexus/vendor/meshopt_decoder.module.js';
 import { EffectComposer } from '/lost-in-the-nexus/vendor/postprocessing/EffectComposer.js';
 import { RenderPass } from '/lost-in-the-nexus/vendor/postprocessing/RenderPass.js';

@@ -1,9 +1,10 @@
 // Classifies replay-visible abilities by caster movement.
 
-import { readFile, readdir, writeFile, mkdir } from "node:fs/promises";
 import * as path from "node:path";
-import { DATA_ROOT, GAMEDATA_DIR, SITE_STATIC } from "./lib/paths.ts";
-import { shouldIncludeGamedataPath } from "./gen-gamedata.ts";
+import { SITE_STATIC } from "./lib/paths.ts";
+import { loadGamedataXmlFiles } from "./lib/gamedata-paths.ts";
+import { displayPath, readJson, writeJson } from "./lib/fs.ts";
+import { runScript } from "./lib/script.ts";
 import { buildEffectGraph } from "./lib/effect-graph.ts";
 import type { EffectGraph } from "./lib/effect-graph.ts";
 
@@ -18,23 +19,6 @@ const CASTER_UNIT_VALUES = new Set(["Caster", "Source"]);
 
 // Refs that leave the caster's own effect chain.
 const FOREIGN_REF_FIELDS = new Set(["SpawnEffect", "Abil", "AbilArray", "Tech", "Entry"]);
-
-async function collectGamedataFiles(dir: string, rel: string, out: string[]): Promise<void> {
-  let entries;
-  try {
-    entries = await readdir(dir, { withFileTypes: true });
-  } catch {
-    return;
-  }
-  for (const e of entries) {
-    const childRel = rel ? `${rel}/${e.name}` : e.name;
-    if (e.isDirectory()) {
-      await collectGamedataFiles(path.join(dir, e.name), childRel, out);
-    } else if (e.name.endsWith(".xml") && shouldIncludeGamedataPath(`mods/${childRel}`)) {
-      out.push(`mods/${childRel}`);
-    }
-  }
-}
 
 // Every id reachable from `id` through forward refs and parent links.
 function* reachable(graph: EffectGraph, id: string): Iterable<string> {
@@ -91,37 +75,28 @@ export function classifyMovement(graph: EffectGraph, abilityIds: Iterable<string
   return out;
 }
 
-async function main(): Promise<void> {
-  console.log("gen-replay-movement: starting");
-  // Union over every shipped build's catalog.
-  const abilLinkDir = path.join(SITE_STATIC, "replay", "abillinks");
-  const { builds } = JSON.parse(await readFile(path.join(abilLinkDir, "index.json"), "utf-8")) as { builds: number[] };
-  const abilLinkIndex: Record<string, string> = {};
+// Union over every shipped build's catalog.
+async function loadAbilLinkIndex(): Promise<Record<string, string>> {
+  const dir = path.join(SITE_STATIC, "replay", "abillinks");
+  const { builds } = await readJson<{ builds: number[] }>(path.join(dir, "index.json"));
+  const out: Record<string, string> = {};
   for (const build of builds) {
-    Object.assign(abilLinkIndex, JSON.parse(await readFile(path.join(abilLinkDir, `${build}.json`), "utf-8")));
+    Object.assign(out, await readJson<Record<string, string>>(path.join(dir, `${build}.json`)));
   }
+  return out;
+}
 
-  const relPaths: string[] = [];
-  await collectGamedataFiles(GAMEDATA_DIR, "", relPaths);
-  const files = await Promise.all(
-    relPaths.map(async (rel) => ({ path: rel, content: await readFile(path.join(DATA_ROOT, rel), "utf-8") })),
-  );
-  const graph = buildEffectGraph(files);
-
+async function main(): Promise<void> {
+  const abilLinkIndex = await loadAbilLinkIndex();
+  const graph = buildEffectGraph(await loadGamedataXmlFiles());
   const result = classifyMovement(graph, new Set(Object.values(abilLinkIndex)));
 
   const dest = path.join(SITE_STATIC, "replay", "movement-abilities.json");
-  await mkdir(path.dirname(dest), { recursive: true });
-  await writeFile(dest, JSON.stringify(result), "utf-8");
+  await writeJson(dest, result);
   const teleports = Object.values(result).filter((k) => k === "teleport").length;
   console.log(
-    `gen-replay-movement: ${teleports} teleport, ${Object.keys(result).length - teleports} dash abilities -> ${path.relative(process.cwd(), dest)}`,
+    `gen-replay-movement: ${teleports} teleport, ${Object.keys(result).length - teleports} dash abilities -> ${displayPath(dest)}`,
   );
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
-  main().catch((error) => {
-    console.error(error);
-    process.exitCode = 1;
-  });
-}
+runScript(import.meta.url, main);

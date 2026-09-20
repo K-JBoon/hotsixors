@@ -1,11 +1,12 @@
-import { readFile, rm, readdir, rmdir } from "node:fs/promises";
+import { rm, readdir, rmdir } from "node:fs/promises";
 import * as path from "node:path";
 import { SITE_DATA, SITE_STATIC } from "./lib/paths.ts";
+import { readJson } from "./lib/fs.ts";
 
 const PUBLIC_DIR = path.join(SITE_STATIC, "..", "public");
 const MANIFEST = path.join(SITE_DATA, "bundle-sources.json");
 
-const sources: string[] = JSON.parse(await readFile(MANIFEST, "utf-8"));
+const sources = await readJson<string[]>(MANIFEST);
 
 // The test entry re-exports every client module; nothing on the site loads it.
 sources.push("js/index.js");

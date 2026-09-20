@@ -1,6 +1,5 @@
-import { readdir, readFile, writeFile, mkdir, rm } from "node:fs/promises";
+import { readdir, readFile, rm } from "node:fs/promises";
 import * as path from "node:path";
-import { fileURLToPath } from "node:url";
 import type { AnchorMap, FileTreeNode } from "./types.ts";
 import {
   GAMEDATA_DIR,
@@ -9,123 +8,18 @@ import {
   SITE_STATIC,
   gamedataPathToContentPath,
 } from "./lib/paths.ts";
+import { writeJson, writeText } from "./lib/fs.ts";
+import { frontmatter } from "./lib/frontmatter.ts";
+import { runScript } from "./lib/script.ts";
+import {
+  SUPPORTED_EXTS,
+  isLocaleDir,
+  shouldDescendIntoGamedataPath,
+  shouldIncludeGamedataPath,
+} from "./lib/gamedata-paths.ts";
 import { sanitizeGamedataUrl } from "./lib/galaxy-source.ts";
 import { escapeHtml } from "./lib/gamestrings.ts";
 import { buildXrefSidecars, scanXrefFile, type ScannedFile } from "./lib/gamedata-xref.ts";
-
-const SCRIPT_PATH = fileURLToPath(import.meta.url);
-
-const SUPPORTED_EXTS = new Set([".xml", ".galaxy", ".aitree"]);
-const INCLUDED_GAMEDATA_PREFIXES = [
-  "mods/heroesdata.stormmod/base.stormdata/gamedata/heroes/",
-  "mods/heroesdata.stormmod/base.stormdata/gamedata/maps/",
-  "mods/heroesdata.stormmod/base.stormdata/triggerlibs/",
-  "mods/heroesdata.stormmod/base.stormdata/ai/",
-];
-const INCLUDED_GAMEDATA_FILES = new Set([
-  "mods/heroesdata.stormmod/base.stormdata/gamedata/behaviordata.xml",
-  "mods/heroesdata.stormmod/base.stormdata/gamedata/effectdata.xml",
-  "mods/heroesdata.stormmod/base.stormdata/gamedata/abildata.xml",
-  "mods/heroesdata.stormmod/base.stormdata/gamedata/talentdata.xml",
-  "mods/heroesdata.stormmod/base.stormdata/gamedata/validatordata.xml",
-]);
-const EXCLUDED_GAMEDATA_FILES = new Set(["characterdata.xml", "gamedata.xml", "librarylist.xml", "preload.xml"]);
-const EXCLUDED_GAMEDATA_SEGMENTS = [
-  "actordata",
-  "announcerdata",
-  "announcerpackdata",
-  "bannerdata",
-  "boostdata",
-  "bystanderdata",
-  "colorspecdata",
-  "colorstyledata",
-  "conversationdata",
-  "critterdata",
-  "decorationdata",
-  "doodadautodata",
-  "emoticondata",
-  "emoticonpackdata",
-  "footprintdata",
-  "genericcursordata",
-  "genericglazedata",
-  "genericmaterialimpactdata",
-  "hittestdata",
-  "lightdata",
-  "modeldata",
-  "mountdata",
-  "pingdata",
-  "portraitpackdata",
-  "rewarddata",
-  "scoreresultdata",
-  "scorevaluedata",
-  "skindata",
-  "sound",
-  "sounddata",
-  "soundexclusivitydata",
-  "soundmixsnapshotdata",
-  "soundtrackdata",
-  "spraydata",
-  "terraindata",
-  "texturedata",
-  "vodata",
-  "vodefinitiondata",
-  "voicelinedata",
-  "voiceoverdata",
-];
-
-function normalizedSegments(relPath: string): string[] {
-  return relPath.toLowerCase().split(/[\\/]+/);
-}
-
-function normalizedPath(relPath: string): string {
-  return relPath.toLowerCase().replaceAll("\\", "/");
-}
-
-function isExcludedGamedataPath(relPath: string): boolean {
-  const segments = normalizedSegments(relPath);
-  return segments.some((segment) =>
-    EXCLUDED_GAMEDATA_SEGMENTS.some((excluded) => segment.includes(excluded))
-  );
-}
-
-function isIncludedGamedataDomain(relPath: string): boolean {
-  const candidate = normalizedPath(relPath);
-  if (INCLUDED_GAMEDATA_FILES.has(candidate)) return true;
-  if (INCLUDED_GAMEDATA_PREFIXES.some((prefix) => candidate.startsWith(prefix))) return true;
-  if (/^mods\/heromods\/[^/]+\/base\.stormdata\/(?:gamedata\/|ai\/|[^/]+\.galaxy$)/.test(candidate)) return true;
-  if (/^mods\/heroesmapmods\/battlegroundmapmods\/[^/]+\/base\.stormdata\/(?:gamedata\/|ai\/|[^/]+\.galaxy$)/.test(candidate)) return true;
-  return false;
-}
-
-export function shouldIncludeGamedataPath(relPath: string): boolean {
-  const ext = path.extname(relPath).toLowerCase();
-  if (!SUPPORTED_EXTS.has(ext)) return false;
-  if (!isIncludedGamedataDomain(relPath)) return false;
-  if (EXCLUDED_GAMEDATA_FILES.has(path.basename(relPath).toLowerCase())) return false;
-
-  return !isExcludedGamedataPath(relPath);
-}
-
-function shouldDescendIntoGamedataPath(relPath: string): boolean {
-  if (isExcludedGamedataPath(relPath)) return false;
-
-  const candidate = normalizedPath(relPath);
-  const candidatePrefix = `${candidate}/`;
-  if (INCLUDED_GAMEDATA_PREFIXES.some((prefix) =>
-    prefix.startsWith(candidatePrefix) || candidate.startsWith(prefix)
-  )) return true;
-
-  if (/^mods\/heromods(?:\/[^/]+(?:\/base\.stormdata(?:\/(?:gamedata|ai).*)?)?)?$/.test(candidate)) return true;
-  if (/^mods\/heroesmapmods(?:\/battlegroundmapmods(?:\/[^/]+(?:\/base\.stormdata(?:\/(?:gamedata|ai).*)?)?)?)?$/.test(candidate)) return true;
-  return false;
-}
-
-// Skip locale-specific stormdata directories (e.g. enus.stormdata, dede.stormdata)
-const LOCALE_CODES = new Set(["dede", "enus", "eses", "esmx", "frfr", "itit", "kokr", "plpl", "ptbr", "ruru", "zhcn", "zhtw"]);
-function isLocaleDir(name: string): boolean {
-  const m = name.match(/^([a-z]{4})\.stormdata$/i);
-  return m ? LOCALE_CODES.has(m[1].toLowerCase()) : false;
-}
 
 export function renderGamedataHtml(
   content: string,
@@ -231,26 +125,17 @@ async function processFile(
     for (const ids of anchors.values()) allIds.push(...ids);
   }
 
-  const frontmatter = `+++
-title = ${JSON.stringify(slug)}
-path = ${JSON.stringify(zolaPath)}
-template = "gamedata/single.html"
-in_search_index = false
-
-[extra]
-file_path = ${JSON.stringify(relPath)}
-url_path = ${JSON.stringify(urlRelPath)}
-file_ext = ${JSON.stringify(ext.slice(1))}
-parent_dir = ${JSON.stringify(parentDir)}
-anchor_ids = [${allIds.map((id) => JSON.stringify(id)).join(", ")}]
-+++
-
-`;
-
-  const pageContent = frontmatter + html;
-  const outPath = gamedataPathToContentPath(relPath);
-  await mkdir(path.dirname(outPath), { recursive: true });
-  await writeFile(outPath, pageContent, "utf-8");
+  const page = frontmatter(
+    { title: slug, path: zolaPath, template: "gamedata/single.html", in_search_index: false },
+    {
+      file_path: relPath,
+      url_path: urlRelPath,
+      file_ext: ext.slice(1),
+      parent_dir: parentDir,
+      anchor_ids: allIds,
+    },
+  );
+  await writeText(gamedataPathToContentPath(relPath), `${page}\n${html}`);
 }
 
 async function walkDir(
@@ -275,13 +160,7 @@ async function walkDir(
       tree.children!.push(childNode);
       await walkDir(absPath, relPath, anchorMap, declAnchorMap, childNode, scannedFiles);
 
-      const sectionPath = path.join(SITE_CONTENT_GAMEDATA, relPath, "_index.md");
-      await mkdir(path.dirname(sectionPath), { recursive: true });
-      await writeFile(
-        sectionPath,
-        `+++\ntitle = ${JSON.stringify(entry.name)}\ntemplate = "gamedata/list.html"\n\n[extra]\ndir_path = ${JSON.stringify(relPath)}\n+++\n`,
-        "utf-8"
-      );
+      await writeText(path.join(SITE_CONTENT_GAMEDATA, relPath, "_index.md"), sectionPage(entry.name, relPath));
     } else if (entry.isFile()) {
       const ext = path.extname(entry.name).toLowerCase();
       if (SUPPORTED_EXTS.has(ext) && shouldIncludeGamedataPath(relPath)) {
@@ -299,6 +178,11 @@ async function walkDir(
   }
 }
 
+/** Zola section page for one game data directory. */
+function sectionPage(title: string, dirPath: string): string {
+  return frontmatter({ title, template: "gamedata/list.html" }, { dir_path: dirPath });
+}
+
 function pruneEmptyDirs(node: FileTreeNode): boolean {
   if (node.type === "file") return true;
   if (!node.children) return false;
@@ -313,21 +197,16 @@ async function writeXrefSidecars(scannedFiles: ScannedFile[]): Promise<void> {
   let bytes = 0;
   for (const [urlPath, { sidecar, incoming }] of sidecars) {
     const outPath = path.join(outDir, `${urlPath}.json`);
-    await mkdir(path.dirname(outPath), { recursive: true });
     for (const [file, payload] of [[outPath, sidecar], [outPath.replace(/\.json$/, ".refs.json"), incoming]] as const) {
-      const json = JSON.stringify(payload);
-      bytes += json.length;
-      await writeFile(file, json, "utf-8");
+      bytes += JSON.stringify(payload).length;
+      await writeJson(file, payload);
     }
   }
   console.log(`gen-gamedata: wrote ${sidecars.size} xref sidecars (${(bytes / 1e6).toFixed(1)} MB)`);
 }
 
 async function main(): Promise<void> {
-  console.log("gen-gamedata: starting");
   await rm(SITE_CONTENT_GAMEDATA, { recursive: true, force: true });
-  await mkdir(SITE_CONTENT_GAMEDATA, { recursive: true });
-  await mkdir(SITE_DATA, { recursive: true });
 
   const anchorMap: AnchorMap = {};
   const declAnchorMap: AnchorMap = {};
@@ -340,70 +219,35 @@ async function main(): Promise<void> {
 
   pruneEmptyDirs(tree);
 
-  await writeFile(
-    path.join(SITE_DATA, "anchor-map.json"),
-    JSON.stringify(anchorMap, null, 2),
-    "utf-8"
-  );
+  await writeJson(path.join(SITE_DATA, "anchor-map.json"), anchorMap, 2);
+  await writeJson(path.join(SITE_DATA, "decl-anchor-map.json"), declAnchorMap, 2);
+  await writeJson(path.join(SITE_DATA, "gamedata-tree.json"), tree, 2);
+  await writeJson(path.join(SITE_STATIC, "gamedata-tree.json"), tree);
 
-  await writeFile(
-    path.join(SITE_DATA, "decl-anchor-map.json"),
-    JSON.stringify(declAnchorMap, null, 2),
-    "utf-8"
-  );
-
-  await writeFile(
-    path.join(SITE_DATA, "gamedata-tree.json"),
-    JSON.stringify(tree, null, 2),
-    "utf-8"
-  );
-
-  await mkdir(SITE_STATIC, { recursive: true });
-  await writeFile(
-    path.join(SITE_STATIC, "gamedata-tree.json"),
-    JSON.stringify(tree),
-    "utf-8"
-  );
-
-  // Build compact id-lookup.json for client-side click-to-definition
-  // Deduplicates file paths into an indexed array to minimise size
-  const idLookupFiles: string[] = [];
-  const idLookupFilesIndex: Record<string, number> = {};
-  const idLookupIds: Record<string, [number, number]> = {};
+  // Client-side click-to-definition. File paths are deduplicated into an
+  // indexed array to keep the lookup small enough to load on any page.
+  const files: string[] = [];
+  const fileIndex = new Map<string, number>();
+  const ids: Record<string, [number, number]> = {};
   for (const [elemId, info] of Object.entries(anchorMap)) {
-    const xmlPath = info.xmlPath;
-    if (!(xmlPath in idLookupFilesIndex)) {
-      idLookupFilesIndex[xmlPath] = idLookupFiles.length;
-      idLookupFiles.push(xmlPath);
+    let index = fileIndex.get(info.xmlPath);
+    if (index === undefined) {
+      index = files.length;
+      fileIndex.set(info.xmlPath, index);
+      files.push(info.xmlPath);
     }
-    idLookupIds[elemId] = [idLookupFilesIndex[xmlPath], info.line];
+    ids[elemId] = [index, info.line];
   }
-  await writeFile(
-    path.join(SITE_STATIC, "id-lookup.json"),
-    JSON.stringify({ files: idLookupFiles, ids: idLookupIds }),
-    "utf-8"
-  );
-  console.log(`gen-gamedata: wrote id-lookup.json with ${idLookupFiles.length} files and ${Object.keys(idLookupIds).length} IDs`);
+  await writeJson(path.join(SITE_STATIC, "id-lookup.json"), { files, ids });
+  console.log(`gen-gamedata: wrote id-lookup.json with ${files.length} files and ${Object.keys(ids).length} IDs`);
 
-  await writeFile(
-    path.join(SITE_CONTENT_GAMEDATA, "_index.md"),
-    `+++\ntitle = "Game Data"\ntemplate = "gamedata/list.html"\n\n[extra]\ndir_path = ""\n+++\n`,
-    "utf-8"
-  );
-
+  await writeText(path.join(SITE_CONTENT_GAMEDATA, "_index.md"), sectionPage("Game Data", ""));
   // walkDir starts inside mods/, so it never writes that directory's own
   // section the way it does for every directory below it.
-  await mkdir(path.join(SITE_CONTENT_GAMEDATA, "mods"), { recursive: true });
-  await writeFile(
-    path.join(SITE_CONTENT_GAMEDATA, "mods", "_index.md"),
-    `+++\ntitle = "mods"\ntemplate = "gamedata/list.html"\n\n[extra]\ndir_path = "mods"\n+++\n`,
-    "utf-8"
-  );
+  await writeText(path.join(SITE_CONTENT_GAMEDATA, "mods", "_index.md"), sectionPage("mods", "mods"));
 
   console.log(`gen-gamedata: wrote anchor-map.json with ${Object.keys(anchorMap).length} entries`);
   console.log("gen-gamedata: done");
 }
 
-if (path.resolve(process.argv[1] ?? "") === SCRIPT_PATH) {
-  main().catch((e) => { console.error(e); process.exit(1); });
-}
+runScript(import.meta.url, main);

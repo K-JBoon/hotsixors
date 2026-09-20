@@ -1,9 +1,7 @@
-import { writeFile, mkdir } from "node:fs/promises";
 import * as path from "node:path";
-import { fileURLToPath } from "node:url";
 import { SITE_DATA, gameVersion, readHdpInfo } from "./lib/paths.ts";
-
-const SCRIPT_PATH = fileURLToPath(import.meta.url);
+import { writeText } from "./lib/fs.ts";
+import { runScript } from "./lib/script.ts";
 
 interface SourceVersion {
   name: string;
@@ -47,8 +45,6 @@ function formatBuildDate(date: Date): string {
 }
 
 async function main(): Promise<void> {
-  console.log("gen-build-info: starting");
-
   const date = buildDate();
   const info = await readHdpInfo();
   const version = gameVersion(info);
@@ -75,12 +71,8 @@ async function main(): Promise<void> {
     ],
   };
 
-  await mkdir(SITE_DATA, { recursive: true });
-  await writeFile(path.join(SITE_DATA, "build-info.json"), JSON.stringify(buildInfo, null, 2) + "\n", "utf-8");
-
+  await writeText(path.join(SITE_DATA, "build-info.json"), JSON.stringify(buildInfo, null, 2) + "\n");
   console.log(`gen-build-info: wrote build-info.json for ${version}`);
 }
 
-if (path.resolve(process.argv[1] ?? "") === SCRIPT_PATH) {
-  main().catch((e) => { console.error(e); process.exit(1); });
-}
+runScript(import.meta.url, main);

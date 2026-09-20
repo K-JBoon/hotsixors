@@ -1,9 +1,10 @@
 // Builds the replay viewer's unit type -> hero lookup. Unit types are the only
 // hero identity in a replay that is not localized.
 
-import { mkdir, writeFile } from "node:fs/promises";
 import * as path from "node:path";
 import { SITE_STATIC } from "./lib/paths.ts";
+import { displayPath, writeJson } from "./lib/fs.ts";
+import { runScript } from "./lib/script.ts";
 import { loadDataFile } from "./lib/heroes-data.ts";
 
 interface HeroEntry {
@@ -27,21 +28,12 @@ export function collectHeroUnits(heroes: Record<string, HeroEntry>): Record<stri
 }
 
 async function main(): Promise<void> {
-  console.log("gen-replay-hero-units: starting");
   const heroData = await loadDataFile<Record<string, HeroEntry>>("herodata");
   const heroUnits = collectHeroUnits(heroData.items);
 
   const dest = path.join(SITE_STATIC, "replay", "hero-units.json");
-  await mkdir(path.dirname(dest), { recursive: true });
-  await writeFile(dest, JSON.stringify(heroUnits), "utf-8");
-  console.log(
-    `gen-replay-hero-units: ${Object.keys(heroUnits).length} unit types -> ${path.relative(process.cwd(), dest)}`
-  );
+  await writeJson(dest, heroUnits);
+  console.log(`gen-replay-hero-units: ${Object.keys(heroUnits).length} unit types -> ${displayPath(dest)}`);
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
-  main().catch((error) => {
-    console.error(error);
-    process.exitCode = 1;
-  });
-}
+runScript(import.meta.url, main);

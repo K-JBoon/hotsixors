@@ -1,14 +1,16 @@
-import { mkdir, writeFile } from "node:fs/promises";
 import * as path from "node:path";
-import type { ScalingSummaryRow, StructureGroup, StructureStats, StructureWeapon } from "./types.ts";
+import type { ScalingSummaryRow, StructureGroup, StructureStats } from "./types.ts";
 import { GAMEDATA_DIR, SITE_CONTENT, SITE_DATA } from "./lib/paths.ts";
+import { writeJson, writeText } from "./lib/fs.ts";
+import { frontmatter } from "./lib/frontmatter.ts";
+import { runScript } from "./lib/script.ts";
 import {
   STRUCTURE_SCALING_FIELDS,
-  attr,
   block,
   links,
   numberTag,
   readCached,
+  readWeapon,
   summarizeScaling,
   summarizeScalingRows,
 } from "./lib/catalog-xml.ts";
@@ -85,35 +87,6 @@ const groupsConfig: GroupDef[] = [
   },
 ];
 
-function withParentBlock(xml: string, currentBlock: string | null, fallbackParentId?: string | null) {
-  if (!currentBlock) return null;
-  const currentTag = currentBlock.match(/^<\w+\b[^>]*>/i)?.[0] ?? "";
-  const parentId = fallbackParentId ?? attr(currentTag, "parent");
-  const parentBlock = parentId ? block(xml, currentTag.match(/^<(\w+)/i)?.[1] ?? "CWeapon", parentId) : null;
-  return { currentBlock, parentBlock };
-}
-
-function inheritedNumber(xml: string, currentBlock: string | null, tag: string) {
-  const blocks = withParentBlock(xml, currentBlock);
-  if (!blocks) return null;
-  return numberTag(blocks.currentBlock, tag) ?? (blocks.parentBlock ? numberTag(blocks.parentBlock, tag) : null);
-}
-
-function weapon(xml: string, id: string, effectXml: string): StructureWeapon {
-  const weaponBlock = block(xml, "CWeapon", id);
-  const effectId = weaponBlock
-    ? attr(weaponBlock.match(/<DisplayEffect\b[^>]+/i)?.[0] ?? "", "value")
-      ?? attr(weaponBlock.match(/<Effect\b[^>]+/i)?.[0] ?? "", "value")
-    : null;
-  const effectBlock = effectId ? block(effectXml, "CEffect", effectId) : null;
-  return {
-    id,
-    damage: effectBlock ? numberTag(effectBlock, "Amount") : null,
-    period: inheritedNumber(xml, weaponBlock, "Period"),
-    range: inheritedNumber(xml, weaponBlock, "Range"),
-  };
-}
-
 function galaxyConst(galaxy: string, name: string) {
   const value = new RegExp(`const fixed ${name} = ([\\d.]+);`).exec(galaxy)?.[1];
   if (!value) throw new Error(`gen-structures: ${name} not found in heroeslib_h.galaxy`);
@@ -167,22 +140,19 @@ async function processStructure(def: StructureDef): Promise<StructureStats> {
     killXpNote: isTownHall ? trickleNote(galaxy) : null,
     scaling: summarizeScaling(behaviorXml, scalingLinks, STRUCTURE_SCALING_FIELDS),
     scalingRows: summarizeScalingRows(behaviorXml, scalingLinks, STRUCTURE_SCALING_FIELDS),
-    weapons: weaponLinks.map((id) => weapon(weaponXml, id, effectXml)),
+    weapons: weaponLinks.map((id) => readWeapon(weaponXml, id, effectXml, true)),
   };
 }
 
 async function main() {
-  console.log("gen-structures: starting");
-  await mkdir(SITE_DATA, { recursive: true });
-  await mkdir(SITE_CONTENT, { recursive: true });
   const groups: StructureGroup[] = [];
   for (const group of groupsConfig) groups.push({ ...group, units: await Promise.all(group.units.map(processStructure)) });
-  await writeFile(path.join(SITE_DATA, "structures.json"), JSON.stringify({ groups }, null, 2), "utf-8");
-  await writeFile(path.join(SITE_CONTENT, "structures.md"), `+++\ntitle = "Structures"\ntemplate = "structures.html"\n+++\n`, "utf-8");
+  await writeJson(path.join(SITE_DATA, "structures.json"), { groups }, 2);
+  await writeText(
+    path.join(SITE_CONTENT, "structures.md"),
+    frontmatter({ title: "Structures", template: "structures.html" }),
+  );
   console.log(`gen-structures: wrote ${groups.reduce((sum, group) => sum + group.units.length, 0)} structures`);
 }
 
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+runScript(import.meta.url, main);

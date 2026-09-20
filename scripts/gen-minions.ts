@@ -1,14 +1,16 @@
-import { mkdir, writeFile } from "node:fs/promises";
 import * as path from "node:path";
-import type { MinionMercGroup, MinionMercStats, MinionMercWeapon } from "./types.ts";
+import type { MinionMercGroup, MinionMercStats } from "./types.ts";
 import { GAMEDATA_DIR, SITE_CONTENT, SITE_DATA } from "./lib/paths.ts";
+import { writeJson, writeText } from "./lib/fs.ts";
+import { frontmatter } from "./lib/frontmatter.ts";
+import { runScript } from "./lib/script.ts";
 import {
   MINION_SCALING_FIELDS,
-  attr,
   block,
   links,
   numberTag,
   readCached,
+  readWeapon,
   summarizeArmor,
   summarizeScaling,
   summarizeScalingRows,
@@ -246,21 +248,6 @@ function summarizeXpScalingPattern(behaviorXmls: (string | null)[], ids: string[
   return summarizeIncrementPattern(xpScalingValues(behaviorXmls, ids));
 }
 
-function weapon(xml: string, id: string, effectXml: string): MinionMercWeapon {
-  const weaponBlock = block(xml, "CWeapon", id);
-  const effectId = weaponBlock
-    ? attr(weaponBlock.match(/<DisplayEffect\b[^>]+/i)?.[0] ?? "", "value")
-      ?? attr(weaponBlock.match(/<Effect\b[^>]+/i)?.[0] ?? "", "value")
-    : null;
-  const effectBlock = effectId ? block(effectXml, "CEffect", effectId) : null;
-  return {
-    id,
-    damage: effectBlock ? numberTag(effectBlock, "Amount") : null,
-    period: weaponBlock ? numberTag(weaponBlock, "Period") : null,
-    range: weaponBlock ? numberTag(weaponBlock, "Range") : null,
-  };
-}
-
 async function processUnit(def: UnitDef): Promise<MinionMercStats> {
   const [
     unitXml,
@@ -319,23 +306,20 @@ async function processUnit(def: UnitDef): Promise<MinionMercStats> {
     scalingRows: scalingRows.length ? scalingRows : fallbackScalingRows,
     armor: summarizeArmor(statsBlock, armorXml),
     weapons: weaponLinks.length > 0
-      ? weaponLinks.map((id) => weapon(weaponXml, id, effectXml))
-      : fallbackWeaponLinks.map((id) => weapon(fallbackWeaponXml, id, fallbackEffectXml)),
+      ? weaponLinks.map((id) => readWeapon(weaponXml, id, effectXml))
+      : fallbackWeaponLinks.map((id) => readWeapon(fallbackWeaponXml, id, fallbackEffectXml)),
   };
 }
 
 async function main() {
-  console.log("gen-minions: starting");
-  await mkdir(SITE_DATA, { recursive: true });
-  await mkdir(SITE_CONTENT, { recursive: true });
   const groups: MinionMercGroup[] = [];
   for (const group of groupsConfig) groups.push({ ...group, units: await Promise.all(group.units.map(processUnit)) });
-  await writeFile(path.join(SITE_DATA, "minions-and-mercs.json"), JSON.stringify({ groups }, null, 2), "utf-8");
-  await writeFile(path.join(SITE_CONTENT, "minions-and-mercs.md"), `+++\ntitle = "Minions & Mercs"\ntemplate = "minions-and-mercs.html"\n+++\n`, "utf-8");
+  await writeJson(path.join(SITE_DATA, "minions-and-mercs.json"), { groups }, 2);
+  await writeText(
+    path.join(SITE_CONTENT, "minions-and-mercs.md"),
+    frontmatter({ title: "Minions & Mercs", template: "minions-and-mercs.html" }),
+  );
   console.log(`gen-minions: wrote ${groups.reduce((sum, group) => sum + group.units.length, 0)} units`);
 }
 
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+runScript(import.meta.url, main);

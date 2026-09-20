@@ -1,17 +1,11 @@
 // Builds site/data/cross-references.json from the effect graph and mechanics.
 
-import { readdir, readFile, writeFile, mkdir } from "node:fs/promises";
+import { readFile } from "node:fs/promises";
 import * as path from "node:path";
-import { fileURLToPath } from "node:url";
-import {
-  DATA_ROOT,
-  GAMEDATA_DIR,
-  SITE_DATA,
-  SITE_STATIC,
-  gameVersion,
-  readHdpInfo,
-} from "./lib/paths.ts";
-import { shouldIncludeGamedataPath } from "./gen-gamedata.ts";
+import { SITE_DATA, SITE_STATIC, gameVersion, readHdpInfo } from "./lib/paths.ts";
+import { loadGamedataXmlFiles, type GamedataFile } from "./lib/gamedata-paths.ts";
+import { writeJson } from "./lib/fs.ts";
+import { runScript } from "./lib/script.ts";
 import {
   buildEffectGraph,
   findMechanicApplications,
@@ -39,27 +33,6 @@ interface MechanicsFile {
 export interface CrossReferencesFile {
   generatedFrom: string;
   mechanics: MechanicApplications[];
-}
-
-async function collectGamedataFiles(
-  dir: string,
-  rel: string,
-  out: string[],
-): Promise<void> {
-  let entries;
-  try {
-    entries = await readdir(dir, { withFileTypes: true });
-  } catch {
-    return;
-  }
-  for (const e of entries) {
-    const childRel = rel ? `${rel}/${e.name}` : e.name;
-    if (e.isDirectory()) {
-      await collectGamedataFiles(path.join(dir, e.name), childRel, out);
-    } else if (e.name.endsWith(".xml") && shouldIncludeGamedataPath(`mods/${childRel}`)) {
-      out.push(`mods/${childRel}`);
-    }
-  }
 }
 
 function anchorIndex(sc: ShortcodeData): Record<string, AbilTalentEntry> {
@@ -128,7 +101,7 @@ function expandSharedAnchorEntries(applications: MechanicApplications[], sc: Sho
 
 // Pure join: testable without the filesystem.
 export function buildCrossReferences(
-  files: { path: string; content: string }[],
+  files: GamedataFile[],
   shortcodeData: ShortcodeData,
   mechanics: MechanicLike[],
   generatedFrom: string,
@@ -148,36 +121,16 @@ async function main(): Promise<void> {
     await readFile(path.join(SITE_DATA, "mechanics.json"), "utf-8"),
   ) as MechanicsFile;
 
-  const relPaths: string[] = [];
-  await collectGamedataFiles(GAMEDATA_DIR, "", relPaths);
-  const files = await Promise.all(
-    relPaths.map(async (rel) => ({
-      path: rel,
-      content: await readFile(path.join(DATA_ROOT, rel), "utf-8"),
-    })),
-  );
-
-  const generatedFrom = gameVersion(await readHdpInfo());
   const result = buildCrossReferences(
-    files,
+    await loadGamedataXmlFiles(),
     shortcodeData,
     mechanicsFile.mechanics,
-    generatedFrom,
+    gameVersion(await readHdpInfo()),
   );
 
-  await mkdir(SITE_DATA, { recursive: true });
-  await writeFile(
-    path.join(SITE_DATA, "cross-references.json"),
-    JSON.stringify(result, null, 2),
-    "utf-8",
-  );
+  await writeJson(path.join(SITE_DATA, "cross-references.json"), result, 2);
   const counts = result.mechanics.map((m) => `${m.slug}=${m.entries.length}`).join(" ");
   console.log(`gen-cross-references: wrote cross-references.json (${counts})`);
 }
 
-if (path.resolve(process.argv[1] ?? "") === fileURLToPath(import.meta.url)) {
-  main().catch((error) => {
-    console.error(error);
-    process.exit(1);
-  });
-}
+runScript(import.meta.url, main);

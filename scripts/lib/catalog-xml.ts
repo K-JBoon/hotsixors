@@ -3,7 +3,7 @@
 // gen scripts need without paying for a full parse of every mod.
 
 import { readFile } from "node:fs/promises";
-import type { ScalingSummaryRow } from "../types.ts";
+import type { CatalogWeapon, ScalingSummaryRow } from "../types.ts";
 
 /** Files are read once per run and shared between the gen scripts. */
 const fileCache = new Map<string, Promise<string>>();
@@ -41,6 +41,39 @@ export function links(src: string, tag: string, name: string) {
   const re = new RegExp(`<${tag}\\b[^>]+${name}="([^"]+)"`, "gi");
   for (const match of src.matchAll(re)) out.push(match[1]);
   return out;
+}
+
+/** A tag's value on the block, or on the block its `parent` attribute names. */
+function inheritedNumber(xml: string, currentBlock: string, tag: string) {
+  const own = numberTag(currentBlock, tag);
+  if (own !== null) return own;
+  const openingTag = currentBlock.match(/^<(\w+)\b[^>]*>/i);
+  const parentId = attr(openingTag?.[0] ?? "", "parent");
+  const parentBlock = parentId ? block(xml, openingTag?.[1] ?? "CWeapon", parentId) : null;
+  return parentBlock ? numberTag(parentBlock, tag) : null;
+}
+
+/**
+ * Damage, cadence and reach of one weapon. `inherit` follows the weapon's
+ * parent chain for Period and Range, which the town structures need.
+ */
+export function readWeapon(weaponXml: string, id: string, effectXml: string, inherit = false): CatalogWeapon {
+  const weaponBlock = block(weaponXml, "CWeapon", id);
+  const effectId = weaponBlock
+    ? attr(weaponBlock.match(/<DisplayEffect\b[^>]+/i)?.[0] ?? "", "value")
+      ?? attr(weaponBlock.match(/<Effect\b[^>]+/i)?.[0] ?? "", "value")
+    : null;
+  const effectBlock = effectId ? block(effectXml, "CEffect", effectId) : null;
+  const number = (tag: string) => {
+    if (!weaponBlock) return null;
+    return inherit ? inheritedNumber(weaponXml, weaponBlock, tag) : numberTag(weaponBlock, tag);
+  };
+  return {
+    id,
+    damage: effectBlock ? numberTag(effectBlock, "Amount") : null,
+    period: number("Period"),
+    range: number("Range"),
+  };
 }
 
 export function summarizeMinuteBands(values: string[]) {

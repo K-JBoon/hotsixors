@@ -1,7 +1,9 @@
-import { readdir, readFile, writeFile } from "node:fs/promises";
+import { readdir, readFile } from "node:fs/promises";
 import * as path from "node:path";
 import type { FileTreeNode } from "./types.ts";
 import { SITE_CONTENT_HEROES, SITE_DATA, SITE_STATIC, slugify } from "./lib/paths.ts";
+import { readJsonSafe, writeJson } from "./lib/fs.ts";
+import { runScript } from "./lib/script.ts";
 import { frontmatterValue } from "./lib/frontmatter.ts";
 
 interface SearchEntry {
@@ -11,6 +13,21 @@ interface SearchEntry {
   text?: string;
   path?: string;
   hero?: string;
+}
+
+interface MechanicsIndex {
+  mechanics: Array<{
+    name: string;
+    category: string;
+    description: string;
+    summary: string;
+    primaryBehavior: string;
+    sourceIds: string[];
+  }>;
+}
+
+interface CrossReferencesIndex {
+  mechanics: Array<{ slug: string; name: string; category: string; entries: Array<{ heroName: string; name: string }> }>;
 }
 
 function stripFrontmatter(content: string): string {
@@ -49,6 +66,13 @@ function flattenGameDataTree(node: FileTreeNode, entries: SearchEntry[]): void {
   }
 
   for (const child of node.children || []) flattenGameDataTree(child, entries);
+}
+
+/** An index another gen script writes; missing means its script did not run. */
+async function optionalIndex<T>(name: string): Promise<T | null> {
+  const data = await readJsonSafe<T>(path.join(SITE_DATA, name));
+  if (!data) console.warn(`gen-search: ${name} not found; skipping its entries`);
+  return data;
 }
 
 async function main(): Promise<void> {
@@ -92,17 +116,11 @@ async function main(): Promise<void> {
     });
   }
 
-  try {
-    const tree = JSON.parse(await readFile(path.join(SITE_DATA, "gamedata-tree.json"), "utf-8")) as FileTreeNode;
-    flattenGameDataTree(tree, entries);
-  } catch {
-    console.warn("gen-search: gamedata-tree.json not found; skipping game data entries");
-  }
+  const tree = await optionalIndex<FileTreeNode>("gamedata-tree.json");
+  if (tree) flattenGameDataTree(tree, entries);
 
-  try {
-    const data = JSON.parse(await readFile(path.join(SITE_DATA, "mechanics.json"), "utf-8")) as {
-      mechanics: Array<{ name: string; category: string; description: string; summary: string; primaryBehavior: string; sourceIds: string[] }>;
-    };
+  const data = await optionalIndex<MechanicsIndex>("mechanics.json");
+  if (data) {
     entries.push({
       title: "Status Effects",
       url: "/status-effects/",
@@ -126,23 +144,19 @@ async function main(): Promise<void> {
         text: [mechanic.category, mechanic.description, mechanic.summary, mechanic.primaryBehavior, mechanic.sourceIds.join(" ")].join(" "),
       });
     }
-  } catch {
-    console.warn("gen-search: mechanics.json not found; skipping mechanics entries");
   }
 
-  try {
-    const data = JSON.parse(await readFile(path.join(SITE_DATA, "cross-references.json"), "utf-8")) as {
-      mechanics: Array<{ slug: string; name: string; category: string; entries: Array<{ heroName: string; name: string }> }>;
-    };
+  const crossReferences = await optionalIndex<CrossReferencesIndex>("cross-references.json");
+  if (crossReferences) {
     entries.push({
       title: "Effect Index",
       url: "/effect-index/",
       type: "Reference",
-      text: data.mechanics
+      text: crossReferences.mechanics
         .map((m) => `${m.name} ${m.category} ${m.entries.map((e) => `${e.heroName} ${e.name}`).join(" ")}`)
         .join(" "),
     });
-    for (const mechanic of data.mechanics) {
+    for (const mechanic of crossReferences.mechanics) {
       entries.push({
         title: `${mechanic.name} — abilities & talents`,
         url: `/effect-index/#${mechanic.slug}`,
@@ -150,15 +164,10 @@ async function main(): Promise<void> {
         text: `${mechanic.category} ${mechanic.entries.map((e) => `${e.heroName} ${e.name}`).join(" ")}`,
       });
     }
-  } catch {
-    console.warn("gen-search: cross-references.json not found; skipping effect-index entries");
   }
 
-  await writeFile(path.join(SITE_STATIC, "site-search.json"), JSON.stringify(entries, null, 2), "utf-8");
+  await writeJson(path.join(SITE_STATIC, "site-search.json"), entries, 2);
   console.log(`gen-search: wrote site-search.json with ${entries.length} entries`);
 }
 
-main().catch((error) => {
-  console.error(error);
-  process.exit(1);
-});
+runScript(import.meta.url, main);

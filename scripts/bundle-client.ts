@@ -1,7 +1,8 @@
-import { mkdir, rm, writeFile } from "node:fs/promises";
+import { rm } from "node:fs/promises";
 import * as path from "node:path";
 import { build, type BuildOptions, type Metafile } from "esbuild";
 import { SITE_DATA, SITE_STATIC } from "./lib/paths.ts";
+import { writeText } from "./lib/fs.ts";
 
 const OUT_DIR = path.join(SITE_STATIC, "bundle");
 const MANIFEST = path.join(SITE_DATA, "bundles.json");
@@ -27,7 +28,6 @@ const shared: BuildOptions = {
 };
 
 await rm(OUT_DIR, { recursive: true, force: true });
-await mkdir(SITE_DATA, { recursive: true });
 
 const results = await Promise.all([
   build({
@@ -62,8 +62,8 @@ for (const { metafile } of results as Array<{ metafile: Metafile }>) {
   }
 }
 
-await writeFile(MANIFEST, JSON.stringify(manifest, null, 2) + "\n");
-await writeFile(SOURCES, JSON.stringify([...sources].sort(), null, 2) + "\n");
+await writeText(MANIFEST, JSON.stringify(manifest, null, 2) + "\n");
+await writeText(SOURCES, JSON.stringify([...sources].sort(), null, 2) + "\n");
 
 for (const [file, bytes] of sizes.sort((a, b) => b[1] - a[1])) {
   console.log(`${(bytes / 1024).toFixed(1).padStart(8)} KB  ${file}`);

@@ -21,6 +21,28 @@ import {
   talentIdsFromValidators,
 } from "./gating.ts";
 
+// The id-to-entry lookups below scan every anchor and are asked about the same
+// ids over and over, so each one keeps its answers for the index it was asked
+// about. An index is built once per run and never mutated.
+const idLookupCaches = new WeakMap<AnchorIndex, Map<string, Map<string, unknown>>>();
+
+function cachedById<T>(anchorToEntry: AnchorIndex, lookup: string, id: string, compute: () => T): T {
+  let byLookup = idLookupCaches.get(anchorToEntry);
+  if (!byLookup) {
+    byLookup = new Map();
+    idLookupCaches.set(anchorToEntry, byLookup);
+  }
+  let byId = byLookup.get(lookup);
+  if (!byId) {
+    byId = new Map();
+    byLookup.set(lookup, byId);
+  }
+  if (byId.has(id)) return byId.get(id) as T;
+  const value = compute();
+  byId.set(id, value);
+  return value;
+}
+
 const TOKEN_STOP_WORDS = new Set(["a", "and", "of", "the", "to", "talent", "mastery"]);
 
 function idTokens(id: string): string[] {
@@ -53,54 +75,103 @@ function entryAliases(entry: AbilTalentEntry): string[] {
   ].filter((alias): alias is string => Boolean(alias));
 }
 
-function idMatchesAlias(id: string, alias: string): boolean {
-  return hasIdBoundary(id, alias) || id.toLowerCase().includes(alias.toLowerCase());
+// The alias lists each lookup scans. Both cases are kept: hasIdBoundary needs
+// the original, the substring test needs the lowered one.
+interface AliasRow {
+  anchor: string;
+  entry: AbilTalentEntry;
+  aliases: string[];
+  lowered: string[];
+}
+
+interface AliasTable {
+  traits: AliasRow[];
+  talents: AliasRow[];
+  nonTraits: AliasRow[];
+  all: AliasRow[];
+}
+
+const aliasTables = new WeakMap<AnchorIndex, AliasTable>();
+
+function row(anchor: string, entry: AbilTalentEntry, aliases: string[]): AliasRow {
+  return { anchor, entry, aliases, lowered: aliases.map((a) => a.toLowerCase()) };
+}
+
+function aliasTable(anchorToEntry: AnchorIndex): AliasTable {
+  const hit = aliasTables.get(anchorToEntry);
+  if (hit) return hit;
+
+  const isAbilityNameId = (s: string): boolean => anchorToEntry[s]?.kind === "ability";
+  const table: AliasTable = { traits: [], talents: [], nonTraits: [], all: [] };
+  for (const [anchor, entry] of Object.entries(anchorToEntry)) {
+    const isTrait = entry.kind === "ability" && entry.abilityType === "Trait";
+    table.all.push(row(anchor, entry, entryAliases(entry)));
+    if (isTrait) table.traits.push(row(anchor, entry, [anchor, ...entryAliases(entry)]));
+    else table.nonTraits.push(row(anchor, entry, entryAliases(entry)));
+    if (entry.kind === "talent") {
+      // Skip buttonId matches when they point at the unlocked ability itself.
+      const aliases = [anchor, entry.nameId, entry.buttonId]
+        .filter((a): a is string => Boolean(a))
+        .filter((a) => !(a === entry.buttonId && isAbilityNameId(a)));
+      table.talents.push(row(anchor, entry, aliases));
+    }
+  }
+
+  aliasTables.set(anchorToEntry, table);
+  return table;
+}
+
+function rowMatches(row: AliasRow, id: string, idLower: string): boolean {
+  for (let i = 0; i < row.aliases.length; i++) {
+    if (hasIdBoundary(id, row.aliases[i]) || idLower.includes(row.lowered[i])) return true;
+  }
+  return false;
+}
+
+/** The longest-named row whose aliases match, which is the most specific one. */
+function longestMatch(rows: AliasRow[], id: string): AliasRow | null {
+  const idLower = id.toLowerCase();
+  let best: AliasRow | null = null;
+  for (const row of rows) {
+    if (!rowMatches(row, id, idLower)) continue;
+    if (!best || row.anchor.length > best.anchor.length) best = row;
+  }
+  return best;
 }
 
 function sourceAnchorForId(anchorToEntry: AnchorIndex, id: string | null | undefined): string | null {
   if (!id) return null;
-  let best: string | null = null;
-  for (const [anchor, entry] of Object.entries(anchorToEntry)) {
-    if (entry.kind !== "ability" || entry.abilityType !== "Trait") continue;
-    const aliases = [anchor, ...entryAliases(entry)];
-    if (!aliases.some((alias) => idMatchesAlias(id, alias))) continue;
-    if (!best || anchor.length > best.length) best = anchor;
-  }
-  return best;
+  return cachedById(anchorToEntry, "sourceAnchor", id, () => computeSourceAnchorForId(anchorToEntry, id));
+}
+
+function computeSourceAnchorForId(anchorToEntry: AnchorIndex, id: string): string | null {
+  return longestMatch(aliasTable(anchorToEntry).traits, id)?.anchor ?? null;
 }
 
 function talentAnchorForId(anchorToEntry: AnchorIndex, id: string | null | undefined): string | null {
   if (!id) return null;
-  // Skip buttonId matches when they point at the unlocked ability itself.
-  const isAbilityNameId = (s: string): boolean => anchorToEntry[s]?.kind === "ability";
-  let best: string | null = null;
-  for (const [anchor, entry] of Object.entries(anchorToEntry)) {
-    if (entry.kind !== "talent") continue;
-    const aliases = [anchor, entry.nameId, entry.buttonId]
-      .filter((a): a is string => Boolean(a))
-      .filter((a) => !(a === entry.buttonId && isAbilityNameId(a)));
-    if (!aliases.some((alias) => idMatchesAlias(id, alias))) continue;
-    if (!best || anchor.length > best.length) best = anchor;
-  }
-  return best;
+  return cachedById(anchorToEntry, "talentAnchor", id, () => computeTalentAnchorForId(anchorToEntry, id));
+}
+
+function computeTalentAnchorForId(anchorToEntry: AnchorIndex, id: string): string | null {
+  return longestMatch(aliasTable(anchorToEntry).talents, id)?.anchor ?? null;
 }
 
 function hasNonTraitAlias(anchorToEntry: AnchorIndex, id: string | null | undefined): boolean {
   if (!id) return false;
-  return Object.values(anchorToEntry).some((entry) => {
-    if (entry.kind === "ability" && entry.abilityType === "Trait") return false;
-    return entryAliases(entry).some((alias) => idMatchesAlias(id, alias));
+  return cachedById(anchorToEntry, "nonTraitAlias", id, () => {
+    const idLower = id.toLowerCase();
+    return aliasTable(anchorToEntry).nonTraits.some((row) => rowMatches(row, id, idLower));
   });
 }
 
 export function entryForNamedId(anchorToEntry: AnchorIndex, id: string | null | undefined): AbilTalentEntry | null {
   if (!id) return null;
-  let best: { anchor: string; entry: AbilTalentEntry } | null = null;
-  for (const [anchor, entry] of Object.entries(anchorToEntry)) {
-    if (!entryAliases(entry).some((alias) => idMatchesAlias(id, alias))) continue;
-    if (!best || anchor.length > best.anchor.length) best = { anchor, entry };
-  }
-  return best?.entry ?? null;
+  return cachedById(anchorToEntry, "entryForNamed", id, () => computeEntryForNamedId(anchorToEntry, id));
+}
+
+function computeEntryForNamedId(anchorToEntry: AnchorIndex, id: string): AbilTalentEntry | null {
+  return longestMatch(aliasTable(anchorToEntry).all, id)?.entry ?? null;
 }
 
 function directSourceEntry(

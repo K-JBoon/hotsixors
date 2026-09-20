@@ -7,12 +7,13 @@
 
 import { createServer } from "node:http";
 import { createReadStream, existsSync } from "node:fs";
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { readFile, stat } from "node:fs/promises";
 import { extname, join, normalize } from "node:path";
-import { stat } from "node:fs/promises";
 import puppeteer from "puppeteer";
 
 import { SITE_STATIC, SITE_STATIC_REPLAY } from "./lib/paths.ts";
+import { readJsonSafe, writeBinary, writeJson } from "./lib/fs.ts";
+import { runScript } from "./lib/script.ts";
 
 declare global {
   interface Window {
@@ -114,14 +115,6 @@ function serveStatic(root: string) {
 
 const decodeImage = (dataUrl: string) => Buffer.from(dataUrl.slice(dataUrl.indexOf(",") + 1), "base64");
 
-async function readJson<T>(file: string, fallback: T): Promise<T> {
-  try {
-    return JSON.parse(await readFile(file, "utf-8")) as T;
-  } catch {
-    return fallback;
-  }
-}
-
 async function main() {
   const slugs = process.argv.slice(2);
   if (!slugs.length) {
@@ -130,15 +123,13 @@ async function main() {
     return;
   }
 
-  const maps = await readJson<Record<string, { slug: string; mapWidth: number; mapHeight: number }>>(
+  const maps = await readJsonSafe<Record<string, { slug: string; mapWidth: number; mapHeight: number }>>(
     join(SITE_STATIC_REPLAY, "maps.json"),
-    {},
-  );
+  ) ?? {};
   const bySlug = new Map(Object.values(maps).map((entry) => [entry.slug, entry]));
 
-  await mkdir(PLATE_DIR, { recursive: true });
   // The viewer reads this to know which maps have a plate to paste.
-  const rendered = new Set(await readJson<string[]>(PLATE_INDEX, []));
+  const rendered = new Set(await readJsonSafe<string[]>(PLATE_INDEX) ?? []);
 
   const site = await serveStatic(SITE_STATIC);
   const browser = await puppeteer.launch({
@@ -185,7 +176,7 @@ async function main() {
           console.error(`gen-replay-map3d: ${slug} failed to load`);
           continue;
         }
-        await writeFile(join(PLATE_DIR, `${slug}.webp`), decodeImage(plate));
+        await writeBinary(join(PLATE_DIR, `${slug}.webp`), decodeImage(plate));
 
         const placed = JSON.parse(await readFile(placedFile, "utf-8")) as { instances: Instance[] };
         const buildings = placed.instances.filter((item) => item.m.startsWith("storm_building_"));
@@ -193,7 +184,6 @@ async function main() {
         // One sprite per distinct model, yaw, scale and team: two towers facing
         // different ways are different pictures, and 60 buildings collapse to ~48.
         const spriteDir = join(PLATE_DIR, slug);
-        await mkdir(spriteDir, { recursive: true });
         const sprites = new Map<string, SpriteEntry>();
         for (const item of buildings) {
           const key = spriteKey(item);
@@ -208,7 +198,7 @@ async function main() {
             console.error(`gen-replay-map3d: no model for ${item.m}`);
             continue;
           }
-          await writeFile(join(spriteDir, `${key}.webp`), decodeImage(sprite.png));
+          await writeBinary(join(spriteDir, `${key}.webp`), decodeImage(sprite.png));
           sprites.set(key, {
             w: sprite.w,
             h: sprite.h,
@@ -220,13 +210,13 @@ async function main() {
           });
         }
 
-        await writeFile(
+        await writeJson(
           join(PLATE_DIR, `${slug}.json`),
-          JSON.stringify({ scale: PLATE_SCALE, pitch: SPRITE_PITCH, sprites: Object.fromEntries(sprites), buildings }, null, 1),
-          "utf-8",
+          { scale: PLATE_SCALE, pitch: SPRITE_PITCH, sprites: Object.fromEntries(sprites), buildings },
+          1,
         );
         rendered.add(slug);
-        await writeFile(PLATE_INDEX, JSON.stringify([...rendered].sort(), null, 1), "utf-8");
+        await writeJson(PLATE_INDEX, [...rendered].sort(), 1);
         console.log(`gen-replay-map3d: ${slug}, ${buildings.length} buildings, ${sprites.size} sprites`);
       } catch (error) {
         console.error(`gen-replay-map3d: ${slug} failed:`, error);
@@ -237,10 +227,7 @@ async function main() {
     await site.close();
   }
 
-  await writeFile(PLATE_INDEX, JSON.stringify([...rendered].sort(), null, 1), "utf-8");
+  await writeJson(PLATE_INDEX, [...rendered].sort(), 1);
 }
 
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+runScript(import.meta.url, main);

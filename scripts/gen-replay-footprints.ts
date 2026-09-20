@@ -1,8 +1,10 @@
 // Builds the replay viewer's structure footprint table and unit sight data.
 
-import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
+import { readFile } from "node:fs/promises";
 import * as path from "node:path";
 import { GAMEDATA_DIR, SITE_STATIC } from "./lib/paths.ts";
+import { walkFiles, writeJson } from "./lib/fs.ts";
+import { runScript } from "./lib/script.ts";
 import { attr } from "./lib/catalog-xml.ts";
 
 type Shape = { rings: [number, number][][]; r: number };
@@ -59,14 +61,6 @@ function parseShape(body: string): Shape | null {
   return { rings, r };
 }
 
-async function* xmlFiles(dir: string): AsyncGenerator<string> {
-  for (const entry of await readdir(dir, { withFileTypes: true })) {
-    const full = path.join(dir, entry.name);
-    if (entry.isDirectory()) yield* xmlFiles(full);
-    else if (entry.name.toLowerCase().endsWith(".xml")) yield full;
-  }
-}
-
 // Base data first so shared ids resolve consistently across maps.
 function scanOrder(files: string[]) {
   const rank = (f: string) => (f.includes("heroesdata.stormmod") ? 0 : f.includes("core.stormmod") ? 1 : 2);
@@ -74,13 +68,14 @@ function scanOrder(files: string[]) {
 }
 
 async function main() {
-  console.log("gen-replay-footprints: starting");
   const footprints = new Map<string, FootprintDef>();
   const units = new Map<string, UnitDef>();
   const weapons = new Map<string, WeaponDef>();
 
   const all: string[] = [];
-  for await (const file of xmlFiles(GAMEDATA_DIR)) all.push(file);
+  for await (const file of walkFiles(GAMEDATA_DIR)) {
+    if (file.abs.toLowerCase().endsWith(".xml")) all.push(file.abs);
+  }
 
   for (const file of scanOrder(all)) {
     const xml = await readFile(file, "utf-8");
@@ -182,19 +177,14 @@ async function main() {
   }
 
   const out = path.join(SITE_STATIC, "replay", "footprints.json");
-  await mkdir(path.dirname(out), { recursive: true });
-  await writeFile(
-    out,
-    JSON.stringify({
-      shapes,
-      units: unitToShape,
-      sight: unitToSight,
-      flying: unitToFlying,
-      speed: unitToSpeed,
-      range: unitToRange,
-    }),
-    "utf-8"
-  );
+  await writeJson(out, {
+    shapes,
+    units: unitToShape,
+    sight: unitToSight,
+    flying: unitToFlying,
+    speed: unitToSpeed,
+    range: unitToRange,
+  });
   console.log(
     `gen-replay-footprints: ${Object.keys(unitToShape).length} unit types over ${shapes.length} shapes (${missing} without a footprint shape), ` +
       `${Object.keys(unitToSight).length} with a sight radius (${missingSight} without), ` +
@@ -204,7 +194,4 @@ async function main() {
   );
 }
 
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+runScript(import.meta.url, main);

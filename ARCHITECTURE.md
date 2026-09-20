@@ -19,8 +19,18 @@ abilities from replays)
 
 ## The generation pipeline
 
-`npm run gen` scripts run in order. Some are parallelizable, but others
-depend on output of previous scripts.
+`npm run gen` runs `scripts/gen.ts`, which holds the task graph: each generator
+declares the tasks whose output it reads, and the runner starts as many at once
+as those dependencies and the core count allow. `--serial` runs one at a time,
+which is easier to read when a generator is misbehaving.
+
+The wall time is the longest dependency chain, currently
+`gen-gamedata` -> `gen-heroes` -> `gen-cross-references` -> `gen-search`.
+
+The effect graph never changes once built, so `walk.ts` keeps each parent chain
+and an index of the apply-behavior effects per behavior, `gating.ts` inverts
+talent-to-behavior grants, and `owners.ts` keeps one alias table per anchor
+index. Without them each of the 37 mechanics re-walked the whole graph.
 
 | Script | Writes | Notes |
 | --- | --- | --- |
@@ -38,6 +48,18 @@ depend on output of previous scripts.
 | `gen-build-info` | `data/build-info.json` | |
 
 `npm run clean` deletes all generated data.
+
+Each task also declares which half of the extraction its `.gamedata/` inputs
+come from. `casc-extract` writes `mods/` ("mods"), and the HeroesDataParser run
+after it writes `data/`, `gamestrings/` and `images/` ("parsed"). No mods task
+reads a parsed task's output, which is what lets `npm run refresh` run the mods
+half of the graph while the parser is still working. `tests/gen-tasks.test.ts`
+holds that invariant. `npm run extract && npm run gen` does the same work
+without the overlap.
+
+`gen-replay-maps` renders a map only when the packaged archive's hash is not
+already in `maps.json`, which takes a repeat run from ~50s to under a second.
+`MAPS_FORCE=1` renders every map again.
 
 ### Webfonts
 
@@ -103,7 +125,15 @@ them into a format the site can use.
   a `shortcode-data.json` entry.
 - `stormmap.ts`: parses data out of a .StormMap file like terrain structure,
 lane waypoints, etc.
-- `json-patch.ts`, `paths.ts`, `png.ts`, `stormmap.ts`, `python-literal.ts`.
+- `fs.ts`: reads and writes files. Every write creates its parent directory, so
+no gen script calls `mkdir` itself.
+- `script.ts`: `runScript(import.meta.url, main)`, the entry point every gen
+script ends with. It logs the start, skips `main` when the module is imported
+rather than run, and turns a failure into a non-zero exit code.
+- `frontmatter.ts`: builds and reads Zola's TOML front matter.
+- `gamedata-paths.ts`: decides which files under `mods/` the site publishes,
+and loads the XML catalogs the effect graph reads.
+- `json-patch.ts`, `png.ts`, `python-literal.ts`.
 
 ## The effect graph
 

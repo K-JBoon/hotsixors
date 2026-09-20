@@ -1,8 +1,16 @@
-import { readFile, readdir, writeFile, mkdir, copyFile, stat } from "node:fs/promises";
+import { readFile, readdir } from "node:fs/promises";
 import * as path from "node:path";
-import { fileURLToPath } from "node:url";
-import type { HeroData, HeroUnitData, HeroAbility, HeroTalent, AnchorMap, ShortcodeData, ShortcodeEntry, AbilityStats, HeroStats, HeroUnitStats, HeroResourceData, HeroLifeData, HeroWeaponData } from "./types.ts";
-import type { Gamestrings } from "./types.ts";
+import type {
+  AnchorMap,
+  Gamestrings,
+  HeroData,
+  HeroLifeData,
+  HeroResourceData,
+  HeroStats,
+  HeroUnitData,
+  HeroUnitStats,
+  HeroWeaponData,
+} from "./types.ts";
 import {
   HEROES_IMAGES_DIR,
   GAMEDATA_DIR,
@@ -13,20 +21,17 @@ import {
   gameVersion,
   readHdpInfo,
 } from "./lib/paths.ts";
+import { readJsonSafe, writeJson, writeText } from "./lib/fs.ts";
+import { frontmatter } from "./lib/frontmatter.ts";
+import { runScript } from "./lib/script.ts";
 import { loadDataFile, loadGamestrings } from "./lib/heroes-data.ts";
-import { parseAbilityStats } from "./lib/abilityxml.ts";
 import {
-  PASSIVE_ABILITY_ID,
   entryNameId,
   getAbilityName,
-  getAbilityShortDesc,
-  getAbilityFullDesc,
   getHeroDescription,
-  getUnitName,
-  renderGameStringMarkup,
   getRoleFromPlaystyles,
+  getUnitName,
   splitCamelCase,
-  stripMarkup,
 } from "./lib/gamestrings.ts";
 import {
   copyImageIfExists,
@@ -38,8 +43,6 @@ import {
   type ResolvedTalent,
   type SubAbilityGroup,
 } from "./lib/hero-entries.ts";
-
-const SCRIPT_PATH = fileURLToPath(import.meta.url);
 
 // Friendly labels for sub-ability group parent IDs.
 const SUB_ABILITY_LABEL_OVERRIDES: Record<string, string> = {
@@ -104,12 +107,6 @@ function categorySlug(category: string): string {
 
 function tierSlug(tier: string): string {
   return tier.toLowerCase();
-}
-
-/** Convert a plain object to a TOML inline table string. */
-function toTomlInlineTable(obj: object): string {
-  const pairs = Object.entries(obj as Record<string, unknown>).map(([k, v]) => `${k} = ${JSON.stringify(v)}`);
-  return `{${pairs.join(", ")}}`;
 }
 
 interface HeroStatsSource {
@@ -290,30 +287,28 @@ async function resolveHeroUnits(
   return out;
 }
 
-function heroPageToml(hero: HeroData, heroName: string, slug: string, displayName: string, gs: Gamestrings): string {
-  const role = getRoleFromPlaystyles(hero.playstyles ?? []);
-  const inGameRole = gs.hero.expandedRole?.[heroName] ?? "";
-  const description = getHeroDescription(gs, heroName, hero.variationSkinIds ?? []);
-  return `+++
-title = ${JSON.stringify(displayName)}
-slug = ${JSON.stringify(slug)}
-template = "heroes/single.html"
-description = ${JSON.stringify(description)}
-
-[extra]
-hero_name = ${JSON.stringify(displayName)}
-hero_id = ${JSON.stringify(hero.hyperlinkId)}
-internal_name = ${JSON.stringify(heroName)}
-unit_id = ${JSON.stringify(hero.unitId)}
-franchise = ${JSON.stringify(hero.franchise ?? "")}
-role = ${JSON.stringify(role)}
-in_game_role = ${JSON.stringify(inGameRole)}
-rarity = ${JSON.stringify(hero.rarity ?? "")}
-release_date = ${JSON.stringify(hero.releaseDate ?? "")}
-ratings = ${toTomlInlineTable(hero.ratings ?? {})}
-portraits = ${toTomlInlineTable(hero.portraits ?? {})}
-+++
-`;
+function heroPage(hero: HeroData, heroName: string, slug: string, displayName: string, gs: Gamestrings): string {
+  return frontmatter(
+    {
+      title: displayName,
+      slug,
+      template: "heroes/single.html",
+      description: getHeroDescription(gs, heroName, hero.variationSkinIds ?? []),
+    },
+    {
+      hero_name: displayName,
+      hero_id: hero.hyperlinkId,
+      internal_name: heroName,
+      unit_id: hero.unitId,
+      franchise: hero.franchise ?? "",
+      role: getRoleFromPlaystyles(hero.playstyles ?? []),
+      in_game_role: gs.hero.expandedRole?.[heroName] ?? "",
+      rarity: hero.rarity ?? "",
+      release_date: hero.releaseDate ?? "",
+      ratings: hero.ratings ?? {},
+      portraits: hero.portraits ?? {},
+    },
+  );
 }
 
 const GAMEDATA_HEROES_DIR = path.join(GAMEDATA_DIR, "heroesdata.stormmod/base.stormdata/gamedata/heroes");
@@ -353,32 +348,20 @@ async function addGamedataAliases(aliases: Record<string, string[]>): Promise<vo
 }
 
 async function main(): Promise<void> {
-  console.log("gen-heroes: starting");
-
   console.log(`gen-heroes: using version ${gameVersion(await readHdpInfo())}`);
   const heroData = (await loadDataFile<Record<string, HeroData>>("herodata")).items;
   const gs = (await loadGamestrings<Gamestrings>()).items;
 
-  let anchorMap: AnchorMap = {};
-  let declAnchorMap: AnchorMap = {};
-  try {
-    anchorMap = JSON.parse(await readFile(path.join(SITE_DATA, "anchor-map.json"), "utf-8"));
-    declAnchorMap = JSON.parse(await readFile(path.join(SITE_DATA, "decl-anchor-map.json"), "utf-8"));
-  } catch {
-    console.warn("gen-heroes: anchor-map.json not found — XML links will be omitted");
+  const anchorMap = await readJsonSafe<AnchorMap>(path.join(SITE_DATA, "anchor-map.json"));
+  const declAnchorMap = await readJsonSafe<AnchorMap>(path.join(SITE_DATA, "decl-anchor-map.json"));
+  if (!anchorMap || !declAnchorMap) {
+    console.warn("gen-heroes: anchor-map.json not found, XML links will be omitted");
   }
 
   const SITE_DATA_HEROES = path.join(SITE_DATA, "heroes");
-  for (const dir of [
-    SITE_CONTENT_HEROES,
-    SITE_DATA_HEROES,
-    path.join(SITE_STATIC_IMAGES, "abilitytalents"),
-    path.join(SITE_STATIC_IMAGES, "heroportraits"),
-  ]) {
-    await mkdir(dir, { recursive: true });
-  }
 
-  const { resolveEntry, shortcodeData, abilityDescriptions, missingIcons } = createEntryResolver(gs, anchorMap, declAnchorMap);
+  const { resolveEntry, shortcodeData, abilityDescriptions, missingIcons } =
+    createEntryResolver(gs, anchorMap ?? {}, declAnchorMap ?? {});
 
   for (const [heroName, hero] of Object.entries(heroData)) {
     const slug = heroPageSlug(heroName, hero);
@@ -391,27 +374,23 @@ async function main(): Promise<void> {
     const subAbilityGroups = await resolveSubAbilityGroups(hero, gs, ctx, resolveEntry);
     const heroUnitAbilities = await resolveHeroUnits(hero, gs, ctx, resolveEntry);
 
-    await writeFile(path.join(SITE_CONTENT_HEROES, `${slug}.md`), heroPageToml(hero, heroName, slug, displayName, gs), "utf-8");
+    await writeText(path.join(SITE_CONTENT_HEROES, `${slug}.md`), heroPage(hero, heroName, slug, displayName, gs));
     console.log(`gen-heroes: wrote ${slug}.md`);
 
     const stats = buildHeroStats(hero);
     const unitStats = buildHeroUnitStats(hero, gs, stats);
-    await writeFile(
+    await writeJson(
       path.join(SITE_DATA_HEROES, `${slug}.json`),
-      JSON.stringify({ stats, unitStats, abilities, subAbilityGroups, heroUnitAbilities, talents }, null, 2),
-      "utf-8"
+      { stats, unitStats, abilities, subAbilityGroups, heroUnitAbilities, talents },
+      2,
     );
     console.log(`gen-heroes: wrote data/heroes/${slug}.json`);
   }
 
-  await writeFile(path.join(SITE_STATIC, "shortcode-data.json"), JSON.stringify(shortcodeData, null, 2), "utf-8");
+  await writeJson(path.join(SITE_STATIC, "shortcode-data.json"), shortcodeData, 2);
   console.log(`gen-heroes: wrote shortcode-data.json with ${Object.keys(shortcodeData).length} entries`);
 
-  await writeFile(
-    path.join(SITE_STATIC, "ability-descriptions.json"),
-    JSON.stringify(abilityDescriptions),
-    "utf-8"
-  );
+  await writeJson(path.join(SITE_STATIC, "ability-descriptions.json"), abilityDescriptions);
   console.log(
     `gen-heroes: wrote ability-descriptions.json with ${Object.keys(abilityDescriptions).length} entries`
   );
@@ -425,11 +404,9 @@ async function main(): Promise<void> {
 
   const heroAliases = buildHeroAliases(heroData);
   await addGamedataAliases(heroAliases);
-  await writeFile(path.join(SITE_STATIC, "hero-aliases.json"), JSON.stringify(heroAliases, null, 2), "utf-8");
+  await writeJson(path.join(SITE_STATIC, "hero-aliases.json"), heroAliases, 2);
   console.log(`gen-heroes: wrote hero-aliases.json with ${Object.keys(heroAliases).length} entries`);
   console.log("gen-heroes: done");
 }
 
-if (path.resolve(process.argv[1] ?? "") === SCRIPT_PATH) {
-  main().catch((e) => { console.error(e); process.exit(1); });
-}
+runScript(import.meta.url, main);

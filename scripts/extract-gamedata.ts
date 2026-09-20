@@ -5,7 +5,7 @@
 // server serves and downloads nothing.
 
 import { spawn } from "node:child_process";
-import { access, chmod, mkdir, mkdtemp, rm, rename } from "node:fs/promises";
+import { chmod, mkdir, mkdtemp, rm, rename } from "node:fs/promises";
 import { createWriteStream } from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
@@ -14,6 +14,8 @@ import { Readable } from "node:stream";
 import { fileURLToPath } from "node:url";
 
 import { DATA_ROOT, HDP_INFO, gameBuild, gameVersion, readHdpInfo } from "./lib/paths.ts";
+import { exists } from "./lib/fs.ts";
+import { isMain } from "./lib/script.ts";
 
 const SCRIPT_PATH = fileURLToPath(import.meta.url);
 const REPO_ROOT = path.resolve(path.dirname(SCRIPT_PATH), "..");
@@ -73,15 +75,6 @@ async function run(command: string, args: string[], cwd?: string): Promise<void>
       code === 0 ? resolve() : reject(new Error(`${path.basename(command)} exited with ${code}`))
     );
   });
-}
-
-async function exists(file: string): Promise<boolean> {
-  try {
-    await access(file);
-    return true;
-  } catch {
-    return false;
-  }
 }
 
 /** Download and unpack the parser, or reuse an earlier unpack. */
@@ -148,7 +141,16 @@ async function ptrBuild(): Promise<ProductBuild | undefined> {
   return ptr;
 }
 
-async function main(): Promise<void> {
+export interface ExtractOptions {
+  /**
+   * Called once `casc-extract` has written `mods/`, before the parser run that
+   * writes `data/`, `gamestrings/` and `images/`. The parser only reads `mods/`,
+   * so work that needs nothing else can start here. See scripts/refresh.ts.
+   */
+  onModsReady?: () => void;
+}
+
+export async function extract({ onModsReady }: ExtractOptions = {}): Promise<void> {
   const ptr = process.argv.includes("--ptr") || process.env.HOTS_PTR === "1";
   const printBuild = process.argv.includes("--print-build");
   const source = ptr ? ["--download-ptr"] : [];
@@ -210,6 +212,8 @@ async function main(): Promise<void> {
     throw new Error(`casc-extract wrote no ${HDP_INFO}`);
   }
 
+  onModsReady?.();
+
   await run(parser, [
     "online",
     ...source,
@@ -228,8 +232,9 @@ async function main(): Promise<void> {
   console.log(`extract-gamedata: ${gameVersion(info)} (HDP ${info.HdpVersion})`);
 }
 
-if (path.resolve(process.argv[1] ?? "") === SCRIPT_PATH) {
-  main().catch((e) => {
+// --print-build writes the build number alone, so this script logs no banner.
+if (isMain(import.meta.url)) {
+  extract().catch((e) => {
     console.error(e);
     process.exit(1);
   });

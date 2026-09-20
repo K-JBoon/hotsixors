@@ -316,12 +316,15 @@ export interface BattlegroundData {
   xmlFiles: BattlegroundXmlFile[];
 }
 
-export interface MinionMercWeapon {
+/** One weapon as the unit catalogs describe it. */
+export interface CatalogWeapon {
   id: string;
   damage: number | null;
   period: number | null;
   range: number | null;
 }
+
+export type MinionMercWeapon = CatalogWeapon;
 
 export interface ScalingSummaryRow {
   label: string;
@@ -354,12 +357,7 @@ export interface MinionMercsData {
   groups: MinionMercGroup[];
 }
 
-export interface StructureWeapon {
-  id: string;
-  damage: number | null;
-  period: number | null;
-  range: number | null;
-}
+export type StructureWeapon = CatalogWeapon;
 
 export interface StructureStats {
   id: string;
