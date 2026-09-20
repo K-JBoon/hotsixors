@@ -1,5 +1,3 @@
-import { createNexusScene } from '/lost-in-the-nexus/nexus-scene.js';
-
 const view = document.getElementById('nexus-view');
 const status = document.getElementById('nexus-status');
 const picker = document.getElementById('nexus-map');
@@ -20,29 +18,54 @@ const ASSETS = document.querySelector('.nexus-page')?.dataset.nexusAssets || '';
 
 const params = new URLSearchParams(location.search);
 
-const nexus = await createNexusScene({
-  view,
-  assets: ASSETS,
-  pitch: Number(params.get('pitch')) || 55,
-  hotkeys: {
-    c: () => nexus.swapCamera(),
-    g: () => nexus.hotsCamera(),
-    h: () => setShadows(!nexus.shadowsEnabled()),
-    r: () => nexus.resetCamera(),
-  },
-});
-
-const { maps } = nexus;
-
 function setStatus(text) {
   status.hidden = !text;
   status.textContent = text || '';
 }
 
+function fetchJson(url) {
+  return fetch(url).then((r) => (r.ok ? r.json() : null)).catch(() => null);
+}
+
+// Both indexes are a few kilobytes. Reading them here rather than through the
+// scene keeps three.js out of the page until a battleground is picked.
+const [maps, terrainIndex] = await Promise.all([
+  fetchJson(`${ASSETS}/lost-in-the-nexus/maps3d/index.json`).then((v) => v || {}),
+  fetchJson(`${ASSETS}/lost-in-the-nexus/terrain/index.json`).then((v) => v || {}),
+]);
+
+let nexus = null;
+let scenePromise = null;
+
+// ~900 KB of three.js and its examples, so it waits for a real request.
+function sceneReady() {
+  scenePromise ||= (async () => {
+    setStatus('Loading viewer…');
+    const { createNexusScene } = await import('/lost-in-the-nexus/nexus-scene.js');
+    nexus = await createNexusScene({
+      view,
+      assets: ASSETS,
+      pitch: Number(params.get('pitch')) || 55,
+      hotkeys: {
+        c: () => nexus.swapCamera(),
+        g: () => nexus.hotsCamera(),
+        h: () => setShadows(!nexus.shadowsEnabled()),
+        r: () => nexus.resetCamera(),
+      },
+    });
+    nexus.setShadows(shadowsWanted);
+    nexus.setBloom(bloomWanted);
+    nexus.setParticles(particlesWanted);
+    return nexus;
+  })();
+  return scenePromise;
+}
+
 async function loadMap(slug) {
-  const ok = await nexus.loadMap(slug, setStatus);
+  const scene = await sceneReady();
+  const ok = await scene.loadMap(slug, setStatus);
   if (!ok) return;
-  nexus.frame({
+  scene.frame({
     span: params.has('span') ? Number(params.get('span')) || undefined : undefined,
     cx: params.has('cx') ? Number(params.get('cx')) : undefined,
     cy: params.has('cy') ? Number(params.get('cy')) : undefined,
@@ -51,40 +74,39 @@ async function loadMap(slug) {
   status.hidden = true;
 }
 
-function setShadows(on) {
-  nexus.setShadows(on);
-  shadowBox.checked = on;
+function remember(key, value) {
   try {
-    localStorage.setItem(SHADOWS, String(on));
+    localStorage.setItem(key, String(value));
   } catch {
     // Private mode: the choice lasts this visit.
   }
+}
+
+function setShadows(on) {
+  shadowsWanted = on;
+  nexus?.setShadows(on);
+  shadowBox.checked = on;
+  remember(SHADOWS, on);
 }
 
 function setBloom(on) {
-  nexus.setBloom(on);
+  bloomWanted = on;
+  nexus?.setBloom(on);
   bloomBox.checked = on;
-  try {
-    localStorage.setItem(BLOOM, String(on));
-  } catch {
-    // Private mode: the choice lasts this visit.
-  }
+  remember(BLOOM, on);
 }
 
 function setParticles(on) {
-  nexus.setParticles(on);
+  particlesWanted = on;
+  nexus?.setParticles(on);
   particleBox.checked = on;
-  try {
-    localStorage.setItem(PARTICLES, String(on));
-  } catch {
-    // Private mode: the choice lasts this visit.
-  }
+  remember(PARTICLES, on);
 }
 
-window.__nexusProbe = () => nexus.probe();
+window.__nexusProbe = () => nexus?.probe();
 
 function megabytes(slug) {
-  const bytes = (maps[slug]?.bytes || 0) + (nexus.terrainIndex[slug]?.bytes || 0);
+  const bytes = (maps[slug]?.bytes || 0) + (terrainIndex[slug]?.bytes || 0);
   return bytes ? `${Math.round(bytes / 1e6)} MB` : 'tens of megabytes';
 }
 
@@ -168,13 +190,7 @@ picker.onchange = () => {
 };
 
 gateButton.onclick = () => {
-  if (gateRemember.checked) {
-    try {
-      localStorage.setItem(AUTOLOAD, 'true');
-    } catch {
-      // Nothing to persist to; the choice lasts this visit.
-    }
-  }
+  if (gateRemember.checked) remember(AUTOLOAD, true);
   gate.hidden = true;
   start(picker.value);
 };
@@ -200,11 +216,7 @@ particleBox.onchange = () => {
 streamerBox.onchange = () => {
   // Keeping focus would send WASD into the checkbox.
   streamerBox.blur();
-  try {
-    localStorage.setItem(STREAMER, streamerBox.checked ? '1' : '0');
-  } catch {
-    // Private mode: choice lasts this visit only.
-  }
+  remember(STREAMER, streamerBox.checked ? '1' : '0');
 };
 try {
   streamerBox.checked = localStorage.getItem(STREAMER) === '1';
@@ -265,9 +277,10 @@ async function startGame(lobbyCode) {
   gameStarted = true;
   gameButton.hidden = true;
   gate.hidden = true;
+  const scene = await sceneReady();
   status.hidden = true;
   const { createNexusGame } = await import('/lost-in-the-nexus/nexus-game.js');
-  createNexusGame({ nexus, page: document.querySelector('.nexus-page'), lobbyCode, setStatus });
+  createNexusGame({ nexus: scene, page: document.querySelector('.nexus-page'), lobbyCode, setStatus });
 }
 gameButton.onclick = () => {
   gameButton.blur();
