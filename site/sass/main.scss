@@ -949,6 +949,12 @@ html:not(.datamining-enabled) [data-datamining] {
     text-align: right;
   }
 
+  &__bound {
+    color: $text-muted;
+    font-size: 0.7rem;
+    flex-shrink: 0;
+  }
+
   &__slider {
     flex: 1;
     accent-color: $accent-blue;
@@ -2478,6 +2484,8 @@ html:not(.datamining-enabled) .mechanics-table {
 
 // ─── Responsive: Tablet ───────────────────────────────────────────────────────
 @media (max-width: $bp-compact) {
+  .hero-level-control { max-width: none; flex: 1 1 100%; }
+
   .hero-banner {
     &__loading { flex: 0 1 40%; width: 40%; max-width: 40%; height: 220px; }
     &__name { font-size: 2rem; }
