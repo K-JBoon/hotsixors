@@ -1,7 +1,14 @@
 # Cloudflare merges every matching rule rather than letting the most specific
-# one win, so these must not overlap: a /* catch-all alongside /*.js emits
-# "max-age=600, max-age=300" on scripts. Pages' own defaults cover anything
-# not listed here.
+# one win, so Cache-Control rules must not overlap: a /* catch-all alongside
+# /*.js emits "max-age=600, max-age=300" on scripts. Pages' own defaults cover
+# anything not listed here.
+
+# Header names that appear in no other rule are safe to set from a catch-all:
+# merging only duplicates a header when two rules set the same one.
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Frame-Options: SAMEORIGIN
 
 /
   Cache-Control: public, max-age=600
@@ -15,15 +22,30 @@
 /*.css
   Cache-Control: public, max-age=31536000, immutable
 
+# Client data: unhashed names, so a deploy replaces them in place. An hour of
+# staleness is acceptable; the alternative is a revalidation round trip per
+# file, and the gamedata pages fetch one sidecar per node visited.
+/*.json
+  Cache-Control: public, max-age=3600
+
 # Every file under /bundle/ carries a content hash in its name, entry scripts
 # included, so a deploy never reuses a stale URL.
 /bundle/*
   Cache-Control: public, max-age=31536000, immutable
 
-# The 3D viewer's modules load by plain path, with no cachebusting. Scoped to
-# .js so it does not overlap the /*.html, /*.css and image rules below.
+# Pinned copies of three.js and its examples. Content never changes without a
+# filename change, and they live outside /lost-in-the-nexus/ so this rule does
+# not overlap the no-cache one below.
+/nexus-vendor/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# The 3D viewer's own modules load by plain path with no cachebusting, so they
+# must revalidate or a deploy serves stale code against fresh assets. Scoped to
+# .js so it does not overlap the /*.html, /*.css and image rules.
+# NOTE: this only holds if the Cloudflare dashboard's Browser Cache TTL is set
+# to "Respect Existing Headers". A fixed TTL there raises any shorter max-age.
 /lost-in-the-nexus/*.js
-  Cache-Control: public, max-age=300
+  Cache-Control: no-cache
 
 /*.svg
   Cache-Control: public, max-age=31536000
