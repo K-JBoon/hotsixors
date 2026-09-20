@@ -487,6 +487,16 @@ html:not(.datamining-enabled) [data-datamining] {
   white-space: nowrap;
 }
 
+@media (max-width: $bp-nav) {
+  .select-search {
+    flex-basis: 100%;
+    margin-left: 0;
+    justify-content: flex-start;
+  }
+
+  .select-search__input { flex: 1 1 auto; }
+}
+
 .select-search-card--match {
   border-color: $accent-gold;
   box-shadow: 0 0 0 1px rgba($accent-gold, 0.5), 0 0 22px rgba($accent-gold, 0.24);
