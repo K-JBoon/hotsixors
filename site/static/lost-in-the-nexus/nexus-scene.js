@@ -1,12 +1,12 @@
 import * as THREE from 'three';
-import { GLTFLoader } from '/lost-in-the-nexus/vendor/GLTFLoader.js';
-import { OrbitControls } from '/lost-in-the-nexus/vendor/OrbitControls.js';
-import { clone as cloneSkinned } from '/lost-in-the-nexus/utils/SkeletonUtils.js';
-import { MeshoptDecoder } from '/lost-in-the-nexus/vendor/meshopt_decoder.module.js';
-import { EffectComposer } from '/lost-in-the-nexus/vendor/postprocessing/EffectComposer.js';
-import { RenderPass } from '/lost-in-the-nexus/vendor/postprocessing/RenderPass.js';
-import { UnrealBloomPass } from '/lost-in-the-nexus/vendor/postprocessing/UnrealBloomPass.js';
-import { OutputPass } from '/lost-in-the-nexus/vendor/postprocessing/OutputPass.js';
+import { GLTFLoader } from '/nexus-vendor/GLTFLoader.js';
+import { OrbitControls } from '/nexus-vendor/OrbitControls.js';
+import { clone as cloneSkinned } from '/nexus-vendor/utils/SkeletonUtils.js';
+import { MeshoptDecoder } from '/nexus-vendor/meshopt_decoder.module.js';
+import { EffectComposer } from '/nexus-vendor/postprocessing/EffectComposer.js';
+import { RenderPass } from '/nexus-vendor/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from '/nexus-vendor/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from '/nexus-vendor/postprocessing/OutputPass.js';
 import { emitterMesh } from '/lost-in-the-nexus/nexus-particles.js';
 
 function fetchJson(url) {
