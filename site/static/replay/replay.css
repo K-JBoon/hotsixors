@@ -108,14 +108,17 @@ body.is-dragging-file .replay-drop-overlay {
   cursor: pointer;
   padding: 0.5rem 1.25rem;
   border-radius: 8px;
-  background: #2b62a8;
-  color: #fff;
-  border: none;
+  background: #e4b800;
+  color: #0a0e1a;
+  border: 1px solid #c8961e;
   font: inherit;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
 .replay-file-btn:hover {
-  background: #3a76c4;
+  background: #fdcd00;
 }
 
 .replay-summary {

@@ -244,16 +244,19 @@ body:has(.nexus-page) .site-footer {
 
 .nexus-gate__panel button {
   padding: 0.55rem 1.4rem;
-  border: 1px solid rgba(140, 160, 200, 0.45);
+  border: 1px solid #c8961e;
   border-radius: 4px;
-  background: rgba(60, 90, 160, 0.35);
-  color: inherit;
+  background: #e4b800;
+  color: #0a0e1a;
   font: inherit;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   cursor: pointer;
 }
 
 .nexus-gate__panel button:hover {
-  background: rgba(70, 105, 185, 0.5);
+  background: #fdcd00;
 }
 
 .nexus-gate__remember {
@@ -270,16 +273,19 @@ body:has(.nexus-page) .site-footer {
 #nexus-game {
   flex: none;
   padding: 0.3rem 0.7rem;
-  border: 1px solid rgba(140, 160, 220, 0.4);
+  border: 1px solid #c8961e;
   border-radius: 6px;
-  background: rgba(60, 90, 160, 0.45);
-  color: inherit;
+  background: #e4b800;
+  color: #0a0e1a;
   font: inherit;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   cursor: pointer;
 }
 
 #nexus-game:hover {
-  background: rgba(70, 105, 185, 0.7);
+  background: #fdcd00;
 }
 
 #nexus-game[hidden] {

@@ -12,8 +12,8 @@
 .draft-btn { padding: 0.5rem 1rem; font-size: 1rem; cursor: pointer; background: rgba(255,255,255,0.08); color: inherit; border: 1px solid #555; border-radius: 4px; }
 .draft-btn:hover:not(:disabled) { background: rgba(255,255,255,0.15); }
 .draft-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-.draft-btn--primary { background: #1a6bbf; color: white; border-color: #1a6bbf; }
-.draft-btn--primary:hover:not(:disabled) { background: #2480d9; }
+.draft-btn--primary { background: #e4b800; color: #0a0e1a; border-color: #c8961e; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+.draft-btn--primary:hover:not(:disabled) { background: #fdcd00; }
 .draft-actions { display: flex; gap: 0.5rem; }
 .draft-sep { border: 0; border-top: 1px solid #444; margin: 0.5rem 0; }
 
