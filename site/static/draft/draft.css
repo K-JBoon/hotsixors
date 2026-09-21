@@ -37,12 +37,19 @@
 .draft-map__btn:hover { background: rgba(255,255,255,0.15); }
 .draft-start { display: flex; justify-content: center; padding: 1rem; }
 .draft-await { opacity: 0.7; font-style: italic; }
+body:has(#draft-root[data-state="drafting"]),
+body:has(#draft-root[data-state="result"]) { height: 100dvh; overflow: hidden; }
+body:has(#draft-root[data-state="drafting"]) .site-footer,
+body:has(#draft-root[data-state="result"]) .site-footer { display: none; }
 .draft-main-area:has(#draft-root[data-state="drafting"]),
-.draft-main-area:has(#draft-root[data-state="result"]) { padding: 0; }
+.draft-main-area:has(#draft-root[data-state="result"]) { padding: 0; min-height: 0; }
 .draft-page:has(#draft-root[data-state="drafting"]),
-.draft-page:has(#draft-root[data-state="result"]) { max-width: none; padding: 0; }
+.draft-page:has(#draft-root[data-state="result"]) { max-width: none; padding: 0; height: 100%; }
 .draft-page:has(#draft-root[data-state="drafting"]) > h1,
 .draft-page:has(#draft-root[data-state="result"]) > h1 { display: none; }
+
+#draft-root[data-state="drafting"],
+#draft-root[data-state="result"] { height: 100%; }
 
 #draft-root[data-state="drafting"] { color: #d8e3f2; }
 
@@ -51,11 +58,11 @@
     radial-gradient(ellipse at 50% -20%, rgba(60,100,180,0.15), transparent 60%),
     radial-gradient(ellipse at 50% 120%, rgba(40,30,90,0.25), transparent 60%),
     linear-gradient(180deg, #050914 0%, #070c1a 50%, #050812 100%);
-     only the hero grid scrolls (see .draft-stage / .draft-grid below). */
-  height: calc(100dvh - 4rem);
+  height: 100%;
+  max-height: 100dvh;
   min-height: 0;
   overflow: hidden;
-  padding: 1rem 1.25rem 1.5rem;
+  padding: 0.75rem 1rem 0.85rem;
   display: grid;
   grid-template-rows: auto 1fr auto;
   gap: 0.75rem;
@@ -94,11 +101,10 @@
   grid-template-columns: 1fr auto auto auto 1fr;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.5rem 1rem 0.75rem;
+  padding: 0.35rem 1rem 0.5rem;
   border-bottom: 1px solid rgba(120,150,200,0.25);
-     (the board background stays full-bleed). Mirrored on .draft-stage. */
   width: 100%;
-  max-width: 1600px;
+  max-width: 1800px;
   margin-inline: auto;
 }
 .draft-header__team {
@@ -149,15 +155,14 @@
 .draft-timer--critical { color: #ff5a5a; text-shadow: 0 0 8px rgba(255,90,90,0.6); }
 .draft-stage {
   display: grid;
-  grid-template-columns: 300px 1fr 300px;
-  gap: 1.5rem;
+  grid-template-columns: 244px 1fr 244px;
+  gap: 1rem;
   align-items: stretch;
   min-height: 0; /* allow children to scroll instead of growing the stage */
   width: 100%;
-  max-width: 1600px;
+  max-width: 1800px;
   margin-inline: auto;
 }
-   can't fit all five hexes, so they never overlap the lock-in bar. */
 .draft-captain {
   display: flex;
   flex-direction: column;
@@ -182,17 +187,17 @@
   pointer-events: none;
 }
 .draft-captain__picks { display: flex; flex-direction: column; align-items: center; }
-.draft-captain__picks .draft-pickhex { margin-top: -40px; }
+.draft-captain__picks .draft-pickhex { margin-top: -34px; }
 .draft-captain__picks .draft-pickhex:first-child { margin-top: 0; }
-.draft-captain--left  .draft-pickhex--even { transform: translateX(-60px); }
-.draft-captain--left  .draft-pickhex--odd  { transform: translateX( 60px); }
-.draft-captain--right .draft-pickhex--even { transform: translateX( 60px); }
-.draft-captain--right .draft-pickhex--odd  { transform: translateX(-60px); }
+.draft-captain--left  .draft-pickhex--even { transform: translateX(-46px); }
+.draft-captain--left  .draft-pickhex--odd  { transform: translateX( 46px); }
+.draft-captain--right .draft-pickhex--even { transform: translateX( 46px); }
+.draft-captain--right .draft-pickhex--odd  { transform: translateX(-46px); }
 .draft-pickhex {
   --hex-bg: rgba(20,28,46,0.85);
   --hex-border: rgba(120,150,200,0.35);
   --hex-accent: #6cb6ff;
-  width: 168px;
+  width: 148px;
   aspect-ratio: 1 / 1.1547; /* regular hexagon (pointy-top) */
   position: relative;
   filter: drop-shadow(0 2px 6px rgba(0,0,0,0.55));
@@ -250,10 +255,10 @@
 }
 .draft-roleRow {
   display: grid;
-  grid-template-columns: 72px 1fr;
+  grid-template-columns: 64px 1fr;
   align-items: center;
-  gap: 1rem;
-  padding: 0.65rem 0.25rem;
+  gap: 0.75rem;
+  padding: 0.4rem 0.25rem;
   border-top: 1px solid rgba(120,150,200,0.12);
 }
 .draft-roleRow:first-child { border-top: none; }
@@ -373,7 +378,12 @@
 }
 .draft-search__count { color: #8aa0c0; }
 .draft-search__hint  { color: #506070; margin-left: auto; }
-.draft-lockbar { display: flex; justify-content: center; padding-top: 0.5rem; }
+.draft-lockbar {
+  display: flex;
+  justify-content: center;
+  padding-top: 0.4rem;
+  border-top: 1px solid rgba(120,150,200,0.18);
+}
 .draft-lockin {
   min-width: 280px;
   padding: 0.65rem 1rem;
@@ -421,12 +431,9 @@
   color: #c8d4e8;
 }
 .draft-result__actions { justify-content: center; }
-   Responsive: tablet / resized-window shrink, then phone stacked board.
-   Desktop (>=961px) is unchanged. CSS-only; no DOM/JS changes.
-   =================================================================== */
 @media (max-width: 960px) {
   .draft-stage {
-    grid-template-columns: 160px 1fr 160px;
+    grid-template-columns: 172px 1fr 172px;
     gap: 0.75rem;
   }
   .draft-pickhex { width: 96px; }
@@ -444,7 +451,7 @@
 }
 @media (max-width: 600px) {
   .draft-board {
-    height: calc(100dvh - 4rem);   /* mirrors desktop nav budget */
+    height: 100%;
     min-height: 0;
     padding: 0.5rem 0.6rem 0.6rem;
     gap: 0.4rem;
