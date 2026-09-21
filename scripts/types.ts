@@ -353,8 +353,22 @@ export interface MinionMercGroup {
   units: MinionMercStats[];
 }
 
+export interface TimingRow {
+  label: string;
+  /** Already formatted: "0:30", "every 3rd wave". */
+  value: string;
+  note?: string;
+}
+
+export interface TimingGroup {
+  id: string;
+  title: string;
+  rows: TimingRow[];
+}
+
 export interface MinionMercsData {
   groups: MinionMercGroup[];
+  timings: TimingGroup[];
 }
 
 export type StructureWeapon = CatalogWeapon;

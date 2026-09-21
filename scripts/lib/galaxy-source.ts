@@ -10,6 +10,35 @@ export function formatSeconds(s: number): string {
   return `${m}:${sec.toString().padStart(2, "0")}`;
 }
 
+/**
+ * Value of `NAME`, whether declared as a header const or assigned in
+ * `InitVariables`. Returns the first match, which is the declaration.
+ */
+export function galaxyValue(src: string, name: string): number | null {
+  const m = new RegExp(`\\b${name}\\s*=\\s*(-?[\\d.]+)\\s*;`).exec(src);
+  return m ? parseFloat(m[1]) : null;
+}
+
+/** Body of the named Galaxy function, from its signature to the closing brace. */
+export function galaxyFunctionBody(src: string, fnName: string): string | null {
+  const start = new RegExp(`^\\w+ ${fnName}\\s*\\(`, "m").exec(src);
+  if (!start) return null;
+  const end = src.indexOf("\n}", start.index);
+  return src.slice(start.index, end === -1 ? undefined : end);
+}
+
+/**
+ * `galaxyValue` scoped to one function body. An assignment whose right side is
+ * another variable, as the camp initializers use, resolves against `src`.
+ */
+export function galaxyValueIn(src: string, fnName: string, name: string): number | null {
+  const body = galaxyFunctionBody(src, fnName);
+  if (body === null) return null;
+  const m = new RegExp(`\\b${name}\\s*=\\s*(-?[\\d.]+|\\w+)\\s*;`).exec(body);
+  if (!m) return null;
+  return /^-?[\d.]+$/.test(m[1]) ? parseFloat(m[1]) : galaxyValue(src, m[1]);
+}
+
 // Track the source header file for each const.
 export type ConstEntry = { value: number; headerFile: string; headerName: string };
 

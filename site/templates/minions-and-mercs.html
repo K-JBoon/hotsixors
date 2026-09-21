@@ -25,6 +25,55 @@
 
   <br>
 
+  {% for group in data.timings %}
+  <section class="minions-section" id="{{ group.id }}">
+    <div class="minions-section__header">
+      <h2>{{ group.title }}</h2>
+    </div>
+
+    <div class="minions-table-wrap" tabindex="0" role="region" aria-label="{{ group.title }} timings table">
+      <table class="minions-table minions-table--timings">
+        <thead>
+          <tr>
+            <th scope="col">Timer</th>
+            <th scope="col">Value</th>
+            <th scope="col">Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in group.rows %}
+          <tr>
+            <th scope="row"><span class="minions-table__unit">{{ row.label }}</span></th>
+            <td>{{ row.value }}</td>
+            <td>{% if row.note %}{{ row.note }}{% else %}&mdash;{% endif %}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+  {% endfor %}
+
+  <p class="minions-timings-caveat">
+    Camp timers start when the gates open, and a camp respawns this long after it is captured. Some battlegrounds override these values; the battleground's own page carries its objective timers.
+  </p>
+  <ul class="mechanics-source-list" data-datamining>
+    <li>
+      <a href="{{ get_url(path='gamedata/mods/heroesdata.stormmod/base.stormdata/triggerlibs/mapmechanicslib-galaxy') }}">mapmechanicslib.galaxy</a>
+      <span>camp initial spawn and respawn per camp class</span>
+    </li>
+    <li>
+      <a href="{{ get_url(path='gamedata/mods/heroesdata.stormmod/base.stormdata/triggerlibs/heroeslib-galaxy') }}">heroeslib.galaxy</a>
+      <span>minion wave interval</span>
+    </li>
+    <li>
+      <a href="{{ get_url(path='gamedata/mods/heroesdata.stormmod/base.stormdata/triggerlibs/gamelib_h-galaxy') }}">gamelib_h.galaxy</a>
+      <span>catapult wave period and cap</span>
+    </li>
+  </ul>
+
+  <br>
+
   {% for group in data.groups %}
   <section class="minions-section" id="{{ group.id }}">
     <div class="minions-section__header">

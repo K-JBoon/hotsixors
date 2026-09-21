@@ -44,10 +44,14 @@ export function unitChain(unitId: string, xmls: string[]): string[] {
   return chain;
 }
 
-export function firstNumberAttr(blocks: string[], tag: string): number | null {
+export function firstNumberAttr(blocks: string[], tag: string, consts?: Map<string, string>): number | null {
   for (const b of blocks) {
-    const m = b.match(new RegExp(`<${tag}\\b[^>]+value="([\\d.]+)"`));
-    if (m) return parseFloat(m[1]);
+    const m = b.match(new RegExp(`<${tag}\\b[^>]+value="([^"]+)"`));
+    if (!m) continue;
+    if (/^[\d.]+$/.test(m[1])) return parseFloat(m[1]);
+    // Some map catalogs hold the value in a <const>, e.g. LifeMax="$ZerglingHealth".
+    const resolved = consts ? resolveConst(m[1], consts) : null;
+    if (resolved !== null) return resolved;
   }
   return null;
 }

@@ -29,6 +29,7 @@ const LOADING_SCREENS: Record<string, string> = {
   "alterac-pass": "storm_ui_homescreenbackground_wcav.png",
   "volskaya-foundry": "storm_ui_homescreenbackground_volskaya.png",
   "warhead-junction": "storm_ui_homescreenbackground_warhead.png",
+  "braxis-holdout": "storm_ui_homescreenbackground_braxisholdout.png",
 };
 
 const BATTLEGROUND_MODS_DIR = path.join(GAMEDATA_DIR, "heroesmapmods/battlegroundmapmods");
@@ -236,8 +237,8 @@ async function processMap(cfg: BattlegroundConfig, abilityIndex: Map<string, { n
     const chain = unitChain(vc.unitId, unitXmls);
     const blocks = chain.length ? chain : [directBlock];
 
-    const hp = firstNumberAttr(blocks, "LifeMax");
-    const speed = firstNumberAttr(blocks, "Speed");
+    const hp = firstNumberAttr(blocks, "LifeMax", constMap);
+    const speed = firstNumberAttr(blocks, "Speed", constMap);
 
     const abilities: BattlegroundAbility[] = extractAbilities(blocks, abilityIndex);
 

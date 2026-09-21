@@ -80,6 +80,7 @@ const MSC2 = "heroesmapmods/battlegroundmapmods/warheadjunction.stormmod/base.st
 const MMAP = "heroesmapmods/battlegroundmapmods/alteracpass.stormmod/base.stormdata/libmmap.galaxy";
 const MHMU = "heroesmapmods/battlegroundmapmods/hanamura.stormmod/base.stormdata/libmhmu.galaxy";
 const NPLD = "heroesmapmods/battlegroundmapmods/hanamura.stormmod/base.stormdata/libnpld.galaxy";
+const SCHO = "heroesmapmods/battlegroundmapmods/braxisholdout.stormmod/base.stormdata/libscho.galaxy";
 
 export const BATTLEGROUNDS: BattlegroundConfig[] = [
   {
@@ -876,6 +877,90 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
           matchPattern: "libMHmu_gf_MakePayloadAttack",
           contextLines: 12,
         },
+      },
+    ],
+  },
+  {
+    slug: "braxis-holdout",
+    name: "Braxis Holdout",
+    franchise: "StarCraft",
+    description: "Capture the beacons and watch what happens when a flood of weaponized Zerg ravages the battlefield.",
+    objectives: [
+      { title: "Capture the Beacons", description: "Periodically two beacons will activate. Capture both to fill your Holding Cell with Zerg.", image: "braxis-holdout-1.jpg" },
+      { title: "Fill Holding Cells", description: "Once either Holding Cell fills, both open and unleash waves of Zerg at each team\u2019s base.", image: "braxis-holdout-2.jpg" },
+      { title: "Zerg Rush", description: "Hold out against the enemy\u2019s Zerg while helping yours. The Zerg will attack Heroes, so engage cautiously.", image: "braxis-holdout-3.jpg" },
+    ],
+    summary: [
+      "The first beacons activate 90 seconds into the match, following a 30-second warning. Later beacon events start 2 minutes and 10 seconds after the previous Zerg wave dies.",
+      "A team fills its Holding Cell only while it holds both beacons. Charge builds 2% every 0.75 seconds, so 0% to 100% takes 37.5 seconds.",
+      "Once either Holding Cell fills, both open and release the Zerg each team has banked.",
+      "The first Zerg wave takes a random lane. Each later wave takes the other lane from the one before it.",
+      "The Core fires 5 missiles at a nearby enemy Hero every 4 seconds, each dealing 5% of their maximum Health.",
+    ],
+    modPaths: ["braxisholdout.stormmod", "braxisholdoutdata.stormmod"],
+    timers: [
+      { label: "First Beacons", seconds: 90, note: "a 1:00 timer plus the 30-second warning" },
+      { label: "Beacon Cycle", galaxyConst: "libSCHO_gv_mMHO_AttackEventDuration_C", note: "starts when the previous Zerg wave dies; the warning follows" },
+      { label: "Beacon Warning", galaxyConst: "libSCHO_gv_mMHO_AttackEventWarningDuration_C" },
+      { label: "Beacon Capture", galaxyConst: "libSCHO_gv_mMHO_CapturePointCaptureTime_C", note: "doubled against a beacon the enemy holds" },
+      { label: "Drop Pod Cooldown", galaxyConst: "libSCHO_gv_zergDropPodCooldownTime_C", note: "per team, up to 6 pods per wave" },
+      { label: "Regeneration Globes", galaxyConst: "libSCHO_gv_mMHO_RegenGlobeCoolupTime_C" },
+      { label: "First Boss Spawn", seconds: 300 },
+      { label: "Boss Respawn", seconds: 250 },
+    ],
+    summons: [
+      {
+        label: "Zerg Wave",
+        modPaths: ["braxisholdoutdata.stormmod"],
+        variants: [
+          { unitId: "ZergZergling", label: "Zergling" },
+          { unitId: "ZergBaneling", label: "Baneling" },
+          { unitId: "ZergHydralisk", label: "Hydralisk" },
+          { unitId: "ZergGuardian", label: "Guardian" },
+          { unitId: "ZergUltralisk", label: "Ultralisk" },
+        ],
+      },
+    ],
+    mechanics: [
+      {
+        title: "Capture the Beacons",
+        body: "Stand inside a beacon to capture it. An uncaptured beacon takes 3 seconds, and a beacon the enemy holds takes 6, because the capture bar has to be driven back through neutral. A Holding Cell only fills while its team holds both beacons; one each, or none, and both cells stop.",
+        codeBlockSpec: {
+          galaxyFile: SCHO,
+          matchPattern: "int libSCHO_gf_MMHOGetHiveControlBeaconOwners ()",
+          contextLines: 12,
+        },
+      },
+      {
+        title: "Fill Holding Cells",
+        body: "A Holding Cell fills by 2% every 0.75 seconds, so 0% to 100% takes 37.5 seconds. Charge does not decay when a team loses the beacons. Once either cell reaches 100%, both cells open and each team gets the Zerg it banked, so a team that charged to 40% still gets a wave.",
+        codeBlockSpec: {
+          galaxyFile: SCHO,
+          matchPattern: "libSCHO_gv_mMHO_TeamProgress[libGame_gv_teamOrderIndex_C] += libSCHO_gv_mMHO_ControlBeaconProgressIncrement_C",
+          contextLines: 10,
+        },
+      },
+      {
+        title: "Zerg Waves",
+        body: "The wave a cell releases is drawn from a table indexed by its charge. A low charge sends Zerglings and a few Hydralisks; a full charge sends Ultralisks, Guardians and Banelings as well. Zerg prioritize Minions and Structures, but they attack Heroes on the way. While a Guardian or an Ultralisk is attacking, its team can call down a Drop Pod carrying 3 Zerglings and a Hydralisk, once every 13 seconds and up to 6 times per wave.",
+        codeBlockSpec: {
+          galaxyFile: SCHO,
+          matchPattern: "void libSCHO_gf_MMHODetermineSpawnCompositionBasedOnProgress",
+          contextLines: 22,
+        },
+      },
+      {
+        title: "Wave Lanes",
+        body: "The first wave of the match takes a random lane. Every wave after that takes the other lane from the one before it.",
+        codeBlockSpec: {
+          galaxyFile: SCHO,
+          matchPattern: "libSCHO_gv_mMHO_AttackLane = (3 - libSCHO_gv_mMHO_AttackLane);",
+          contextLines: 6,
+        },
+      },
+      {
+        title: "Core Missiles",
+        body: "The Core attacks on its own. Every 4 seconds it marks an enemy Hero within 12 range and fires 5 missiles at them, each dealing 5% of that Hero\u2019s maximum Health to everything Heroic it lands on.",
       },
     ],
   },

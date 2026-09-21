@@ -22,6 +22,7 @@ export const SITE_CONTENT = path.join(REPO_ROOT, "site/content");
 export const SITE_CONTENT_HEROES = path.join(REPO_ROOT, "site/content/heroes");
 export const SITE_CONTENT_BATTLEGROUNDS = path.join(REPO_ROOT, "site/content/battlegrounds");
 export const SITE_DATA_BATTLEGROUNDS = path.join(REPO_ROOT, "site/data/battlegrounds");
+export const SITE_DATA_HEROES = path.join(REPO_ROOT, "site/data/heroes");
 export const SITE_CONTENT_GAMEDATA = path.join(REPO_ROOT, "site/content/gamedata");
 export const SITE_STATIC_IMAGES = path.join(REPO_ROOT, "site/static/images");
 export const SITE_STATIC = path.join(REPO_ROOT, "site/static");

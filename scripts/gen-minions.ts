@@ -1,9 +1,10 @@
 import * as path from "node:path";
-import type { MinionMercGroup, MinionMercStats } from "./types.ts";
+import type { MinionMercGroup, MinionMercStats, TimingGroup, TimingRow } from "./types.ts";
 import { GAMEDATA_DIR, SITE_CONTENT, SITE_DATA } from "./lib/paths.ts";
 import { writeJson, writeText } from "./lib/fs.ts";
 import { frontmatter } from "./lib/frontmatter.ts";
 import { runScript } from "./lib/script.ts";
+import { formatSeconds, galaxyValue, galaxyValueIn } from "./lib/galaxy-source.ts";
 import {
   MINION_SCALING_FIELDS,
   block,
@@ -61,7 +62,12 @@ const alteracReaver = {
   effectXml: alteracReaverXml,
   armorXml: alteracReaverXml,
 };
-const gamelibGalaxyPath = path.join(GAMEDATA_DIR, "heroesdata.stormmod/base.stormdata/triggerlibs/gamelib.galaxy");
+const triggerlibs = path.join(GAMEDATA_DIR, "heroesdata.stormmod/base.stormdata/triggerlibs");
+const gamelibGalaxyPath = path.join(triggerlibs, "gamelib.galaxy");
+const gamelibHeaderPath = path.join(triggerlibs, "gamelib_h.galaxy");
+const heroeslibGalaxyPath = path.join(triggerlibs, "heroeslib.galaxy");
+const heroeslibHeaderPath = path.join(triggerlibs, "heroeslib_h.galaxy");
+const mapMechanicsGalaxyPath = path.join(triggerlibs, "mapmechanicslib.galaxy");
 
 function mercFile(file: string) {
   const xml = path.join(heroesData, `mercenaries/${file}`);
@@ -311,10 +317,72 @@ async function processUnit(def: UnitDef): Promise<MinionMercStats> {
   };
 }
 
+// The trigger that configures each camp class in mapmechanicslib.galaxy.
+const SIEGE_CAMP = "libMapM_gt_DataJungleCampDefenderSiegeGiants_Func";
+const BRUISER_CAMP = "libMapM_gt_DataJungleCampDefenderKnights_Func";
+const BOSS_CAMP = "libMapM_gt_DataJungleCampDefenderGraveGolem_Func";
+const DOUBLOON_CAMP = "libMapM_gt_DataJungleCampDefenderDoubloons_Func";
+
+function seconds(label: string, value: number | null, note?: string): TimingRow | null {
+  if (value === null) {
+    console.warn(`gen-minions: no galaxy value for "${label}"`);
+    return null;
+  }
+  return { label, value: formatSeconds(value), ...(note ? { note } : {}) };
+}
+
+function rows(candidates: Array<TimingRow | null>): TimingRow[] {
+  return candidates.filter((row): row is TimingRow => row !== null);
+}
+
+async function timings(): Promise<TimingGroup[]> {
+  const [gamelibHeader, heroeslib, heroeslibHeader, mapMechanics] = await Promise.all([
+    readCached(gamelibHeaderPath),
+    readCached(heroeslibGalaxyPath),
+    readCached(heroeslibHeaderPath),
+    readCached(mapMechanicsGalaxyPath),
+  ]);
+
+  const catapultPeriod = galaxyValue(gamelibHeader, "libGame_gv_minion_PeriodicCatapultsWavePeriod_C");
+  const catapultCap = galaxyValue(gamelibHeader, "libGame_gv_minion_CatapultCap_C");
+  const campRespawn = (label: string, fn: string, note?: string) =>
+    seconds(`${label} respawn`, galaxyValueIn(mapMechanics, fn, "lv_respawnTime"), note);
+
+  return [
+    {
+      id: "lane-timings",
+      title: "Lane minions",
+      rows: rows([
+        // The wave loop starts when the gates open, as do the camp timers.
+        seconds("First wave", galaxyValue(heroeslibHeader, "libCore_gv_bALSpawnMinionsDelay"), "from the gates opening"),
+        seconds("Wave interval", galaxyValue(heroeslib, "libCore_gv_bALMinionWaveInterval")),
+        catapultPeriod === null ? null : {
+          label: "Catapults",
+          value: `every ${catapultPeriod} waves`,
+          note: "starts once a Fort in that lane falls; every wave once its Keep falls too",
+        },
+        catapultCap === null ? null : { label: "Catapult cap", value: `${catapultCap} alive per team` },
+      ]),
+    },
+    {
+      id: "camp-timings",
+      title: "Mercenary camps",
+      rows: rows([
+        seconds("First camp spawn", galaxyValueIn(mapMechanics, SIEGE_CAMP, "lv_initialSpawnDelay")),
+        seconds("First Boss spawn", galaxyValueIn(mapMechanics, BOSS_CAMP, "lv_initialSpawnDelay")),
+        campRespawn("Siege camp", SIEGE_CAMP),
+        campRespawn("Bruiser camp", BRUISER_CAMP),
+        campRespawn("Boss camp", BOSS_CAMP),
+        campRespawn("Doubloon camp", DOUBLOON_CAMP, "Blackheart's Bay"),
+      ]),
+    },
+  ];
+}
+
 async function main() {
   const groups: MinionMercGroup[] = [];
   for (const group of groupsConfig) groups.push({ ...group, units: await Promise.all(group.units.map(processUnit)) });
-  await writeJson(path.join(SITE_DATA, "minions-and-mercs.json"), { groups }, 2);
+  await writeJson(path.join(SITE_DATA, "minions-and-mercs.json"), { groups, timings: await timings() }, 2);
   await writeText(
     path.join(SITE_CONTENT, "minions-and-mercs.md"),
     frontmatter({ title: "Minions & Mercs", template: "minions-and-mercs.html" }),

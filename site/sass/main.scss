@@ -1727,6 +1727,24 @@ html:not(.datamining-enabled) [data-datamining] {
   }
 }
 
+// Three columns, so it fits without the horizontal scroll the wide tables need.
+// Doubled class to outrank the narrow-screen `.minions-table` min-width.
+.minions-table.minions-table--timings {
+  min-width: 0;
+
+  tbody td:first-of-type {
+    color: $text-primary;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+}
+
+.minions-timings-caveat {
+  margin: 1.25rem 0 0;
+  color: $text-muted;
+  line-height: 1.6;
+}
+
 .mechanics-table {
   min-width: 940px;
 
