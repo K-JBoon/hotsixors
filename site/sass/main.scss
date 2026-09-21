@@ -457,6 +457,7 @@ html:not(.datamining-enabled) [data-datamining] {
   align-items: center;
   gap: 0.6rem;
   flex: 1 1 14rem;
+  min-width: 0;
   margin-left: auto;
   justify-content: flex-end;
 }
@@ -2161,6 +2162,9 @@ html:not(.datamining-enabled) .mechanics-table {
     z-index: 1;
     font-weight: 600;
     font-size: 1.5rem;
+    line-height: 1.2;
+    overflow-wrap: break-word;
+    hyphens: auto;
     color: #fff;
     text-shadow: 0 1px 3px rgba(#000, 0.8), 0 0 12px rgba(#000, 0.5);
   }
@@ -2564,7 +2568,10 @@ html:not(.datamining-enabled) .mechanics-table {
   }
 
   .battleground-card {
-    flex-basis: 150px;
+    flex-basis: 130px;
+    padding: 0.6rem 0.75rem;
+
+    &__name { font-size: 1rem; }
   }
 
   // Tables need horizontal scroll on small screens

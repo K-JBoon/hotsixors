@@ -61,20 +61,32 @@ body:has(.nexus-page) .site-footer {
 }
 
 .nexus-controls {
+  --nexus-ctl-height: 2rem;
   position: relative;
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  min-width: 0;
+  max-width: 100%;
   pointer-events: auto;
 }
 
+.nexus-controls > button,
+.nexus-controls > select {
+  box-sizing: border-box;
+  height: var(--nexus-ctl-height);
+  border-radius: 6px;
+  font: inherit;
+  line-height: 1;
+}
+
 .nexus-controls select {
+  min-width: 0;
+  flex: 0 1 auto;
   background: rgba(12, 16, 26, 0.85);
   color: inherit;
   border: 1px solid rgba(140, 160, 220, 0.4);
-  border-radius: 6px;
-  padding: 0.2rem 0.4rem;
-  font: inherit;
+  padding: 0 0.4rem;
 }
 
 #nexus-settings {
@@ -82,13 +94,12 @@ body:has(.nexus-page) .site-footer {
   display: flex;
   align-items: center;
   justify-content: center;
+  aspect-ratio: 1;
   border: 1px solid rgba(140, 160, 220, 0.4);
-  border-radius: 6px;
   background: rgba(12, 16, 26, 0.85);
   color: inherit;
   cursor: pointer;
-  line-height: 1;
-  padding: 0.3rem 0.5rem;
+  padding: 0;
 }
 
 #nexus-settings.is-on {
@@ -214,8 +225,9 @@ body:has(.nexus-page) .site-footer {
 .nexus-gate {
   position: absolute;
   inset: 0;
-  display: grid;
-  place-items: center;
+  z-index: 4;
+  display: flex;
+  overflow-y: auto;
   padding: 1.5rem;
   background: rgba(8, 11, 20, 0.85);
 }
@@ -225,6 +237,7 @@ body:has(.nexus-page) .site-footer {
 }
 
 .nexus-gate__panel {
+  margin: auto;
   max-width: 34rem;
   padding: 1.5rem 1.75rem;
   border: 1px solid rgba(140, 160, 200, 0.28);
@@ -272,12 +285,10 @@ body:has(.nexus-page) .site-footer {
 
 #nexus-game {
   flex: none;
-  padding: 0.3rem 0.7rem;
+  padding: 0 0.7rem;
   border: 1px solid #c8961e;
-  border-radius: 6px;
   background: #e4b800;
   color: #0a0e1a;
-  font: inherit;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -290,4 +301,38 @@ body:has(.nexus-page) .site-footer {
 
 #nexus-game[hidden] {
   display: none;
+}
+
+@media (max-width: 600px) {
+  .nexus-overlay {
+    padding: 0.6rem 0.75rem;
+  }
+
+  .nexus-title {
+    font-size: 1rem;
+  }
+
+  .nexus-gate {
+    padding: 1rem 0.75rem;
+  }
+
+  .nexus-gate__panel {
+    padding: 1.1rem 1rem;
+  }
+
+  .nexus-gate__panel h2 {
+    font-size: 1.1rem;
+  }
+
+  .nexus-gate__panel p {
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+  }
+}
+
+/* Keyboard and mouse hints mean nothing on touch. */
+@media (pointer: coarse) {
+  .nexus-hint {
+    display: none;
+  }
 }

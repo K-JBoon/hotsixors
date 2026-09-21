@@ -48,7 +48,7 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
   scene.add(sun);
   scene.add(sun.target);
 
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.shadowMap.type = THREE.PCFShadowMap;
 
   const world = new THREE.Group();
   scene.add(world);
@@ -164,6 +164,10 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
   // wherever it faces the camera, leaving the rim of the portal. Without it the
   // hall wears a lit drum.
   function applyFresnel(material, [inverted, exponent, low, span]) {
+    // Shared between a model's meshes, so the traversal reaches one several
+    // times; injecting twice redeclares the varyings and it will not compile.
+    if (material.userData.faded) return;
+    material.userData.faded = true;
     keyProgram(material, `fresnel:${inverted},${exponent},${low},${span}`);
     const before = material.onBeforeCompile;
     material.onBeforeCompile = (shader, renderer) => {
@@ -973,9 +977,10 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
     controls.target.addScaledVector(viewDir, -push);
   }
 
-  const clock = new THREE.Clock();
-  function render() {
-    const dt = Math.min(clock.getDelta(), 0.1);
+  const timer = new THREE.Timer();
+  timer.connect(document);
+  function render(timestamp) {
+    const dt = Math.min(timer.update(timestamp).getDelta(), 0.1);
     fly(dt);
     for (const mixer of mixers) mixer.update(dt);
     for (const { map, scroll } of scrollers) {
