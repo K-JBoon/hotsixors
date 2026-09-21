@@ -90,11 +90,20 @@ three entry points (`hotsixors.js`, `replay/replay-ui.js`, `draft/draft.js`) as
 ES modules with code splitting, plus the two classic scripts
 (`level-slider.js`, `underdog-calc.js`) as IIFEs, into `static/bundle/`.
 
+Stylesheets go through the same pass. The bundler compiles `sass/main.scss` and
+`sass/gamedata.scss` with dart-sass into `static/`, then takes those two plus
+`replay/replay.css`, `draft/draft.css` and `lost-in-the-nexus/viewer.css` as CSS
+entry points. Zola's own `compile_sass` is off. A `.scss` edit therefore needs
+`npm run bundle`; `zola serve` alone will not pick it up.
+
 Output names carry a content hash, so `_headers` caches the whole directory
 immutably. Templates resolve an entry through `data/bundles.json`, which the
 bundler writes alongside `data/bundle-sources.json`; `prune-bundled-sources.ts`
-reads the latter to delete the now-duplicated module sources from `site/public`
-after Zola copies `static/`.
+reads the latter to delete the now-duplicated sources from `site/public` after
+Zola copies `static/`.
+
+Only `lost-in-the-nexus/nexus-game.css` stays unhashed: its script fetches it by
+plain path. It caches for ten minutes, like the pages.
 
 `hotsixors.js` only holds what every page needs (nav, site search, grid filter,
 hero list controls). The game data explorer, the talent builder and the effect

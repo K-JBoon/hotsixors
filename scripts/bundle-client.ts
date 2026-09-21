@@ -1,7 +1,8 @@
 import { rm } from "node:fs/promises";
 import * as path from "node:path";
 import { build, type BuildOptions, type Metafile } from "esbuild";
-import { SITE_DATA, SITE_STATIC } from "./lib/paths.ts";
+import * as sass from "sass";
+import { SITE_DATA, SITE_SASS, SITE_STATIC } from "./lib/paths.ts";
 import { writeText } from "./lib/fs.ts";
 
 const OUT_DIR = path.join(SITE_STATIC, "bundle");
@@ -12,6 +13,17 @@ const SOURCES = path.join(SITE_DATA, "bundle-sources.json");
 const MODULE_ENTRIES = ["hotsixors.js", "replay/replay-ui.js", "draft/draft.js"];
 const CLASSIC_ENTRIES = ["level-slider.js", "underdog-calc.js"];
 
+/** Sheets compiled from site/sass, by their name in both directories. */
+const SASS_ENTRIES = ["main", "gamedata"];
+
+/** Stylesheets the templates load, hashed so they cache under /bundle/ too. */
+const STYLE_ENTRIES = [
+  ...SASS_ENTRIES.map((name) => `${name}.css`),
+  "replay/replay.css",
+  "draft/draft.css",
+  "lost-in-the-nexus/viewer.css",
+];
+
 const shared: BuildOptions = {
   outdir: OUT_DIR,
   outbase: SITE_STATIC,
@@ -20,7 +32,7 @@ const shared: BuildOptions = {
   minify: true,
   // `node:` imports are the Node-only test paths inside the replay modules;
   // trystero is fetched from a CDN at runtime.
-  external: ["node:*", "https://*"],
+  external: ["node:*", "https://*", "/fonts/*"],
   // Hashed names let the whole bundle directory be cached immutably.
   entryNames: "[dir]/[name]-[hash]",
   metafile: true,
@@ -28,6 +40,11 @@ const shared: BuildOptions = {
 };
 
 await rm(OUT_DIR, { recursive: true, force: true });
+
+for (const name of SASS_ENTRIES) {
+  const { css } = sass.compile(path.join(SITE_SASS, `${name}.scss`), { loadPaths: [SITE_SASS] });
+  await writeText(path.join(SITE_STATIC, `${name}.css`), css);
+}
 
 const results = await Promise.all([
   build({
@@ -40,6 +57,10 @@ const results = await Promise.all([
     ...shared,
     entryPoints: CLASSIC_ENTRIES.map((entry) => path.join(SITE_STATIC, entry)),
     format: "iife",
+  }),
+  build({
+    ...shared,
+    entryPoints: STYLE_ENTRIES.map((entry) => path.join(SITE_STATIC, entry)),
   }),
 ]);
 

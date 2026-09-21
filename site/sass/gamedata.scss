@@ -1,5 +1,6 @@
+@use "sass:color";
 // Only /gamedata/ pages load this; base.html keeps main.css for the shell.
-@import "tokens";
+@use "tokens" as *;
 
 // ─── Game Data Browser ────────────────────────────────────────────────────────
 $gd-chrome:   #0e1420;
@@ -44,7 +45,7 @@ $gd-hairline: rgba(120, 150, 200, 0.14);
   flex-direction: column;
   min-width: 0;
   overflow: hidden;
-  background: linear-gradient(180deg, $gd-chrome 0%, darken($gd-chrome, 2%) 100%);
+  background: linear-gradient(180deg, $gd-chrome 0%, color.adjust($gd-chrome, $lightness: -2%) 100%);
   border-right: 1px solid $gd-hairline;
   resize: horizontal;
 }

@@ -3,7 +3,8 @@
 {% block title %}Mock Draft — {{ config.title }}{% endblock title %}
 
 {% block head %}
-  <link rel="stylesheet" href="{{ get_url(path='draft/draft.css', cachebust=true) }}">
+  {% set bundles = load_data(path="data/bundles.json") %}
+  <link rel="stylesheet" href="{{ get_url(path=bundles['draft/draft.css']) }}">
 {% endblock head %}
 
 {% block main_class %} draft-main-area{% endblock main_class %}

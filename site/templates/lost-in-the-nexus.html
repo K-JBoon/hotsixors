@@ -6,7 +6,8 @@
   {% if config.extra.nexus_assets %}
   <link rel="preconnect" href="{{ config.extra.nexus_assets }}" crossorigin>
   {% endif %}
-  <link rel="stylesheet" href="{{ get_url(path='lost-in-the-nexus/viewer.css', cachebust=true) }}">
+  {% set bundles = load_data(path="data/bundles.json") %}
+  <link rel="stylesheet" href="{{ get_url(path=bundles['lost-in-the-nexus/viewer.css']) }}">
   <script type="importmap">
     { "imports": { "three": "/nexus-vendor/three.module.min.js" } }
   </script>

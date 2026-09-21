@@ -4,7 +4,8 @@
 
 {% block main_class %} site-main--flush{% endblock main_class %}
 {% block head %}
-  <link rel="stylesheet" href="{{ get_url(path='gamedata.css', cachebust=true) }}">
+  {% set bundles = load_data(path="data/bundles.json") %}
+  <link rel="stylesheet" href="{{ get_url(path=bundles['gamedata.css']) }}">
 {% endblock head %}
 
 

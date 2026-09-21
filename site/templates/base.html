@@ -19,7 +19,8 @@
   <meta name="theme-color" content="#0a0e1a">
   <link rel="preload" href="{{ get_url(path='fonts/inter-latin-400.woff2') }}" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="{{ get_url(path='fonts/rajdhani-latin-600.woff2') }}" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="{{ get_url(path='main.css', cachebust=true) }}">
+  {% set bundles = load_data(path="data/bundles.json") %}
+  <link rel="stylesheet" href="{{ get_url(path=bundles['main.css']) }}">
   {% if page is defined %}
     {% set page_description = page.description | default(value=config.description) %}
     {% set share_title = page.title | default(value=config.title) %}

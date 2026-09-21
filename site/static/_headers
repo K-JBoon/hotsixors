@@ -19,8 +19,13 @@
 /*.html
   Cache-Control: public, max-age=600
 
-/*.css
-  Cache-Control: public, max-age=31536000, immutable
+# Every stylesheet a template loads ships hashed under /bundle/. The game's
+# sheet is the one exception: its script fetches it by plain path, so a deploy
+# replaces it in place and it gets the TTL of the page that loads it. No /*.css
+# catch-all, which would overlap /bundle/* and merge two Cache-Control values
+# onto the hashed sheets.
+/lost-in-the-nexus/*.css
+  Cache-Control: public, max-age=600
 
 # Client data: unhashed names, so a deploy replaces them in place. An hour of
 # staleness is acceptable; the alternative is a revalidation round trip per
