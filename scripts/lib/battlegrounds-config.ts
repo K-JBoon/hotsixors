@@ -166,7 +166,7 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
       { title: "Bombard your Enemies", description: "After receiving enough Doubloons from your Team, Blackheart will bombard your Enemy's forts!", image: "blackhearts-bay-3.jpg" },
     ],
     summary: [
-      "Get doubloons from chests, merc camps, and enemy heroes.",
+      "Get doubloons from chests, skeleton camps, merc camps, and enemy heroes.",
       "Turn in enough at Blackheart's ship and he shoots the enemy's structures.",
       "The first turn-in costs 8 doubloons. Each one after that costs 2 more.",
       "If you die, you drop half your doubloons (rounded down). Anyone can pick them up.",
@@ -181,7 +181,7 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
     mechanics: [
       {
         title: "Doubloon Collection",
-        body: "Chests drop 5 doubloons: some while you hit them, the rest when they break. Merc camps drop 2. A dead hero drops half of what they carried (rounded down), and either team can pick it up.",
+        body: "Chests drop 5 doubloons: some while you hit them, the rest when they break. The big skeleton camp drops 3, small skeleton camps and merc camps drop 2. A dead hero drops half of what they carried (rounded down), and either team can pick it up.",
         codeBlockSpec: {
           galaxyFile: BBAY,
           matchPattern: "libBBAY_gv_mMBBDoubloonsDropped[lv_player] += (lv_count / 2)",
@@ -517,7 +517,7 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
     ],
     summary: [
       "Enemy ranged minions drop 1 Gem and enemy Heroes drop 3. Turn them in at the Spider Queen's Altars.",
-      "If you die, you drop every Gem you carried. Only your team can pick them back up.",
+      "If you die, you drop every Gem you carried. Only your team can pick them back up, and only in the next 6 seconds.",
       "Hit the Gem target to summon three Webweavers, one per lane.",
       "The target starts at 50 Gems, goes up by 5 each time, and caps at 80.",
       "Webweavers spawn 15 seconds after the turn-in. They lose Health over time, cast Death Wave, and summon Cryptcrawlers.",
@@ -543,7 +543,7 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
     mechanics: [
       {
         title: "Gem Turn-In and Escalating Cost",
-        body: "Enemy ranged minions drop 1 Gem. Enemy Heroes drop 3 (Murky and each Lost Viking drop 1). A Hero can carry up to 100 Gems. If you die, your carried Gems drop for your own team to pick back up.\n\nEach team has its own Gem count. Turn in Gems at the Spider Queen's Altars. The target starts at 50, goes up by 5 after each Webweaver wave, and caps at 80.",
+        body: "Enemy ranged minions drop 1 Gem. Enemy Heroes drop 3 (Murky and each Lost Viking drop 1). A Hero can carry up to 100 Gems. If you die, your carried Gems drop for your own team to pick back up. Dropped Gems disappear after 6 seconds.\n\nEach team has its own Gem count. Turn in Gems at the Spider Queen's Altars. The target starts at 50, goes up by 5 after each Webweaver wave, and caps at 80.",
         codeBlockSpec: {
           galaxyFile: MSOC_H,
           matchPattern: "libMSOC_gv_mMTombSpiderQueenActivationAmountStart_C = 50",
@@ -887,18 +887,19 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
     summary: [
       "One neutral payload spawns in the middle. Both teams fight over it and push it toward their own end.",
       "Up to three allied Heroes near the payload make it move faster. Enemy Heroes can contest it to stop it.",
-      "Each team has its own three-part route and its own progress.",
+      "It's a tug-of-war. If the enemy pushed it first, you have to roll it back to the middle before it moves toward your end.",
+      "The first payload spawns at 3:00. The next one spawns 3:00 after a delivery, with a 30-second warning.",
       "Once delivered, the payload fires 12 shots at enemy Structures. It only hits the Core once nothing else is left.",
     ],
     modPaths: ["hanamura.stormmod", "hanamuradata.stormmod"],
     timers: [
-      { label: "Payload Cooldown", galaxyConst: "libMHmu_gv_mapMechanic_CooldownTimer_Duration" },
+      { label: "Payload Cooldown", galaxyConst: "libMHmu_gv_mapMechanic_CooldownTimer_Duration", note: "from gates open or the last delivery; includes the 30s warning" },
     ],
     summons: [],
     mechanics: [
       {
         title: "Payload Escort",
-        body: "Up to three allied Heroes near the payload push it forward. More Heroes means more speed, but a fourth adds nothing. If enemy Heroes are near it too, it's contested and stops until one side leaves.",
+        body: "Up to three allied Heroes near the payload push it forward. More Heroes means more speed, but a fourth adds nothing. If enemy Heroes are near it too, it's contested and stops until one side leaves. If nobody is near it, it stops where it is.",
         codeBlockSpec: {
           galaxyFile: NPLD,
           matchPattern: "Payload_AllyMonitor_1",
@@ -916,11 +917,29 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
       },
       {
         title: "Delivery: 12-Shot Volley",
-        body: "When the payload arrives it fires 12 shots at enemy Structures. It checks the two enemy Fort towns first and hits the one with more Structure Health left, then does the same for the Keep towns. It only hits the Core once nothing else is left.",
+        body: "When the payload arrives it fires 12 shots at enemy Structures. It checks the two enemy Fort towns first and hits the one with more Structure Health left, then does the same for the Keep towns. It only hits the Core once nothing else is left.\n\nAllied Heroes within 12 range of the payload also get a Regen Globe pickup when it arrives.",
         codeBlockSpec: {
           galaxyFile: MHMU,
           matchPattern: "libMHmu_gf_MakePayloadAttack",
           contextLines: 12,
+        },
+      },
+      {
+        title: "Tug-of-War Routes",
+        body: "Only one team has progress at a time. If the enemy moved the payload toward their end, your team first pushes it back along their route to the middle, then out along yours.\n\nEach team has 3 routes. A team switches to its next route each time it delivers, and progress resets for both teams after every delivery.",
+        codeBlockSpec: {
+          galaxyFile: NPLD,
+          matchPattern: "void libNPLD_gf_Payload_MoveToTeamDestination",
+          contextLines: 40,
+        },
+      },
+      {
+        title: "Recon Camps and Core Barrage",
+        body: "Taking a recon camp gives your team vision around it. The camp then respawns on your side, so the enemy has to kill your units to take it back.\n\nThe Core has its own barrage on an 8-second cooldown. It shells random spots within 10 range of itself. Each shell deals 5% of max Health and slows by 70% for 1.25 seconds.",
+        codeBlockSpec: {
+          galaxyFile: MHMU,
+          matchPattern: "UnitCreate(1, \"ReconCampVisionUnit\"",
+          contextLines: 8,
         },
       },
     ],
