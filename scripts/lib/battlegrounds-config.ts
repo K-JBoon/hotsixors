@@ -97,8 +97,9 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
     summary: [
       "Two Immortals spawn in the middle and fight each other.",
       "Hit the enemy Immortal and keep yours alive. Both Immortals use Cleave and Explosions. Watch the ground markers.",
+      "When either Immortal drops to 50% Health, both stop, turn untargetable, and fly to new spots in the arena. The fight starts again a few seconds later.",
       "The winner pushes the enemy lane with the least Structure damage. It gets a Shield based on the % Health it had left in the duel.",
-      "The next duel starts 105 seconds later.",
+      "The next duel starts 105 seconds after the pushing Immortal dies.",
     ],
     modPaths: ["battlefieldofeternity.stormmod", "heavenhell.stormmod"],
     timers: [
@@ -127,7 +128,7 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
     mechanics: [
       {
         title: "The Duel",
-        body: "An Angelic and a Demonic Immortal spawn in the middle and fight each other. Damage the enemy Immortal and protect yours. Both use Cleave and Explosions, and both show a ground marker first. The first Immortal to hit 0 Health loses.",
+        body: "An Angelic and a Demonic Immortal spawn in the middle and fight each other. Damage the enemy Immortal and protect yours. Both use Cleave and Explosions, and both show a ground marker first. Explosions go for Heroes first, then summons, then minions and mercs, then Structures.\n\nWhen either Immortal drops to 50% Health, both stop, turn invulnerable and untargetable, and fly to a new pair of spots in the arena. The new spots are never the ones they started on. In the first duel of the match they always start north and south, then move east and west.\n\nThe first Immortal to hit 0 Health loses. The winning team gets 2 Regen Globes in the middle, and its Immortal waits 15 seconds before it starts to push.",
         codeBlockSpec: {
           galaxyFile: BOE,
           matchPattern: "libMLBD_gv_mMBOEEventWinningTeam = libGame_gf_TeamNumberOfPlayer(UnitGetOwner(lv_winningUnit))",
@@ -141,6 +142,15 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
           galaxyFile: BOE,
           matchPattern: "int libMLBD_gf_MMBOEBossPushingLane",
           contextLines: 12,
+        },
+      },
+      {
+        title: "Duel XP",
+        body: "The duel is worth 750 XP plus 35 per minute of game time. Winning-team Heroes near the losing Immortal get all of it when it dies. The losing team gets the same total in two parts: Heroes near the winning Immortal get the share of Health it lost in the duel, and the rest comes when they kill the pushing Immortal.",
+        codeBlockSpec: {
+          galaxyFile: BOE,
+          matchPattern: "lv_bossDuelLoserXPBalance = (libMLBD_gv_mMBOEXPValue * (lv_hPPercent / 100.0))",
+          contextLines: 4,
         },
       },
     ],
@@ -160,6 +170,7 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
       "Turn in enough at Blackheart's ship and he shoots the enemy's structures.",
       "The first turn-in costs 8 doubloons. Each one after that costs 2 more.",
       "If you die, you drop half your doubloons (rounded down). Anyone can pick them up.",
+      "You can turn in part of the cost. Your team keeps what it paid until the next bombardment.",
     ],
     modPaths: ["blackheartsbay.stormmod"],
     timers: [
@@ -170,7 +181,7 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
     mechanics: [
       {
         title: "Doubloon Collection",
-        body: "Chests drop 5 doubloons and merc camps drop 2. A dead hero drops half of what they carried (rounded down), and either team can pick it up.",
+        body: "Chests drop 5 doubloons: some while you hit them, the rest when they break. Merc camps drop 2. A dead hero drops half of what they carried (rounded down), and either team can pick it up.",
         codeBlockSpec: {
           galaxyFile: BBAY,
           matchPattern: "libBBAY_gv_mMBBDoubloonsDropped[lv_player] += (lv_count / 2)",
@@ -179,7 +190,7 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
       },
       {
         title: "Turn-In & Escalating Cost",
-        body: "A full turn-in starts the bombardment. The cost starts at 8 and goes up by 2 after each of your team's turn-ins: 8, 10, 12, and so on.",
+        body: "Turn-ins add up. You can pay part of the cost, and your team keeps that progress. You only hand over what your team still needs, so you keep any extra doubloons. When the total hits the cost, the bombardment starts. The ship can't take doubloons while it is firing.\n\nThe cost starts at 8 and goes up by 2 after each of your team's bombardments: 8, 10, 12, and so on.",
         codeBlockSpec: {
           galaxyFile: BBAY,
           matchPattern: "libBBAY_gv_mMBBCannonballsBallsSubmitMaxCurrent[lp_team] += libBBAY_gv_mMBBCannonballsBallsSubmitMaxInc_C",
@@ -193,6 +204,15 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
           galaxyFile: BBAY,
           matchPattern: "DistanceBetweenPoints(UnitGetPosition(lv_itBuilding), UnitGetPosition(lv_townHall)) > 10.0",
           contextLines: 10,
+        },
+      },
+      {
+        title: "Chest Spawns",
+        body: "The first round has 1 chest. Rounds 2 to 4 have 2 chests, and every round after that has 3. The next round comes 3:00 after the last chest of the current round breaks. The chest timer pauses while Blackheart is firing.",
+        codeBlockSpec: {
+          galaxyFile: BBAY,
+          matchPattern: "void libBBAY_gf_InitializePatterns ()",
+          contextLines: 20,
         },
       },
     ],
@@ -212,6 +232,7 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
       "Take 3 Tributes to curse the enemy team for 70 seconds. Their Towers, Forts, and Keeps stop shooting, and their minions drop to 1 Health.",
       "After a Tribute is taken, the next one spawns 50-90 seconds later.",
       "After a Curse ends, the next Tribute takes 2:00-2:40.",
+      "Only the cursing team's Tributes reset. The other team keeps its count for the next round.",
     ],
     modPaths: ["cursedhollow.stormmod"],
     timers: [
@@ -234,7 +255,7 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
       },
       {
         title: "Tribute Spawn Location",
-        body: "There are 6 Tribute spots in a 2x3 grid: a top and a bottom spot in the Left, Middle, and Right columns. The first Tribute always spawns in the Middle column. After that, a Tribute never spawns on the same spot as the last one. 3 Tributes in a row never all spawn in the same row, and no two Tributes in the same set of 3 share a column.",
+        body: "There are 6 Tribute spots in a 2x3 grid: a top and a bottom spot in the Left, Middle, and Right columns. The first Tribute always spawns in the Middle column. After that, a Tribute never spawns on the same spot as the last one. 3 Tributes in a row never all spawn in the same row, and no two Tributes in the same set of 3 share a column.\n\nThe map shows the next Tribute spot 15 seconds after a pickup, or 30 seconds after a Curse ends.",
         codeBlockSpec: {
           galaxyFile: MAPM,
           matchPattern: "point libMapM_gf_MMRavenRandomSpawnPoint ()",
@@ -243,7 +264,7 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
       },
       {
         title: "The Curse",
-        body: "3 Tributes curse the enemy team for 70 seconds. Their Towers, Forts, and Keeps stop attacking, and their lane minions drop to 1 Health.",
+        body: "3 Tributes curse the enemy team for 70 seconds. Their Towers, Forts, and Keeps stop attacking, and their lane minions drop to 1 Health. Each Tribute also drops a Regen Globe for the team that took it.\n\nWhen the Curse ends, the team that cursed loses 3 Tributes. The cursed team keeps its count, so a team at 2 only needs 1 more.",
         codeBlockSpec: {
           galaxyFile: MAPM,
           matchPattern: "UnitBehaviorAdd(lv_structureUnit, \"RavenLordsCurseStructures\"",
@@ -267,6 +288,7 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
       "First team to 3 Seeds gets three Garden Terrors, one per lane. They all push at once.",
       "Shamblers guard each Seed. Kill them or pull them away, then channel the Seed.",
       "After a Seed is taken, the next one spawns 50-80 seconds later. After all Terrors die, it takes 90-120 seconds.",
+      "Only the winning team's Seeds reset. The other team keeps its count for the next round.",
     ],
     modPaths: ["gardenofterror.stormmod", "gardenofterrordata.stormmod"],
     timers: [
@@ -288,7 +310,7 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
     mechanics: [
       {
         title: "Collecting Seeds",
-        body: "The first objective starts at 2:30, after a 30-second warning. One Seed is up at a time. Shamblers guard it. Kill them or pull them away, then channel for 6 seconds to take the Seed. First team to 3 Seeds wins the round and gets three Garden Terrors, one per lane.",
+        body: "The first objective starts at 2:30, after a 30-second warning. One Seed is up at a time. Shamblers guard it. Kill them or pull them away, then channel for 6 seconds to take the Seed. Taking it kills the Shamblers and drops a Regen Globe. First team to 3 Seeds wins the round and gets three Garden Terrors, one per lane. Only the winners go back to 0 Seeds.",
         codeBlockSpec: {
           galaxyFile: GRDN,
           matchPattern: "libGRDN_gv_seedsCollected[lv_team] >= libGRDN_gv_seedsNeeded_C",
@@ -302,6 +324,15 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
           galaxyFile: GRDN,
           matchPattern: "fixed libGRDN_gf_RandomCursedPacingSeedSpawnDelay",
           contextLines: 10,
+        },
+      },
+      {
+        title: "Seed Spawn Location",
+        body: "There are 6 Seed spots. A new Seed never uses a recent spot, and it always spawns on the other team's side from the last one. It also never spawns in the same half of the map (top or bottom) three times in a row.",
+        codeBlockSpec: {
+          galaxyFile: GRDN,
+          matchPattern: "int libGRDN_gf_GetNextSeedSpawnLocation ()",
+          contextLines: 30,
         },
       },
       {
@@ -330,6 +361,7 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
       "Risen Miners drop 2 skulls each. The Grave Golem in the mines drops up to 38 skulls as it loses Health.",
       "Each team caps at 55 skulls. The mines close as soon as either team hits the cap.",
       "Each team gets a Grave Golem. More skulls means a stronger Golem.",
+      "Skull counts reset each time the mines open.",
       "The next mines only open after both lane Golems die.",
     ],
     modPaths: ["hauntedmines.stormmod"],
@@ -373,7 +405,7 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
     ],
     summary: [
       "Each round, one of three Shrines activates. It is almost never the same Shrine as last round.",
-      "Both teams race to kill 40 Guardians at the active Shrine. First to 40 wins it.",
+      "A Hero activates the Shrine to start it. Then both teams race to kill 40 Guardians. First to 40 wins it.",
       "Winning a Shrine summons an Arcane, Frozen, or Mortar Punisher. It pushes the lane closest to that Shrine.",
       "The Punisher type almost always changes each round too. It is rerolled together with the Shrine.",
     ],
@@ -381,7 +413,6 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
     timers: [
       { label: "First Shrine Activation", seconds: 180, note: "after a 30s warning" },
       { label: "Next Shrine Delay", galaxyConst: "libMSHE_gv_mMDiabloShrinesShrineTimerDuration_C", note: "restarts when the Punisher dies" },
-      { label: "Punisher Duration", galaxyConst: "libMSHE_gv_mMDiabloShrinesBuffTimerDuration_C" },
       { label: "Shrine Warning", galaxyConst: "libMSHE_gv_mMDiabloShrineWarningTimerLong_C" },
     ],
     summons: [
@@ -403,7 +434,7 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
       },
       {
         title: "40 Guardians → Punisher",
-        body: "Both teams race to kill 40 Guardians (also called Skeletal Defenders) at the active Shrine. First team to 40 kills gets a Punisher.",
+        body: "A Hero channels on the active Shrine to start it. Up to 10 Guardians (also called Skeletal Defenders) are up at once, and the Shrine tops them back up every 5 seconds. Both teams race to 40 kills. The first team there gets a Punisher and 2 Regen Globes.",
         codeBlockSpec: {
           galaxyFile: MSHE,
           matchPattern: "libMSHE_gv_mMDiabloShrineCursedEventTotal_C",
@@ -412,7 +443,7 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
       },
       {
         title: "Punisher Lane Selection",
-        body: "The Punisher pushes the lane closest to its Shrine and goes for enemy Heroes first. Its leap targets a point, not a unit. If a Gate is on that point, the leap lands short so the Punisher does not end up on the Gate. The landing still damages Structures in range.",
+        body: "The Punisher pushes the lane closest to its Shrine and goes for enemy Heroes first. It leaps at a Hero and chases them for a while, then goes back to its lane. Its leap targets a point, not a unit. If a Gate is on that point, the leap lands short so the Punisher does not end up on the Gate. The landing still damages Structures in range.",
         codeBlockSpec: {
           galaxyFile: MSHE,
           matchPattern: "libMSHE_gv_mMDiabloShrinesPunisherPushLane = AILaneWaypointGetClosestLane",
@@ -434,6 +465,7 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
     summary: [
       "Temples activate through the whole game. Each round has 1 or 2 active Temples.",
       "A Temple shoots enemy Structures while your team holds it. After 40 shots, the last 5 fire on their own for the team that holds it.",
+      "Guardians wake up in waves to take the Temple back.",
       "When all active Temples are done, the next round starts 2 minutes later, with a 30-second warning.",
     ],
     modPaths: ["skytemple.stormmod", "skytempledata.stormmod"],
@@ -446,7 +478,7 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
     mechanics: [
       {
         title: "Temple Capture",
-        body: "Stand on a Temple to take it. It shoots enemy Structures while you hold it uncontested. If the enemy contests it or you leave, it stops. After 40 shots, the last 5 fire fast and on their own for your team.\n\nOnly those last 5 shots fire without you. Before that, the Temple only shoots while your team holds both the Temple and its beacon. Leave early and it stops.",
+        body: "Stand on a Temple to take it. It shoots enemy Structures while you hold it uncontested. If the enemy contests it or you leave, it stops. After 40 shots, the last 5 fire fast and on their own for your team.\n\nOnly those last 5 shots fire without you. Before that, the Temple only shoots while your team holds both the Temple and its beacon. Leave early and it stops.\n\nEach Temple has Guardians that wake up to take it back: 1 big Guardian on the first capture, 2 ranged Guardians after 10 shots, and 2 more after 25. They only spawn once per Temple. The big Guardian drops a Regen Globe.",
         codeBlockSpec: {
           galaxyFile: MLCP,
           matchPattern: "libGame_gf_CapturePointCreate(UnitLastCreated(), libMLCP_gv_mMSkyTempleTempleCaptureRadius_C",
@@ -484,7 +516,8 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
       { title: "Summon Webweavers", description: "Whichever team turns in enough Gems first will unleash the Webweavers to destroy their enemy's defenses.", image: "tomb-of-the-spider-queen-3.jpg" },
     ],
     summary: [
-      "Enemy spider minions and Heroes drop Gems. Turn them in at the Spider Queen's Altars.",
+      "Enemy ranged minions drop 1 Gem and enemy Heroes drop 3. Turn them in at the Spider Queen's Altars.",
+      "If you die, you drop every Gem you carried. Only your team can pick them back up.",
       "Hit the Gem target to summon three Webweavers, one per lane.",
       "The target starts at 50 Gems, goes up by 5 each time, and caps at 80.",
       "Webweavers spawn 15 seconds after the turn-in. They lose Health over time, cast Death Wave, and summon Cryptcrawlers.",
@@ -510,7 +543,7 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
     mechanics: [
       {
         title: "Gem Turn-In and Escalating Cost",
-        body: "Each team has its own Gem count. Turn in Gems at the Spider Queen's Altars. The target starts at 50, goes up by 5 after each Webweaver wave, and caps at 80.",
+        body: "Enemy ranged minions drop 1 Gem. Enemy Heroes drop 3 (Murky and each Lost Viking drop 1). A Hero can carry up to 100 Gems. If you die, your carried Gems drop for your own team to pick back up.\n\nEach team has its own Gem count. Turn in Gems at the Spider Queen's Altars. The target starts at 50, goes up by 5 after each Webweaver wave, and caps at 80.",
         codeBlockSpec: {
           galaxyFile: MSOC_H,
           matchPattern: "libMSOC_gv_mMTombSpiderQueenActivationAmountStart_C = 50",
@@ -519,7 +552,7 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
       },
       {
         title: "Webweaver Wave",
-        body: "Hit the target and three Webweavers spawn 15 seconds later, one per lane. They lose Health over time, cast Death Wave, and keep summoning Cryptcrawlers.",
+        body: "Hit the target and three Webweavers spawn 15 seconds later, one per lane. They lose Health over time, cast Death Wave, and keep summoning Cryptcrawlers, which last 60 seconds. The Altars close while Webweavers are alive and open again 15 seconds after the last one dies.",
         codeBlockSpec: {
           galaxyFile: MSOC,
           matchPattern: "libNtve_gf_CreateUnitsWithDefaultFacing(1, \"SoulEater\", c_unitCreateIgnorePlacement",
@@ -541,6 +574,7 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
     summary: [
       "You can't attack the enemy Core. It only takes damage from Altars, Sappers, the Headless Horseman, and the Bell Tower barrage when your team holds all 6 Towers.",
       "An Altar capture deals 1 damage to the enemy Core, plus 1 per Bell Tower your team holds.",
+      "Destroy an enemy Fort to take its whole town. The town rebuilds on your side.",
       "Bell Towers start as Forts and turn into Keeps when the Waygates open, usually at 12:00.",
       "Capture the Headless Horseman in the middle to deal 4 damage to the enemy Core.",
     ],
@@ -555,7 +589,7 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
     mechanics: [
       {
         title: "Altar Captures Deal Core Damage",
-        body: "You can't attack the enemy Core directly. Each Altar capture deals 1 Core damage, plus 1 per Bell Tower your team holds. Sappers, the Headless Horseman, and the barrage from holding all 6 Towers also damage the Core.",
+        body: "You can't attack the enemy Core directly. Each Altar capture deals 1 Core damage, plus 1 per Bell Tower your team holds. Sappers and the Headless Horseman also damage the Core.\n\nIf a team holds all 6 Bell Towers, its Core starts shooting the enemy Core. It fires every 6 seconds, then every 3 seconds after the first 6 shots, until the team loses a Tower.",
         codeBlockSpec: {
           galaxyFile: MTOD,
           matchPattern: "void libMTOD_gf_MMToDAltarFireCannons",
@@ -697,6 +731,15 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
           contextLines: 10,
         },
       },
+      {
+        title: "Warhead Waves",
+        body: "Most waves spawn 2 Warheads in 2 different lanes. The empty lane is never the same twice in a row. The 1st and 4th waves are different: one lane gets 2 Warheads. The next wave spawns 3:05 after the last Warhead of the current wave is picked up, with a 30-second warning.\n\nIf you die with a Nuke, you drop it and either team can pick it up. Dropped Warheads disappear after 2 minutes.",
+        codeBlockSpec: {
+          galaxyFile: MSC2,
+          matchPattern: "void libMSC2_gf_MMSC2SpawnNukeCanisters",
+          contextLines: 40,
+        },
+      },
     ],
   },
   {
@@ -715,6 +758,7 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
       "The breakout timer starts at 25 seconds, goes up by 10 each round, and caps at 55.",
       "First team to finish its breakout gets one Cavalry per lane.",
       "Enemy Heroes can stop the breakout by channeling the camp. Guards can also take it back.",
+      "Each camp has 1 Guard in the first round and 1 more each round, up to 4.",
     ],
     modPaths: ["alteracpass.stormmod"],
     timers: [
@@ -755,7 +799,7 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
       },
       {
         title: "Escalating Capture Time",
-        body: "The Prison Camp timer starts at 25 seconds, goes up by 10 each round, and caps at 55.",
+        body: "The Prison Camp timer starts at 25 seconds, goes up by 10 each round, and caps at 55. Each camp has 1 Guard in the first round and 1 more each round, up to 4. Guards respawn 5 seconds after they die.\n\nThe next round comes a random 110-150 seconds later, minus 2 seconds per minute of game time (up to 60 seconds less).",
         codeBlockSpec: {
           galaxyFile: MMAP,
           matchPattern: "captureFlagVictoryTimeGoal < libMMAP_gv_captureFlagVictoryTimeGoalMax_C",
@@ -764,7 +808,7 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
       },
       {
         title: "Cavalry Reinforcements",
-        body: "The winning team gets one Cavalry per lane (3 total). They push all lanes at once and attack enemies and Structures. Nearby allied Heroes get +10% damage and +30% Movement Speed, and nearby allied Minions move faster.",
+        body: "The winning team gets one Cavalry per lane (3 total), 15 seconds after the breakout. They push all lanes at once and attack enemies and Structures. Nearby allied Heroes get +10% damage and +30% Movement Speed, and nearby allied Minions move faster.",
         codeBlockSpec: {
           galaxyFile: MMAP,
           matchPattern: "libMMAP_gv_aVMechanics[lp_team].lv_cavalryUnitType",
@@ -786,7 +830,8 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
     summary: [
       "Hold the Sun Shrine (top) and the Moon Shrine (bottom) at the same time to unlock the Dragon Altar.",
       "Channel the Altar for 3 seconds to get the Dragon Knight. Moving, taking damage, or losing a Shrine cancels the channel.",
-      "The Dragon Knight lasts until it dies or its timer runs out.",
+      "Shrines take 4 seconds to capture and stay yours until the enemy takes them.",
+      "The Dragon Knight lasts until it dies or its timer runs out. The Shrines come back 90 seconds after that.",
       "It lasts 55 seconds, plus 1 second for every full 30 seconds of game time.",
     ],
     modPaths: ["dragonshire.stormmod"],
@@ -811,7 +856,7 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
     mechanics: [
       {
         title: "Holding Both Shrines",
-        body: "You can only channel the Dragon Altar while your team holds both Shrines. If the enemy takes a Shrine back before the 3-second channel ends, the Altar locks again.",
+        body: "Shrines take 4 seconds to capture and don't decay when you leave. You can only channel the Dragon Altar while your team holds both Shrines. If the enemy takes a Shrine back before the 3-second channel ends, the Altar locks again.",
         codeBlockSpec: {
           galaxyFile: MAPM,
           matchPattern: "lv_chaosTowersOwned == libMapM_gv_mMGardensDragonDragonTowerObeliskCount_C",
