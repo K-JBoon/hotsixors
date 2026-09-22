@@ -66,3 +66,31 @@ test("buildCrossReferences expands shared generic talent anchors to every hero c
     "Muradin:GenericTalentImposingPresence",
   ]);
 });
+
+test("buildCrossReferences links mechanics whose behavior carries another's categories", () => {
+  const files = [{
+    path: "mods/heroesdata.stormmod/base.stormdata/gamedata/behaviordata.xml",
+    content: `
+      <Catalog>
+        <CBehaviorBuff id="StormProtect"><BehaviorCategories index="Protected" value="1"/></CBehaviorBuff>
+        <CBehaviorBuff id="StormShield" parent="StormProtect"><BehaviorCategories index="Protected" value="0"/></CBehaviorBuff>
+        <CBehaviorBuff id="StormSilence"><BehaviorCategories index="DebuffSilence" value="1"/></CBehaviorBuff>
+        <CBehaviorBuff id="StormPolymorph" parent="StormSilence"><BehaviorCategories index="Polymorph" value="1"/></CBehaviorBuff>
+      </Catalog>`,
+  }];
+  const mechanic = (slug, primaryBehavior) => ({ slug, name: slug, category: "c", primaryBehavior, sourceIds: [] });
+  const mechanics = [
+    mechanic("protected", "StormProtect"),
+    mechanic("shield", "StormShield"),
+    mechanic("silenced", "StormSilence"),
+    mechanic("polymorphed", "StormPolymorph"),
+  ];
+  const out = runJoin(`
+    return buildCrossReferences(${JSON.stringify(files)}, {}, ${JSON.stringify(mechanics)}, "9.9.9.99999");
+  `);
+  const bySlug = Object.fromEntries(out.mechanics.map((m) => [m.slug, m]));
+  assert.deepEqual(bySlug.polymorphed.includes.map((r) => r.slug), ["silenced"]);
+  assert.deepEqual(bySlug.silenced.includedIn.map((r) => r.slug), ["polymorphed"]);
+  assert.deepEqual(bySlug.shield.includes, []);
+  assert.deepEqual(bySlug.protected.includedIn, []);
+});

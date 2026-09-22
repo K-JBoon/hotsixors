@@ -61,9 +61,13 @@ export interface AbilTalentEntry {
   talentTier?: number;
 }
 
+export type MechanicRef = Pick<MechanicLike, "slug" | "name">;
+
 export interface MechanicApplications
   extends Pick<MechanicLike, "slug" | "name" | "category"> {
   entries: AbilTalentEntry[];
+  includes?: MechanicRef[];
+  includedIn?: MechanicRef[];
 }
 
 export interface ReverseRef {

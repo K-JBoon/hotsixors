@@ -9,7 +9,7 @@
   <h1>Minions &amp; Mercs</h1>
 
   <p>
-    Lane minion XP uses the experience-globe system: the amount comes from the <code data-datamining>ExperienceAcquiredMinions</code> effect (granted instantly when an enemy Hero lands the last hit, otherwise dropped as a globe pickup) and rises every minute. Mercenaries and bosses grant their unit's kill XP directly.
+    When an enemy hero last-hits a minion, the XP is granted right away. Otherwise the minion drops an XP globe. Minion XP goes up every minute<span data-datamining> (<code>ExperienceAcquiredMinions</code>)</span>. Mercs and bosses give their kill XP directly.
   </p>
   <br>
   <ul class="mechanics-source-list" data-datamining>
@@ -19,7 +19,7 @@
     </li>
     <li>
       <a href="{{ get_url(path='gamedata/mods/heroesdata.stormmod/base.stormdata/triggerlibs/gamelib-galaxy') }}#libGame_gt_ExperienceGlobeSpawn_Func">gamelib.galaxy — ExperienceGlobeSpawn / GrantXP / Scaling</a>
-      <span>who drops globes, how XP is awarded, +2 per minute scaling</span>
+      <span>globe drops, XP grants, +2 per minute scaling</span>
     </li>
   </ul>
 
@@ -55,12 +55,12 @@
   {% endfor %}
 
   <p class="minions-timings-caveat">
-    Camp timers start when the gates open, and a camp respawns this long after it is captured. Some battlegrounds override these values; the battleground's own page carries its objective timers.
+    First spawns count from the gates opening. Respawns count from the capture. Some battlegrounds use different values. Objective timers are on each battleground's page.
   </p>
   <ul class="mechanics-source-list" data-datamining>
     <li>
       <a href="{{ get_url(path='gamedata/mods/heroesdata.stormmod/base.stormdata/triggerlibs/mapmechanicslib-galaxy') }}">mapmechanicslib.galaxy</a>
-      <span>camp initial spawn and respawn per camp class</span>
+      <span>first spawn and respawn per camp type</span>
     </li>
     <li>
       <a href="{{ get_url(path='gamedata/mods/heroesdata.stormmod/base.stormdata/triggerlibs/heroeslib-galaxy') }}">heroeslib.galaxy</a>

@@ -90,7 +90,7 @@ const groupsConfig: GroupDef[] = [
       unit("FootmanMinion", "Melee Minion", "Melee", "Most battlegrounds"),
       unit("RangedMinion", "Ranged Minion", "Ranged", "Most battlegrounds"),
       unit("WizardMinion", "Leader Minion", "Leader", "Most battlegrounds"),
-      unit("CatapultMinion", "Catapult Minion", "Catapult", "Most battlegrounds after forts/keeps fall"),
+      unit("CatapultMinion", "Catapult Minion", "Catapult", "Most battlegrounds, once a Fort falls"),
     ],
   },
   {
@@ -354,12 +354,12 @@ async function timings(): Promise<TimingGroup[]> {
       title: "Lane minions",
       rows: rows([
         // The wave loop starts when the gates open, as do the camp timers.
-        seconds("First wave", galaxyValue(heroeslibHeader, "libCore_gv_bALSpawnMinionsDelay"), "from the gates opening"),
+        seconds("First wave", galaxyValue(heroeslibHeader, "libCore_gv_bALSpawnMinionsDelay"), "after the gates open"),
         seconds("Wave interval", galaxyValue(heroeslib, "libCore_gv_bALMinionWaveInterval")),
         catapultPeriod === null ? null : {
           label: "Catapults",
           value: `every ${catapultPeriod} waves`,
-          note: "starts once a Fort in that lane falls; every wave once its Keep falls too",
+          note: "once that lane's Fort is down. Every wave once its Keep is down too",
         },
         catapultCap === null ? null : { label: "Catapult cap", value: `${catapultCap} alive per team` },
       ]),

@@ -48,7 +48,7 @@
     const modifier = bountyModifier(killer, victim);
     const xp = killXpBase * (Math.trunc(victim) + killXpOffset) * modifier;
     result.innerHTML =
-      "Modifier <strong>×" + formatNumber(modifier, 3) + "</strong> — the kill grants <strong>" +
+      "Modifier <strong>×" + formatNumber(modifier, 3) + "</strong>. The kill is worth <strong>" +
       formatNumber(xp, 1) + " XP</strong>";
   }
 

@@ -9,6 +9,7 @@ import { runScript } from "./lib/script.ts";
 import {
   buildEffectGraph,
   findMechanicApplications,
+  mechanicComposition,
   type MechanicLike,
   type AbilTalentEntry,
   type MechanicApplications,
@@ -107,9 +108,11 @@ export function buildCrossReferences(
   generatedFrom: string,
 ): CrossReferencesFile {
   const graph = buildEffectGraph(files);
+  const composition = mechanicComposition(graph, mechanics);
+  const applications = expandSharedAnchorEntries(findMechanicApplications(graph, anchorIndex(shortcodeData), mechanics), shortcodeData);
   return {
     generatedFrom,
-    mechanics: expandSharedAnchorEntries(findMechanicApplications(graph, anchorIndex(shortcodeData), mechanics), shortcodeData),
+    mechanics: applications.map((m) => ({ ...m, ...composition.get(m.slug) })),
   };
 }
 

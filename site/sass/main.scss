@@ -1781,6 +1781,11 @@ html:not(.datamining-enabled) [data-datamining] {
   }
 }
 
+.mechanics-composition {
+  margin: 0.4rem 0 0;
+  font-size: 0.8rem;
+}
+
 .structures-table {
   min-width: 1040px;
 
@@ -2069,6 +2074,12 @@ html:not(.datamining-enabled) .mechanics-table {
   color: $text-muted;
   font-size: 0.8rem;
   font-weight: normal;
+}
+
+.effect-index-composition {
+  color: $text-muted;
+  font-size: 0.85rem;
+  margin: -0.35rem 0 0.65rem;
 }
 
 .effect-index-empty {

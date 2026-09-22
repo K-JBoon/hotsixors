@@ -1,0 +1,10 @@
+{% component mechanics.composition(mechanic, class) %}
+{%- for rel in [["Also counts as", "includes"], ["Part of", "includedIn"]] -%}
+{%- set refs = mechanic[rel[1]] -%}
+{%- if refs | length > 0 %}
+<p class="{{ class }}">{{ rel[0] }}
+  {% for ref in refs %}<a href="#{{ ref.slug }}">{{ ref.name }}</a>{% if not loop.last %}{% if loop.index == refs | length - 1 %} and {% else %}, {% endif %}{% endif %}{% endfor %}.
+</p>
+{%- endif -%}
+{%- endfor -%}
+{% endcomponent mechanics.composition %}

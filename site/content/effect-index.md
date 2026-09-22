@@ -1,5 +1,5 @@
 +++
 title = "Effect Index"
-description = "Every hero ability and talent that applies each game mechanic — stuns, slows, silences, armor, and more."
+description = "Every ability and talent that applies a stun, slow, silence, armor and more."
 template = "effect-index.html"
 +++

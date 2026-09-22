@@ -100,7 +100,7 @@ function trickleNote(galaxy: string) {
   const period = galaxyConst(galaxy, "libCore_gv_data_XP_TricklePeriod_C");
   const mod = galaxyConst(galaxy, "libCore_gv_data_XP_TrickleTownHallMod_C");
   const bonus = Number(((perTick * mod) / period).toFixed(2));
-  return `Each one destroyed adds +${mod} to the enemy team's XP trickle multiplier (+${bonus} XP/s). Towers of Doom uses kill XP instead.`;
+  return `Destroying one adds +${mod} to the attacking team's passive XP multiplier (+${bonus} XP/s). Towers of Doom gives kill XP instead.`;
 }
 
 async function killXpRows(def: StructureDef, baseKillXp: number | null): Promise<ScalingSummaryRow[]> {

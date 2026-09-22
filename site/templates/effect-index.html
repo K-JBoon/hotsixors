@@ -27,7 +27,7 @@
       <div class="effect-index-controls">
         <div class="effect-index-controls__bar">
           <input type="search" class="effect-index-search" data-effect-search
-                 placeholder="Filter by hero, ability, or talent…" aria-label="Filter entries">
+                 placeholder="Filter by hero, ability or talent…" aria-label="Filter entries">
           <div class="effect-index-bulk-actions" role="group" aria-label="Enable or disable all mechanics">
             <button type="button" class="effect-index-filter-button" data-effect-enable-all>Show all</button>
             <button type="button" class="effect-index-filter-button" data-effect-disable-all>Hide all</button>
@@ -57,8 +57,9 @@
         {% endif %}
         <section class="effect-index-mechanic" id="{{ mechanic.slug }}" data-effect-mechanic="{{ mechanic.slug }}" data-effect-category="{{ mechanic.category | slugify }}">
           <h3>{{ mechanic.name }} <span class="effect-index-count">{{ mechanic.entries | length }}</span></h3>
+          {{<mechanics.composition mechanic={mechanic} class="effect-index-composition" />}}
           {% if mechanic.entries | length == 0 %}
-            <p class="effect-index-empty">No direct applications found in hero data.</p>
+            <p class="effect-index-empty">No hero applies this directly.</p>
           {% else %}
           <ul class="effect-index-list">
             {% for entry in mechanic.entries %}

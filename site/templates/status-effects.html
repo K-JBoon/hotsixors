@@ -4,6 +4,7 @@
 
 {% block content %}
 {% set data = load_data(path="data/mechanics.json") %}
+{% set xrefs = load_data(path="data/cross-references.json") %}
 
 <div class="mechanics-page">
   <h1>Status Effects</h1>
@@ -39,7 +40,12 @@
                   <a class="mechanics-table__status" href="{{ get_url(path='effect-index') }}?effects={{ mechanic.slug }}">{{ mechanic.name }}</a>
                   <code data-datamining>{{ mechanic.primaryBehavior }}</code>
                 </th>
-                <td>{{<prose.lines text={mechanic.description} />}}</td>
+                <td>
+                  {{<prose.lines text={mechanic.description} />}}
+                  {% for xref in xrefs.mechanics %}{% if xref.slug == mechanic.slug %}
+                  {{<mechanics.composition mechanic={xref} class="mechanics-composition" />}}
+                  {% endif %}{% endfor %}
+                </td>
                 <td data-datamining>{{<prose.lines text={mechanic.summary} />}}</td>
                 <td data-datamining>
                   <ul class="mechanics-source-list">
