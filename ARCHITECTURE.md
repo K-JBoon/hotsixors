@@ -276,3 +276,29 @@ State itself is otherwise a plain immutable object (lobby code, captains,
 firstPick, bans/picks per team, `step` index into `PHASE_TABLE`, turn
 deadline) rebuilt via `applyEvent`, so any peer can catch up from a single
 `snapshot` event.
+
+## Copy editing
+
+`npm run dev` starts an edit server (`scripts/copy-server.ts`, port 1112)
+next to `zola serve`. `base.html` loads its client script only when
+`config.base_url` is local, so nothing of it ships.
+
+`scripts/lib/copy-registry.ts` derives the registry on every request: no ids
+are stored anywhere. It scans three kinds of source and records a byte range
+per string.
+
+| Kind | Sources | Encoding on save |
+| --- | --- | --- |
+| `template` | text runs in `site/templates/**/*.html`, and raw HTML inside markdown | `&` and `<` escaped; Tera markup rejected |
+| `markdown` | headings, list items, paragraphs and `title`/`description` in `site/content` outside the generated directories | written as typed |
+| `ts` | allowlisted fields in `battlegrounds-config.ts` and `gen-mechanics.ts` | re-escaped as a string literal |
+
+The client (`scripts/lib/copy-edit-client.js`) matches rendered text against
+the registry by whitespace-normalized text: elements first, then remaining
+text nodes, which it wraps in a span. Text that resolves to one entry edits
+in place; anything ambiguous, or whose source differs from what the page
+shows, opens a panel on the raw source text.
+
+A save re-scans the file, checks the range still holds the text the client
+started from, rewrites it, then reruns the generator the entry names
+(`gen-battlegrounds`, `gen-mechanics`). Zola picks up the write and reloads.

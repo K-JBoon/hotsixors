@@ -187,6 +187,16 @@ h1, h2, h3, h4 {
   color: $accent-gold !important;
   text-decoration: none;
   padding: 1rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.nav-logo__mark {
+  width: 1.75rem;
+  height: 1.75rem;
+  flex: 0 0 auto;
+  display: block;
 }
 
 .nav-toggle {
@@ -2597,6 +2607,9 @@ html:not(.datamining-enabled) .mechanics-table {
 
   .site-nav { padding-left: 0.75rem; padding-right: 0.75rem; gap: 0.5rem; }
 
+  .nav-logo { gap: 0.4rem; }
+  .nav-logo__mark { width: 1.4rem; height: 1.4rem; }
+
   .nav-link { font-size: 0.8rem; padding: 0.75rem 0.35rem; }
 
   // Hero banner: stack vertically
@@ -2686,6 +2699,33 @@ html:not(.datamining-enabled) .mechanics-table {
     min-width: 880px;
   }
 
+  // Two-column layout squeezes the description; stack label above text instead.
+  html:not(.datamining-enabled) .mechanics-table {
+    display: block;
+
+    thead { display: none; }
+
+    tbody,
+    tr { display: block; }
+
+    tr {
+      padding: 0.7rem 0.85rem;
+      border-bottom: 1px solid $border-dim;
+    }
+
+    tbody tr:last-child { border-bottom: 0; }
+
+    th,
+    td {
+      display: block;
+      width: auto;
+      padding: 0;
+      border-bottom: 0;
+    }
+
+    tbody th { margin-bottom: 0.3rem; }
+  }
+
   // Gamedata / guides
   .gamedata-header h1,
   .guides-list h1,
@@ -2719,3 +2759,7 @@ html:not(.datamining-enabled) .mechanics-table {
 
   a { color: #fff; text-decoration: underline; }
 }
+
+.zz-probe { color: #abcdef; }
+
+.zz-probe2 { color: #123456; }
