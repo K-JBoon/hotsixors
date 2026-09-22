@@ -6,6 +6,14 @@ const SKIP_TAGS = new Set(["SCRIPT", "STYLE", "SVG", "PRE", "CODE", "TEXTAREA", 
 
 const normalize = (text) => (text ?? "").replace(/\s+/g, " ").trim();
 
+/** Line breaks render as <br>, so they have to read back as newlines. */
+function readText(node) {
+  if (node.nodeType === Node.TEXT_NODE) return node.nodeValue;
+  let text = "";
+  for (const child of node.childNodes) text += child.nodeName === "BR" ? "\n" : readText(child);
+  return text;
+}
+
 const index = new Map();
 const targets = new Map();
 let enabled = false;
@@ -70,7 +78,7 @@ function markElements() {
   const matched = [];
   for (const node of document.body.querySelectorAll("*")) {
     if (node === ui || SKIP_TAGS.has(node.tagName) || ui.contains(node)) continue;
-    const entries = index.get(normalize(node.textContent));
+    const entries = index.get(normalize(readText(node)));
     if (entries) matched.push([node, entries]);
   }
   for (const [node, entries] of matched) {
@@ -172,7 +180,8 @@ async function save(entry, text, node) {
 }
 
 function editInline(node, entry) {
-  const before = node.textContent;
+  const before = readText(node);
+  const beforeHtml = node.innerHTML;
   node.setAttribute("contenteditable", "plaintext-only");
   node.focus();
 
@@ -180,12 +189,12 @@ function editInline(node, entry) {
     node.removeAttribute("contenteditable");
     node.removeEventListener("keydown", onKey);
     node.removeEventListener("blur", onBlur);
-    const next = node.textContent;
-    if (!commit || normalize(next) === normalize(before)) {
-      node.textContent = before;
+    const next = readText(node);
+    if (!commit || next === before) {
+      node.innerHTML = beforeHtml;
       return;
     }
-    if (!(await save(entry, next, node))) node.textContent = before;
+    if (!(await save(entry, next, node))) node.innerHTML = beforeHtml;
   };
   const onKey = (event) => {
     if (event.key === "Escape") stop(false);
@@ -209,7 +218,8 @@ function onClick(event) {
   event.stopPropagation();
   const entries = targets.get(node.getAttribute("data-copy-edit"));
   if (!entries) return;
-  const plain = entries.length === 1 && entries[0].raw === normalize(node.textContent) && node.children.length === 0;
+  const rendered = readText(node);
+  const plain = entries.length === 1 && normalize(entries[0].raw) === normalize(rendered) && !node.querySelector(":not(br)");
   if (plain) editInline(node, entries[0]);
   else openPanel(node, entries);
 }

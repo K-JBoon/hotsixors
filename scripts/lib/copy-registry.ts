@@ -264,7 +264,7 @@ function encode(kind: CopyKind, text: string): string {
   }
   if (kind === "template") {
     if (/\{[{%#]/.test(text)) throw new Error("template copy cannot contain Tera markup");
-    return text.replace(/&/g, "&amp;").replace(/</g, "&lt;");
+    return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/\r?\n/g, "<br>\n");
   }
   return text;
 }

@@ -5,7 +5,7 @@ import { startCopyServer } from "./copy-server.ts";
 await bundleClient({ watch: true });
 const copy = startCopyServer();
 
-const zola = spawn("zola", ["--root", "site", "serve"], { stdio: "inherit" });
+const zola = spawn("zola", ["--root", "site", "serve", "--debounce", "3000"], { stdio: "inherit" });
 
 for (const signal of ["SIGINT", "SIGTERM"] as const) {
   process.on(signal, () => {

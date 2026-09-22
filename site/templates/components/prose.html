@@ -1,0 +1,6 @@
+{#- Renders authored line breaks; the sources keep plain text. -#}
+{% component prose.lines(text) %}
+{%- for line in text | split(pat="\n") -%}
+{{ line }}{% if not loop.last %}<br>{% endif %}
+{%- endfor -%}
+{% endcomponent prose.lines %}

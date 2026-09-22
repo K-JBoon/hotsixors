@@ -39,8 +39,8 @@
                   <a class="mechanics-table__status" href="{{ get_url(path='effect-index') }}?effects={{ mechanic.slug }}">{{ mechanic.name }}</a>
                   <code data-datamining>{{ mechanic.primaryBehavior }}</code>
                 </th>
-                <td>{{ mechanic.description }}</td>
-                <td data-datamining>{{ mechanic.summary }}</td>
+                <td>{{<prose.lines text={mechanic.description} />}}</td>
+                <td data-datamining>{{<prose.lines text={mechanic.summary} />}}</td>
                 <td data-datamining>
                   <ul class="mechanics-source-list">
                     {% for source in mechanic.sources %}

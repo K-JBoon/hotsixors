@@ -302,3 +302,9 @@ shows, opens a panel on the raw source text.
 A save re-scans the file, checks the range still holds the text the client
 started from, rewrites it, then reruns the generator the entry names
 (`gen-battlegrounds`, `gen-mechanics`). Zola picks up the write and reloads.
+
+Shift-Enter inserts a line break. It reaches the source as `<br>` in a
+template, as a newline in markdown and in a config literal, and the
+`prose.lines` component turns those newlines back into `<br>` when the page
+renders. The client reads `<br>` back as a newline, so multi-line copy keeps
+matching its entry.

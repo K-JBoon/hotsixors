@@ -15,7 +15,7 @@
     {% endif %}
     <div class="hero-banner__info">
       <h1 class="hero-banner__name">{{ bg.name }}</h1>
-      {% if bg.description %}<p class="hero-banner__description">{{ bg.description }}</p>{% endif %}
+      {% if bg.description %}<p class="hero-banner__description">{{<prose.lines text={bg.description} />}}</p>{% endif %}
       <div class="hero-banner__links">
         <a class="hero-wiki-link" href="https://heroesofthestorm.fandom.com/wiki/{{ bg.name | replace(from=" ", to="_") }}" target="_blank" rel="noopener noreferrer">Wiki</a>
         <a class="hero-wiki-link" href="/lost-in-the-nexus/?map={{ page.extra.battleground_slug }}" target="_blank" rel="noopener noreferrer">
@@ -34,7 +34,7 @@
       <div class="bg-objective-card">
         {{<images.optimized path={obj.image} class="bg-objective-card__image" alt="" width={340} height={190} op="fit" display_width={340} display_height={190} loading="lazy" />}}
         <h3 class="bg-objective-card__title">{{ obj.title }}</h3>
-        <p class="bg-objective-card__desc">{{ obj.description }}</p>
+        <p class="bg-objective-card__desc">{{<prose.lines text={obj.description} />}}</p>
       </div>
       {% endfor %}
     </div>
@@ -49,7 +49,7 @@
       {% if bg.overview %}<p class="bg-summary-intro">{{ bg.overview }}</p>{% endif %}
       <ul class="bg-summary-list">
         {% for point in bg.summary %}
-        <li>{{ point }}</li>
+        <li>{{<prose.lines text={point} />}}</li>
         {% endfor %}
       </ul>
     </div>
@@ -58,7 +58,7 @@
     {% for mechanic in bg.mechanics %}
     <div class="bg-section bg-section--mechanic">
       <h3>{{ mechanic.title }}</h3>
-      <p class="bg-mechanic-desc">{{ mechanic.body }}</p>
+      <p class="bg-mechanic-desc">{{<prose.lines text={mechanic.body} />}}</p>
     </div>
     {% endfor %}
   </section>
