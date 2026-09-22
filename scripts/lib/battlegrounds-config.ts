@@ -76,6 +76,7 @@ const MSOC = "heroesmapmods/battlegroundmapmods/tombofthespiderqueen.stormmod/ba
 const MSOC_H = "heroesmapmods/battlegroundmapmods/tombofthespiderqueen.stormmod/base.stormdata/libmsoc_h.galaxy";
 const MTOD = "heroesmapmods/battlegroundmapmods/towersofdoom.stormmod/base.stormdata/libmtod.galaxy";
 const VLSK = "heroesmapmods/battlegroundmapmods/volskayamechanics.stormmod/base.stormdata/libvlsk.galaxy";
+const VOLV = "heroesmapmods/battlegroundmapmods/volskayadata.stormmod/base.stormdata/libvolv.galaxy";
 const MSC2 = "heroesmapmods/battlegroundmapmods/warheadjunction.stormmod/base.stormdata/libmsc2.galaxy";
 const MMAP = "heroesmapmods/battlegroundmapmods/alteracpass.stormmod/base.stormdata/libmmap.galaxy";
 const MHMU = "heroesmapmods/battlegroundmapmods/hanamura.stormmod/base.stormdata/libmhmu.galaxy";
@@ -96,7 +97,7 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
     summary: [
       "An Angelic and Demonic Immortal spawn in the center arena and fight each other.",
       "Heroes damage the enemy Immortal while defending their own. Immortals use Cleave and Explosions, telegraphed by ground indicators.",
-      "The winning Immortal gains a Shield equal to its remaining Health and pushes whichever enemy lane has the least Structure damage.",
+      "The winning Immortal keeps its remaining Health as a percentage: the lane Immortal spawns with a Shield at that percent of its own maximum, and pushes whichever enemy lane has the least Structure damage.",
       "A new duel begins 105 seconds later.",
     ],
     modPaths: ["battlefieldofeternity.stormmod", "heavenhell.stormmod"],
@@ -135,7 +136,7 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
       },
       {
         title: "HP → Lane-Push Shield",
-        body: "The winning Immortal gains a Shield equal to its remaining Health during the Objective phase, then flies to the enemy lane that has taken the least Structure damage.",
+        body: "What carries over from the duel is a percentage, not a Health total. The lane Immortal is a separate unit with its own maximum Health, and it spawns with a Shield equal to that maximum multiplied by the percentage of Health the duel winner had left. Its own Health is set to 50, so the Shield is effectively its whole Health pool.",
         codeBlockSpec: {
           galaxyFile: BOE,
           matchPattern: "int libMLBD_gf_MMBOEBossPushingLane",
@@ -334,7 +335,7 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
     modPaths: ["hauntedmines.stormmod"],
     timers: [
       { label: "First Mine Warning", galaxyConst: "libMHtM_gv_mMUnderworldStartTime_C" },
-      { label: "Mine Cooldown", galaxyConst: "libMHtM_gv_mMUnderworldEventCooldown_C" },
+      { label: "Mine Cooldown", galaxyConst: "libMHtM_gv_mMUnderworldEventCooldown_C", note: "timer actually runs 12s short of this, then the prep phase follows" },
       { label: "Prep Phase", galaxyConst: "libMHtM_gv_mMUnderworldPrepDuration_C" },
       { label: "Golem Summon Delay", galaxyConst: "libMHtM_gv_mMUnderworldSummonedBossDuration_C" },
     ],
@@ -374,12 +375,13 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
       "One of three Shrine locations activates each round; the next Shrine is almost always in a different location from the previous one.",
       "Both teams race to kill 40 Guardians at the active Shrine. First to 40 captures it.",
       "Capturing a Shrine summons an Arcane, Frozen, or Mortar Punisher that pushes the lane closest to that Shrine.",
-      "The Punisher type changes every round and cannot repeat back-to-back.",
+      "The Punisher type almost always changes every round, under the same reroll that moves the Shrine.",
     ],
     modPaths: ["infernalshrines.stormmod", "infernalshrinesdata.stormmod"],
     timers: [
       { label: "First Shrine Activation", seconds: 180, note: "after a 30s warning" },
-      { label: "Shrine Duration", galaxyConst: "libMSHE_gv_mMDiabloShrinesShrineTimerDuration_C" },
+      { label: "Next Shrine Delay", galaxyConst: "libMSHE_gv_mMDiabloShrinesShrineTimerDuration_C", note: "restarts when the Punisher dies" },
+      { label: "Punisher Duration", galaxyConst: "libMSHE_gv_mMDiabloShrinesBuffTimerDuration_C" },
       { label: "Shrine Warning", galaxyConst: "libMSHE_gv_mMDiabloShrineWarningTimerLong_C" },
     ],
     summons: [
@@ -392,7 +394,7 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
     mechanics: [
       {
         title: "Shrine Randomisation",
-        body: "Each round, one of three Shrine locations becomes active. The next Shrine is almost always in a different spot than the previous one, though same-location repeats can happen rarely. The Punisher type (Arcane, Frozen, or Mortar) never repeats back-to-back.",
+        body: "Each round, one of three Shrine locations becomes active with one of three Punisher types (Arcane, Frozen, or Mortar). Location and type are rolled together and rerolled while either one matches the previous round, so normally both change. The reroll gives up after 15 attempts, so a repeat of either is possible but very rare.",
         codeBlockSpec: {
           galaxyFile: MSHE,
           matchPattern: "libMSHE_gv_mMISLastShrine",
@@ -410,7 +412,7 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
       },
       {
         title: "Punisher Lane Selection",
-        body: "Capturing a Shrine summons a Punisher that pushes the lane closest to that Shrine. Punishers focus on attacking enemy Heroes, but their leap can target enemy Gates as well as Heroes.",
+        body: "Capturing a Shrine summons a Punisher that pushes the lane closest to that Shrine. Punishers focus on attacking enemy Heroes. Their leap lands on a point rather than a target, and if a Gate sits at that point the landing is pulled short so the Punisher does not end up on top of it, though the impact still damages Structures in range.",
         codeBlockSpec: {
           galaxyFile: MSHE,
           matchPattern: "libMSHE_gv_mMDiabloShrinesPunisherPushLane = AILaneWaypointGetClosestLane",
@@ -430,15 +432,13 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
       { title: "Defend the Temples", description: "Guardians will try to wrest control of their Temples from your team. Hold them off to keep the Temple's power for yourselves!", image: "sky-temple-3.jpg" },
     ],
     summary: [
-      "Temples activate in a fixed sequence. Depending on the round, 1 or 2 are active at once.",
+      "Temples activate throughout the game. Depending on the round, 1 or 2 are active at once.",
       "A controlled Temple fires at enemy Structures while held. After 40 shots, the final 5 fire automatically for the team holding it.",
-      "Temple shots hit the closest eligible enemy Structure. Fort-side outer Structures go first, then Keep-side inner ones; the Core only becomes a target after the rest are gone.",
-      "Once all active Temples are spent, the next Temple phase starts after a 2-minute cooldown, with a 30-second warning.",
+      "Once all active Temples are finished, the next Temple phase starts after a 2-minute cooldown, with a 30-second warning.",
     ],
     modPaths: ["skytemple.stormmod", "skytempledata.stormmod"],
     timers: [
       { label: "First Temple", galaxyConst: "libMLCP_gv_mMSkyTempleFirstTempleStartTime_C" },
-      { label: "Temple Firing Stage", galaxyConst: "libMLCP_gv_mMSkyTempleTempleStageDuration_C" },
       { label: "Temple Phase Cooldown", galaxyConst: "libMLCP_gv_mMSkyTempleTempleCooldown_C" },
       { label: "Temple Warning", galaxyConst: "libMLCP_gv_mMSkyTempleTempleBlessWarningTimeLong_C" },
     ],
@@ -446,7 +446,7 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
     mechanics: [
       {
         title: "Temple Capture",
-        body: "Stand within a Temple's capture point to take control. An uncontested Temple fires at enemy Structures; if it's contested or abandoned, it stops firing. After 40 normal shots, the last 5 fire automatically in rapid succession for the team holding it.",
+        body: "Stand on a Temple's capture point to take control. An uncontested Temple fires at enemy Structures; if it's contested or abandoned, it stops firing. After 40 shots, the last 5 fire automatically in rapid succession for the team holding it.\n\nThose last 5 shots are the only ones that fire without you: up to that point the Temple only shoots while your team holds both the Temple and its beacon, so abandoning it earlier stops it cold.",
         codeBlockSpec: {
           galaxyFile: MLCP,
           matchPattern: "libGame_gf_CapturePointCreate(UnitLastCreated(), libMLCP_gv_mMSkyTempleTempleCaptureRadius_C",
@@ -455,7 +455,7 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
       },
       {
         title: "Cannon Target Selection",
-        body: "Temple shots hit the closest eligible enemy Structure. Fort-side outer Structures are targeted first, then Keep-side inner ones. The Core is only targeted after everything else is destroyed.",
+        body: "Each Temple walks a fixed list of enemy towns, set per Temple by the map, and only moves to the next town once the current one is dead. Within a town it hits the closest eligible Structure, taking the outer buildings before the ones clustered around the Fort or Keep, and the Fort or Keep itself last. The Core is only targeted once every town on the list is gone.",
         codeBlockSpec: {
           galaxyFile: MLCP,
           matchPattern: "lv_townOuterLoop, UnitGetPosition(libMLCP_gv_mMSkyTemples",
@@ -464,7 +464,7 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
       },
       {
         title: "Temple Activation Order",
-        body: "Rounds 1-3 are fixed: round 1 activates Top and Middle, round 2 activates Bottom, round 3 activates a random pair (Top+Bottom or Middle+Bottom). From round 4 on, 1 or 2 Temples activate at random each round. The game tracks how often each Temple has activated and favors the ones that have activated less.",
+        body: "Rounds 1-3 are fixed: round 1 activates Top and Middle, round 2 activates Bottom, round 3 activates a random pair (Top+Bottom or Middle+Bottom).\n\nRounds 4 to 6 are balanced against each other: round 4 rolls 1 or 2 Temples, round 5 takes whichever count round 4 did not, and round 6 is decided entirely by which Temples are behind on activations. From round 7 the count is random but cannot be the same three rounds running. From round 11 on it is a flat random pick with no memory.",
         codeBlockSpec: {
           galaxyFile: MLCP,
           matchPattern: "void libMLCP_gf_MMSkyTempleNextTemplesLogic ()",
@@ -573,7 +573,7 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
       },
       {
         title: "Altar Spawn Patterns",
-        body: "Altars can spawn as: the two Top altars together, Middle alone, Bottom alone, Middle+Bottom, or one of two 3-Altar patterns (Top pair+Middle, or Top pair+Bottom). The two Top altars always spawn together. The 1st and 5th Altar spawns are always a 3-Altar pattern. Other spawns pick a pattern at random, without repeating one until every pattern has come up.",
+        body: "Altars can spawn as: the two Top altars together, Middle alone, Bottom alone, Middle+Bottom, or one of two 3-Altar patterns (Top pair+Middle, or Top pair+Bottom). The two Top altars always spawn together. The 1st and 5th Altar spawns are always a 3-Altar pattern, and those are the only two 3-Altar spawns in a match. Spawns 2 to 10 draw from the four smaller patterns without repeating until all four have come up, refilling the pool after the 6th. From the 11th spawn on the pattern is picked at random with no memory, so repeats can happen.",
         codeBlockSpec: {
           galaxyFile: MTOD,
           matchPattern: "void libMTOD_gf_MMToDDefineNextAltarsandCreatePreviews ()",
@@ -595,7 +595,7 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
     summary: [
       "Contest a Capture Point that rotates between three locations to earn the Triglav Protector.",
       "The Triglav Protector is a two-person mech: one Hero pilots, another mans the weapons.",
-      "The Triglav Protector has a fixed 150-second timed life once awarded.",
+      "The Triglav Protector's timed life is 50 seconds plus 3 seconds per minute of game time elapsed.",
       "The first point activates at 3:00 after a 30-second warning; later points activate 3:00 after the Protector is destroyed.",
     ],
     modPaths: ["volskayamechanics.stormmod", "volskayadata.stormmod"],
@@ -603,7 +603,7 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
       { label: "First Capture Point Cooldown", galaxyConst: "libVLSK_gv_mechanicInitialSpawnTimerDuration_C" },
       { label: "Capture Point Cooldown", galaxyConst: "libVLSK_gv_cooldownTimerDuration_C" },
       { label: "Capture Warning", galaxyConst: "libVLSK_gv_warningTimerDuration" },
-      { label: "Protector Timed Life", seconds: 150 },
+      { label: "Protector Timed Life (base)", seconds: 50, note: "+3s per minute of game time elapsed" },
     ],
     summons: [
       {
@@ -642,12 +642,12 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
         },
       },
       {
-        title: "Fixed Protector Duration",
-        body: "The Triglav Protector's timed life is fixed at 150 seconds. It does not scale up with game time.",
+        title: "Protector Duration Scales With Game Time",
+        body: "The Triglav Protector's timed life is set when the mech is created: 50 seconds plus 3 seconds for every minute of game time already elapsed. At 10:00 that is 80 seconds. The timer runs down whether or not anyone is piloting, and the mech dies when it expires.",
         codeBlockSpec: {
-          galaxyFile: VLSK,
-          matchPattern: "UnitBehaviorDuration(EventUnit(), \"VehicleDragonTimedLife\")",
-          contextLines: 8,
+          galaxyFile: VOLV,
+          matchPattern: "UnitBehaviorSetDuration(libMapM_gv_vehicle[lv_pilotIndex].lv_unit_Vehicle, \"VehicleDragonTimedLife\"",
+          contextLines: 6,
         },
       },
     ],
@@ -664,7 +664,7 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
     ],
     summary: [
       "Nuclear warheads spawn across the map. Picking one up takes a 5-second channel.",
-      "After pickup, the Nuke is locked out briefly. If a Hero gets crowd-controlled mid-launch, the Nuke goes on a 10-second cooldown.",
+      "After pickup, the Nuke is locked out briefly. If a Hero gets crowd-controlled mid-launch, the Nuke goes on a 5-second cooldown.",
       "Warheads deal 1750 base damage to enemy non-Heroes, plus 70 per minute of game time. Enemy Heroes take 30% of their max Health instead.",
       "The Core periodically launches its own Nuke at nearby enemy Heroes. The Slime Boss is a separate Mercenary Camp.",
     ],
@@ -681,7 +681,7 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
     mechanics: [
       {
         title: "Arming & Interruption",
-        body: "Picking up a Warhead takes a 5-second channel. After pickup, the Nuke is locked out for 5 seconds. If a Hero gets crowd-controlled mid-launch, the Nuke goes on a 10-second cooldown.",
+        body: "Picking up a Warhead takes a 5-second channel. After pickup, the Nuke is locked out for 5 seconds. If a Hero gets crowd-controlled mid-launch, the Nuke goes on a 5-second cooldown.",
         codeBlockSpec: {
           galaxyFile: MSC2,
           matchPattern: "NukeCCedCooldownModifyUnit",
@@ -787,7 +787,7 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
       "Hold both the Sun Shrine (top) and the Moon Shrine (bottom) at the same time to unlock the Dragon Altar.",
       "Channel the Dragon Altar for 3 seconds to claim the Dragon Knight. Moving, taking damage, or losing a Shrine mid-channel breaks the attempt.",
       "Once claimed, the Dragon Knight lasts until destroyed or until its timer runs out.",
-      "Its duration is 55 seconds plus 2 seconds per full game-minute elapsed.",
+      "Its duration is 55 seconds plus 1 second for every full 30 seconds of game time elapsed.",
     ],
     modPaths: ["dragonshire.stormmod"],
     timers: [
@@ -820,7 +820,7 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
       },
       {
         title: "Dragon Knight Duration Scales With Game Time",
-        body: "The Dragon Knight's duration is not fixed. Once claimed, it lasts 55 seconds plus 2 more for each full game-minute elapsed, unless destroyed first.",
+        body: "The Dragon Knight's duration is not fixed. Once claimed, it lasts 55 seconds plus 1 second for every full 30 seconds of game time elapsed, unless destroyed first. That works out to 2 seconds per minute, but it ticks up at each half-minute rather than only on the minute: at 10:00 the Dragon Knight lasts 75 seconds, at 10:30 it lasts 76.",
         codeBlockSpec: {
           galaxyFile: MAPM,
           matchPattern: "IntToFixed((FixedToInt(libMapM_gv_mMGardensDragonDragonKnightStartingTime_C)+2*FixedToInt(TimerGetElapsed(libGame_gv_gameTimer))/60))",
@@ -916,6 +916,7 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
           { unitId: "ZergZergling", label: "Zergling" },
           { unitId: "ZergBaneling", label: "Baneling" },
           { unitId: "ZergHydralisk", label: "Hydralisk" },
+          { unitId: "ZergRoach", label: "Roach" },
           { unitId: "ZergGuardian", label: "Guardian" },
           { unitId: "ZergUltralisk", label: "Ultralisk" },
         ],
@@ -942,7 +943,7 @@ export const BATTLEGROUNDS: BattlegroundConfig[] = [
       },
       {
         title: "Zerg Waves",
-        body: "The wave a cell releases is drawn from a table indexed by its charge. A low charge sends Zerglings and a few Hydralisks; a full charge sends Ultralisks, Guardians and Banelings as well. Zerg prioritize Minions and Structures, but they attack Heroes on the way. While a Guardian or an Ultralisk is attacking, its team can call down a Drop Pod carrying 3 Zerglings and a Hydralisk, once every 13 seconds and up to 6 times per wave.",
+        body: "The charge a cell reaches is snapshotted into one of seven tiers, and the wave is drawn from a table indexed by that tier. A low tier sends Zerglings and a couple of Hydralisks; the top tier sends Ultralisks, Guardians and a lot more Hydralisks, with Roaches in the second wave at every tier. Banelings come from a separate trickle that adds units to the cell as it charges, so they scale with charge without appearing in the tier table. Zerg prioritize Minions and Structures, but they attack Heroes on the way. While a Guardian or an Ultralisk is attacking, its team can call down a Drop Pod carrying 3 Zerglings and a Hydralisk, once every 13 seconds and up to 6 times per wave.",
         codeBlockSpec: {
           galaxyFile: SCHO,
           matchPattern: "void libSCHO_gf_MMHODetermineSpawnCompositionBasedOnProgress",
