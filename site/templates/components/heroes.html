@@ -40,7 +40,7 @@
         {"label": "Support", "slug": "support"}
       ] %}
         <button type="button" class="hero-role-filter__btn role-{{ r.slug }}" aria-pressed="false" data-role="{{ r.slug }}">
-          {{<heroes.role_icon role_slug={r.slug} size={28} />}}
+          {{<heroes.role_icon role_slug={r.slug} size={20} />}}
           {{ r.label }}
         </button>
       {% endfor %}
@@ -207,28 +207,13 @@
       <p class="ability-card__desc">{{ ab.fullDesc }}</p>
     {% endif %}
     {% if show_stats and ab.stats %}
+    {% set multi_charge = ab.stats.chargeCountMax and ab.stats.chargeCountMax > 1 %}
+    {% if multi_charge or ab.stats.castIntroTime or ab.stats.scaling %}
     <dl class="ability-card__stats">
-      {% if ab.stats.manaCost %}
-      <div class="ability-stat">
-        <dt class="ability-stat__label">Mana</dt>
-        <dd class="ability-stat__value">{{ ab.stats.manaCost }}</dd>
-      </div>
-      {% endif %}
-      {% if ab.stats.chargeTimeUse %}
-      <div class="ability-stat">
-        <dt class="ability-stat__label">{% if ab.stats.chargeCountMax > 1 %}Charge CD{% else %}Cooldown{% endif %}</dt>
-        <dd class="ability-stat__value">{{ ab.stats.chargeTimeUse }} s</dd>
-      </div>
-      {% if ab.stats.chargeCountMax > 1 %}
+      {% if multi_charge %}
       <div class="ability-stat">
         <dt class="ability-stat__label">Charges</dt>
         <dd class="ability-stat__value">{{ ab.stats.chargeCountMax }}</dd>
-      </div>
-      {% endif %}
-      {% elif ab.stats.cooldown %}
-      <div class="ability-stat">
-        <dt class="ability-stat__label">Cooldown</dt>
-        <dd class="ability-stat__value">{{ ab.stats.cooldown }} s</dd>
       </div>
       {% endif %}
       {% if ab.stats.castIntroTime %}
@@ -244,6 +229,7 @@
       </div>
       {% endif %}
     </dl>
+    {% endif %}
     {% endif %}
   </div>
 </div>

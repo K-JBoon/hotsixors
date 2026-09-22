@@ -78,14 +78,22 @@ function initTalentBuilds() {
     }
   }
 
-  function showCopiedFeedback(message = "Copied!") {
-    if (!shareStatus) return;
+  // Announce to assistive tech via the live region; sighted users get the
+  // in-place button swap, which keeps the row from reflowing.
+  function showCopiedFeedback(button, message = "Copied!") {
+    if (shareStatus) {
+      shareStatus.textContent = message;
+      window.setTimeout(() => {
+        shareStatus.textContent = "";
+      }, 1600);
+    }
+    if (!button) return;
     if (feedbackTimer) clearTimeout(feedbackTimer);
-    shareStatus.textContent = message;
+    button.classList.add("is-copied");
     feedbackTimer = window.setTimeout(() => {
       feedbackTimer = null;
-      shareStatus.textContent = "";
-    }, 1600);
+      button.classList.remove("is-copied");
+    }, 1400);
   }
 
   function writeHash() {
@@ -131,12 +139,12 @@ function initTalentBuilds() {
 
   shareButton?.addEventListener("click", async () => {
     await copyText(currentBuildUrl(serializeTalentBuildHash(state, talentRows, heroName)));
-    showCopiedFeedback();
+    showCopiedFeedback(shareButton, "Copied build URL!");
   });
 
   buildCodeButton?.addEventListener("click", async () => {
     await copyText(serializeTalentBuildCode(state, talentRows, heroName));
-    showCopiedFeedback("Copied build code!");
+    showCopiedFeedback(buildCodeButton, "Copied build code!");
   });
 
   applyState();

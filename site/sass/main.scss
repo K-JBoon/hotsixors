@@ -725,16 +725,16 @@ html:not(.datamining-enabled) [data-datamining] {
 .hero-grid-header {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.75rem 1rem;
   flex-wrap: wrap;
-  margin-bottom: 2rem;
-  h1 { font-size: 2rem; color: $accent-gold; }
+  margin-bottom: 1.25rem;
+  h1 { font-size: 2rem; line-height: 1.15; color: $accent-gold; }
 }
 
 .hero-role-filter {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.4rem;
+  gap: 0.35rem;
   width: 100%;
   &__btn {
     appearance: none;
@@ -744,13 +744,14 @@ html:not(.datamining-enabled) [data-datamining] {
     color: $text-muted;
     font-family: $font-display;
     font-size: 0.78rem;
-    letter-spacing: 0.05em;
+    line-height: 1.2;
+    letter-spacing: 0.04em;
     text-transform: uppercase;
-    padding: 0.3rem 0.75rem;
+    padding: 0.3rem 0.6rem;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
-    gap: 0.4rem;
+    gap: 0.3rem;
     box-shadow: none;
     transition: background 0.15s, color 0.15s, border-color 0.15s;
     &:hover { color: $text-primary; border-color: $border-gold; }
@@ -931,13 +932,13 @@ html:not(.datamining-enabled) [data-datamining] {
     box-shadow: 0 0 0 3px rgba($accent-gold, 0.7);
     text-decoration: none;
   }
-  &__portrait { width: 100%; aspect-ratio: 3/4; object-fit: cover; object-position: top center; }
-  &__info { padding: 0.6rem; display: flex; flex-direction: column; gap: 0.2rem; }
+  &__portrait { width: 100%; height: auto; aspect-ratio: 5/6; object-fit: cover; object-position: top center; }
+  &__info { padding: 0.5rem 0.55rem; display: flex; flex-direction: column; gap: 0.1rem; }
   &__name {
-    font-family: $font-display; font-weight: 600; font-size: 0.9rem;
-    text-transform: uppercase; letter-spacing: 0.05em; color: $text-primary;
+    font-family: $font-display; font-weight: 600; font-size: 0.9rem; line-height: 1.25;
+    text-transform: uppercase; letter-spacing: 0.04em; color: $text-primary;
   }
-  &__role { font-size: 0.75rem; color: $text-muted; text-transform: uppercase; font-family: $font-display; letter-spacing: 0.08em; }
+  &__role { font-size: 0.72rem; line-height: 1.35; color: $text-muted; text-transform: uppercase; font-family: $font-display; letter-spacing: 0.04em; }
 }
 
 // ─── Hero Detail ─────────────────────────────────────────────────────────────
@@ -988,17 +989,17 @@ html:not(.datamining-enabled) [data-datamining] {
     display: flex;
     align-items: center;
     flex-wrap: wrap;
-    gap: 0.5rem 1.5rem;
+    gap: 0.4rem 1.5rem;
     border-bottom: 1px solid $border-dim;
-    padding-bottom: 0.5rem;
-    margin-bottom: 1rem;
-    h2 { font-size: 1.4rem; color: $accent-gold; margin: 0; flex-shrink: 0; }
+    padding-bottom: 0.4rem;
+    margin-bottom: 0.75rem;
+    h2 { font-size: 1.4rem; line-height: 1.2; color: $accent-gold; margin: 0; flex-shrink: 0; }
   }
 
   &__grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: 0.6rem;
+    grid-template-columns: repeat(auto-fit, minmax(118px, 1fr));
+    gap: 0.5rem;
   }
 
   &__unit + &__unit {
@@ -1017,11 +1018,12 @@ html:not(.datamining-enabled) [data-datamining] {
   background: $bg-card;
   border: 1px solid $border-dim;
   border-radius: 6px;
-  padding: 0.6rem 0.75rem;
+  padding: 0.45rem 0.6rem;
 
   &__label {
     font-family: $font-display;
-    font-size: 0.7rem;
+    font-size: 0.68rem;
+    line-height: 1.3;
     text-transform: uppercase;
     letter-spacing: 0.06em;
     color: $text-muted;
@@ -1029,7 +1031,8 @@ html:not(.datamining-enabled) [data-datamining] {
   }
 
   &__value {
-    font-size: 1.3rem;
+    font-size: 1.2rem;
+    line-height: 1.25;
     font-weight: 600;
     color: $accent-gold;
     font-variant-numeric: tabular-nums;
@@ -1038,9 +1041,10 @@ html:not(.datamining-enabled) [data-datamining] {
   }
 
   &__scaling {
-    font-size: 0.7rem;
+    font-size: 0.68rem;
+    line-height: 1.3;
     color: $text-muted;
-    margin-top: 0.15rem;
+    margin-top: 0.1rem;
   }
 }
 
@@ -1061,10 +1065,10 @@ html:not(.datamining-enabled) [data-datamining] {
     object-position: right center;
     border-radius: 4px;
   }
-  &__info { flex: 1; }
-  &__name { font-size: 2.5rem; line-height:2.4rem; color: $accent-gold; }
-  &__meta { display: flex; gap: 0.5rem; flex-wrap: wrap; margin: 0.5rem 0 0.75rem; }
-  &__desc { color: $text-muted; max-width: 60ch; line-height: 1.7; }
+  &__info { flex: 1; padding: 0.25rem 0; }
+  &__name { font-size: 2.5rem; line-height: 1.05; color: $accent-gold; }
+  &__meta { display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; margin: 0.5rem 0 0.6rem; }
+  &__desc { color: $text-muted; max-width: 62ch; line-height: 1.6; }
 }
 
 .hero-banner__links {
@@ -1198,8 +1202,8 @@ html:not(.datamining-enabled) [data-datamining] {
 
 // ─── Talents ─────────────────────────────────────────────────────────────────
 .talent-builder-help {
-  margin: -0.25rem 0 1rem;
-  padding: 0.75rem 0.9rem;
+  margin: -0.25rem 0 0.9rem;
+  padding: 0.5rem 0.75rem;
   border: 1px solid $border-dim;
   border-left-color: $accent-gold;
   border-left-width: 3px;
@@ -1208,20 +1212,21 @@ html:not(.datamining-enabled) [data-datamining] {
   color: $text-muted;
   font-size: 0.85rem;
 
-  p {
-    margin-bottom: 0.35rem;
+  summary {
     color: $text-primary;
     font-weight: 600;
+    cursor: pointer;
+    list-style-position: inside;
+    padding: 0.15rem 0;
   }
+
+  &[open] summary { margin-bottom: 0.4rem; }
 
   ul {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.35rem 1.25rem;
-    padding-left: 1rem;
+    padding-left: 1.1rem;
   }
 
-  li { line-height: 1.4; }
+  li { line-height: 1.4; margin-top: 0.2rem; }
 }
 
 .talent-tier { margin-bottom: 1.5rem; }
@@ -1286,6 +1291,7 @@ html:not(.datamining-enabled) [data-datamining] {
 .talent-build-actions__share-url { margin-left: auto; }
 
 .share-build-button {
+  position: relative;
   background: $accent-gold;
   border: 1px solid $border-gold;
   border-radius: 4px;
@@ -1298,28 +1304,75 @@ html:not(.datamining-enabled) [data-datamining] {
   padding: 0.45rem 0.8rem;
 
   &:hover { background: color.adjust($accent-gold, $lightness: 5%); }
+
+  // The label swaps in place so the row keeps its width.
+  &__done {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+  }
+
+  &.is-copied &__idle { opacity: 0; }
+  &.is-copied &__done { opacity: 1; }
+}
+
+.build-code-field {
+  display: flex;
+  align-items: stretch;
+  min-width: 0;
 }
 
 .build-code-preview {
   background: $bg-deep;
   border: 1px solid $border-dim;
-  border-radius: 4px;
+  border-radius: 4px 0 0 4px;
+  border-right: 0;
   color: $text-muted;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   font-size: 0.8rem;
   padding: 0.45rem 0.6rem;
+  min-width: 0;
 
   &:disabled { opacity: 1; -webkit-text-fill-color: $text-muted; }
 }
 
-.share-build-status {
+.build-code-copy {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 2.25rem;
+  background: $bg-card;
+  border: 1px solid $border-dim;
+  border-radius: 0 4px 4px 0;
   color: $text-muted;
-  font-size: 0.78rem;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+
+  svg { width: 16px; height: 16px; }
+
+  &[hidden] { display: none; }
+  &:hover { background: $bg-card-hover; border-color: $accent-gold; color: $accent-gold; }
+
+  &__done { display: none; }
+  &.is-copied {
+    color: $accent-gold;
+    border-color: $accent-gold;
+    .build-code-copy__idle { display: none; }
+    .build-code-copy__done { display: block; }
+  }
+}
+
+.share-build-status {
+  position: absolute;
+  width: 1px;
+  height: 1px;
   overflow: hidden;
-  text-overflow: ellipsis;
+  clip: rect(0, 0, 0, 0);
   white-space: nowrap;
-  min-width: 0;
 }
 
 .breadcrumb-ellipsis {
@@ -2535,8 +2588,6 @@ html:not(.datamining-enabled) .mechanics-table {
   }
 
   .talent-card { min-width: 180px; }
-
-  .abilities-grid { grid-template-columns: 1fr; }
 }
 
 // ─── Responsive: Mobile ───────────────────────────────────────────────────────
@@ -2557,14 +2608,15 @@ html:not(.datamining-enabled) .mechanics-table {
       flex: none;
       width: 100%;
       max-width: 100%;
-      height: 200px;
+      height: 150px;
       border-radius: 0;
       object-position: right center;
     }
 
-    &__info { padding: 1rem; }
-    &__name { font-size: 1.6rem; }
-    &__desc { max-width: 100%; }
+    &__info { padding: 0.85rem 0.9rem; }
+    &__name { font-size: 1.5rem; }
+    &__meta { margin: 0.4rem 0 0.5rem; }
+    &__desc { max-width: 100%; font-size: 0.9rem; line-height: 1.5; }
   }
 
   .battleground-detail .hero-banner.role-battleground .hero-banner__info {
@@ -2573,13 +2625,22 @@ html:not(.datamining-enabled) .mechanics-table {
 
   // Hero grid
   .hero-grid-header {
-    h1 { font-size: 1.4rem; }
+    gap: 0.5rem 0.75rem;
+    margin-bottom: 0.85rem;
+    h1 { font-size: 1.25rem; }
+  }
+
+  .hero-role-filter__btn {
+    font-size: 0.72rem;
+    padding: 0.25rem 0.5rem;
   }
 
   .hero-grid {
-    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-    gap: 0.6rem;
+    grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+    gap: 0.5rem;
   }
+
+  .hero-stats__header { gap: 0.3rem 1rem; }
 
   // Abilities
   .abilities-grid { grid-template-columns: 1fr; }
