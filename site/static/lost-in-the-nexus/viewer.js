@@ -3,8 +3,6 @@ const status = document.getElementById('nexus-status');
 const picker = document.getElementById('nexus-map');
 const shadowBox = document.getElementById('nexus-shadows');
 const SHADOWS = 'hotsixors.nexus.shadows';
-const bloomBox = document.getElementById('nexus-bloom');
-const BLOOM = 'hotsixors.nexus.bloom';
 const particleBox = document.getElementById('nexus-particles');
 const PARTICLES = 'hotsixors.nexus.particles';
 const streamerBox = document.getElementById('nexus-streamer');
@@ -54,7 +52,6 @@ function sceneReady() {
       },
     });
     nexus.setShadows(shadowsWanted);
-    nexus.setBloom(bloomWanted);
     nexus.setParticles(particlesWanted);
     return nexus;
   })();
@@ -87,13 +84,6 @@ function setShadows(on) {
   nexus?.setShadows(on);
   shadowBox.checked = on;
   remember(SHADOWS, on);
-}
-
-function setBloom(on) {
-  bloomWanted = on;
-  nexus?.setBloom(on);
-  bloomBox.checked = on;
-  remember(BLOOM, on);
 }
 
 function setParticles(on) {
@@ -201,12 +191,6 @@ shadowBox.onchange = () => {
   setShadows(shadowBox.checked);
 };
 
-bloomBox.onchange = () => {
-  // Keeping focus would send WASD into the checkbox.
-  bloomBox.blur();
-  setBloom(bloomBox.checked);
-};
-
 particleBox.onchange = () => {
   // Keeping focus would send WASD into the checkbox.
   particleBox.blur();
@@ -251,14 +235,6 @@ try {
   // Private mode: default on.
 }
 setShadows(shadowsWanted);
-
-let bloomWanted = true;
-try {
-  bloomWanted = localStorage.getItem(BLOOM) !== 'false';
-} catch {
-  // Private mode: default on.
-}
-setBloom(bloomWanted);
 
 let particlesWanted = false;
 try {

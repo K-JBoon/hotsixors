@@ -5,12 +5,47 @@ import { clone as cloneSkinned } from '/nexus-vendor/utils/SkeletonUtils.js';
 import { MeshoptDecoder } from '/nexus-vendor/meshopt_decoder.module.js';
 import { EffectComposer } from '/nexus-vendor/postprocessing/EffectComposer.js';
 import { RenderPass } from '/nexus-vendor/postprocessing/RenderPass.js';
-import { UnrealBloomPass } from '/nexus-vendor/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from '/nexus-vendor/postprocessing/OutputPass.js';
 import { emitterMesh } from '/lost-in-the-nexus/nexus-particles.js';
+import { applySplat } from '/lost-in-the-nexus/nexus-terrain.js';
+
+// The frame is gamma space end to end, so a hex colour means what it says.
+THREE.ColorManagement.enabled = false;
 
 function fetchJson(url) {
   return fetch(url).then((r) => (r.ok ? r.json() : null)).catch(() => null);
+}
+
+// The game's fill and back lights carry no specular; only the key does. three
+// sorts the shadow-casting key to index 0 of the directional loop.
+{
+  const chunk = THREE.ShaderChunk.lights_fragment_begin;
+  const at = chunk.indexOf('#if ( NUM_DIR_LIGHTS > 0 )');
+  const call = 'RE_Direct( directLight, geometryPosition, geometryNormal, geometryViewDir, geometryClearcoatNormal, material, reflectedLight );';
+  const hit = chunk.indexOf(call, at);
+  if (at >= 0 && hit >= 0) {
+    THREE.ShaderChunk.lights_fragment_begin = chunk.slice(0, hit) +
+      `if ( UNROLLED_LOOP_INDEX > 0 ) {
+         reflectedLight.directDiffuse += saturate( dot( geometryNormal, directLight.direction ) ) * directLight.color * BRDF_Lambert( material.diffuseColor );
+       } else {
+         ${call}
+       }` + chunk.slice(hit + call.length);
+  }
+}
+
+// The environment stands in for the game's ambient reflection map, which only
+// reflects; diffuse ambient is the ambient light's alone.
+THREE.ShaderChunk.lights_fragment_maps = THREE.ShaderChunk.lights_fragment_maps.replace(
+  'iblIrradiance += getIBLIrradiance( geometryNormal );',
+  ''
+);
+
+async function inBatches(items, width, work) {
+  let next = 0;
+  const lane = async () => {
+    while (next < items.length) await work(items[next++]);
+  };
+  await Promise.all(Array.from({ length: Math.min(width, items.length) }, lane));
 }
 
 // The scene, its loader and the fly camera. Both the viewer page and the guessing
@@ -35,20 +70,124 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
 
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(0x0c1018);
-  // Most of the light is the sun. A strong ambient fills every shadow and the
-  // map reads as one flat grey sheet: against the game's own frame the contrast
-  // was half and the ground lost its warmth.
-  scene.add(new THREE.HemisphereLight(0xa8c4f0, 0x6b5a42, 0.6));
-  const SUN_DIR = new THREE.Vector3(-60, 90, 60).normalize();
-  const sun = new THREE.DirectionalLight(0xfff0d8, 4.0);
-  sun.position.copy(SUN_DIR).multiplyScalar(150);
+  // A map is lit by its CLight: an ambient and three directionals, of which only
+  // the key casts shadows. three divides diffuse light by pi and the game does
+  // not, so every intensity is scaled up by it.
+  const ambient = new THREE.AmbientLight();
+  const sun = new THREE.DirectionalLight();
+  const fill = new THREE.DirectionalLight();
+  const back = new THREE.DirectionalLight();
+  const SUN_DIR = new THREE.Vector3();
   sun.castShadow = true;
   sun.shadow.mapSize.set(4096, 4096);
   sun.shadow.radius = 3;
-  scene.add(sun);
-  scene.add(sun.target);
+  scene.add(ambient, sun, sun.target, fill, back);
 
   renderer.shadowMap.type = THREE.PCFShadowMap;
+  renderer.toneMapping = THREE.CustomToneMapping;
+  // The game lights in gamma space: art is read as stored and the frame is not
+  // encoded again. Lit in linear space, every shadow and midtone came out
+  // lifted and the maps read washed out against the game's own frames.
+  renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
+
+  // Measured against an in-game frame of Braxis Holdout: its median, its 95th
+  // percentile, its contrast and its saturation.
+  const AMBIENT_GAIN = 0.5;
+  const EXPOSURE_GAIN = 0.85;
+  const SPECULAR_GAIN = 3;
+  const SKY_SATURATION = 0.4;
+
+  // The specular map stays decoded: read raw, it turns every metal to chrome.
+  function gammaArt(root) {
+    root.traverse((node) => {
+      for (const material of [node.material].flat()) {
+        if (!material || material.userData.gamma) continue;
+        material.userData.gamma = true;
+        material.specularColor?.multiplyScalar(SPECULAR_GAIN);
+        for (const [key, value] of Object.entries(material)) {
+          if (key === 'specularColorMap' || !value?.isTexture) continue;
+          if (value.colorSpace !== THREE.SRGBColorSpace) continue;
+          value.colorSpace = THREE.NoColorSpace;
+          value.needsUpdate = true;
+        }
+      }
+    });
+  }
+
+  // The core `DefaultLight`, for a map the index names no light for.
+  const DEFAULT_LIGHT = {
+    ambient: [0.502, 0.353, 0.667],
+    exposure: 1.6,
+    whitePoint: 1.85,
+    key: { colour: [1, 1, 0.722], strength: 1, direction: [0.648, -0.127, -0.751] },
+    fill: { colour: [0.424, 0.525, 0.267], strength: 0.257, direction: [-0.836, 0.266, -0.48] },
+    back: { colour: [1, 1, 0.722], strength: 0.2, direction: [0.635, -0.212, -0.743] },
+  };
+
+  // The game's HDR operator is Hable's filmic curve, normalised so the white
+  // point lands on 1.
+  const baseToneMapping = THREE.ShaderChunk.tonemapping_pars_fragment;
+  function setFilmic(whitePoint) {
+    THREE.ShaderChunk.tonemapping_pars_fragment = baseToneMapping.replace(
+      /vec3 CustomToneMapping\( vec3 color \) \{[^}]*\}/,
+      `vec3 hable( vec3 x ) {
+         return ( x * ( 0.15 * x + 0.05 ) + 0.004 ) / ( x * ( 0.15 * x + 0.5 ) + 0.06 ) - 0.0667;
+       }
+       vec3 CustomToneMapping( vec3 color ) {
+         return saturate( hable( color * toneMappingExposure ) / hable( vec3( ${whitePoint.toFixed(3)} ) ) );
+       }`
+    );
+  }
+
+  function aim(light, { colour, strength, direction }) {
+    light.color.setRGB(...colour);
+    light.intensity = strength * Math.PI;
+    // Game direction is where the light travels, x east, y north, z up.
+    light.position.set(-direction[0], -direction[2], direction[1]).normalize();
+  }
+
+  // What spec-mapped metal reflects: a sky in the map's ambient colour, lit
+  // from above and dark below. The game's own map is not shipped.
+  const pmrem = new THREE.PMREMGenerator(renderer);
+  const skyColours = [new THREE.Color(), new THREE.Color(), new THREE.Color()];
+  const sky = new THREE.Mesh(
+    new THREE.SphereGeometry(1, 32, 16),
+    new THREE.ShaderMaterial({
+      side: THREE.BackSide,
+      uniforms: { top: { value: skyColours[0] }, middle: { value: skyColours[1] }, bottom: { value: skyColours[2] } },
+      vertexShader: 'varying float vUp; void main() { vUp = normalize( position ).y; gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 ); }',
+      fragmentShader: `uniform vec3 top; uniform vec3 middle; uniform vec3 bottom; varying float vUp;
+        void main() { gl_FragColor = vec4( vUp > 0.0 ? mix( middle, top, vUp ) : mix( middle, bottom, -vUp ), 1.0 ); }`,
+    })
+  );
+  const skyScene = new THREE.Scene().add(sky);
+  let environment = null;
+
+  function setEnvironment(light) {
+    const grey = 0.2126 * light.ambient[0] + 0.7152 * light.ambient[1] + 0.0722 * light.ambient[2];
+    const [r, g, b] = light.ambient.map((c) => grey + (c - grey) * SKY_SATURATION);
+    skyColours[0].setRGB(r, g, b).multiplyScalar(1.6);
+    skyColours[1].setRGB(r, g, b);
+    skyColours[2].setRGB(r, g, b).multiplyScalar(0.25);
+    environment?.dispose();
+    environment = pmrem.fromScene(skyScene, 0, 0.1, 10);
+    scene.environment = environment.texture;
+  }
+
+  function setLighting(light = DEFAULT_LIGHT) {
+    setEnvironment(light);
+    ambient.color.setRGB(...light.ambient);
+    ambient.intensity = Math.PI * AMBIENT_GAIN;
+    aim(sun, light.key);
+    SUN_DIR.copy(sun.position);
+    for (const [node, spec] of [[fill, light.fill], [back, light.back]]) {
+      node.visible = Boolean(spec);
+      if (spec) aim(node, spec);
+    }
+    renderer.toneMappingExposure = light.exposure * EXPOSURE_GAIN;
+    setFilmic(light.whitePoint || 1.85);
+    for (const pass of outputs) pass.material.needsUpdate = true;
+  }
 
   const world = new THREE.Group();
   scene.add(world);
@@ -59,15 +198,13 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
   const persp = new THREE.PerspectiveCamera(FREE_FOV, aspect(), 0.2, 6000);
   let camera = persp;
 
-  // Glow art is flat cards of bright texture: what makes the game's read as
-  // light is the bloom over it, so the scene renders through one. The threshold
-  // is what keeps it off the lit ground, which is nearly as bright.
+  // The scene renders to HDR so additive glow accumulates before the tone map.
   const composer = new EffectComposer(renderer);
   const renderPass = new RenderPass(scene, camera);
   composer.addPass(renderPass);
-  const bloom = new UnrealBloomPass(new THREE.Vector2(1, 1), 0.35, 0.5, 0.85);
-  composer.addPass(bloom);
-  composer.addPass(new OutputPass());
+  const outputs = [new OutputPass(), new OutputPass()];
+  composer.addPass(outputs[0]);
+  setLighting();
 
   const controls = new OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true;
@@ -102,6 +239,7 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
   // mode for, so the converter tags the material and the blend is set here. A
   // few of those layers scroll, which is the only motion their geometry has.
   function applyGlow(source) {
+    gammaArt(source);
     source.traverse((node) => {
       for (const material of [node.material].flat()) {
         // A lit material can fade its light by view angle too: the raven over
@@ -112,6 +250,7 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
         // A mask that could not be baked — it scrolls, or it reads the other
         // unwrap — is the material's transparency, glow art or not.
         if (material?.userData?.mask) applyMask(material, material.userData.mask);
+        if (material?.userData?.roughnessInSpecularAlpha) applySpecularRoughness(material);
         const glow = material?.userData?.glow;
         if (!glow) continue;
         material.toneMapped = false;
@@ -190,6 +329,25 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
          float facing = abs( dot( normalize( vGlowNormal ), normalize( vGlowEye ) ) );
          float rim = pow( ${inverted ? '1.0 - facing' : 'facing'}, ${exponent.toFixed(2)} );
          diffuseColor.a *= clamp( ${low.toFixed(3)} + ${span.toFixed(3)} * rim, 0.0, 1.0 );`
+      );
+    };
+    material.needsUpdate = true;
+  }
+
+  // The converter packs per-pixel roughness into the specular map's alpha.
+  function applySpecularRoughness(material) {
+    if (material.userData.roughened) return;
+    material.userData.roughened = true;
+    keyProgram(material, 'specRough');
+    const before = material.onBeforeCompile;
+    material.onBeforeCompile = (shader, renderer) => {
+      before?.call(material, shader, renderer);
+      shader.fragmentShader = shader.fragmentShader.replace(
+        '#include <roughnessmap_fragment>',
+        `#include <roughnessmap_fragment>
+         #ifdef USE_SPECULAR_COLORMAP
+           roughnessFactor = texture2D( specularColorMap, vSpecularColorMapUv ).a;
+         #endif`
       );
     };
     material.needsUpdate = true;
@@ -342,9 +500,7 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
     gradient.addColorStop(1, `rgba(${rgb},0)`);
     context.fillStyle = gradient;
     context.fillRect(0, 0, size, size);
-    const texture = new THREE.CanvasTexture(canvas);
-    texture.colorSpace = THREE.SRGBColorSpace;
-    return texture;
+    return new THREE.CanvasTexture(canvas);
   }
 
   function backdropMesh(box, colour) {
@@ -403,9 +559,20 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
     }
 
     const terrain = terrainIndex[slug];
+    setLighting(terrain?.light);
     if (terrain) {
       const ground = await loadGltf(asset(terrain.gltf));
       if (token !== loadToken) return false;
+      if (ground) gammaArt(ground.scene);
+      if (ground && terrain.splat) {
+        await applySplat(ground.scene, terrain.splat, {
+          base: asset('/lost-in-the-nexus/terrain/'),
+          cells: terrain.cells,
+          renderer,
+          specularExponent: terrain.light?.terrainSpecularExp,
+        });
+        if (token !== loadToken) return false;
+      }
       if (ground) {
         world.add(ground.scene);
         groundBox = new THREE.Box3().setFromObject(ground.scene);
@@ -420,7 +587,9 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
     const clips = {};
     let done = 0;
     const wanted = placed.models.filter((name) => !(skip && skip(name)));
-    await Promise.all(wanted.map(async (name) => {
+    // A model resolves only once its textures have, and all of them at once
+    // run the browser out of request slots.
+    await inBatches(wanted, 24, async (name) => {
       const entry = models.models[name];
       // An emitter-only model has no geometry at all: a chimney's smoke, the
       // fireflies over a hedge, the swirl in the Hall of Storms portal.
@@ -433,7 +602,7 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
       if (token === loadToken && ++done % 8 === 0) {
         onStatus(`Loading models ${done}/${wanted.length}…`);
       }
-    }));
+    });
     if (token !== loadToken) return false;
 
     // Game x east, y north, z up -> glTF x east, y up, z south.
@@ -479,7 +648,6 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
       if (!wanted.includes(name)) continue;
       for (const spec of models.models[name].particles) {
         const texture = textures.load(asset('/lost-in-the-nexus/models/' + spec.uri));
-        texture.colorSpace = THREE.SRGBColorSpace;
         texture.flipY = false;
         const mesh = emitterMesh(spec, texture, list);
         if (!mesh) continue;
@@ -529,10 +697,6 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
     world.traverse((node) => {
       for (const m of [node.material].flat()) if (m) m.needsUpdate = true;
     });
-  }
-
-  function setBloom(on) {
-    bloom.enabled = on;
   }
 
   // One ortho shadow camera over the framed area; a tighter fit buys resolution.
@@ -716,20 +880,24 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
 
   // Readback of an offscreen render: the live canvas keeps showing the player's
   // own view while a shot is developed.
+  // The scene renders to HDR and goes through the same tone map as the view; the
+  // output pass writes sRGB itself, so the final target stays untagged.
   function readTarget(cam, width, height, transparent = false) {
-    const target = new THREE.WebGLRenderTarget(width, height, { samples: 4 });
-    target.texture.colorSpace = THREE.SRGBColorSpace;
+    const hdr = new THREE.WebGLRenderTarget(width, height, { samples: 4, type: THREE.HalfFloatType });
+    const target = new THREE.WebGLRenderTarget(width, height);
     const background = scene.background;
     if (transparent) {
       scene.background = null;
       renderer.setClearAlpha(0);
     }
     const previous = renderer.getRenderTarget();
-    renderer.setRenderTarget(target);
+    renderer.setRenderTarget(hdr);
     renderer.render(scene, cam);
+    outputs[1].render(renderer, target, hdr);
     const pixels = new Uint8Array(width * height * 4);
     renderer.readRenderTargetPixels(target, 0, 0, width, height, pixels);
     renderer.setRenderTarget(previous);
+    hdr.dispose();
     target.dispose();
     scene.background = background;
     renderer.setClearAlpha(1);
@@ -895,7 +1063,6 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
     ctx.strokeText(text, 12, 28);
     ctx.fillText(text, 12, 28);
     const map = new THREE.CanvasTexture(canvas);
-    map.colorSpace = THREE.SRGBColorSpace;
     const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map, depthTest: false, toneMapped: false }));
     sprite.scale.set((width / 56) * 1.6, 1.6, 1);
     sprite.position.y = 2.4;
@@ -1009,7 +1176,6 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
     swapCamera,
     hotsCamera,
     setShadows,
-    setBloom,
     setParticles,
     setFlyEnabled,
     getShot,
@@ -1022,7 +1188,6 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
     getSpan: () => span,
     getCentre: () => centre.clone(),
     shadowsEnabled: () => renderer.shadowMap.enabled,
-    bloomEnabled: () => bloom.enabled,
     particlesEnabled: () => particlesWanted,
     // Lets a headless check confirm the keys move the camera.
     probe: () => controls.target.toArray().map((v) => Math.round(v)),
