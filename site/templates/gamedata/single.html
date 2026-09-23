@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}{{ page.extra.file_path | split(pat="/") | last }} — Game Data — {{ config.title }}{% endblock title %}
+{% block title %}{{ page.extra.file_path }} | Game Data | {{ config.title }}{% endblock title %}
 
 {% block main_class %} site-main--flush{% endblock main_class %}
 {% block head %}

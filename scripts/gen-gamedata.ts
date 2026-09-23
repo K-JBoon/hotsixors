@@ -171,13 +171,20 @@ async function processFile(
   }
 
   const page = frontmatter(
-    { title: slug, path: zolaPath, template: "gamedata/single.html", in_search_index: false },
+    {
+      title: slug,
+      path: zolaPath,
+      template: "gamedata/single.html",
+      in_search_index: false,
+      description: `${relPath} from the Heroes of the Storm game files.`,
+    },
     {
       file_path: relPath,
       url_path: urlRelPath,
       file_ext: ext.slice(1) || lang,
       parent_dir: parentDir,
       anchor_ids: allIds,
+      noindex: true,
     },
   );
   await writeText(gamedataPathToContentPath(relPath), `${page}\n${html}`);
@@ -223,7 +230,10 @@ async function walkDir(
 
 /** Zola section page for one game data directory. */
 function sectionPage(title: string, dirPath: string): string {
-  return frontmatter({ title, template: "gamedata/list.html" }, { dir_path: dirPath });
+  const description = dirPath
+    ? `Heroes of the Storm game data files in ${dirPath}.`
+    : "Browse the Heroes of the Storm game files: XML data, Galaxy scripts and game strings.";
+  return frontmatter({ title, template: "gamedata/list.html", description }, { dir_path: dirPath, noindex: true });
 }
 
 function pruneEmptyDirs(node: FileTreeNode): boolean {

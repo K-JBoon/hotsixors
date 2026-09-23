@@ -307,6 +307,7 @@ function heroPage(hero: HeroData, heroName: string, slug: string, displayName: s
       release_date: hero.releaseDate ?? "",
       ratings: hero.ratings ?? {},
       portraits: hero.portraits ?? {},
+      meta_description: `${displayName} talents, abilities and stats in Heroes of the Storm, read from the game files.`,
     },
   );
 }

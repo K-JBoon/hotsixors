@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block title %}
-  {% if section.extra.dir_path %}{{ section.extra.dir_path }} — {% endif %}Game Data — {{ config.title }}
+  {% if section.extra.dir_path %}{{ section.extra.dir_path }} | {% endif %}Game Data | {{ config.title }}
 {% endblock title %}
 
 {% block main_class %} site-main--flush{% endblock main_class %}

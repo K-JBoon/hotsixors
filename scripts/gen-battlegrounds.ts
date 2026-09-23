@@ -316,7 +316,12 @@ async function main() {
 
   await writeText(
     path.join(SITE_CONTENT_BATTLEGROUNDS, "_index.md"),
-    frontmatter({ title: "Battlegrounds", template: "battlegrounds/list.html", sort_by: "title" }),
+    frontmatter({
+      title: "Battlegrounds",
+      description: "Every Heroes of the Storm battleground, with map objectives and timers.",
+      template: "battlegrounds/list.html",
+      sort_by: "title",
+    }),
   );
 
   for (const cfg of BATTLEGROUNDS) {
@@ -338,7 +343,12 @@ async function main() {
     await writeText(
       path.join(SITE_CONTENT_BATTLEGROUNDS, `${cfg.slug}.md`),
       frontmatter(
-        { title: cfg.name, slug: cfg.slug, template: "battlegrounds/single.html" },
+        {
+          title: cfg.name,
+          slug: cfg.slug,
+          template: "battlegrounds/single.html",
+          description: `${cfg.name} battleground in Heroes of the Storm. ${cfg.description.replace(/\s+/g, " ")}`.trim(),
+        },
         { battleground_slug: cfg.slug, franchise: cfg.franchise, loading_screen: hasLoadingScreen },
       ),
     );

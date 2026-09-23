@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}{{ page.title }} — {{ config.title }}{% endblock title %}
+{% block title %}{{ page.title }} Map Objectives and Timers | {{ config.title }}{% endblock title %}
 
 {% block og_image %}{% if page.extra.loading_screen %}{% set card = resize_image(path='images/battlegrounds/' ~ page.extra.battleground_slug ~ '.png', width=1200, height=630, op="fill", format="jpg", quality=82) %}{{ card.url }}{% else %}{{ get_url(path='og-default.png') }}{% endif %}{% endblock og_image %}
 

@@ -5,6 +5,7 @@ template = "guides/single.html"
 date = 2026-05-16
 
 [extra]
+noindex = true
 hero = "Leoric"
 +++
 

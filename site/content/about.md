@@ -1,5 +1,6 @@
 +++
 title = "About"
+description = "About HotSixors, a free and open-source Heroes of the Storm site, with links to other HotS tools and references."
 template = "about.html"
 +++
 

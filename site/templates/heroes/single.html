@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}{{ page.extra.hero_name }} — {{ config.title }}{% endblock title %}
+{% block title %}{{ page.extra.hero_name }} Talents, Abilities and Stats | {{ config.title }}{% endblock title %}
 
 {% block og_image %}{% if page.extra.portraits.loading %}{% set card = resize_image(path='images/heroportraits/' ~ page.extra.portraits.loading, width=1200, height=630, op="fill", format="jpg", quality=82) %}{{ card.url }}{% else %}{{ get_url(path='og-default.png') }}{% endif %}{% endblock og_image %}
 

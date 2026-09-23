@@ -22,19 +22,23 @@
   {% set bundles = load_data(path="data/bundles.json") %}
   <link rel="stylesheet" href="{{ get_url(path=bundles['main.css']) }}">
   {% if page is defined %}
-    {% set page_description = page.description | default(value=config.description) %}
-    {% set share_title = page.title | default(value=config.title) %}
-    {% set share_url = page.permalink %}
+    {% set doc = page %}
   {% elif section is defined %}
-    {% set page_description = section.description | default(value=config.description) %}
-    {% set share_title = section.title | default(value=config.title) %}
-    {% set share_url = section.permalink %}
+    {% set doc = section %}
+  {% endif %}
+  {% if doc is defined %}
+    {% set page_description = doc.extra.meta_description | default(value=doc.description) %}
+    {% if not page_description %}{% set page_description = config.description %}{% endif %}
+    {% set share_title = doc.title | default(value=config.title) %}
+    {% set share_url = doc.permalink %}
   {% else %}
     {% set page_description = config.description %}
     {% set share_title = config.title %}
     {% set share_url = config.base_url %}
   {% endif %}
   <meta name="description" content="{{ page_description }}">
+  {% set build_info = load_data(path="data/build-info.json", required=false) %}
+  {% if build_info and build_info.is_ptr or doc is defined and doc.extra.noindex %}<meta name="robots" content="noindex">{% endif %}
   <link rel="canonical" href="{{ share_url }}">
   <meta property="og:site_name" content="{{ config.title }}">
   <meta property="og:type" content="website">
@@ -43,11 +47,23 @@
   <meta property="og:url" content="{{ share_url }}">
   <meta property="og:image" content="{% block og_image %}{{ get_url(path='og-default.png') }}{% endblock og_image %}">
   <meta name="twitter:card" content="summary_large_image">
+  {% set home_url = config.base_url ~ "/" %}
+  {% if current_path == "/" %}
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":{{ config.title | json_encode() | safe }},"url":{{ home_url | json_encode() | safe }},"description":{{ page_description | json_encode() | safe }}}</script>
+  {% elif doc is defined and doc.ancestors | length > 1 %}
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[
+    {"@type":"ListItem","position":1,"name":{{ config.title | json_encode() | safe }},"item":{{ home_url | json_encode() | safe }}}
+    {%- for path in doc.ancestors %}{% if not loop.first %}
+    {%- set crumb = get_section(path=path, metadata_only=true) %}
+    ,{"@type":"ListItem","position":{{ loop.index }},"name":{{ crumb.title | json_encode() | safe }},"item":{{ crumb.permalink | json_encode() | safe }}}
+    {%- endif %}{% endfor %}
+    {%- set last = doc.ancestors | length %}
+    ,{"@type":"ListItem","position":{{ last + 1 }},"name":{{ share_title | json_encode() | safe }}}]}</script>
+  {% endif %}
   {% block head %}{% endblock head %}
 </head>
 <body>
   <a class="skip-link" href="#main-content">Skip to content</a>
-  {% set build_info = load_data(path="data/build-info.json", required=false) %}
   {% if build_info and build_info.is_ptr %}
   <div class="ptr-banner" role="status">
     PTR build {{ build_info.game_version }}.

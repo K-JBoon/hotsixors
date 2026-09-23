@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Lost in the Nexus — {{ config.title }}{% endblock title %}
+{% block title %}Lost in the Nexus: 3D Heroes of the Storm Map Viewer | {{ config.title }}{% endblock title %}
 
 {% block head %}
   {% if config.extra.nexus_assets %}
@@ -37,7 +37,7 @@
           </div>
         </div>
       </div>
-      <p class="nexus-hint">Drag to orbit, wheel to zoom, right-drag to pan, WASD/QE to move, C for a flat camera, G for the game camera, H for shadows, R to reset.</p>
+      <p class="nexus-hint">Drag to orbit, wheel to zoom, right-drag to pan, WASD/QE to move, C for a flat camera, G for the game camera, H for shadows, B for bloom, R to reset.</p>
     </div>
     <div class="nexus-status" id="nexus-status">Loading…</div>
     <div class="nexus-gate" id="nexus-gate" hidden>
