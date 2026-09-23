@@ -6,7 +6,6 @@ import { computeFolds, createFolder } from "./folding.js";
 import { chainOf, childrenOf, createXrefLinker, defsByLine, gamedataFileLabel, gamedataHref, incomingGroups, outlineDefs, targetsOf } from "./xref.js";
 import { getAvailableStorage, getStoredBoolean, loadGameDataTree, setStoredBoolean } from "./storage.js";
 
-// Hidden anchor spans carry the secondary ids of a line and must survive re-rendering.
 function rawLineText(line) {
   // A stray CR would be a hard break inside the pre, pushing appended badges
   // onto a row of their own.
@@ -14,10 +13,13 @@ function rawLineText(line) {
   return line.dataset.raw;
 }
 
+// Hidden anchor spans carry the secondary ids of a line. They move rather than
+// being recreated, so a hash that already targets one keeps matching :target.
 function setLineHtml(line, html) {
-  const anchors = [...line.querySelectorAll(".line-anchor")].map((el) => el.outerHTML).join("");
+  const anchors = [...line.querySelectorAll(".line-anchor")];
   const marks = [...line.querySelectorAll(".xref-defrow")];
-  line.innerHTML = anchors + html;
+  line.innerHTML = html;
+  line.prepend(...anchors);
   for (const mark of marks) line.appendChild(mark);
 }
 

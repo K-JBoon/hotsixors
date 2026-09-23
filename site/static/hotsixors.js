@@ -471,6 +471,11 @@ async function initPageModules() {
     const mod = await import("./js/gamedata-page.js");
     mod.initBattlegroundHighlighting();
   }
+  const proseCode = document.querySelectorAll(".guide-content pre > code[data-lang]");
+  if (proseCode.length) {
+    const { highlightCode } = await import("./js/highlight.js");
+    for (const code of proseCode) code.innerHTML = highlightCode(code.textContent, code.dataset.lang);
+  }
   if (document.querySelector("[data-talent-hero]")) {
     const mod = await import("./js/hero-page.js");
     mod.initTalentBuilds();

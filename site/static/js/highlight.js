@@ -195,3 +195,8 @@ export function highlightGameDataLine(value, lang, linkFor) {
   if (lang === "galaxy") return highlightGalaxyCode(value);
   return escapeHtml(value);
 }
+
+export function highlightCode(text, lang) {
+  const highlightLine = lang === "xml" ? createXmlHighlighter() : (line) => highlightGameDataLine(line, lang);
+  return String(text ?? "").split("\n").map((line) => highlightLine(line)).join("\n");
+}

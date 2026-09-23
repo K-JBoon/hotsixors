@@ -335,7 +335,8 @@ $gd-hairline: rgba(120, 150, 200, 0.14);
   .line[hidden] { display: none; }
 
   .line:hover { background: rgba(255, 255, 255, 0.035); }
-  .line:target {
+  .line:target,
+  .line:has(> .line-anchor:target) {
     background: rgba($accent-gold, 0.13);
     border-left-color: $accent-gold;
   }
@@ -438,15 +439,6 @@ $gd-hairline: rgba(120, 150, 200, 0.14);
   }
   .line:hover::before { color: $text-muted; }
 }
-
-.syntax-comment { color: #7d8799; font-style: italic; }
-.syntax-tag,
-.syntax-keyword { color: #7dd3fc; }
-.syntax-attr,
-.syntax-type { color: #fbbf24; }
-.syntax-string { color: #86efac; }
-.syntax-number { color: #c4b5fd; }
-.syntax-punctuation { color: #7c8aa0; }
 
 .code-viewer .xref-link {
   color: #86efac;

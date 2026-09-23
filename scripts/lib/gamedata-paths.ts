@@ -21,6 +21,34 @@ const INCLUDED_GAMEDATA_FILES = new Set([
   "mods/heroesdata.stormmod/base.stormdata/gamedata/talentdata.xml",
   "mods/heroesdata.stormmod/base.stormdata/gamedata/validatordata.xml",
 ]);
+// Engine defaults, load manifests and shared catalogs published for reference.
+// The effect graph doesn't read them.
+const REFERENCE_GAMEDATA_FILES = new Set([
+  "mods/core.stormmod/base.stormdata/gamedata/behaviordata.xml",
+  "mods/core.stormmod/base.stormdata/gamedata/buttondata.xml",
+  "mods/core.stormmod/base.stormdata/gamedata/effectdata.xml",
+  "mods/core.stormmod/base.stormdata/gamedata/validatordata.xml",
+  "mods/core.stormmod/base.stormdata/triggerlibs/nativelib.galaxy",
+  "mods/core.stormmod/base.stormdata/triggerlibs/nativelib_h.galaxy",
+  "mods/heroesdata.stormmod/base.stormdata/gamedata.xml",
+  "mods/heroesdata.stormmod/base.stormdata/includes.xml",
+  "mods/heroesdata.stormmod/base.stormdata/triggerlibs/librarylist.xml",
+  "mods/heroesdata.stormmod/base.stormdata/gamedata/accumulatordata.xml",
+  "mods/heroesdata.stormmod/base.stormdata/gamedata/buttondata.xml",
+  "mods/heroesdata.stormmod/base.stormdata/gamedata/gamedata.xml",
+  "mods/heroesdata.stormmod/base.stormdata/gamedata/herodata.xml",
+  "mods/heroesdata.stormmod/base.stormdata/gamedata/requirementdata.xml",
+  "mods/heroesdata.stormmod/base.stormdata/gamedata/rewarddata.xml",
+  "mods/heroesdata.stormmod/base.stormdata/gamedata/unitdata.xml",
+  "mods/heroesdata.stormmod/base.stormdata/gamedata/weapondata.xml",
+  "mods/heromods/herointeractions.stormmod/base.stormdata/gamedata/vodefinitiondata.xml",
+  "mods/heroes.stormmod/base.stormmaps/maps/heroes/singleplayermaps/startingexperience/tutorial01.stormmap/base.stormdata/gamedata/herodata.xml",
+  "mods/heroes.stormmod/base.stormmaps/maps/heroes/singleplayermaps/startingexperience/tutorialmapmechanics.stormmap/base.stormdata/gamedata/herodata.xml",
+]);
+// Each hero mod's manifests and English strings.
+const REFERENCE_HEROMOD_FILE_RE =
+  /^mods\/heromods\/[^/]+\/(?:documentinfo|base\.stormdata\/gamedata\.xml|base\.stormdata\/gamedata\/gamedata\.xml|enus\.stormdata\/localizeddata\/gamestrings\.txt)$/;
+const HEROMOD_STRINGS_DIR_RE = /^mods\/heromods\/[^/]+\/enus\.stormdata(?:\/localizeddata)?$/;
 const EXCLUDED_GAMEDATA_FILES = new Set(["characterdata.xml", "gamedata.xml", "librarylist.xml", "preload.xml"]);
 const EXCLUDED_GAMEDATA_SEGMENTS = [
   "actordata",
@@ -84,7 +112,13 @@ function isIncludedGamedataDomain(relPath: string): boolean {
   return false;
 }
 
+export function isReferenceGamedataPath(relPath: string): boolean {
+  const candidate = normalizedPath(relPath);
+  return REFERENCE_GAMEDATA_FILES.has(candidate) || REFERENCE_HEROMOD_FILE_RE.test(candidate);
+}
+
 export function shouldIncludeGamedataPath(relPath: string): boolean {
+  if (isReferenceGamedataPath(relPath)) return true;
   const ext = path.extname(relPath).toLowerCase();
   if (!SUPPORTED_EXTS.has(ext)) return false;
   if (!isIncludedGamedataDomain(relPath)) return false;
@@ -94,13 +128,16 @@ export function shouldIncludeGamedataPath(relPath: string): boolean {
 }
 
 export function shouldDescendIntoGamedataPath(relPath: string): boolean {
+  const candidate = normalizedPath(relPath);
+  if (HEROMOD_STRINGS_DIR_RE.test(candidate)) return true;
+  if (isLocaleDir(path.posix.basename(candidate))) return false;
   if (isExcludedGamedataPath(relPath)) return false;
 
-  const candidate = normalizedPath(relPath);
   const candidatePrefix = `${candidate}/`;
   if (INCLUDED_GAMEDATA_PREFIXES.some((prefix) =>
     prefix.startsWith(candidatePrefix) || candidate.startsWith(prefix)
   )) return true;
+  if ([...REFERENCE_GAMEDATA_FILES].some((file) => file.startsWith(candidatePrefix))) return true;
 
   if (/^mods\/heromods(?:\/[^/]+(?:\/base\.stormdata(?:\/(?:gamedata|ai).*)?)?)?$/.test(candidate)) return true;
   if (/^mods\/heroesmapmods(?:\/battlegroundmapmods(?:\/[^/]+(?:\/base\.stormdata(?:\/(?:gamedata|ai).*)?)?)?)?$/.test(candidate)) return true;
@@ -126,7 +163,7 @@ export async function loadGamedataXmlFiles(): Promise<GamedataFile[]> {
   const relPaths: string[] = [];
   for await (const file of walkFiles(GAMEDATA_DIR)) {
     const rel = `mods/${file.rel}`;
-    if (file.rel.endsWith(".xml") && shouldIncludeGamedataPath(rel)) relPaths.push(rel);
+    if (file.rel.endsWith(".xml") && shouldIncludeGamedataPath(rel) && !isReferenceGamedataPath(rel)) relPaths.push(rel);
   }
   return Promise.all(
     relPaths.map(async (rel) => ({ path: rel, content: await readFile(path.join(DATA_ROOT, rel), "utf-8") })),

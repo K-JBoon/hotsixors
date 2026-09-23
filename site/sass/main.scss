@@ -1410,14 +1410,16 @@ html:not(.datamining-enabled) [data-datamining] {
 
 .guide-layout {
   display: grid;
-  grid-template-columns: 220px 1fr;
+  grid-template-columns: 220px minmax(0, 1fr);
   gap: 2rem;
   align-items: start;
-  @media (max-width: 768px) { grid-template-columns: 1fr; }
+  @media (max-width: 768px) { grid-template-columns: minmax(0, 1fr); }
 }
 
 .guide-sidebar {
   position: sticky; top: 5rem; background: $bg-card; border: 1px solid $border-dim; border-radius: 6px; padding: 1rem;
+  max-height: calc(100vh - 6rem); overflow-y: auto;
+  @media (max-width: 768px) { position: static; max-height: none; }
   &__hero-link {
     display: block; background: $accent-gold; color: $bg-deep; font-family: $font-display; font-weight: 700;
     text-transform: uppercase; letter-spacing: 0.06em; padding: 0.5rem 1rem; border-radius: 4px;
@@ -1444,8 +1446,17 @@ html:not(.datamining-enabled) [data-datamining] {
   p { color: $text-primary; margin-bottom: 1rem; line-height: 1.8; }
   h2 { font-size: 1.4rem; color: $accent-gold; margin: 1.5rem 0 0.75rem; }
   h3 { font-size: 1.1rem; color: $text-primary; margin: 1.25rem 0 0.5rem; }
-  code { background: $bg-card; padding: 0.15em 0.4em; border-radius: 3px; font-size: 0.875em; }
+  h4 { font-size: 1rem; margin: 1.5rem 0 0.4rem; text-transform: none; letter-spacing: 0; }
+  :is(h2, h3, h4) code { text-transform: none; letter-spacing: 0; }
+  code { background: $bg-card; padding: 0.15em 0.4em; border-radius: 3px; font-size: 0.875em; overflow-wrap: anywhere; }
   pre { background: $bg-card; border: 1px solid $border-dim; padding: 1rem; border-radius: 6px; overflow-x: auto; margin-bottom: 1rem; }
+
+  :is(ul, ol) {
+    margin: 0 0 1rem;
+    padding-left: 1.25rem;
+    color: $text-primary;
+    li { margin-bottom: 0.4rem; line-height: 1.8; }
+  }
 
   table {
     width: 100%;
@@ -1454,6 +1465,7 @@ html:not(.datamining-enabled) [data-datamining] {
     border-radius: 8px;
     margin-bottom: 1.5rem;
     font-size: 0.9rem;
+    @media (max-width: 768px) { display: block; overflow-x: auto; }
 
     th,
     td {
@@ -1492,6 +1504,17 @@ html:not(.datamining-enabled) [data-datamining] {
   .ability-card__desc { margin: 0; color: $text-muted; line-height: 1.5; font-size: 0.85rem; }
   .ability-card__meta { margin: 0.05rem 0 0.35rem; color: $text-muted; line-height: 1.4; font-size: 0.78rem; }
 }
+
+.guide-content pre code { background: none; padding: 0; }
+
+.syntax-comment { color: #7d8799; font-style: italic; }
+.syntax-tag,
+.syntax-keyword { color: #7dd3fc; }
+.syntax-attr,
+.syntax-type { color: #fbbf24; }
+.syntax-string { color: #86efac; }
+.syntax-number { color: #c4b5fd; }
+.syntax-punctuation { color: #7c8aa0; }
 
 // ─── Shortcodes ───────────────────────────────────────────────────────────────
 .shortcode-ability,

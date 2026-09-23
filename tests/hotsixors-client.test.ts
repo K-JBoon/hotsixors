@@ -11,6 +11,7 @@ import {
   createXrefLinker,
   defsByLine,
   gamedataFileLabel,
+  highlightCode,
   highlightGameDataLine,
   incomingGroups,
   jumpHistory,
@@ -543,6 +544,17 @@ test("xml highlighting carries comments and tags across lines", () => {
   assert.match(continuation, /syntax-attr">Amount<\/span>/);
   assert.equal(continuation.includes("syntax-tag"), false);
   assert.match(continuation, /syntax-punctuation">\/&gt;<\/span>$/);
+});
+
+test("highlightCode keeps XML tag state across the lines of a block", () => {
+  const html = highlightCode('<CEffectDamage id="X"\n  parent="StormSpell">\n</CEffectDamage>', "xml").split("\n");
+
+  assert.equal(html.length, 3);
+  assert.match(html[0], /syntax-tag">&lt;CEffectDamage<\/span>/);
+  assert.match(html[1], /syntax-attr">parent<\/span>/);
+  assert.equal(html[1].includes("syntax-tag"), false);
+  assert.match(highlightCode("int x = 1;", "galaxy"), /syntax-type">int<\/span>/);
+  assert.equal(highlightCode("a < b", "text"), "a &lt; b");
 });
 
 test("computeFolds nests by indentation", () => {

@@ -1,7 +1,7 @@
 // Extracts readable excerpts from GalaxyScript for timers and mechanics.
 
 export function sanitizeGamedataUrl(relPath: string): string {
-  return relPath.replace(/\.(xml|galaxy|aitree)$/i, (m) => "-" + m.slice(1));
+  return relPath.replace(/\.(xml|galaxy|aitree|txt)$/i, (m) => "-" + m.slice(1));
 }
 
 export function formatSeconds(s: number): string {

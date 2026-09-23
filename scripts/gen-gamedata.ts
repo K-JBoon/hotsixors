@@ -12,14 +12,18 @@ import { writeJson, writeText } from "./lib/fs.ts";
 import { frontmatter } from "./lib/frontmatter.ts";
 import { runScript } from "./lib/script.ts";
 import {
-  SUPPORTED_EXTS,
-  isLocaleDir,
+  isReferenceGamedataPath,
   shouldDescendIntoGamedataPath,
   shouldIncludeGamedataPath,
 } from "./lib/gamedata-paths.ts";
 import { sanitizeGamedataUrl } from "./lib/galaxy-source.ts";
 import { escapeHtml } from "./lib/gamestrings.ts";
 import { buildXrefSidecars, scanXrefFile, type ScannedFile } from "./lib/gamedata-xref.ts";
+
+interface XrefScans {
+  primary: ScannedFile[];
+  reference: ScannedFile[];
+}
 
 export function renderGamedataHtml(
   content: string,
@@ -76,27 +80,61 @@ function extractDeclAnchors(lines: string[]): Map<string, number> {
   return result;
 }
 
+// GameStrings keys, like Button/Tooltip/AnaSleepDart, anchor their line.
+export function extractStringAnchors(lines: string[]): Map<number, string[]> {
+  const result = new Map<number, string[]>();
+  lines.forEach((line, i) => {
+    const key = line.replace(/^\uFEFF/, "").match(/^([^=\s]+)=/)?.[1];
+    if (key) result.set(i + 1, [key]);
+  });
+  return result;
+}
+
+// aitree and DocumentInfo are XML, and the client highlighter keys off the lang.
+function gamedataLang(relPath: string): string {
+  const ext = path.extname(relPath).toLowerCase();
+  if (ext === ".aitree" || path.basename(relPath).toLowerCase() === "documentinfo") return "xml";
+  return ext.slice(1);
+}
+
+// One id names records in several catalogs (a talent and its button), so each
+// record line also gets a "<Class>.<id>" anchor that picks the record. An
+// id-less class default gets "<Class>.default".
+export function extractRecordAnchors(lines: string[]): Map<number, string[]> {
+  const result = new Map<number, string[]>();
+  const recordRe = /^\s*<(C[A-Z]\w*)\b([^>]*)>/;
+  lines.forEach((line, i) => {
+    const m = line.match(recordRe);
+    const name = m && (m[2].match(/\bid="([^"]+)"/)?.[1] ?? (/\bdefault="1"/.test(m[2]) ? "default" : null));
+    if (name) result.set(i + 1, [`${m[1]}.${name}`]);
+  });
+  return result;
+}
+
 async function processFile(
   absPath: string,
   relPath: string,
   anchorMap: AnchorMap,
   declAnchorMap: AnchorMap,
-  scannedFiles: ScannedFile[]
+  scans: XrefScans
 ): Promise<void> {
   const ext = path.extname(absPath).toLowerCase();
-  // aitree is XML, and the client highlighter keys off the lang.
-  const lang = ext === ".aitree" ? "xml" : ext.slice(1);
+  const lang = gamedataLang(relPath);
   const content = await readFile(absPath, "utf-8");
   const lines = content.split(/\r?\n/);
-  const anchors = extractAnchors(lines);
+  const anchors = ext === ".txt" ? extractStringAnchors(lines) : extractAnchors(lines);
+  // Reference files redeclare ids that the hero files own, so they stay out of
+  // the id maps and rank last as xref targets.
+  const reference = isReferenceGamedataPath(relPath);
 
   const urlRelPath = sanitizeGamedataUrl(relPath);
 
-  if (ext === ".xml") scannedFiles.push({ path: urlRelPath, scan: scanXrefFile(content) });
+  if (ext === ".xml") (reference ? scans.reference : scans.primary).push({ path: urlRelPath, scan: scanXrefFile(content) });
 
-  // aitree ids are node hashes local to their tree, so they stay out of the
-  // global id lookup.
-  if (ext !== ".aitree") {
+  // aitree ids are node hashes local to their tree, and string keys aren't
+  // record ids, so both stay out of the global id lookup.
+  const hasRecordIds = ext !== ".aitree" && ext !== ".txt";
+  if (hasRecordIds && !reference) {
     for (const [lineNumber, ids] of anchors) {
       for (const id of ids) {
         if (!anchorMap[id]) {
@@ -106,7 +144,7 @@ async function processFile(
     }
   }
 
-  if (ext === ".xml") {
+  if (ext === ".xml" && !reference) {
     for (const [id, lineNumber] of extractDeclAnchors(lines)) {
       if (!declAnchorMap[id]) {
         declAnchorMap[id] = { xmlPath: urlRelPath, line: lineNumber };
@@ -114,14 +152,21 @@ async function processFile(
     }
   }
 
-  const html = renderGamedataHtml(content, anchors, lang, ext === ".xml" ? urlRelPath : undefined);
+  const lineAnchors = new Map(anchors);
+  if (ext === ".xml") {
+    for (const [lineNumber, ids] of extractRecordAnchors(lines)) {
+      lineAnchors.set(lineNumber, [...(anchors.get(lineNumber) ?? []), ...ids]);
+    }
+  }
+
+  const html = renderGamedataHtml(content, lineAnchors, lang, ext === ".xml" ? urlRelPath : undefined);
 
   const slug = path.basename(relPath);
   const parentDir = path.dirname(relPath);
   const zolaPath = "gamedata/" + urlRelPath;
   const allIds: string[] = [];
-  // aitree node hashes would add thousands of ids per page.
-  if (ext !== ".aitree") {
+  // aitree node hashes and string keys would add thousands of ids per page.
+  if (hasRecordIds) {
     for (const ids of anchors.values()) allIds.push(...ids);
   }
 
@@ -130,7 +175,7 @@ async function processFile(
     {
       file_path: relPath,
       url_path: urlRelPath,
-      file_ext: ext.slice(1),
+      file_ext: ext.slice(1) || lang,
       parent_dir: parentDir,
       anchor_ids: allIds,
     },
@@ -144,7 +189,7 @@ async function walkDir(
   anchorMap: AnchorMap,
   declAnchorMap: AnchorMap,
   tree: FileTreeNode,
-  scannedFiles: ScannedFile[]
+  scans: XrefScans
 ): Promise<void> {
   const entries = await readdir(dir, { withFileTypes: true });
   entries.sort((a, b) => a.name.localeCompare(b.name));
@@ -154,25 +199,23 @@ async function walkDir(
     const relPath = relBase ? `${relBase}/${entry.name}` : entry.name;
 
     if (entry.isDirectory()) {
-      if (isLocaleDir(entry.name)) continue;
       if (!shouldDescendIntoGamedataPath(relPath)) continue;
       const childNode: FileTreeNode = { name: entry.name, path: relPath, type: "dir", children: [] };
       tree.children!.push(childNode);
-      await walkDir(absPath, relPath, anchorMap, declAnchorMap, childNode, scannedFiles);
+      await walkDir(absPath, relPath, anchorMap, declAnchorMap, childNode, scans);
 
       await writeText(path.join(SITE_CONTENT_GAMEDATA, relPath, "_index.md"), sectionPage(entry.name, relPath));
     } else if (entry.isFile()) {
-      const ext = path.extname(entry.name).toLowerCase();
-      if (SUPPORTED_EXTS.has(ext) && shouldIncludeGamedataPath(relPath)) {
+      if (shouldIncludeGamedataPath(relPath)) {
         console.log(`  Processing ${relPath}`);
         const fileNode: FileTreeNode = {
           name: entry.name,
           path: sanitizeGamedataUrl(relPath),
           type: "file",
-          lang: ext.slice(1),
+          lang: gamedataLang(relPath),
         };
         tree.children!.push(fileNode);
-        await processFile(absPath, relPath, anchorMap, declAnchorMap, scannedFiles);
+        await processFile(absPath, relPath, anchorMap, declAnchorMap, scans);
       }
     }
   }
@@ -211,11 +254,11 @@ async function main(): Promise<void> {
   const anchorMap: AnchorMap = {};
   const declAnchorMap: AnchorMap = {};
   const tree: FileTreeNode = { name: "mods", path: "mods", type: "dir", children: [] };
-  const scannedFiles: ScannedFile[] = [];
+  const scans: XrefScans = { primary: [], reference: [] };
 
-  await walkDir(GAMEDATA_DIR, "mods", anchorMap, declAnchorMap, tree, scannedFiles);
+  await walkDir(GAMEDATA_DIR, "mods", anchorMap, declAnchorMap, tree, scans);
 
-  await writeXrefSidecars(scannedFiles);
+  await writeXrefSidecars([...scans.primary, ...scans.reference]);
 
   pruneEmptyDirs(tree);
 

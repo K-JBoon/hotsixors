@@ -52,14 +52,14 @@ test("gamedata export skips unused XML while keeping lookup data", () => {
   assert.equal(results["mods/heromods/dva.stormmod/base.stormdata/gamedata/dvadata.xml"], true);
   assert.equal(results["mods/heromods/dva.stormmod/base.stormdata/gamedata/validatordata.xml"], true);
   assert.equal(results["mods/heromods/dva.stormmod/base.stormdata/gamedata/characterdata.xml"], false);
-  assert.equal(results["mods/heromods/dva.stormmod/base.stormdata/gamedata/gamedata.xml"], false);
+  assert.equal(results["mods/heromods/dva.stormmod/base.stormdata/gamedata/gamedata.xml"], true);
   assert.equal(results["mods/heromods/dva.stormmod/base.stormdata/gamedata/dvaskindata/dvabasedata.xml"], false);
   assert.equal(results["mods/heromods/dva.stormmod/base.stormdata/gamedata/dvavodata/dvabasevodata.xml"], false);
   assert.equal(results["mods/heromods/dva.stormmod/base.stormdata/gamedata/lightdata.xml"], false);
   assert.equal(results["mods/heromods/dva.stormmod/base.stormdata/gamedata/sounddata.xml"], false);
   assert.equal(results["mods/heromods/dva.stormmod/base.stormdata/gamedata/soundexclusivitydata.xml"], false);
   assert.equal(results["mods/heromods/maiev.stormmod/preload.xml"], false);
-  assert.equal(results["mods/heroesdata.stormmod/base.stormdata/triggerlibs/librarylist.xml"], false);
+  assert.equal(results["mods/heroesdata.stormmod/base.stormdata/triggerlibs/librarylist.xml"], true);
   assert.equal(results["mods/heroesmapmods/battlegroundmapmods/alteracpass.stormmod/base.stormdata/gamedata/soundtrackdata.xml"], false);
   assert.equal(results["mods/heroesmapmods/battlegroundmapmods/alteracpass.stormmod/preload.xml"], false);
   assert.equal(results["mods/heroesmapmods/battlegroundmapmods/volskayasound.stormmod/base.stormdata/libvlss.galaxy"], false);
@@ -147,6 +147,105 @@ test("gamedata HTML is compact escaped source with line anchors", () => {
   assert.match(html, /A &amp; B/);
   assert.doesNotMatch(html, /style="/);
   assert.doesNotMatch(html, /shiki/);
+});
+
+test("gamedata record lines get a class-qualified anchor", () => {
+  const script = `
+    import { extractRecordAnchors } from "./scripts/gen-gamedata.ts";
+    const lines = ${JSON.stringify([
+      '  <CButton id="AnaSleepDart" parent="StormButtonParent">',
+      '    <TooltipAppender Validator="AnaHasOverdose" />',
+      '  <CTalent id="AnaSleepDartNightTerrors">',
+      '  <const id="$Range" value="8" />',
+      '  <CEffectApplyBehavior default="1">',
+      '  <CGame id="Dflt">',
+    ])};
+    console.log(JSON.stringify([...extractRecordAnchors(lines)]));
+  `;
+  const output = execFileSync(
+    process.execPath,
+    ["--import", "tsx", "--input-type=module", "-e", script],
+    { cwd: new URL("..", import.meta.url), encoding: "utf-8" }
+  );
+
+  assert.deepEqual(JSON.parse(output), [
+    [1, ["CButton.AnaSleepDart"]],
+    [3, ["CTalent.AnaSleepDartNightTerrors"]],
+    [5, ["CEffectApplyBehavior.default"]],
+    [6, ["CGame.Dflt"]],
+  ]);
+});
+
+function runGamedataModule(body) {
+  const script = `import * as paths from "./scripts/lib/gamedata-paths.ts";
+    import * as gen from "./scripts/gen-gamedata.ts";
+    ${body}`;
+  const output = execFileSync(
+    process.execPath,
+    ["--import", "tsx", "--input-type=module", "-e", script],
+    { cwd: new URL("..", import.meta.url), encoding: "utf-8" }
+  );
+  return JSON.parse(output);
+}
+
+test("gamedata export adds the reference files the Hero XML guide links", () => {
+  const paths = [
+    "mods/core.stormmod/base.stormdata/gamedata/effectdata.xml",
+    "mods/core.stormmod/base.stormdata/gamedata/abildata.xml",
+    "mods/heroesdata.stormmod/base.stormdata/gamedata/unitdata.xml",
+    "mods/heroesdata.stormmod/base.stormdata/includes.xml",
+    "mods/heromods/ana.stormmod/documentinfo",
+    "mods/heromods/ana.stormmod/base.stormdata/gamedata.xml",
+    "mods/heromods/ana.stormmod/enus.stormdata/localizeddata/gamestrings.txt",
+    "mods/heromods/ana.stormmod/frfr.stormdata/localizeddata/gamestrings.txt",
+    "mods/heromods/ana.stormmod/base.stormdata/gamedata/assets.txt",
+    "mods/heroesmapmods/battlegroundmapmods/alteracpass.stormmod/base.stormdata/gamedata/gamedata.xml",
+    "mods/heroes.stormmod/base.stormmaps/maps/heroes/singleplayermaps/startingexperience/tutorial01.stormmap/base.stormdata/gamedata/herodata.xml",
+  ];
+  const [included, reference] = runGamedataModule(`
+    const paths_ = ${JSON.stringify(paths)};
+    console.log(JSON.stringify([
+      Object.fromEntries(paths_.map((p) => [p, paths.shouldIncludeGamedataPath(p)])),
+      Object.fromEntries(paths_.map((p) => [p, paths.isReferenceGamedataPath(p)])),
+    ]));
+  `);
+
+  assert.deepEqual(Object.entries(included).filter(([, v]) => !v).map(([p]) => p), [
+    "mods/core.stormmod/base.stormdata/gamedata/abildata.xml",
+    "mods/heromods/ana.stormmod/frfr.stormdata/localizeddata/gamestrings.txt",
+    "mods/heromods/ana.stormmod/base.stormdata/gamedata/assets.txt",
+    "mods/heroesmapmods/battlegroundmapmods/alteracpass.stormmod/base.stormdata/gamedata/gamedata.xml",
+  ]);
+  assert.equal(reference["mods/heroesdata.stormmod/base.stormdata/gamedata/unitdata.xml"], true);
+  assert.equal(reference["mods/core.stormmod/base.stormdata/gamedata/abildata.xml"], false);
+});
+
+test("gamedata walk enters English hero strings and reference folders only", () => {
+  const dirs = [
+    "mods/heromods/ana.stormmod/enus.stormdata",
+    "mods/heromods/ana.stormmod/enus.stormdata/localizeddata",
+    "mods/heromods/ana.stormmod/frfr.stormdata",
+    "mods/heroesdata.stormmod/enus.stormdata",
+    "mods/core.stormmod/base.stormdata/triggerlibs",
+    "mods/core.stormmod/base.stormdata/ui",
+  ];
+  const results = runGamedataModule(`
+    console.log(JSON.stringify(${JSON.stringify(dirs)}.map((d) => paths.shouldDescendIntoGamedataPath(d))));
+  `);
+
+  assert.deepEqual(results, [true, true, false, false, true, false]);
+});
+
+test("GameStrings keys anchor their line", () => {
+  const anchors = runGamedataModule(`
+    const lines = ${JSON.stringify(["\uFEFF14 seconds=14 seconds", "Button/Name/AnaSleepDart=Sleep Dart", "", "Button/Tooltip/AnaSleepDart=Fire a dart"])};
+    console.log(JSON.stringify([...gen.extractStringAnchors(lines)]));
+  `);
+
+  assert.deepEqual(anchors, [
+    [2, ["Button/Name/AnaSleepDart"]],
+    [4, ["Button/Tooltip/AnaSleepDart"]],
+  ]);
 });
 
 test("gamedata export keeps AI think trees", () => {
