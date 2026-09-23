@@ -73,7 +73,7 @@ function blank(value) {
 }
 
 // Blinn-Phong exponent to three's perceptual roughness: alpha^2 = 2 / (n + 2).
-const roughnessOf = (exponent) => Math.pow(2 / (Math.max(exponent, 1) + 2), 0.25);
+export const roughnessOf = (exponent) => Math.pow(2 / (Math.max(exponent, 1) + 2), 0.25);
 
 export async function applySplat(scene, splat, { base, cells, renderer, specularExponent = 30 }) {
   const loader = new THREE.TextureLoader();
@@ -119,8 +119,6 @@ export async function applySplat(scene, splat, { base, cells, renderer, specular
     for (const material of [node.material].flat()) {
       if (!material?.map || done.has(material)) continue;
       done.add(material);
-      // Terrain shine is the lights' alone; the ambient reflection is for models.
-      material.envMapIntensity = 0;
       material.customProgramCacheKey = () => 'splat';
       material.onBeforeCompile = (shader) => {
         Object.assign(shader.uniforms, uniforms);

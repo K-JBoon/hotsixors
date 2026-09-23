@@ -48,6 +48,7 @@ function sceneReady() {
         c: () => nexus.swapCamera(),
         g: () => nexus.hotsCamera(),
         h: () => setShadows(!nexus.shadowsEnabled()),
+        b: () => nexus.setBloom(!nexus.bloomEnabled()),
         r: () => nexus.resetCamera(),
       },
     });

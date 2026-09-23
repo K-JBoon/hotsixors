@@ -7,7 +7,8 @@ import { EffectComposer } from '/nexus-vendor/postprocessing/EffectComposer.js';
 import { RenderPass } from '/nexus-vendor/postprocessing/RenderPass.js';
 import { OutputPass } from '/nexus-vendor/postprocessing/OutputPass.js';
 import { emitterMesh } from '/lost-in-the-nexus/nexus-particles.js';
-import { applySplat } from '/lost-in-the-nexus/nexus-terrain.js';
+import { BloomPass } from '/lost-in-the-nexus/nexus-bloom.js';
+import { applySplat, roughnessOf } from '/lost-in-the-nexus/nexus-terrain.js';
 
 // The frame is gamma space end to end, so a hex colour means what it says.
 THREE.ColorManagement.enabled = false;
@@ -17,7 +18,9 @@ function fetchJson(url) {
 }
 
 // The game's fill and back lights carry no specular; only the key does. three
-// sorts the shadow-casting key to index 0 of the directional loop.
+// sorts the shadow-casting key to index 0 of the directional loop. Models shade
+// the game's way: unnormalised Blinn-Phong in the key's specular colour, and
+// no highlight at all without a specular map.
 {
   const chunk = THREE.ShaderChunk.lights_fragment_begin;
   const at = chunk.indexOf('#if ( NUM_DIR_LIGHTS > 0 )');
@@ -25,20 +28,75 @@ function fetchJson(url) {
   const hit = chunk.indexOf(call, at);
   if (at >= 0 && hit >= 0) {
     THREE.ShaderChunk.lights_fragment_begin = chunk.slice(0, hit) +
-      `if ( UNROLLED_LOOP_INDEX > 0 ) {
-         reflectedLight.directDiffuse += saturate( dot( geometryNormal, directLight.direction ) ) * directLight.color * BRDF_Lambert( material.diffuseColor );
-       } else {
-         ${call}
-       }` + chunk.slice(hit + call.length);
+      `#ifdef GAME_SHADING
+       {
+         float gameNL = dot( geometryNormal, directLight.direction );
+         reflectedLight.directDiffuse += saturate( gameNL ) * directLight.color * BRDF_Lambert( material.diffuseColor );
+         #ifdef GAME_SPECULAR
+           if ( UNROLLED_LOOP_INDEX == 0 ) {
+             float r2 = material.roughness * material.roughness;
+             float power = 2.0 / ( r2 * r2 ) - 2.0;
+             float blinn = pow( max( dot( geometryNormal, normalize( directLight.direction + geometryViewDir ) ), 1e-4 ), power );
+             float shadow = dot( directLight.color, vec3( 1.0 ) ) / max( dot( directionalLight.color, vec3( 1.0 ) ), 1e-4 );
+             reflectedLight.directSpecular += saturate( blinn * sign( gameNL ) ) * shadow * keySpecular * material.specularColor;
+           }
+         #endif
+       }
+       #else
+         if ( UNROLLED_LOOP_INDEX > 0 ) {
+           reflectedLight.directDiffuse += saturate( dot( geometryNormal, directLight.direction ) ) * directLight.color * BRDF_Lambert( material.diffuseColor );
+         } else {
+           ${call}
+         }
+       #endif` + chunk.slice(hit + call.length);
+    THREE.ShaderChunk.lights_pars_begin = `#ifdef GAME_SHADING
+        uniform vec3 keySpecular;
+      #endif
+      ${THREE.ShaderChunk.lights_pars_begin}`;
   }
 }
 
-// The environment stands in for the game's ambient reflection map, which only
-// reflects; diffuse ambient is the ambient light's alone.
+// The game's filmic operator. It maps luminance and scales the colour by the
+// ratio, so hue and saturation pass through; the curve takes the gamma-space
+// frame to linear and its shape puts the gamma back.
+THREE.ShaderChunk.tonemapping_pars_fragment = THREE.ShaderChunk.tonemapping_pars_fragment.replace(
+  /vec3 CustomToneMapping\( vec3 color \) \{[^}]*\}/,
+  `vec3 CustomToneMapping( vec3 color ) {
+     float luma = max( dot( color, vec3( 0.35, 0.5, 0.125 ) ), 1e-4 );
+     float x = pow( luma, 2.2 ) * toneMappingExposure;
+     return color * ( x * ( 12.3 * x + 0.5 ) / ( x * ( 12.3 * x + 4.0 ) + 0.02 ) ) / luma;
+   }`
+);
+
+// The game's height fog, integrated along the view ray: dense low down and
+// thinning exponentially with height. `fogNear` carries the density at height
+// zero and `fogFar` the falloff.
+THREE.ShaderChunk.fog_pars_vertex = '#ifdef USE_FOG\n varying vec3 vFogView;\n#endif';
+THREE.ShaderChunk.fog_vertex = '#ifdef USE_FOG\n vFogView = mvPosition.xyz;\n#endif';
+THREE.ShaderChunk.fog_pars_fragment = `#ifdef USE_FOG
+    uniform vec3 fogColor;
+    uniform float fogNear;
+    uniform float fogFar;
+    varying vec3 vFogView;
+  #endif`;
+THREE.ShaderChunk.fog_fragment = `#ifdef USE_FOG
+    vec3 fogRay = transpose( mat3( viewMatrix ) ) * vFogView;
+    float fogAmount = fogNear * length( fogRay ) * exp( -cameraPosition.y * fogFar );
+    float fogT = clamp( fogFar * fogRay.y, -88.0, 88.0 );
+    if ( abs( fogRay.y ) > 0.01 && fogT != 0.0 ) fogAmount *= ( 1.0 - exp( -fogT ) ) / fogT;
+    gl_FragColor.rgb = mix( gl_FragColor.rgb, fogColor, saturate( fogAmount ) );
+  #endif`;
+
+// The environment only reflects; diffuse ambient is the ambient light's alone.
+// Models reflect nothing but their own envio layer. three hands a material the
+// scene's environment at the scene's intensity, whatever the material asks.
 THREE.ShaderChunk.lights_fragment_maps = THREE.ShaderChunk.lights_fragment_maps.replace(
   'iblIrradiance += getIBLIrradiance( geometryNormal );',
   ''
-);
+) + `
+  #if defined( GAME_SHADING ) && defined( RE_IndirectSpecular )
+    radiance = vec3( 0.0 );
+  #endif`;
 
 async function inBatches(items, width, work) {
   let next = 0;
@@ -90,23 +148,15 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
   // lifted and the maps read washed out against the game's own frames.
   renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 
-  // Measured against an in-game frame of Braxis Holdout: its median, its 95th
-  // percentile, its contrast and its saturation.
-  const AMBIENT_GAIN = 0.5;
-  const EXPOSURE_GAIN = 0.85;
-  const SPECULAR_GAIN = 3;
   const SKY_SATURATION = 0.4;
 
-  // The specular map stays decoded: read raw, it turns every metal to chrome.
   function gammaArt(root) {
     root.traverse((node) => {
       for (const material of [node.material].flat()) {
         if (!material || material.userData.gamma) continue;
         material.userData.gamma = true;
-        material.specularColor?.multiplyScalar(SPECULAR_GAIN);
-        for (const [key, value] of Object.entries(material)) {
-          if (key === 'specularColorMap' || !value?.isTexture) continue;
-          if (value.colorSpace !== THREE.SRGBColorSpace) continue;
+        for (const value of Object.values(material)) {
+          if (!value?.isTexture || value.colorSpace !== THREE.SRGBColorSpace) continue;
           value.colorSpace = THREE.NoColorSpace;
           value.needsUpdate = true;
         }
@@ -114,30 +164,30 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
     });
   }
 
+  // The key's specular colour, which the game premultiplies by the map's
+  // HDRSpecMultiplier.
+  const keySpecular = { value: new THREE.Color() };
+
+  function gameShading(material, specular = Boolean(material?.specularColorMap)) {
+    if (!material || material.userData.gameShaded) return;
+    material.userData.gameShaded = true;
+    material.defines = { ...material.defines, GAME_SHADING: '', ...(specular && { GAME_SPECULAR: '' }) };
+    const before = material.onBeforeCompile;
+    material.onBeforeCompile = (shader, renderer) => {
+      before?.call(material, shader, renderer);
+      shader.uniforms.keySpecular = keySpecular;
+    };
+    material.needsUpdate = true;
+  }
+
   // The core `DefaultLight`, for a map the index names no light for.
   const DEFAULT_LIGHT = {
     ambient: [0.502, 0.353, 0.667],
     exposure: 1.6,
-    whitePoint: 1.85,
     key: { colour: [1, 1, 0.722], strength: 1, direction: [0.648, -0.127, -0.751] },
     fill: { colour: [0.424, 0.525, 0.267], strength: 0.257, direction: [-0.836, 0.266, -0.48] },
     back: { colour: [1, 1, 0.722], strength: 0.2, direction: [0.635, -0.212, -0.743] },
   };
-
-  // The game's HDR operator is Hable's filmic curve, normalised so the white
-  // point lands on 1.
-  const baseToneMapping = THREE.ShaderChunk.tonemapping_pars_fragment;
-  function setFilmic(whitePoint) {
-    THREE.ShaderChunk.tonemapping_pars_fragment = baseToneMapping.replace(
-      /vec3 CustomToneMapping\( vec3 color \) \{[^}]*\}/,
-      `vec3 hable( vec3 x ) {
-         return ( x * ( 0.15 * x + 0.05 ) + 0.004 ) / ( x * ( 0.15 * x + 0.5 ) + 0.06 ) - 0.0667;
-       }
-       vec3 CustomToneMapping( vec3 color ) {
-         return saturate( hable( color * toneMappingExposure ) / hable( vec3( ${whitePoint.toFixed(3)} ) ) );
-       }`
-    );
-  }
 
   function aim(light, { colour, strength, direction }) {
     light.color.setRGB(...colour);
@@ -177,16 +227,22 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
   function setLighting(light = DEFAULT_LIGHT) {
     setEnvironment(light);
     ambient.color.setRGB(...light.ambient);
-    ambient.intensity = Math.PI * AMBIENT_GAIN;
+    ambient.intensity = Math.PI;
     aim(sun, light.key);
     SUN_DIR.copy(sun.position);
+    const { specular = [1, 1, 1], specularStrength = 1 } = light.key;
+    keySpecular.value.setRGB(...specular).multiplyScalar(specularStrength * (light.specularMultiplier ?? 1));
     for (const [node, spec] of [[fill, light.fill], [back, light.back]]) {
       node.visible = Boolean(spec);
       if (spec) aim(node, spec);
     }
-    renderer.toneMappingExposure = light.exposure * EXPOSURE_GAIN;
-    setFilmic(light.whitePoint || 1.85);
-    for (const pass of outputs) pass.material.needsUpdate = true;
+    renderer.toneMappingExposure = light.exposure;
+    for (const pass of blooms) pass.threshold = light.bloomThreshold ?? 0.9;
+    // The density is folded into height zero, so the fog needs two numbers.
+    const { fog } = light;
+    scene.fog = fog
+      ? new THREE.Fog(new THREE.Color(...fog.colour), fog.density * Math.exp(fog.height * fog.falloff), fog.falloff)
+      : null;
   }
 
   const world = new THREE.Group();
@@ -202,6 +258,8 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
   const composer = new EffectComposer(renderer);
   const renderPass = new RenderPass(scene, camera);
   composer.addPass(renderPass);
+  const blooms = [new BloomPass(), new BloomPass()];
+  composer.addPass(blooms[0]);
   const outputs = [new OutputPass(), new OutputPass()];
   composer.addPass(outputs[0]);
   setLighting();
@@ -250,9 +308,14 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
         // A mask that could not be baked — it scrolls, or it reads the other
         // unwrap — is the material's transparency, glow art or not.
         if (material?.userData?.mask) applyMask(material, material.userData.mask);
+        if (material?.userData?.flipbook) applyFlipbook(material, material.userData.flipbook);
         if (material?.userData?.roughnessInSpecularAlpha) applySpecularRoughness(material);
+        if (material?.userData?.envio) applyEnvio(material, material.userData.envio);
         const glow = material?.userData?.glow;
-        if (!glow) continue;
+        if (!glow) {
+          gameShading(material);
+          continue;
+        }
         material.toneMapped = false;
         // The flat kind is unlit but still a surface: it occludes, so it keeps
         // its depth write. The vortex's star sphere is one, and drawn additively
@@ -260,6 +323,7 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
         if (glow === 'add') {
           material.blending = THREE.AdditiveBlending;
           material.depthWrite = false;
+          material.fog = false;
         }
         const scroll = material.userData.scroll;
         if (scroll && material.map) scrollers.push({ map: material.map, scroll });
@@ -287,6 +351,62 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
     material.transparent = true;
     material.needsUpdate = true;
     if (scroll[0] || scroll[1]) scrollers.push({ map, scroll });
+  }
+
+  // A flipbook layer plays a sprite sheet, one cell per frame, row-major from
+  // the top left. Lava and the animated pools are 8x8 sheets; drawn whole they
+  // tile all 64 frames over the surface. Frames crossfade, and the gradients
+  // come from the unwrapped uv so the cell's own wrap leaves no mip seam.
+  const flipbooks = [];
+  const FLIPBOOK_SLOTS = {
+    map: ['map_fragment', 'vMapUv'],
+    alphaMap: ['alphamap_fragment', 'vAlphaMapUv'],
+    emissiveMap: ['emissivemap_fragment', 'vEmissiveMapUv'],
+    normalMap: ['normal_fragment_maps', 'vNormalMapUv'],
+  };
+
+  const flipbookHead = (columns, rows, frames = columns * rows) => /* glsl */ `
+    uniform float flipFrame;
+    vec4 flipbook( sampler2D sheet, vec2 uv ) {
+      const vec2 grid = vec2( ${columns.toFixed(1)}, ${rows.toFixed(1)} );
+      const float frames = ${frames.toFixed(1)};
+      vec2 inCell = fract( uv ) / grid;
+      vec2 dx = dFdx( uv ) / grid;
+      vec2 dy = dFdy( uv ) / grid;
+      float step = floor( flipFrame );
+      float a = mod( step, frames );
+      float b = mod( step + 1.0, frames );
+      vec2 cellA = vec2( mod( a, grid.x ), floor( a / grid.x ) ) / grid;
+      vec2 cellB = vec2( mod( b, grid.x ), floor( b / grid.x ) ) / grid;
+      return mix(
+        textureGrad( sheet, cellA + inCell, dx, dy ),
+        textureGrad( sheet, cellB + inCell, dx, dy ),
+        flipFrame - step
+      );
+    }
+  `;
+
+  function applyFlipbook(material, { grid: [columns, rows], fps, first, maps }) {
+    if (material.userData.flipping) return;
+    material.userData.flipping = true;
+    const frame = { value: first };
+    if (fps) flipbooks.push({ frame, fps, count: columns * rows });
+    keyProgram(material, `flipbook:${columns}x${rows}:${maps}`);
+    const before = material.onBeforeCompile;
+    material.onBeforeCompile = (shader, renderer) => {
+      before?.call(material, shader, renderer);
+      shader.uniforms.flipFrame = frame;
+      let fragment = shader.fragmentShader;
+      for (const slot of maps) {
+        const [chunk, uv] = FLIPBOOK_SLOTS[slot];
+        fragment = fragment.replace(
+          `#include <${chunk}>`,
+          THREE.ShaderChunk[chunk].replaceAll(`texture2D( ${slot}, ${uv} )`, `flipbook( ${slot}, ${uv} )`)
+        );
+      }
+      shader.fragmentShader = flipbookHead(columns, rows) + fragment;
+    };
+    material.needsUpdate = true;
   }
 
   // three keys its program cache on `onBeforeCompile.toString()`, which is the
@@ -353,6 +473,103 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
     material.needsUpdate = true;
   }
 
+  // The game's metal reflects a map of its own rather than the sky: a cube
+  // looked up by the reflected view ray or by the normal, or a sphere map. The
+  // lookup is in view space, so the highlights follow the camera. The
+  // converter lays a cube's faces side by side in DDS order, and the faces are
+  // picked here: a samplerCube can share a texture unit with the shadow map of
+  // a mesh that receives none, and WebGL then drops the draw.
+  const REFLECTIVE_CUBE = 2;
+  const REFLECTIVE_SPHERE = 3;
+  const envioMaps = new Map();
+
+  const ENVIO_CUBE = /* glsl */ `
+    vec3 envioCube( sampler2D strip, vec3 d ) {
+      vec3 a = abs( d );
+      float face;
+      vec2 st;
+      if ( a.x >= a.y && a.x >= a.z ) {
+        face = d.x > 0.0 ? 0.0 : 1.0;
+        st = vec2( d.x > 0.0 ? -d.z : d.z, -d.y ) / a.x;
+      } else if ( a.y >= a.z ) {
+        face = d.y > 0.0 ? 2.0 : 3.0;
+        st = vec2( d.x, d.y > 0.0 ? d.z : -d.z ) / a.y;
+      } else {
+        face = d.z > 0.0 ? 4.0 : 5.0;
+        st = vec2( d.z > 0.0 ? d.x : -d.x, -d.y ) / a.z;
+      }
+      vec2 inFace = clamp( st * 0.5 + 0.5, 0.01, 0.99 );
+      return texture2D( strip, vec2( ( face + inFace.x ) / 6.0, inFace.y ) ).rgb;
+    }
+  `;
+
+  function envioMap(uri) {
+    if (envioMaps.has(uri)) return envioMaps.get(uri);
+    const map = textures.load(asset('/lost-in-the-nexus/models/' + uri));
+    // Faces sit side by side, so a mip would bleed one into the next.
+    map.generateMipmaps = false;
+    map.minFilter = THREE.LinearFilter;
+    envioMaps.set(uri, map);
+    return map;
+  }
+
+  function applyEnvio(material, { uri, lookup, bright, mask, maskTiling = [1, 1] }) {
+    if (material.userData.reflecting) return;
+    material.userData.reflecting = true;
+    const sphere = lookup === REFLECTIVE_SPHERE;
+    const map = envioMap(uri);
+    if (!sphere) map.flipY = false;
+    const uniforms = {
+      envioMap: { value: map },
+      envioBright: { value: bright },
+      envioMask: { value: null },
+      envioMaskTiling: { value: new THREE.Vector2(...maskTiling) },
+    };
+    if (mask) {
+      const maskMap = textures.load(asset('/lost-in-the-nexus/models/' + mask));
+      maskMap.wrapS = maskMap.wrapT = THREE.RepeatWrapping;
+      maskMap.flipY = false;
+      uniforms.envioMask.value = maskMap;
+    }
+    keyProgram(material, `envio:${lookup}:${Boolean(mask)}`);
+    const before = material.onBeforeCompile;
+    material.onBeforeCompile = (shader, renderer) => {
+      before?.call(material, shader, renderer);
+      Object.assign(shader.uniforms, uniforms);
+      shader.vertexShader = 'varying vec2 vEnvioUv;\n' + shader.vertexShader.replace(
+        '#include <uv_vertex>',
+        `#include <uv_vertex>
+         vEnvioUv = uv;`
+      );
+      // The game's view space is x right, y forward, z up: three's (x, -z, y).
+      const ray = lookup === REFLECTIVE_CUBE || sphere
+        ? 'reflect( -geometryViewDir, geometryNormal )'
+        : 'geometryNormal';
+      const look = sphere
+        ? `vec3 envio = texture2D( envioMap, ( ${ray} ).xy * 0.5 + 0.5 ).rgb;`
+        : `vec3 v = ${ray};
+           vec3 envio = envioCube( envioMap, vec3( v.x, -v.z, v.y ) );`;
+      shader.fragmentShader = `varying vec2 vEnvioUv;
+        uniform sampler2D envioMap;
+        uniform float envioBright;
+        uniform vec2 envioMaskTiling;
+        ${mask ? 'uniform sampler2D envioMask;' : ''}
+        ${sphere ? '' : ENVIO_CUBE}
+        ${shader.fragmentShader}`.replace(
+        '#include <lights_fragment_end>',
+        // The layer's brightness scales its alpha too, and the mask is
+        // multiplied by that alpha.
+        `#include <lights_fragment_end>
+         {
+           ${look}
+           vec3 envioAmount = vec3( envioBright * envioBright )${mask ? ' * texture2D( envioMask, vEnvioUv * envioMaskTiling ).rgb' : ''};
+           reflectedLight.indirectSpecular += envio * envioAmount;
+         }`
+      );
+    };
+    material.needsUpdate = true;
+  }
+
   // The same fade over a lit material's emissive pass. By the emissive stage a
   // standard material has already resolved `normal`, and it carries the view
   // vector throughout, so this needs no varyings of its own. `vNormal` would
@@ -391,7 +608,9 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
     if (cached) return cached;
     const material = source.clone();
     material.userData = source.userData;
-    // `clone` copies neither the key nor the injections it stands for.
+    // `clone` copies neither the key nor the injections it stands for, and
+    // resets a standard material's defines.
+    material.defines = { ...source.defines };
     material.programKey = source.programKey || '';
     material.customProgramCacheKey = () => material.programKey;
     // `team colour emissive add`: the layer is the shape of the light and the
@@ -433,7 +652,7 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
   // A flat plane at the type's height, clipped to the map's water regions; the
   // terrain occludes it elsewhere. Regions overlap and a translucent quad drawn
   // twice goes muddy, so the union is rasterised and each row's runs become a quad.
-  function waterMesh({ height, regions, colour }) {
+  function waterMesh({ height, regions, colour, normals, tiling, scroll, specularity }) {
     let maxX = 0;
     let maxY = 0;
     for (const [, , x2, y2] of regions) {
@@ -469,15 +688,61 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
     // The catalog colour tints refracted ground rather than a lit surface, so it
     // needs damping before a lit material uses it.
     const tint = (colour || [0.05, 0.2, 0.3]).slice(0, 3).map((c) => c * 0.5);
-    return new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({
+    const material = new THREE.MeshStandardMaterial({
       color: new THREE.Color(...tint),
       transparent: true,
       opacity: 0.8,
-      roughness: 0.3,
+      roughness: specularity ? roughnessOf(specularity) : 0.3,
       metalness: 0.0,
       depthWrite: false,
       side: THREE.DoubleSide,
-    }));
+    });
+    if (normals) waterSurface(material, normals, tiling, scroll);
+    return new THREE.Mesh(geometry, material);
+  }
+
+  // The game ripples its water with a run of normal-map frames, drawn twice at
+  // the type's world tiling and drifting apart along its scroll vectors.
+  const waterClock = { value: 0 };
+
+  function waterSurface(material, { uri, grid: [columns, rows], frames, fps }, tiling, scroll) {
+    const sheet = textures.load(asset(uri));
+    sheet.flipY = false;
+    const frame = { value: 0 };
+    if (fps) flipbooks.push({ frame, fps, count: frames });
+    keyProgram(material, `water:${columns}x${rows}:${frames}`);
+    material.onBeforeCompile = (shader) => {
+      Object.assign(shader.uniforms, {
+        flipFrame: frame,
+        waterNormals: { value: sheet },
+        waterTiling: { value: new THREE.Vector4(...tiling) },
+        waterScroll: { value: new THREE.Vector4(...scroll) },
+        waterTime: waterClock,
+      });
+      shader.vertexShader = 'varying vec2 vWaterAt;\n' + shader.vertexShader.replace(
+        '#include <worldpos_vertex>',
+        `#include <worldpos_vertex>
+         vWaterAt = ( modelMatrix * vec4( transformed, 1.0 ) ).xz;`
+      );
+      shader.fragmentShader = `varying vec2 vWaterAt;
+        uniform sampler2D waterNormals;
+        uniform vec4 waterTiling;
+        uniform vec4 waterScroll;
+        uniform float waterTime;
+        ${flipbookHead(columns, rows, frames)}
+        ${shader.fragmentShader}`.replace(
+        '#include <normal_fragment_maps>',
+        // Map north is world -z; the sheet's +v runs north.
+        `#include <normal_fragment_maps>
+         {
+           vec2 at = vec2( vWaterAt.x, -vWaterAt.y );
+           vec3 a = flipbook( waterNormals, at * waterTiling.xy + waterScroll.xy * waterTime ).xyz * 2.0 - 1.0;
+           vec3 b = flipbook( waterNormals, at * waterTiling.zw + waterScroll.zw * waterTime ).xyz * 2.0 - 1.0;
+           vec3 ripple = normalize( vec3( a.xy + b.xy, a.z * b.z ) );
+           normal = normalize( ( viewMatrix * vec4( ripple.x, ripple.z, -ripple.y, 0.0 ) ).xyz );
+         }`
+      );
+    };
   }
 
   // The ground is cut away where the map declares no terrain, so the holes in a
@@ -521,6 +786,7 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
   function clearWorld() {
     mixers.length = 0;
     scrollers.length = 0;
+    flipbooks.length = 0;
     emitters.length = 0;
     emitterSource = null;
     groundBox = null;
@@ -572,6 +838,9 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
           specularExponent: terrain.light?.terrainSpecularExp,
         });
         if (token !== loadToken) return false;
+        ground.scene.traverse((node) => {
+          for (const material of [node.material].flat()) if (material?.map) gameShading(material, true);
+        });
       }
       if (ground) {
         world.add(ground.scene);
@@ -692,6 +961,10 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
   }
 
   // Toggling the shadow map changes every program, so the materials recompile.
+  function setBloom(on) {
+    blooms[0].enabled = on;
+  }
+
   function setShadows(on) {
     renderer.shadowMap.enabled = on;
     world.traverse((node) => {
@@ -893,6 +1166,10 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
     const previous = renderer.getRenderTarget();
     renderer.setRenderTarget(hdr);
     renderer.render(scene, cam);
+    if (blooms[0].enabled) {
+      blooms[1].setSize(width, height);
+      blooms[1].render(renderer, null, hdr);
+    }
     outputs[1].render(renderer, target, hdr);
     const pixels = new Uint8Array(width * height * 4);
     renderer.readRenderTargetPixels(target, 0, 0, width, height, pixels);
@@ -1153,6 +1430,10 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
     for (const { map, scroll } of scrollers) {
       map.offset.set((map.offset.x + scroll[0] * dt) % 1, (map.offset.y + scroll[1] * dt) % 1);
     }
+    waterClock.value += dt;
+    for (const { frame, fps, count } of flipbooks) {
+      frame.value = (((frame.value + fps * dt) % count) + count) % count;
+    }
     // Particles run off one clock each; their whole motion is a function of it.
     for (const mesh of emitters) mesh.userData.particles.value += dt;
     controls.update();
@@ -1176,6 +1457,8 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
     swapCamera,
     hotsCamera,
     setShadows,
+    setBloom,
+    bloomEnabled: () => blooms[0].enabled,
     setParticles,
     setFlyEnabled,
     getShot,
