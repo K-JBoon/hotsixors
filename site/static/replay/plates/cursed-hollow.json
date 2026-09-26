@@ -257,7 +257,7 @@
   "storm_building_kingscrest_ravencourt_gate_00.y285.s100.t0": {
    "w": 78,
    "h": 202,
-   "worldW": 2.997,
+   "worldW": 2.998,
    "worldH": 7.783,
    "anchorX": 0.5,
    "anchorY": 0.6217,
@@ -266,7 +266,7 @@
   "storm_building_kingscrest_ravencourt_gate_00.y285.s100.t1": {
    "w": 78,
    "h": 202,
-   "worldW": 2.997,
+   "worldW": 2.998,
    "worldH": 7.783,
    "anchorX": 0.5,
    "anchorY": 0.6217,
@@ -275,8 +275,8 @@
   "storm_building_kingscrest_ravencourt_gate_00.y90.s100.t0": {
    "w": 36,
    "h": 201,
-   "worldW": 1.398,
-   "worldH": 7.725,
+   "worldW": 1.396,
+   "worldH": 7.724,
    "anchorX": 0.5,
    "anchorY": 0.6226,
    "file": "/replay/plates/cursed-hollow/storm_building_kingscrest_ravencourt_gate_00.y90.s100.t0.webp"
@@ -284,16 +284,16 @@
   "storm_building_kingscrest_ravencourt_gate_00.y270.s100.t1": {
    "w": 36,
    "h": 201,
-   "worldW": 1.398,
-   "worldH": 7.725,
+   "worldW": 1.396,
+   "worldH": 7.724,
    "anchorX": 0.5,
    "anchorY": 0.6226,
    "file": "/replay/plates/cursed-hollow/storm_building_kingscrest_ravencourt_gate_00.y270.s100.t1.webp"
   },
   "storm_building_kingscrest_ravencourt_gate_00.y225.s100.t1": {
    "w": 144,
-   "h": 176,
-   "worldW": 5.555,
+   "h": 177,
+   "worldW": 5.554,
    "worldH": 6.788,
    "anchorX": 0.5,
    "anchorY": 0.6395,
@@ -301,8 +301,8 @@
   },
   "storm_building_kingscrest_ravencourt_gate_00.y45.s100.t0": {
    "w": 144,
-   "h": 176,
-   "worldW": 5.555,
+   "h": 177,
+   "worldW": 5.554,
    "worldH": 6.788,
    "anchorX": 0.5,
    "anchorY": 0.6395,
@@ -310,18 +310,18 @@
   },
   "storm_building_kingscrest_ravencourt_gate_00.y135.s100.t0": {
    "w": 144,
-   "h": 177,
+   "h": 176,
    "worldW": 5.554,
-   "worldH": 6.789,
+   "worldH": 6.788,
    "anchorX": 0.5,
    "anchorY": 0.6395,
    "file": "/replay/plates/cursed-hollow/storm_building_kingscrest_ravencourt_gate_00.y135.s100.t0.webp"
   },
   "storm_building_kingscrest_ravencourt_gate_00.y315.s100.t1": {
    "w": 144,
-   "h": 177,
-   "worldW": 5.553,
-   "worldH": 6.789,
+   "h": 176,
+   "worldW": 5.554,
+   "worldH": 6.788,
    "anchorX": 0.5,
    "anchorY": 0.6395,
    "file": "/replay/plates/cursed-hollow/storm_building_kingscrest_ravencourt_gate_00.y315.s100.t1.webp"
@@ -380,104 +380,41 @@
    "anchorY": 0.6678,
    "file": "/replay/plates/cursed-hollow/storm_building_kingscrest_ravencourt_manawell.y322.s100.t1.webp"
   },
-  "storm_building_kingscrest_ravencourt_castleupgrade.y99.s100.t0": {
-   "w": 155,
-   "h": 215,
-   "worldW": 5.959,
-   "worldH": 8.281,
-   "anchorX": 0.4351,
-   "anchorY": 0.6999,
-   "file": "/replay/plates/cursed-hollow/storm_building_kingscrest_ravencourt_castleupgrade.y99.s100.t0.webp"
+  "storm_building_kingscrest_ravencourt_castleupgrade.y315.s100.t0": {
+   "w": 188,
+   "h": 247,
+   "worldW": 7.214,
+   "worldH": 9.494,
+   "anchorX": 0.5384,
+   "anchorY": 0.6436,
+   "file": "/replay/plates/cursed-hollow/storm_building_kingscrest_ravencourt_castleupgrade.y315.s100.t0.webp"
   },
-  "storm_building_kingscrest_ravencourt_castleupgrade.y98.s100.t0": {
-   "w": 154,
-   "h": 214,
-   "worldW": 5.912,
-   "worldH": 8.238,
-   "anchorX": 0.4345,
-   "anchorY": 0.7005,
-   "file": "/replay/plates/cursed-hollow/storm_building_kingscrest_ravencourt_castleupgrade.y98.s100.t0.webp"
+  "storm_building_kingscrest_ravencourt_castleupgrade.y315.s100.t1": {
+   "w": 188,
+   "h": 247,
+   "worldW": 7.214,
+   "worldH": 9.494,
+   "anchorX": 0.5384,
+   "anchorY": 0.6436,
+   "file": "/replay/plates/cursed-hollow/storm_building_kingscrest_ravencourt_castleupgrade.y315.s100.t1.webp"
   },
-  "storm_building_kingscrest_ravencourt_castleupgrade.y279.s100.t1": {
-   "w": 155,
-   "h": 215,
-   "worldW": 5.959,
-   "worldH": 8.281,
-   "anchorX": 0.5649,
-   "anchorY": 0.6873,
-   "file": "/replay/plates/cursed-hollow/storm_building_kingscrest_ravencourt_castleupgrade.y279.s100.t1.webp"
-  },
-  "storm_building_kingscrest_ravencourt_castleupgrade.y278.s100.t1": {
-   "w": 154,
-   "h": 214,
-   "worldW": 5.913,
-   "worldH": 8.239,
-   "anchorX": 0.5655,
-   "anchorY": 0.6887,
-   "file": "/replay/plates/cursed-hollow/storm_building_kingscrest_ravencourt_castleupgrade.y278.s100.t1.webp"
-  },
-  "storm_building_kingscrest_ravencourt_castleupgrade.y196.s100.t1": {
-   "w": 164,
-   "h": 229,
-   "worldW": 6.291,
-   "worldH": 8.798,
-   "anchorX": 0.5172,
-   "anchorY": 0.7192,
-   "file": "/replay/plates/cursed-hollow/storm_building_kingscrest_ravencourt_castleupgrade.y196.s100.t1.webp"
-  },
-  "storm_building_kingscrest_ravencourt_castlesuperior.y107.s100.t0": {
-   "w": 213,
-   "h": 287,
-   "worldW": 8.18,
-   "worldH": 11.051,
-   "anchorX": 0.4502,
-   "anchorY": 0.7066,
-   "file": "/replay/plates/cursed-hollow/storm_building_kingscrest_ravencourt_castlesuperior.y107.s100.t0.webp"
-  },
-  "storm_building_kingscrest_ravencourt_castlesuperior.y93.s100.t1": {
-   "w": 178,
-   "h": 261,
-   "worldW": 6.851,
-   "worldH": 10.023,
-   "anchorX": 0.4231,
-   "anchorY": 0.718,
-   "file": "/replay/plates/cursed-hollow/storm_building_kingscrest_ravencourt_castlesuperior.y93.s100.t1.webp"
-  },
-  "storm_building_kingscrest_ravencourt_castlesuperior.y214.s100.t1": {
-   "w": 242,
-   "h": 302,
-   "worldW": 9.319,
-   "worldH": 11.622,
-   "anchorX": 0.5692,
-   "anchorY": 0.6725,
-   "file": "/replay/plates/cursed-hollow/storm_building_kingscrest_ravencourt_castlesuperior.y214.s100.t1.webp"
-  },
-  "storm_building_kingscrest_ravencourt_castlesuperior.y42.s100.t1": {
+  "storm_building_kingscrest_ravencourt_castlesuperior.y315.s100.t0": {
    "w": 245,
-   "h": 307,
-   "worldW": 9.422,
-   "worldH": 11.794,
-   "anchorX": 0.429,
-   "anchorY": 0.6428,
-   "file": "/replay/plates/cursed-hollow/storm_building_kingscrest_ravencourt_castlesuperior.y42.s100.t1.webp"
-  },
-  "storm_building_kingscrest_ravencourt_castlesuperior.y47.s100.t0": {
-   "w": 244,
    "h": 308,
-   "worldW": 9.404,
-   "worldH": 11.833,
-   "anchorX": 0.4278,
-   "anchorY": 0.6467,
-   "file": "/replay/plates/cursed-hollow/storm_building_kingscrest_ravencourt_castlesuperior.y47.s100.t0.webp"
+   "worldW": 9.417,
+   "worldH": 11.827,
+   "anchorX": 0.5108,
+   "anchorY": 0.6033,
+   "file": "/replay/plates/cursed-hollow/storm_building_kingscrest_ravencourt_castlesuperior.y315.s100.t0.webp"
   },
-  "storm_building_kingscrest_ravencourt_castlesuperior.y268.s100.t0": {
-   "w": 176,
-   "h": 259,
-   "worldW": 6.758,
-   "worldH": 9.949,
-   "anchorX": 0.5838,
-   "anchorY": 0.6482,
-   "file": "/replay/plates/cursed-hollow/storm_building_kingscrest_ravencourt_castlesuperior.y268.s100.t0.webp"
+  "storm_building_kingscrest_ravencourt_castlesuperior.y315.s100.t1": {
+   "w": 245,
+   "h": 308,
+   "worldW": 9.417,
+   "worldH": 11.827,
+   "anchorX": 0.5108,
+   "anchorY": 0.6033,
+   "file": "/replay/plates/cursed-hollow/storm_building_kingscrest_ravencourt_castlesuperior.y315.s100.t1.webp"
   },
   "storm_building_kingscrest_watchtower.y0.s100.tx": {
    "w": 228,
@@ -765,7 +702,7 @@
    "x": 113,
    "y": 41,
    "z": 7.928,
-   "r": 4.974,
+   "r": 4.9741,
    "t": 0,
    "sprite": "storm_building_kingscrest_ravencourt_gate_00.y285.s100.t0"
   },
@@ -774,7 +711,7 @@
    "x": 135,
    "y": 175,
    "z": 7.928,
-   "r": 4.974,
+   "r": 4.9741,
    "t": 1,
    "sprite": "storm_building_kingscrest_ravencourt_gate_00.y285.s100.t1"
   },
@@ -783,7 +720,7 @@
    "x": 144,
    "y": 47,
    "z": 7.928,
-   "r": 4.974,
+   "r": 4.9741,
    "t": 1,
    "sprite": "storm_building_kingscrest_ravencourt_gate_00.y285.s100.t1"
   },
@@ -792,7 +729,7 @@
    "x": 104,
    "y": 169,
    "z": 7.928,
-   "r": 4.974,
+   "r": 4.9741,
    "t": 0,
    "sprite": "storm_building_kingscrest_ravencourt_gate_00.y285.s100.t0"
   },
@@ -801,7 +738,7 @@
    "x": 105,
    "y": 108,
    "z": 7.928,
-   "r": 1.5705,
+   "r": 1.5708,
    "t": 0,
    "sprite": "storm_building_kingscrest_ravencourt_gate_00.y90.s100.t0"
   },
@@ -810,7 +747,7 @@
    "x": 143,
    "y": 108,
    "z": 7.928,
-   "r": 4.7121,
+   "r": 4.7124,
    "t": 1,
    "sprite": "storm_building_kingscrest_ravencourt_gate_00.y270.s100.t1"
   },
@@ -819,7 +756,7 @@
    "x": 184,
    "y": 142,
    "z": 7.928,
-   "r": 3.9267,
+   "r": 3.927,
    "t": 1,
    "sprite": "storm_building_kingscrest_ravencourt_gate_00.y225.s100.t1"
   },
@@ -828,7 +765,7 @@
    "x": 64,
    "y": 74,
    "z": 7.928,
-   "r": 0.7851,
+   "r": 0.7854,
    "t": 0,
    "sprite": "storm_building_kingscrest_ravencourt_gate_00.y45.s100.t0"
   },
@@ -837,7 +774,7 @@
    "x": 55,
    "y": 134,
    "z": 7.928,
-   "r": 2.356,
+   "r": 2.3562,
    "t": 0,
    "sprite": "storm_building_kingscrest_ravencourt_gate_00.y135.s100.t0"
   },
@@ -846,7 +783,7 @@
    "x": 193,
    "y": 82,
    "z": 7.928,
-   "r": 5.4975,
+   "r": 5.4978,
    "t": 1,
    "sprite": "storm_building_kingscrest_ravencourt_gate_00.y315.s100.t1"
   },
@@ -855,7 +792,7 @@
    "x": 75,
    "y": 105,
    "z": 7.928,
-   "r": 1.5705,
+   "r": 1.5708,
    "t": 0,
    "sprite": "storm_building_kingscrest_ravencourt_gate_00.y90.s100.t0"
   },
@@ -864,7 +801,7 @@
    "x": 173,
    "y": 111,
    "z": 7.928,
-   "r": 4.7121,
+   "r": 4.7124,
    "t": 1,
    "sprite": "storm_building_kingscrest_ravencourt_gate_00.y270.s100.t1"
   },
@@ -981,108 +918,108 @@
    "x": 93,
    "y": 106,
    "z": 7.928,
-   "r": 1.726,
+   "r": 5.4978,
    "t": 0,
-   "sprite": "storm_building_kingscrest_ravencourt_castleupgrade.y99.s100.t0"
+   "sprite": "storm_building_kingscrest_ravencourt_castleupgrade.y315.s100.t0"
   },
   {
    "m": "storm_building_kingscrest_ravencourt_castleupgrade",
    "x": 92,
    "y": 167,
    "z": 7.928,
-   "r": 1.7143,
+   "r": 5.4978,
    "t": 0,
-   "sprite": "storm_building_kingscrest_ravencourt_castleupgrade.y98.s100.t0"
+   "sprite": "storm_building_kingscrest_ravencourt_castleupgrade.y315.s100.t0"
   },
   {
    "m": "storm_building_kingscrest_ravencourt_castleupgrade",
    "x": 101.5,
    "y": 38.5,
    "z": 7.928,
-   "r": 1.711,
+   "r": 5.4978,
    "t": 0,
-   "sprite": "storm_building_kingscrest_ravencourt_castleupgrade.y98.s100.t0"
+   "sprite": "storm_building_kingscrest_ravencourt_castleupgrade.y315.s100.t0"
   },
   {
    "m": "storm_building_kingscrest_ravencourt_castleupgrade",
    "x": 155,
    "y": 110,
    "z": 7.928,
-   "r": 4.8676,
+   "r": 5.4978,
    "t": 1,
-   "sprite": "storm_building_kingscrest_ravencourt_castleupgrade.y279.s100.t1"
+   "sprite": "storm_building_kingscrest_ravencourt_castleupgrade.y315.s100.t1"
   },
   {
    "m": "storm_building_kingscrest_ravencourt_castleupgrade",
    "x": 156,
    "y": 49,
    "z": 7.928,
-   "r": 4.856,
+   "r": 5.4978,
    "t": 1,
-   "sprite": "storm_building_kingscrest_ravencourt_castleupgrade.y278.s100.t1"
+   "sprite": "storm_building_kingscrest_ravencourt_castleupgrade.y315.s100.t1"
   },
   {
    "m": "storm_building_kingscrest_ravencourt_castleupgrade",
    "x": 146.5,
    "y": 177.5,
    "z": 7.856,
-   "r": 3.4218,
+   "r": 5.4978,
    "t": 1,
-   "sprite": "storm_building_kingscrest_ravencourt_castleupgrade.y196.s100.t1"
+   "sprite": "storm_building_kingscrest_ravencourt_castleupgrade.y315.s100.t1"
   },
   {
    "m": "storm_building_kingscrest_ravencourt_castlesuperior",
    "x": 62,
    "y": 108,
    "z": 7.928,
-   "r": 1.8676,
+   "r": 5.4978,
    "t": 0,
-   "sprite": "storm_building_kingscrest_ravencourt_castlesuperior.y107.s100.t0"
+   "sprite": "storm_building_kingscrest_ravencourt_castlesuperior.y315.s100.t0"
   },
   {
    "m": "storm_building_kingscrest_ravencourt_castlesuperior",
    "x": 194,
    "y": 133,
    "z": 7.928,
-   "r": 1.626,
+   "r": 5.4978,
    "t": 1,
-   "sprite": "storm_building_kingscrest_ravencourt_castlesuperior.y93.s100.t1"
+   "sprite": "storm_building_kingscrest_ravencourt_castlesuperior.y315.s100.t1"
   },
   {
    "m": "storm_building_kingscrest_ravencourt_castlesuperior",
    "x": 186,
    "y": 108,
    "z": 7.928,
-   "r": 3.735,
+   "r": 5.4978,
    "t": 1,
-   "sprite": "storm_building_kingscrest_ravencourt_castlesuperior.y214.s100.t1"
+   "sprite": "storm_building_kingscrest_ravencourt_castlesuperior.y315.s100.t1"
   },
   {
    "m": "storm_building_kingscrest_ravencourt_castlesuperior",
    "x": 202,
    "y": 92,
    "z": 7.928,
-   "r": 0.7246,
+   "r": 5.4978,
    "t": 1,
-   "sprite": "storm_building_kingscrest_ravencourt_castlesuperior.y42.s100.t1"
+   "sprite": "storm_building_kingscrest_ravencourt_castlesuperior.y315.s100.t1"
   },
   {
    "m": "storm_building_kingscrest_ravencourt_castlesuperior",
    "x": 54,
    "y": 83,
    "z": 7.928,
-   "r": 0.813,
+   "r": 5.4978,
    "t": 0,
-   "sprite": "storm_building_kingscrest_ravencourt_castlesuperior.y47.s100.t0"
+   "sprite": "storm_building_kingscrest_ravencourt_castlesuperior.y315.s100.t0"
   },
   {
    "m": "storm_building_kingscrest_ravencourt_castlesuperior",
    "x": 46,
    "y": 124,
    "z": 7.928,
-   "r": 4.6718,
+   "r": 5.4978,
    "t": 0,
-   "sprite": "storm_building_kingscrest_ravencourt_castlesuperior.y268.s100.t0"
+   "sprite": "storm_building_kingscrest_ravencourt_castlesuperior.y315.s100.t0"
   },
   {
    "m": "storm_building_kingscrest_watchtower",

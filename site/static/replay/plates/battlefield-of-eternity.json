@@ -221,8 +221,8 @@
   "storm_building_hell_gate_00.y75.s100.t1": {
    "w": 172,
    "h": 239,
-   "worldW": 6.603,
-   "worldH": 9.184,
+   "worldW": 6.602,
+   "worldH": 9.183,
    "anchorX": 0.499,
    "anchorY": 0.6205,
    "file": "/replay/plates/battlefield-of-eternity/storm_building_hell_gate_00.y75.s100.t1.webp"
@@ -230,7 +230,7 @@
   "storm_building_heaven_gate_00.y75.s100.t0": {
    "w": 116,
    "h": 234,
-   "worldW": 4.47,
+   "worldW": 4.469,
    "worldH": 9.008,
    "anchorX": 0.5,
    "anchorY": 0.6219,
@@ -248,7 +248,7 @@
   "storm_building_heaven_gate_00.y285.s100.t0": {
    "w": 116,
    "h": 234,
-   "worldW": 4.467,
+   "worldW": 4.468,
    "worldH": 9.008,
    "anchorX": 0.5,
    "anchorY": 0.6219,
@@ -264,10 +264,10 @@
    "file": "/replay/plates/battlefield-of-eternity/storm_building_hell_gate.y225.s100.t1.webp"
   },
   "storm_building_heaven_gate.y45.s100.t0": {
-   "w": 183,
+   "w": 182,
    "h": 217,
-   "worldW": 7.02,
-   "worldH": 8.358,
+   "worldW": 7.019,
+   "worldH": 8.359,
    "anchorX": 0.5,
    "anchorY": 0.6314,
    "file": "/replay/plates/battlefield-of-eternity/storm_building_heaven_gate.y45.s100.t0.webp"
@@ -275,7 +275,7 @@
   "storm_building_heaven_gate_00.y135.s100.t0": {
    "w": 182,
    "h": 217,
-   "worldW": 7.018,
+   "worldW": 7.019,
    "worldH": 8.359,
    "anchorX": 0.5,
    "anchorY": 0.6314,
@@ -285,7 +285,7 @@
    "w": 217,
    "h": 248,
    "worldW": 8.361,
-   "worldH": 9.531,
+   "worldH": 9.53,
    "anchorX": 0.4985,
    "anchorY": 0.613,
    "file": "/replay/plates/battlefield-of-eternity/storm_building_hell_gate.y315.s100.t1.webp"
@@ -293,7 +293,7 @@
   "storm_building_heaven_gate.y90.s100.t0": {
    "w": 71,
    "h": 226,
-   "worldW": 2.719,
+   "worldW": 2.717,
    "worldH": 8.676,
    "anchorX": 0.5,
    "anchorY": 0.6266,
@@ -302,8 +302,8 @@
   "storm_building_hell_gate.y270.s100.t1": {
    "w": 131,
    "h": 216,
-   "worldW": 5.041,
-   "worldH": 8.318,
+   "worldW": 5.04,
+   "worldH": 8.317,
    "anchorX": 0.5003,
    "anchorY": 0.629,
    "file": "/replay/plates/battlefield-of-eternity/storm_building_hell_gate.y270.s100.t1.webp"
@@ -335,74 +335,47 @@
    "anchorY": 0.7026,
    "file": "/replay/plates/battlefield-of-eternity/storm_building_heaven_moonwell.y45.s100.t0.webp"
   },
-  "storm_building_heaven_fort.y87.s100.t0": {
-   "w": 174,
-   "h": 230,
-   "worldW": 6.69,
-   "worldH": 8.863,
-   "anchorX": 0.5112,
-   "anchorY": 0.6912,
-   "file": "/replay/plates/battlefield-of-eternity/storm_building_heaven_fort.y87.s100.t0.webp"
+  "storm_building_heaven_fort.y315.s100.t0": {
+   "w": 225,
+   "h": 284,
+   "worldW": 8.667,
+   "worldH": 10.929,
+   "anchorX": 0.4939,
+   "anchorY": 0.659,
+   "file": "/replay/plates/battlefield-of-eternity/storm_building_heaven_fort.y315.s100.t0.webp"
   },
-  "storm_building_hell_fort.y285.s100.t1": {
-   "w": 160,
-   "h": 229,
-   "worldW": 6.153,
-   "worldH": 8.82,
+  "storm_building_hell_fort.y315.s100.t1": {
+   "w": 184,
+   "h": 250,
+   "worldW": 7.072,
+   "worldH": 9.602,
    "anchorX": 0.5,
-   "anchorY": 0.6942,
-   "file": "/replay/plates/battlefield-of-eternity/storm_building_hell_fort.y285.s100.t1.webp"
+   "anchorY": 0.6784,
+   "file": "/replay/plates/battlefield-of-eternity/storm_building_hell_fort.y315.s100.t1.webp"
   },
-  "storm_building_hell_fort.y294.s100.t1": {
-   "w": 172,
-   "h": 239,
-   "worldW": 6.597,
-   "worldH": 9.201,
-   "anchorX": 0.5,
-   "anchorY": 0.6861,
-   "file": "/replay/plates/battlefield-of-eternity/storm_building_hell_fort.y294.s100.t1.webp"
-  },
-  "storm_building_heaven_fort.y98.s100.t0": {
-   "w": 186,
-   "h": 242,
-   "worldW": 7.151,
-   "worldH": 9.299,
-   "anchorX": 0.5104,
-   "anchorY": 0.681,
-   "file": "/replay/plates/battlefield-of-eternity/storm_building_heaven_fort.y98.s100.t0.webp"
-  },
-  "storm_building_heaven_keep.y131.s100.t0": {
-   "w": 230,
-   "h": 288,
-   "worldW": 8.843,
-   "worldH": 11.092,
-   "anchorX": 0.4946,
-   "anchorY": 0.6558,
-   "file": "/replay/plates/battlefield-of-eternity/storm_building_heaven_keep.y131.s100.t0.webp"
-  },
-  "storm_building_heaven_keep.y46.s100.t0": {
+  "storm_building_heaven_keep.y315.s100.t0": {
    "w": 231,
    "h": 289,
-   "worldW": 8.867,
-   "worldH": 11.104,
-   "anchorX": 0.4949,
+   "worldW": 8.868,
+   "worldH": 11.103,
+   "anchorX": 0.505,
    "anchorY": 0.6489,
-   "file": "/replay/plates/battlefield-of-eternity/storm_building_heaven_keep.y46.s100.t0.webp"
+   "file": "/replay/plates/battlefield-of-eternity/storm_building_heaven_keep.y315.s100.t0.webp"
   },
-  "storm_building_hell_keep.y225.s100.t1": {
+  "storm_building_hell_keep.y315.s100.t1": {
    "w": 212,
    "h": 270,
    "worldW": 8.16,
    "worldH": 10.374,
    "anchorX": 0.5012,
-   "anchorY": 0.6583,
-   "file": "/replay/plates/battlefield-of-eternity/storm_building_hell_keep.y225.s100.t1.webp"
+   "anchorY": 0.6566,
+   "file": "/replay/plates/battlefield-of-eternity/storm_building_hell_keep.y315.s100.t1.webp"
   },
   "storm_building_hell_wall.y225.s100.t1": {
    "w": 137,
    "h": 176,
-   "worldW": 5.287,
-   "worldH": 6.763,
+   "worldW": 5.288,
+   "worldH": 6.762,
    "anchorX": 0.5895,
    "anchorY": 0.6514,
    "file": "/replay/plates/battlefield-of-eternity/storm_building_hell_wall.y225.s100.t1.webp"
@@ -419,16 +392,16 @@
   "storm_building_hell_wall.y180.s100.t1": {
    "w": 58,
    "h": 179,
-   "worldW": 2.235,
-   "worldH": 6.877,
-   "anchorX": 0.6605,
+   "worldW": 2.234,
+   "worldH": 6.876,
+   "anchorX": 0.6606,
    "anchorY": 0.6923,
    "file": "/replay/plates/battlefield-of-eternity/storm_building_hell_wall.y180.s100.t1.webp"
   },
   "storm_building_hell_wall.y165.s100.t1": {
    "w": 91,
    "h": 186,
-   "worldW": 3.494,
+   "worldW": 3.493,
    "worldH": 7.159,
    "anchorX": 0.5762,
    "anchorY": 0.6946,
@@ -440,14 +413,14 @@
    "worldW": 5.288,
    "worldH": 6.762,
    "anchorX": 0.5064,
-   "anchorY": 0.7164,
+   "anchorY": 0.7163,
    "file": "/replay/plates/battlefield-of-eternity/storm_building_hell_wall.y135.s100.t1.webp"
   },
   "storm_building_hell_wall.y120.s100.t1": {
    "w": 148,
    "h": 159,
    "worldW": 5.701,
-   "worldH": 6.109,
+   "worldH": 6.11,
    "anchorX": 0.4843,
    "anchorY": 0.7384,
    "file": "/replay/plates/battlefield-of-eternity/storm_building_hell_wall.y120.s100.t1.webp"
@@ -456,7 +429,7 @@
    "w": 150,
    "h": 195,
    "worldW": 5.775,
-   "worldH": 7.486,
+   "worldH": 7.485,
    "anchorX": 0.4628,
    "anchorY": 0.6843,
    "file": "/replay/plates/battlefield-of-eternity/storm_building_heaven_wall.y45.s100.t0.webp"
@@ -491,7 +464,7 @@
   "storm_building_heaven_wall.y315.s100.t0": {
    "w": 150,
    "h": 195,
-   "worldW": 5.776,
+   "worldW": 5.775,
    "worldH": 7.485,
    "anchorX": 0.4686,
    "anchorY": 0.6385,
@@ -501,7 +474,7 @@
    "w": 158,
    "h": 179,
    "worldW": 6.087,
-   "worldH": 6.891,
+   "worldH": 6.892,
    "anchorX": 0.4804,
    "anchorY": 0.6454,
    "file": "/replay/plates/battlefield-of-eternity/storm_building_heaven_wall.y300.s100.t0.webp"
@@ -765,7 +738,7 @@
    "x": 139,
    "y": 144,
    "z": 7.916,
-   "r": 1.3088,
+   "r": 1.3089,
    "t": 1,
    "sprite": "storm_building_hell_gate_00.y75.s100.t1"
   },
@@ -774,7 +747,7 @@
    "x": 109,
    "y": 64,
    "z": 7.916,
-   "r": 1.3088,
+   "r": 1.3089,
    "t": 0,
    "sprite": "storm_building_heaven_gate_00.y75.s100.t0"
   },
@@ -783,7 +756,7 @@
    "x": 144,
    "y": 66,
    "z": 7.916,
-   "r": 4.974,
+   "r": 4.9741,
    "t": 1,
    "sprite": "storm_building_hell_gate_00.y285.s100.t1"
   },
@@ -792,7 +765,7 @@
    "x": 104,
    "y": 142,
    "z": 7.916,
-   "r": 4.974,
+   "r": 4.9741,
    "t": 0,
    "sprite": "storm_building_heaven_gate_00.y285.s100.t0"
   },
@@ -801,7 +774,7 @@
    "x": 175,
    "y": 132,
    "z": 7.916,
-   "r": 3.9267,
+   "r": 3.927,
    "t": 1,
    "sprite": "storm_building_hell_gate.y225.s100.t1"
   },
@@ -810,7 +783,7 @@
    "x": 73,
    "y": 76,
    "z": 7.916,
-   "r": 0.7851,
+   "r": 0.7854,
    "t": 0,
    "sprite": "storm_building_heaven_gate.y45.s100.t0"
   },
@@ -819,7 +792,7 @@
    "x": 70,
    "y": 125,
    "z": 7.916,
-   "r": 2.356,
+   "r": 2.3562,
    "t": 0,
    "sprite": "storm_building_heaven_gate_00.y135.s100.t0"
   },
@@ -828,7 +801,7 @@
    "x": 178,
    "y": 83,
    "z": 7.916,
-   "r": 5.4975,
+   "r": 5.4978,
    "t": 1,
    "sprite": "storm_building_hell_gate.y315.s100.t1"
   },
@@ -837,7 +810,7 @@
    "x": 80,
    "y": 101,
    "z": 7.916,
-   "r": 1.5705,
+   "r": 1.5708,
    "t": 0,
    "sprite": "storm_building_heaven_gate.y90.s100.t0"
   },
@@ -846,7 +819,7 @@
    "x": 168,
    "y": 107,
    "z": 7.916,
-   "r": 4.7121,
+   "r": 4.7124,
    "t": 1,
    "sprite": "storm_building_hell_gate.y270.s100.t1"
   },
@@ -945,79 +918,79 @@
    "x": 98,
    "y": 65,
    "z": 7.916,
-   "r": 1.5241,
+   "r": 5.4978,
    "t": 0,
-   "sprite": "storm_building_heaven_fort.y87.s100.t0"
+   "sprite": "storm_building_heaven_fort.y315.s100.t0"
   },
   {
    "m": "storm_building_hell_fort",
    "x": 150,
    "y": 143,
    "z": 7.916,
-   "r": 4.9731,
+   "r": 5.4978,
    "t": 1,
-   "sprite": "storm_building_hell_fort.y285.s100.t1"
+   "sprite": "storm_building_hell_fort.y315.s100.t1"
   },
   {
    "m": "storm_building_hell_fort",
    "x": 156,
    "y": 68,
    "z": 7.916,
-   "r": 5.1235,
+   "r": 5.4978,
    "t": 1,
-   "sprite": "storm_building_hell_fort.y294.s100.t1"
+   "sprite": "storm_building_hell_fort.y315.s100.t1"
   },
   {
    "m": "storm_building_heaven_fort",
    "x": 92,
    "y": 140,
    "z": 7.916,
-   "r": 1.7077,
+   "r": 5.4978,
    "t": 0,
-   "sprite": "storm_building_heaven_fort.y98.s100.t0"
+   "sprite": "storm_building_heaven_fort.y315.s100.t0"
   },
   {
    "m": "storm_building_heaven_keep",
    "x": 61,
    "y": 117,
    "z": 7.916,
-   "r": 2.2902,
+   "r": 5.4978,
    "t": 0,
-   "sprite": "storm_building_heaven_keep.y131.s100.t0"
+   "sprite": "storm_building_heaven_keep.y315.s100.t0"
   },
   {
    "m": "storm_building_heaven_keep",
    "x": 65,
    "y": 84,
    "z": 7.916,
-   "r": 0.796,
+   "r": 5.4978,
    "t": 0,
-   "sprite": "storm_building_heaven_keep.y46.s100.t0"
+   "sprite": "storm_building_heaven_keep.y315.s100.t0"
   },
   {
    "m": "storm_building_hell_keep",
    "x": 187,
    "y": 91,
    "z": 7.916,
-   "r": 3.9265,
+   "r": 5.4978,
    "t": 1,
-   "sprite": "storm_building_hell_keep.y225.s100.t1"
+   "sprite": "storm_building_hell_keep.y315.s100.t1"
   },
   {
    "m": "storm_building_hell_keep",
    "x": 183,
    "y": 124,
    "z": 7.916,
-   "r": 3.9265,
+   "r": 5.4978,
    "t": 1,
-   "sprite": "storm_building_hell_keep.y225.s100.t1"
+   "sprite": "storm_building_hell_keep.y315.s100.t1"
   },
   {
    "m": "storm_building_hell_wall",
    "x": 183.5,
    "y": 78.5,
    "z": 7.916,
-   "r": 3.9267,
+   "r": 3.927,
    "t": 1,
    "sprite": "storm_building_hell_wall.y225.s100.t1"
   },
@@ -1026,7 +999,7 @@
    "x": 173.5,
    "y": 88.5,
    "z": 7.916,
-   "r": 3.665,
+   "r": 3.6651,
    "t": 1,
    "sprite": "storm_building_hell_wall.y210.s100.t1"
   },
@@ -1035,7 +1008,7 @@
    "x": 142.5,
    "y": 73,
    "z": 7.916,
-   "r": 3.1413,
+   "r": 3.1416,
    "t": 1,
    "sprite": "storm_building_hell_wall.y180.s100.t1"
   },
@@ -1044,7 +1017,7 @@
    "x": 145.5,
    "y": 59,
    "z": 7.916,
-   "r": 3.1413,
+   "r": 3.1416,
    "t": 1,
    "sprite": "storm_building_hell_wall.y180.s100.t1"
   },
@@ -1053,7 +1026,7 @@
    "x": 138.5,
    "y": 137,
    "z": 7.916,
-   "r": 3.1413,
+   "r": 3.1416,
    "t": 1,
    "sprite": "storm_building_hell_wall.y180.s100.t1"
   },
@@ -1062,7 +1035,7 @@
    "x": 140.5,
    "y": 151,
    "z": 7.916,
-   "r": 2.8796,
+   "r": 2.8797,
    "t": 1,
    "sprite": "storm_building_hell_wall.y165.s100.t1"
   },
@@ -1071,7 +1044,7 @@
    "x": 170.5,
    "y": 126.5,
    "z": 7.916,
-   "r": 2.356,
+   "r": 2.3562,
    "t": 1,
    "sprite": "storm_building_hell_wall.y135.s100.t1"
   },
@@ -1080,7 +1053,7 @@
    "x": 180.5,
    "y": 136.5,
    "z": 7.916,
-   "r": 2.0942,
+   "r": 2.0943,
    "t": 1,
    "sprite": "storm_building_hell_wall.y120.s100.t1"
   },
@@ -1089,7 +1062,7 @@
    "x": 64.5,
    "y": 129.5,
    "z": 7.916,
-   "r": 0.7851,
+   "r": 0.7854,
    "t": 0,
    "sprite": "storm_building_heaven_wall.y45.s100.t0"
   },
@@ -1098,7 +1071,7 @@
    "x": 74.5,
    "y": 119.5,
    "z": 7.916,
-   "r": 0.5234,
+   "r": 0.5235,
    "t": 0,
    "sprite": "storm_building_heaven_wall.y30.s100.t0"
   },
@@ -1134,7 +1107,7 @@
    "x": 107.5,
    "y": 57,
    "z": 7.916,
-   "r": 6.0212,
+   "r": 6.0213,
    "t": 0,
    "sprite": "storm_building_heaven_wall.y345.s100.t0"
   },
@@ -1143,7 +1116,7 @@
    "x": 77.5,
    "y": 81.5,
    "z": 7.916,
-   "r": 5.4975,
+   "r": 5.4978,
    "t": 0,
    "sprite": "storm_building_heaven_wall.y315.s100.t0"
   },
@@ -1152,7 +1125,7 @@
    "x": 67.5,
    "y": 71.5,
    "z": 7.916,
-   "r": 5.2358,
+   "r": 5.2359,
    "t": 0,
    "sprite": "storm_building_heaven_wall.y300.s100.t0"
   }

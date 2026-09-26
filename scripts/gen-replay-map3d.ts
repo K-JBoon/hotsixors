@@ -9,7 +9,7 @@ import { createServer } from "node:http";
 import { createReadStream, existsSync } from "node:fs";
 import { readFile, stat } from "node:fs/promises";
 import { extname, join, normalize } from "node:path";
-import puppeteer from "puppeteer";
+import puppeteer, { type Page } from "puppeteer";
 
 import { SITE_STATIC, SITE_STATIC_REPLAY } from "./lib/paths.ts";
 import { readJsonSafe, writeBinary, writeJson } from "./lib/fs.ts";
@@ -53,6 +53,8 @@ const SPRITE_PITCH = 60;
 const FORMAT = "image/webp";
 const PLATE_QUALITY = Number(process.env.PLATE_QUALITY) || 0.82;
 const SPRITE_QUALITY = 0.9;
+/** Maps rendered at once. */
+const JOBS = Number(process.env.MAP3D_JOBS) || 2;
 
 interface Instance {
   m: string;
@@ -132,102 +134,118 @@ async function main() {
   const rendered = new Set(await readJsonSafe<string[]>(PLATE_INDEX) ?? []);
 
   const site = await serveStatic(SITE_STATIC);
-  const browser = await puppeteer.launch({
-    headless: true,
-    args: [
-      "--use-gl=angle",
-      "--use-angle=swiftshader",
-      "--enable-unsafe-swiftshader",
-      "--enable-webgl",
-      "--ignore-gpu-blocklist",
-      "--no-sandbox",
-    ],
-  });
-  const page = await browser.newPage();
-  page.on("pageerror", (error: unknown) => console.error("page:", String(error)));
-  await page.setViewport({ width: 960, height: 720 });
+  // Index writes are queued so parallel workers never write the file at once.
+  let indexWrite = Promise.resolve();
+  const saveIndex = () => (indexWrite = indexWrite.then(() => writeJson(PLATE_INDEX, [...rendered].sort(), 1)));
 
-  try {
-    for (const slug of slugs) {
-      try {
-        const meta = bySlug.get(slug);
-        if (!meta) {
-          console.error(`gen-replay-map3d: ${slug} is not in maps.json`);
-          continue;
-        }
-        const placedFile = join(SITE_STATIC, "lost-in-the-nexus/maps3d", `${slug}.json`);
-        if (!existsSync(placedFile)) {
-          console.error(`gen-replay-map3d: ${slug} has no 3D conversion`);
-          continue;
-        }
-
-        // A fresh page per map: model caches and animation mixers pile up.
-        await page.goto(`http://127.0.0.1:${site.port}/lost-in-the-nexus/render.html`, { waitUntil: "load" });
-        await page.waitForFunction("window.nexusReady === true", { timeout: 120_000 });
-
-        const rect = { minX: 0, minY: 0, maxX: meta.mapWidth, maxY: meta.mapHeight };
-        const plate = await page.evaluate(
-          (s, r, options) => window.nexusRender.map(s, r, options),
-          slug,
-          rect,
-          { pxPerUnit: PLATE_SCALE, format: FORMAT, quality: PLATE_QUALITY },
-        );
-        if (!plate) {
-          console.error(`gen-replay-map3d: ${slug} failed to load`);
-          continue;
-        }
-        await writeBinary(join(PLATE_DIR, `${slug}.webp`), decodeImage(plate));
-
-        const placed = JSON.parse(await readFile(placedFile, "utf-8")) as { instances: Instance[] };
-        const buildings = placed.instances.filter((item) => item.m.startsWith("storm_building_"));
-
-        // One sprite per distinct model, yaw, scale and team: two towers facing
-        // different ways are different pictures, and 60 buildings collapse to ~48.
-        const spriteDir = join(PLATE_DIR, slug);
-        const sprites = new Map<string, SpriteEntry>();
-        for (const item of buildings) {
-          const key = spriteKey(item);
-          item.sprite = key;
-          if (sprites.has(key)) continue;
-          const sprite = await page.evaluate(
-            (n, options) => window.nexusRender.sprite(n, options),
-            item.m,
-            { pxPerUnit: SPRITE_SCALE, pitch: SPRITE_PITCH, r: item.r || 0, s: item.s || 0, team: item.t, format: FORMAT, quality: SPRITE_QUALITY },
-          );
-          if (!sprite) {
-            console.error(`gen-replay-map3d: no model for ${item.m}`);
-            continue;
-          }
-          await writeBinary(join(spriteDir, `${key}.webp`), decodeImage(sprite.png));
-          sprites.set(key, {
-            w: sprite.w,
-            h: sprite.h,
-            worldW: sprite.worldW,
-            worldH: sprite.worldH,
-            anchorX: sprite.anchorX,
-            anchorY: sprite.anchorY,
-            file: `/replay/plates/${slug}/${key}.webp`,
-          });
-        }
-
-        await writeJson(
-          join(PLATE_DIR, `${slug}.json`),
-          { scale: PLATE_SCALE, pitch: SPRITE_PITCH, sprites: Object.fromEntries(sprites), buildings },
-          1,
-        );
-        rendered.add(slug);
-        await writeJson(PLATE_INDEX, [...rendered].sort(), 1);
-        console.log(`gen-replay-map3d: ${slug}, ${buildings.length} buildings, ${sprites.size} sprites`);
-      } catch (error) {
-        console.error(`gen-replay-map3d: ${slug} failed:`, error);
-      }
+  async function renderMap(page: Page, slug: string) {
+    const meta = bySlug.get(slug);
+    if (!meta) {
+      console.error(`gen-replay-map3d: ${slug} is not in maps.json`);
+      return;
     }
+    const placedFile = join(SITE_STATIC, "lost-in-the-nexus/maps3d", `${slug}.json`);
+    if (!existsSync(placedFile)) {
+      console.error(`gen-replay-map3d: ${slug} has no 3D conversion`);
+      return;
+    }
+
+    // A fresh page per map: model caches and animation mixers pile up.
+    await page.goto(`http://127.0.0.1:${site.port}/lost-in-the-nexus/render.html`, { waitUntil: "load" });
+    await page.waitForFunction("window.nexusReady === true", { timeout: 120_000 });
+
+    const rect = { minX: 0, minY: 0, maxX: meta.mapWidth, maxY: meta.mapHeight };
+    const plate = await page.evaluate(
+      (s, r, options) => window.nexusRender.map(s, r, options),
+      slug,
+      rect,
+      { pxPerUnit: PLATE_SCALE, format: FORMAT, quality: PLATE_QUALITY },
+    );
+    if (!plate) {
+      console.error(`gen-replay-map3d: ${slug} failed to load`);
+      return;
+    }
+    await writeBinary(join(PLATE_DIR, `${slug}.webp`), decodeImage(plate));
+
+    const placed = JSON.parse(await readFile(placedFile, "utf-8")) as { instances: Instance[] };
+    const buildings = placed.instances.filter((item) => item.m.startsWith("storm_building_"));
+
+    // One sprite per distinct model, yaw, scale and team: two towers facing
+    // different ways are different pictures, and 60 buildings collapse to ~48.
+    const spriteDir = join(PLATE_DIR, slug);
+    const sprites = new Map<string, SpriteEntry>();
+    for (const item of buildings) {
+      const key = spriteKey(item);
+      item.sprite = key;
+      if (sprites.has(key)) continue;
+      const sprite = await page.evaluate(
+        (n, options) => window.nexusRender.sprite(n, options),
+        item.m,
+        { pxPerUnit: SPRITE_SCALE, pitch: SPRITE_PITCH, r: item.r || 0, s: item.s || 0, team: item.t, format: FORMAT, quality: SPRITE_QUALITY },
+      );
+      if (!sprite) {
+        console.error(`gen-replay-map3d: no model for ${item.m}`);
+        continue;
+      }
+      await writeBinary(join(spriteDir, `${key}.webp`), decodeImage(sprite.png));
+      sprites.set(key, {
+        w: sprite.w,
+        h: sprite.h,
+        worldW: sprite.worldW,
+        worldH: sprite.worldH,
+        anchorX: sprite.anchorX,
+        anchorY: sprite.anchorY,
+        file: `/replay/plates/${slug}/${key}.webp`,
+      });
+    }
+
+    await writeJson(
+      join(PLATE_DIR, `${slug}.json`),
+      { scale: PLATE_SCALE, pitch: SPRITE_PITCH, sprites: Object.fromEntries(sprites), buildings },
+      1,
+    );
+    rendered.add(slug);
+    await saveIndex();
+    console.log(`gen-replay-map3d: ${slug}, ${buildings.length} buildings, ${sprites.size} sprites`);
+  }
+
+  // A browser per worker: each gets its own SwiftShader GPU process.
+  async function worker(queue: string[]) {
+    const browser = await puppeteer.launch({
+      headless: true,
+      args: [
+        "--use-gl=angle",
+        "--use-angle=swiftshader",
+        "--enable-unsafe-swiftshader",
+        "--enable-webgl",
+        "--ignore-gpu-blocklist",
+        "--no-sandbox",
+      ],
+    });
+    try {
+      const page = await browser.newPage();
+      page.on("pageerror", (error: unknown) => console.error("page:", String(error)));
+      await page.setViewport({ width: 960, height: 720 });
+      for (let slug = queue.shift(); slug; slug = queue.shift()) {
+        try {
+          await renderMap(page, slug);
+        } catch (error) {
+          console.error(`gen-replay-map3d: ${slug} failed:`, error);
+        }
+      }
+    } finally {
+      await browser.close();
+    }
+  }
+
+  const queue = [...slugs];
+  try {
+    await Promise.all(Array.from({ length: Math.min(JOBS, queue.length) }, () => worker(queue)));
   } finally {
-    await browser.close();
     await site.close();
   }
 
-  await writeJson(PLATE_INDEX, [...rendered].sort(), 1);
+  await saveIndex();
 }
 
 runScript(import.meta.url, main);

@@ -9,6 +9,9 @@ import { OutputPass } from '/nexus-vendor/postprocessing/OutputPass.js';
 import { emitterMesh } from '/lost-in-the-nexus/nexus-particles.js';
 import { BloomPass } from '/lost-in-the-nexus/nexus-bloom.js';
 import { applySplat, roughnessOf } from '/lost-in-the-nexus/nexus-terrain.js';
+import { STAGES, LAST_SHADING_STAGE, stageFeatures, stageMaterial } from '/lost-in-the-nexus/nexus-stages.js';
+import { modelInfo, materialInfo, materialControls } from '/lost-in-the-nexus/nexus-tweaks.js';
+import { createFrameStats, formatStats } from '/lost-in-the-nexus/nexus-perf.js';
 
 // The frame is gamma space end to end, so a hex colour means what it says.
 THREE.ColorManagement.enabled = false;
@@ -49,6 +52,21 @@ function fetchJson(url) {
            ${call}
          }
        #endif` + chunk.slice(hit + call.length);
+    THREE.ShaderChunk.lights_fragment_begin = THREE.ShaderChunk.lights_fragment_begin
+      .replace(
+        '#if defined( USE_SHADOWMAP ) && ( UNROLLED_LOOP_INDEX < NUM_DIR_LIGHT_SHADOWS )',
+        '#if defined( USE_SHADOWMAP ) && ( UNROLLED_LOOP_INDEX < NUM_DIR_LIGHT_SHADOWS ) && UNROLLED_LOOP_INDEX != 1'
+      )
+      .replace(
+        'vDirectionalShadowCoord[ i ] ) : 1.0;',
+        `vDirectionalShadowCoord[ i ] ) : 1.0;
+        #if NUM_DIR_LIGHT_SHADOWS > 1
+          if ( UNROLLED_LOOP_INDEX == 0 && receiveShadow ) {
+            DirectionalLightShadow moving = directionalLightShadows[ 1 ];
+            directLight.color *= getShadow( directionalShadowMap[ 1 ], moving.shadowMapSize, moving.shadowIntensity, moving.shadowBias, moving.shadowRadius, vDirectionalShadowCoord[ 1 ] );
+          }
+        #endif`
+      );
     THREE.ShaderChunk.lights_pars_begin = `#ifdef GAME_SHADING
         uniform vec3 keySpecular;
       #endif
@@ -139,9 +157,21 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
   sun.castShadow = true;
   sun.shadow.mapSize.set(4096, 4096);
   sun.shadow.radius = 3;
-  scene.add(ambient, sun, sun.target, fill, back);
+  // Static casters draw into the key's map only when something changes.
+  // Animated ones redraw each frame into the map of a dark light at index 1,
+  // which the key samples as well.
+  const MOVING = 1;
+  const DORMANT = 2;
+  sun.shadow.autoUpdate = false;
+  const sunMoving = new THREE.DirectionalLight(0x000000, 0);
+  sunMoving.target = sun.target;
+  sunMoving.castShadow = true;
+  sunMoving.shadow.mapSize.copy(sun.shadow.mapSize);
+  sunMoving.shadow.radius = sun.shadow.radius;
+  scene.add(ambient, sun, sunMoving, sun.target, fill, back);
 
-  renderer.shadowMap.type = THREE.PCFShadowMap;
+  // A restored context comes back with a default shadow map.
+  renderer.domElement.addEventListener('webglcontextrestored', () => setShadows(shadowsOn));
   renderer.toneMapping = THREE.CustomToneMapping;
   // The game lights in gamma space: art is read as stored and the frame is not
   // encoded again. Lit in linear space, every shadow and midtone came out
@@ -167,6 +197,9 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
   // The key's specular colour, which the game premultiplies by the map's
   // HDRSpecMultiplier.
   const keySpecular = { value: new THREE.Color() };
+  const specularBase = new THREE.Color();
+  let specularScale = 1;
+  let frameBase = {};
 
   function gameShading(material, specular = Boolean(material?.specularColorMap)) {
     if (!material || material.userData.gameShaded) return;
@@ -243,15 +276,36 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
     scene.fog = fog
       ? new THREE.Fog(new THREE.Color(...fog.colour), fog.density * Math.exp(fog.height * fog.falloff), fog.falloff)
       : null;
+    specularBase.copy(keySpecular.value);
+    specularScale = 1;
+    frameBase = {};
+    frameBase = Object.fromEntries(frameControls().map((c) => [c.key, c.get()]));
   }
 
+  // Placed art never moves, so the renderer's walk over every node is off.
+  // Anything that does move updates its own matrices: the lights and wisps
+  // each frame, animated models when they animate.
   const world = new THREE.Group();
   scene.add(world);
+  scene.matrixWorldAutoUpdate = false;
+
+  function freeze(node) {
+    node.updateMatrixWorld(true);
+    node.traverse((child) => (child.matrixAutoUpdate = false));
+    return node;
+  }
 
   const aspect = () => view.clientWidth / Math.max(view.clientHeight, 1);
   const ortho = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 6000);
   const FREE_FOV = 50;
   const persp = new THREE.PerspectiveCamera(FREE_FOV, aspect(), 0.2, 6000);
+  const seesAll = (cam) => {
+    cam.layers.enable(MOVING);
+    cam.layers.enable(DORMANT);
+    return cam;
+  };
+  seesAll(ortho);
+  seesAll(persp);
   let camera = persp;
 
   // The scene renders to HDR so additive glow accumulates before the tone map.
@@ -305,8 +359,12 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
         if (material?.userData?.emissiveFresnel) {
           applyEmissiveFresnel(material, material.userData.emissiveFresnel);
         }
+        if (material?.userData?.diffuseFresnel) {
+          applyDiffuseFresnel(material, material.userData.diffuseFresnel);
+        }
         // A mask that could not be baked — it scrolls, or it reads the other
         // unwrap — is the material's transparency, glow art or not.
+        if (material?.userData?.teamLight) applyTeamLight(material, material.userData.teamLight);
         if (material?.userData?.mask) applyMask(material, material.userData.mask);
         if (material?.userData?.flipbook) applyFlipbook(material, material.userData.flipbook);
         if (material?.userData?.roughnessInSpecularAlpha) applySpecularRoughness(material);
@@ -324,6 +382,9 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
           material.blending = THREE.AdditiveBlending;
           material.depthWrite = false;
           material.fog = false;
+          // Order does not matter to an additive layer; the default two-pass
+          // double-sided draw also marks the material dirty twice per frame.
+          material.forceSinglePass = true;
         }
         const scroll = material.userData.scroll;
         if (scroll && material.map) scrollers.push({ map: material.map, scroll });
@@ -418,6 +479,13 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
     material.customProgramCacheKey = () => material.programKey;
   }
 
+  // The game's CalcFresnelTerm: pow(1 - |N.V|, exp) peaks at the silhouette,
+  // and the inverted mode is one minus that.
+  function fresnelTerm(normal, eye, inverted, exponent, low, span) {
+    const rim = `pow( max( 1.0 - abs( dot( ${normal}, ${eye} ) ), 0.0001 ), ${exponent.toFixed(2)} )`;
+    return `clamp( ${low.toFixed(3)} + ${span.toFixed(3)} * ${inverted ? `( 1.0 - ${rim} )` : rim}, 0.0, 1.0 )`;
+  }
+
   // A layer can fade by view angle, and on the game's energy that is the whole
   // effect: the Hall of Storms wall is a full cylinder of bright cyan faded out
   // wherever it faces the camera, leaving the rim of the portal. Without it the
@@ -446,9 +514,7 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
         ${shader.fragmentShader}`.replace(
         '#include <color_fragment>',
         `#include <color_fragment>
-         float facing = abs( dot( normalize( vGlowNormal ), normalize( vGlowEye ) ) );
-         float rim = pow( ${inverted ? '1.0 - facing' : 'facing'}, ${exponent.toFixed(2)} );
-         diffuseColor.a *= clamp( ${low.toFixed(3)} + ${span.toFixed(3)} * rim, 0.0, 1.0 );`
+         diffuseColor.a *= ${fresnelTerm('normalize( vGlowNormal )', 'normalize( vGlowEye )', inverted, exponent, low, span)};`
       );
     };
     material.needsUpdate = true;
@@ -482,6 +548,7 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
   const REFLECTIVE_CUBE = 2;
   const REFLECTIVE_SPHERE = 3;
   const envioMaps = new Map();
+  const envioUniforms = new WeakMap();
 
   const ENVIO_CUBE = /* glsl */ `
     vec3 envioCube( sampler2D strip, vec3 d ) {
@@ -531,6 +598,7 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
       maskMap.flipY = false;
       uniforms.envioMask.value = maskMap;
     }
+    envioUniforms.set(material, uniforms);
     keyProgram(material, `envio:${lookup}:${Boolean(mask)}`);
     const before = material.onBeforeCompile;
     material.onBeforeCompile = (shader, renderer) => {
@@ -587,9 +655,65 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
       shader.fragmentShader = shader.fragmentShader.replace(
         '#include <emissivemap_fragment>',
         `#include <emissivemap_fragment>
-         float emisFacing = abs( dot( normal, normalize( vViewPosition ) ) );
-         float emisRim = pow( ${inverted ? '1.0 - emisFacing' : 'emisFacing'}, ${exponent.toFixed(2)} );
-         totalEmissiveRadiance *= clamp( ${low.toFixed(3)} + ${span.toFixed(3)} * emisRim, 0.0, 1.0 );`
+         totalEmissiveRadiance *= ${fresnelTerm('normal', 'normalize( vViewPosition )', inverted, exponent, low, span)};`
+      );
+    };
+    material.needsUpdate = true;
+  }
+
+  // The same fade over lit art. The Heaven crystals are green in the diffuse
+  // and that layer fades out facing the camera, which leaves the team-coloured
+  // light. It runs after the normal map and before lighting reads diffuseColor.
+  function applyDiffuseFresnel(material, [inverted, exponent, low, span]) {
+    if (material.userData.diffuseFaded) return;
+    material.userData.diffuseFaded = true;
+    keyProgram(material, `diffFresnel:${inverted},${exponent},${low},${span}`);
+    const before = material.onBeforeCompile;
+    material.onBeforeCompile = (shader, renderer) => {
+      before?.call(material, shader, renderer);
+      shader.fragmentShader = shader.fragmentShader.replace(
+        '#include <emissivemap_fragment>',
+        `#include <emissivemap_fragment>
+         diffuseColor.rgb *= ${fresnelTerm('normal', 'normalize( vViewPosition )', inverted, exponent, low, span)};`
+      );
+    };
+    material.needsUpdate = true;
+  }
+
+  // `team colour emissive add` on flat art: the owner's colour added as light,
+  // under the layer's picked channel or as a flat amount. The Heaven moonwell's
+  // rings and haze and the fountain's flames are drawn this way.
+  function applyTeamLight(material, { uri, tiling = [1, 1], bright, uv = 0 }) {
+    if (material.userData.teamLit) return;
+    material.userData.teamLit = true;
+    const uniforms = { teamEmissive: { value: TEAM_EMISSIVE[NEUTRAL] }, teamLight: { value: null } };
+    if (uri) {
+      const map = textures.load(asset('/lost-in-the-nexus/models/' + uri));
+      map.wrapS = map.wrapT = THREE.RepeatWrapping;
+      map.flipY = false;
+      map.repeat.set(tiling[0], tiling[1]);
+      uniforms.teamLight.value = map;
+    }
+    keyProgram(material, `teamLight:${Boolean(uri)}:${bright}:${uv}:${tiling}`);
+    const before = material.onBeforeCompile;
+    material.onBeforeCompile = (shader, renderer) => {
+      before?.call(material, shader, renderer);
+      shader.uniforms.teamEmissive = uniforms.teamEmissive;
+      shader.uniforms.teamLight = uniforms.teamLight;
+      // The Heaven gate's bars light through the second unwrap.
+      const head = uv ? 'varying vec2 vTeamUv;\n#ifndef USE_UV1\nattribute vec2 uv1;\n#endif\n' : 'varying vec2 vTeamUv;\n';
+      shader.vertexShader = head + shader.vertexShader.replace(
+        '#include <uv_vertex>',
+        `#include <uv_vertex>
+         vTeamUv = ${uv ? 'uv1' : 'uv'} * vec2( ${tiling[0].toFixed(4)}, ${tiling[1].toFixed(4)} );`
+      );
+      shader.fragmentShader = `varying vec2 vTeamUv;
+        uniform vec3 teamEmissive;
+        ${uri ? 'uniform sampler2D teamLight;' : ''}
+        ${shader.fragmentShader}`.replace(
+        '#include <color_fragment>',
+        `#include <color_fragment>
+         diffuseColor.rgb += teamEmissive * ${bright.toFixed(4)}${uri ? ' * texture2D( teamLight, vTeamUv ).g' : ''};`
       );
     };
     material.needsUpdate = true;
@@ -597,12 +721,17 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
 
   // Team colour is a mask in the art's alpha: 1 keeps the art, 0 is all team
   // colour. Only a material the converter marked asks for it — its layer reads
-  // RGBA — so a gate's ward turns and the stone it hangs in does not.
-  const TEAM_COLOURS = [new THREE.Color(0x3f7fd8), new THREE.Color(0xd8452f)];
+  // RGBA — so a gate's ward turns and the stone it hangs in does not. The game's
+  // `CColorSpec` colours, one diffuse and one emissive per owner. A placement
+  // with no owner is neutral, which is also where a merc camp's ring starts.
+  const NEUTRAL = 2;
+  const TEAM_COLOURS = [0x245cff, 0xb20000, 0xf7de0e].map((c) => new THREE.Color(c));
+  const TEAM_EMISSIVE = [0x245cff, 0xff0000, 0x7ebff1].map((c) => new THREE.Color(c));
   const teamMaterials = new Map();
 
   function teamMaterial(source, team) {
-    if (!source?.userData?.team && !source?.userData?.emissiveTeam) return source;
+    const { team: masked, emissiveTeam, teamTint, teamLight } = source?.userData ?? {};
+    if (!masked && !emissiveTeam && !teamTint && !teamLight) return source;
     const key = `${source.uuid}|${team}`;
     const cached = teamMaterials.get(key);
     if (cached) return cached;
@@ -613,11 +742,22 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
     material.defines = { ...source.defines };
     material.programKey = source.programKey || '';
     material.customProgramCacheKey = () => material.programKey;
+    material.onBeforeCompile = source.onBeforeCompile;
+    if (envioUniforms.has(source)) envioUniforms.set(material, envioUniforms.get(source));
     // `team colour emissive add`: the layer is the shape of the light and the
     // owner's colour is the light. Untinted it is a grey lamp on every gate.
     if (source.userData.emissiveTeam && material.emissive) {
-      material.emissive = TEAM_COLOURS[team].clone();
+      material.emissive = TEAM_EMISSIVE[team].clone();
     }
+    if (teamLight) {
+      const before = material.onBeforeCompile;
+      material.onBeforeCompile = (shader, renderer) => {
+        before?.call(material, shader, renderer);
+        shader.uniforms.teamEmissive = { value: TEAM_EMISSIVE[team] };
+      };
+    }
+    // A capture ring's art is only the glyph's shape; the owner's colour is its colour.
+    if (source.userData.teamTint) material.color.multiply(TEAM_COLOURS[team]);
     if (source.userData.team) {
       keyProgram(material, `team:${team}`);
       const before = source.onBeforeCompile;
@@ -696,6 +836,7 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
       metalness: 0.0,
       depthWrite: false,
       side: THREE.DoubleSide,
+      forceSinglePass: true,
     });
     if (normals) waterSurface(material, normals, tiling, scroll);
     return new THREE.Mesh(geometry, material);
@@ -776,6 +917,7 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
       transparent: true,
       depthWrite: false,
       side: THREE.DoubleSide,
+      forceSinglePass: true,
     }));
     const centre = box.getCenter(new THREE.Vector3());
     mesh.position.set(centre.x, box.max.y - BACKDROP_DROP, centre.z);
@@ -784,6 +926,7 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
 
   // Instances share their source's buffers, so each is freed once.
   function clearWorld() {
+    endInspect();
     mixers.length = 0;
     scrollers.length = 0;
     flipbooks.length = 0;
@@ -844,12 +987,13 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
       }
       if (ground) {
         world.add(ground.scene);
+        freeze(ground.scene);
         groundBox = new THREE.Box3().setFromObject(ground.scene);
         // Only the maps that hang in daylight name one; elsewhere the scene's
         // own background is what belongs under the cut.
-        if (terrain.backdrop) world.add(backdropMesh(groundBox, terrain.backdrop));
+        if (terrain.backdrop) world.add(freeze(backdropMesh(groundBox, terrain.backdrop)));
       }
-      for (const body of terrain.water || []) world.add(waterMesh(body));
+      for (const body of terrain.water || []) world.add(freeze(waterMesh(body)));
     }
 
     const sources = {};
@@ -881,19 +1025,28 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
       const clip = clips[item.m];
       // A skinned model needs its own skeleton, which a plain clone shares.
       const node = clip ? cloneSkinned(source) : source.clone(true);
+      node.userData.model = item.m;
       node.position.set(item.x, item.z, -item.y);
       node.rotation.y = item.r || 0;
       if (item.s) node.scale.multiplyScalar(item.s);
-      if (item.t !== undefined && models.models[item.m]?.team) applyTeam(node, item.t);
+      if (models.models[item.m]?.team) applyTeam(node, item.t ?? NEUTRAL);
       world.add(node);
-      if (clip) {
-        const mixer = new THREE.AnimationMixer(node);
-        const action = mixer.clipAction(clip);
-        action.play();
-        // Or every tree sways in lockstep.
-        action.time = Math.random() * clip.duration;
-        mixers.push(mixer);
-      }
+      freeze(node);
+      if (!clip) continue;
+      const parts = [];
+      node.traverse((child) => {
+        child.layers.set(MOVING);
+        parts.push(child);
+      });
+      const mixer = new THREE.AnimationMixer(node);
+      const action = mixer.clipAction(clip);
+      action.play();
+      // Or every tree sways in lockstep.
+      action.time = Math.random() * clip.duration;
+      // Wide enough that a shadow falling into view still moves.
+      const reach = new THREE.Box3().setFromObject(node).getBoundingSphere(new THREE.Sphere());
+      reach.radius *= 3;
+      mixers.push({ node, parts, mixer, reach, idle: 0, awake: true });
     }
 
     emitterSource = { instances: placed.instances, models, wanted };
@@ -958,15 +1111,42 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
       const priority = materials.find((m) => m.userData?.priority)?.userData?.priority;
       if (priority) node.renderOrder = priority;
     });
+    sun.shadow.needsUpdate = true;
   }
 
   // Toggling the shadow map changes every program, so the materials recompile.
   function setBloom(on) {
+    if (inspecting) {
+      inspecting.bloom = on;
+      setStage(inspecting.stage);
+      return;
+    }
     blooms[0].enabled = on;
   }
 
+  // three culls shadow casters by the view camera's layers, so each map
+  // gets its own pass with a camera that sees only its casters.
+  const staticCasters = new THREE.Camera();
+  const movingCasters = new THREE.Camera();
+  movingCasters.layers.set(MOVING);
+
+  function splitShadowPass(shadowMap) {
+    if (shadowMap.split) return;
+    shadowMap.split = true;
+    const render = shadowMap.render;
+    shadowMap.render = function (lights, root) {
+      render.call(this, lights.filter((light) => light === sun), root, staticCasters);
+      render.call(this, lights.filter((light) => light === sunMoving), root, movingCasters);
+    };
+  }
+
+  let shadowsOn = false;
   function setShadows(on) {
+    shadowsOn = on;
+    splitShadowPass(renderer.shadowMap);
+    renderer.shadowMap.type = THREE.PCFShadowMap;
     renderer.shadowMap.enabled = on;
+    sun.shadow.needsUpdate = true;
     world.traverse((node) => {
       for (const m of [node.material].flat()) if (m) m.needsUpdate = true;
     });
@@ -985,7 +1165,11 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
     cam.near = 0.5;
     cam.far = radius * 5;
     cam.updateProjectionMatrix();
-    sun.shadow.normalBias = (2 * radius) / sun.shadow.mapSize.x * 1.5;
+    sun.shadow.normalBias = ((2 * radius) / sun.shadow.mapSize.x) * (sun.shadow.radius + 1.5);
+    sun.shadow.needsUpdate = true;
+    sunMoving.position.copy(sun.position);
+    sunMoving.shadow.normalBias = sun.shadow.normalBias;
+    sunMoving.shadow.camera.copy(cam);
   }
 
   function frame({ span: wantSpan, cx, cy, flat } = {}) {
@@ -1149,7 +1333,7 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
     controls.update();
   }
 
-  const shotCamera = new THREE.PerspectiveCamera(50, 1, 0.2, 6000);
+  const shotCamera = seesAll(new THREE.PerspectiveCamera(50, 1, 0.2, 6000));
 
   // Readback of an offscreen render: the live canvas keeps showing the player's
   // own view while a shot is developed.
@@ -1164,6 +1348,7 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
       renderer.setClearAlpha(0);
     }
     const previous = renderer.getRenderTarget();
+    animate(0, cam);
     renderer.setRenderTarget(hdr);
     renderer.render(scene, cam);
     if (blooms[0].enabled) {
@@ -1202,7 +1387,7 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
   // Straight-down orthographic plate of a game-coordinate rect, at the replay
   // viewer's pixels per game unit. Image north is +y, which is how the viewer
   // reads its minimaps.
-  const rectCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 8000);
+  const rectCamera = seesAll(new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 8000));
   function renderRect({ minX, minY, maxX, maxY, pxPerUnit = 4, transparent = false, format = 'image/png', quality = 0.92 }) {
     const w = maxX - minX;
     const h = maxY - minY;
@@ -1226,7 +1411,7 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
   // One model alone on transparent ground, pitched the way the replay viewer
   // pastes it over a flat map. The anchor is where the instance's own origin
   // lands in the image, so the viewer can place it from a world position.
-  const modelCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 8000);
+  const modelCamera = seesAll(new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 8000));
   const SPRITE_PAD = 0.15; // game units of margin, so antialiasing has room
   async function renderModel(name, { pxPerUnit = 26, pitch: spritePitch = 60, team, r = 0, s = 0, format = 'image/png', quality = 0.92 } = {}) {
     const models = await modelsIndex();
@@ -1379,8 +1564,20 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
   // A click, not a drag: OrbitControls already owns pointerdown for orbiting,
   // so this only fires the pick on a short, near-stationary press.
   const pickRay = new THREE.Raycaster();
+  pickRay.layers.enable(MOVING);
+  pickRay.layers.enable(DORMANT);
   let pressAt = null;
   let pressTime = 0;
+  let onClick = null;
+
+  function aimPick(x, y) {
+    const rect = renderer.domElement.getBoundingClientRect();
+    pickRay.setFromCamera(
+      new THREE.Vector2(((x - rect.left) / rect.width) * 2 - 1, -((y - rect.top) / rect.height) * 2 + 1),
+      camera
+    );
+  }
+
   renderer.domElement.addEventListener('pointerdown', (e) => {
     pressAt = [e.clientX, e.clientY];
     pressTime = performance.now();
@@ -1389,16 +1586,176 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
     if (!pressAt) return;
     const [x, y] = pressAt;
     pressAt = null;
-    if (!onWispPick || !wisps.size) return;
     if (Math.hypot(e.clientX - x, e.clientY - y) > 4 || performance.now() - pressTime > 350) return;
-    const rect = renderer.domElement.getBoundingClientRect();
-    pickRay.setFromCamera(
-      new THREE.Vector2(((e.clientX - rect.left) / rect.width) * 2 - 1, -((e.clientY - rect.top) / rect.height) * 2 + 1),
-      camera
-    );
-    const hit = pickRay.intersectObjects([...wisps.values()], false)[0];
-    if (hit) onWispPick(hit.object.userData.wispId);
+    aimPick(e.clientX, e.clientY);
+    const wisp = onWispPick && pickRay.intersectObjects([...wisps.values()], false)[0];
+    if (wisp) onWispPick(wisp.object.userData.wispId);
+    else onClick?.(e);
   });
+
+  // The placed model under the pointer. Surfaces that write no depth (water,
+  // particles, the backdrop) let the ray through; the ground stops it.
+  function pickModel(x, y) {
+    aimPick(x, y);
+    for (const hit of pickRay.intersectObject(world, true)) {
+      let node = hit.object;
+      while (node && !node.userData.model) node = node.parent;
+      if (node) return node;
+      if ([hit.object.material].flat().some((m) => m?.depthWrite !== false)) return null;
+    }
+    return null;
+  }
+
+  // Debug: one model alone under the live renderer, its materials cut at a
+  // stage from STAGES. Orbit and fly work as usual; post stages switch the
+  // frame's bloom and tone map.
+  let inspecting = null;
+  const TONE_MAP_STAGE = STAGES.length - 1;
+  const BLOOM_STAGE = TONE_MAP_STAGE - 1;
+
+  // Frame-wide constants for the debug panel. Light sliders are in game units:
+  // 1 is the strength the map asks for.
+  function frameControls() {
+    const lit = (light) => ({ max: 3, get: () => light.intensity / Math.PI, set: (v) => (light.intensity = v * Math.PI) });
+    const list = [
+      ['exposure', 'Exposure', { max: 4, get: () => renderer.toneMappingExposure, set: (v) => (renderer.toneMappingExposure = v) }],
+      ['bloomThreshold', 'Bloom threshold', { max: 3, get: () => blooms[0].threshold, set: (v) => blooms.forEach((pass) => (pass.threshold = v)) }],
+      ['ambient', 'Ambient', lit(ambient)],
+      ['key', 'Key light', lit(sun)],
+      ['fill', 'Fill light', lit(fill)],
+      ['back', 'Back light', lit(back)],
+      ['keySpecular', 'Key specular', {
+        max: 4,
+        get: () => specularScale,
+        set: (v) => {
+          specularScale = v;
+          keySpecular.value.copy(specularBase).multiplyScalar(v);
+        },
+      }],
+    ];
+    if (scene.fog) {
+      const { fog } = scene;
+      list.push(
+        ['fogDensity', 'Fog density', { max: 4 * (frameBase.fogDensity || fog.near) || 0.02, step: 0.0001, get: () => fog.near, set: (v) => (fog.near = v) }],
+        ['fogFalloff', 'Fog falloff', { max: 4 * (frameBase.fogFalloff || fog.far) || 0.5, step: 0.0001, get: () => fog.far, set: (v) => (fog.far = v) }],
+      );
+    }
+    return list.map(([key, label, spec]) => ({ key, label, min: 0, step: 0.01, ...spec, base: frameBase[key] ?? spec.get() }));
+  }
+
+  function inspectDetails() {
+    if (!inspecting) return null;
+    const { node, originals, variants } = inspecting;
+    const unique = [...new Set(originals.flat())];
+    const apply = (material) => (fn) => {
+      fn(material);
+      for (const [key, copy] of variants) if (key.startsWith(`${material.uuid}|`)) fn(copy);
+    };
+    return {
+      model: modelInfo(node),
+      frame: frameControls(),
+      materials: unique.map((material) => ({
+        name: material.name || material.type,
+        info: materialInfo(material),
+        controls: materialControls(material, { envio: envioUniforms.get(material), apply: apply(material) }),
+      })),
+    };
+  }
+
+  // `inset` is the width in pixels the panel covers on the right; the model is
+  // centred in what is left.
+  function inspect(node, { inset = 0 } = {}) {
+    endInspect();
+    const meshes = [];
+    node.traverse((child) => {
+      if (child.isMesh && child.material) meshes.push(child);
+    });
+    const originals = meshes.map((mesh) => mesh.material);
+    const hidden = [...world.children, wispGroup].filter((o) => o !== node && o.visible);
+    for (const o of hidden) o.visible = false;
+    inspecting = {
+      node,
+      meshes,
+      originals,
+      hidden,
+      variants: new Map(),
+      bloom: blooms[0].enabled,
+      stage: 0,
+      view: { camera, position: camera.position.clone(), target: controls.target.clone(), fov: persp.fov, centre: centre.clone(), span },
+    };
+
+    const sphere = new THREE.Box3().setFromObject(node).getBoundingSphere(new THREE.Sphere());
+    const radius = Math.max(sphere.radius, 0.5);
+    const direction = camera.getWorldDirection(new THREE.Vector3());
+    if (camera !== persp) swapCamera();
+    persp.fov = FREE_FOV;
+    if (inset) persp.setViewOffset(view.clientWidth, view.clientHeight, inset / 2, 0, view.clientWidth, view.clientHeight);
+    const distance = (radius / Math.sin(THREE.MathUtils.degToRad(FREE_FOV / 2))) * 1.1;
+    controls.target.copy(sphere.center);
+    persp.position.copy(sphere.center).addScaledVector(direction, -distance);
+    centre.copy(sphere.center);
+    span = radius;
+    fitShadow();
+    resize();
+    controls.update();
+
+    setStage(0);
+    precompileStages(inspecting);
+    return { ...stageFeatures(originals.flat()), fog: Boolean(scene.fog), bloom: inspecting.bloom };
+  }
+
+  function stageMaterials(index) {
+    const { originals, variants } = inspecting;
+    if (index >= LAST_SHADING_STAGE) return originals;
+    const cut = (material) => {
+      const key = `${material.uuid}|${index}`;
+      if (!variants.has(key)) variants.set(key, stageMaterial(material, index));
+      return variants.get(key);
+    };
+    return originals.map((m) => (Array.isArray(m) ? m.map(cut) : cut(m)));
+  }
+
+  function setStage(index) {
+    if (!inspecting) return;
+    inspecting.stage = index;
+    const materials = stageMaterials(index);
+    inspecting.meshes.forEach((mesh, i) => (mesh.material = materials[i]));
+    blooms[0].enabled = inspecting.bloom && index >= BLOOM_STAGE;
+    renderer.toneMapping = index === TONE_MAP_STAGE ? THREE.CustomToneMapping : THREE.NoToneMapping;
+  }
+
+  // Compiles each stage off the frame, so stepping through does not stall.
+  async function precompileStages(state) {
+    for (let index = 0; index < LAST_SHADING_STAGE; index++) {
+      if (inspecting !== state) return;
+      const current = state.stage;
+      setStage(index);
+      const compiled = renderer.compileAsync(scene, camera);
+      setStage(current);
+      await compiled;
+    }
+  }
+
+  function endInspect() {
+    if (!inspecting) return;
+    const { meshes, originals, hidden, variants, bloom, view } = inspecting;
+    inspecting = null;
+    meshes.forEach((mesh, i) => (mesh.material = originals[i]));
+    for (const o of hidden) o.visible = true;
+    for (const material of variants.values()) material.dispose();
+    blooms[0].enabled = bloom;
+    renderer.toneMapping = THREE.CustomToneMapping;
+    if (camera !== view.camera) swapCamera();
+    camera.position.copy(view.position);
+    controls.target.copy(view.target);
+    persp.fov = view.fov;
+    persp.clearViewOffset();
+    centre.copy(view.centre);
+    span = view.span;
+    fitShadow();
+    resize();
+    controls.update();
+  }
 
   // Keeps the camera a little clear of whatever it is looking straight at, so
   // dollying or flying in can't push the lens through a wall or a doodad.
@@ -1409,6 +1766,8 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
   // whatever it is embedded in — a narrow corridor still frames tight.
   const MIN_SHOT_DIST = 1.2;
   const surfaceRay = new THREE.Raycaster();
+  surfaceRay.layers.enable(MOVING);
+  surfaceRay.layers.enable(DORMANT);
   const viewDir = new THREE.Vector3();
   function clampToSurfaces() {
     camera.getWorldDirection(viewDir);
@@ -1421,12 +1780,50 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
     controls.target.addScaledVector(viewDir, -push);
   }
 
+  let frameStats = null;
+  function setStats(on) {
+    if (Boolean(frameStats) === on) return;
+    frameStats?.dispose();
+    frameStats = on ? createFrameStats(renderer) : null;
+  }
+
+  function statsText() {
+    const size = renderer.getDrawingBufferSize(new THREE.Vector2());
+    return frameStats && formatStats(frameStats.read(), { width: size.x, height: size.y, pixelRatio: renderer.getPixelRatio() });
+  }
+
+  // Off-screen animation waits and catches up once it is back in view.
+  // Animated nodes are frozen too, so their bones cost nothing until then,
+  // and a dormant layer keeps them out of both shadow passes.
+  const frustum = new THREE.Frustum();
+  const viewProjection = new THREE.Matrix4();
+  const loose = [ambient, sun, sunMoving, sun.target, fill, back, wispGroup];
+
+  function animate(dt, view = camera) {
+    for (const node of loose) node.updateMatrixWorld();
+    view.updateMatrixWorld();
+    frustum.setFromProjectionMatrix(viewProjection.multiplyMatrices(view.projectionMatrix, view.matrixWorldInverse));
+    for (const entry of mixers) {
+      entry.idle += dt;
+      const awake = frustum.intersectsSphere(entry.reach);
+      if (awake !== entry.awake) {
+        entry.awake = awake;
+        for (const part of entry.parts) part.layers.set(awake ? MOVING : DORMANT);
+      }
+      if (!awake) continue;
+      entry.mixer.update(entry.idle);
+      entry.idle = 0;
+      for (const part of entry.parts) part.updateMatrix();
+      entry.node.updateMatrixWorld(true);
+    }
+  }
+
   const timer = new THREE.Timer();
   timer.connect(document);
   function render(timestamp) {
+    frameStats?.begin();
     const dt = Math.min(timer.update(timestamp).getDelta(), 0.1);
     fly(dt);
-    for (const mixer of mixers) mixer.update(dt);
     for (const { map, scroll } of scrollers) {
       map.offset.set((map.offset.x + scroll[0] * dt) % 1, (map.offset.y + scroll[1] * dt) % 1);
     }
@@ -1437,7 +1834,9 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
     // Particles run off one clock each; their whole motion is a function of it.
     for (const mesh of emitters) mesh.userData.particles.value += dt;
     controls.update();
+    animate(dt);
     composer.render();
+    frameStats?.end();
     requestAnimationFrame(render);
   }
   render();
@@ -1458,7 +1857,7 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
     hotsCamera,
     setShadows,
     setBloom,
-    bloomEnabled: () => blooms[0].enabled,
+    bloomEnabled: () => (inspecting ? inspecting.bloom : blooms[0].enabled),
     setParticles,
     setFlyEnabled,
     getShot,
@@ -1468,10 +1867,20 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
     renderModel,
     clampToSurfaces,
     setWisps,
+    pickModel,
+    inspect,
+    setStage,
+    endInspect,
+    inspectDetails,
+    setClickHandler: (handler) => {
+      onClick = handler;
+    },
     getSpan: () => span,
     getCentre: () => centre.clone(),
     shadowsEnabled: () => renderer.shadowMap.enabled,
     particlesEnabled: () => particlesWanted,
+    setStats,
+    statsText,
     // Lets a headless check confirm the keys move the camera.
     probe: () => controls.target.toArray().map((v) => Math.round(v)),
   };

@@ -2,77 +2,95 @@
  "scale": 16,
  "pitch": 60,
  "sprites": {
-  "storm_building_owhana_largegate_00.y45.s100.tx": {
+  "storm_building_owhana_largegate_00.y45.s100.t0": {
    "w": 169,
    "h": 220,
    "worldW": 6.497,
    "worldH": 8.444,
    "anchorX": 0.5,
    "anchorY": 0.6636,
-   "file": "/replay/plates/hanamura-temple/storm_building_owhana_largegate_00.y45.s100.tx.webp"
+   "file": "/replay/plates/hanamura-temple/storm_building_owhana_largegate_00.y45.s100.t0.webp"
   },
-  "storm_building_owhana_largegate_00.y315.s100.tx": {
+  "storm_building_owhana_largegate_00.y315.s100.t1": {
    "w": 169,
    "h": 220,
    "worldW": 6.492,
    "worldH": 8.448,
    "anchorX": 0.5,
    "anchorY": 0.6636,
-   "file": "/replay/plates/hanamura-temple/storm_building_owhana_largegate_00.y315.s100.tx.webp"
+   "file": "/replay/plates/hanamura-temple/storm_building_owhana_largegate_00.y315.s100.t1.webp"
   },
-  "storm_building_owhana_largegate_00.y135.s100.tx": {
+  "storm_building_owhana_largegate_00.y135.s100.t0": {
    "w": 169,
    "h": 220,
    "worldW": 6.496,
    "worldH": 8.445,
    "anchorX": 0.5,
    "anchorY": 0.6636,
-   "file": "/replay/plates/hanamura-temple/storm_building_owhana_largegate_00.y135.s100.tx.webp"
+   "file": "/replay/plates/hanamura-temple/storm_building_owhana_largegate_00.y135.s100.t0.webp"
   },
-  "storm_building_owhana_largegate_00.y225.s100.tx": {
+  "storm_building_owhana_largegate_00.y225.s100.t1": {
    "w": 169,
    "h": 219,
    "worldW": 6.5,
    "worldH": 8.441,
    "anchorX": 0.5,
    "anchorY": 0.6637,
-   "file": "/replay/plates/hanamura-temple/storm_building_owhana_largegate_00.y225.s100.tx.webp"
+   "file": "/replay/plates/hanamura-temple/storm_building_owhana_largegate_00.y225.s100.t1.webp"
   },
-  "storm_building_owhana_payload_entrance.y90.s100.tx": {
+  "storm_building_owhana_payload_entrance.y90.s100.t0": {
    "w": 141,
    "h": 183,
    "worldW": 5.435,
    "worldH": 7.025,
    "anchorX": 0.5022,
    "anchorY": 0.3843,
-   "file": "/replay/plates/hanamura-temple/storm_building_owhana_payload_entrance.y90.s100.tx.webp"
+   "file": "/replay/plates/hanamura-temple/storm_building_owhana_payload_entrance.y90.s100.t0.webp"
   },
-  "storm_building_owhana_payload_entrance.y225.s100.tx": {
+  "storm_building_owhana_payload_entrance.y225.s100.t0": {
    "w": 204,
    "h": 228,
    "worldW": 7.832,
    "worldH": 8.767,
    "anchorX": 0.5001,
    "anchorY": 0.4042,
-   "file": "/replay/plates/hanamura-temple/storm_building_owhana_payload_entrance.y225.s100.tx.webp"
+   "file": "/replay/plates/hanamura-temple/storm_building_owhana_payload_entrance.y225.s100.t0.webp"
   },
-  "storm_building_owhana_payload_entrance.y180.s100.tx": {
+  "storm_building_owhana_payload_entrance.y180.s100.t0": {
    "w": 151,
    "h": 174,
    "worldW": 5.82,
    "worldH": 6.692,
    "anchorX": 0.5023,
    "anchorY": 0.3752,
-   "file": "/replay/plates/hanamura-temple/storm_building_owhana_payload_entrance.y180.s100.tx.webp"
+   "file": "/replay/plates/hanamura-temple/storm_building_owhana_payload_entrance.y180.s100.t0.webp"
   },
-  "storm_building_owhana_payload_entrance.y45.s100.tx": {
+  "storm_building_owhana_payload_entrance.y180.s100.t1": {
+   "w": 151,
+   "h": 174,
+   "worldW": 5.82,
+   "worldH": 6.692,
+   "anchorX": 0.5023,
+   "anchorY": 0.3752,
+   "file": "/replay/plates/hanamura-temple/storm_building_owhana_payload_entrance.y180.s100.t1.webp"
+  },
+  "storm_building_owhana_payload_entrance.y90.s100.t1": {
+   "w": 141,
+   "h": 183,
+   "worldW": 5.435,
+   "worldH": 7.025,
+   "anchorX": 0.5022,
+   "anchorY": 0.3843,
+   "file": "/replay/plates/hanamura-temple/storm_building_owhana_payload_entrance.y90.s100.t1.webp"
+  },
+  "storm_building_owhana_payload_entrance.y45.s100.t1": {
    "w": 204,
    "h": 228,
    "worldW": 7.832,
    "worldH": 8.767,
    "anchorX": 0.4999,
    "anchorY": 0.4077,
-   "file": "/replay/plates/hanamura-temple/storm_building_owhana_payload_entrance.y45.s100.tx.webp"
+   "file": "/replay/plates/hanamura-temple/storm_building_owhana_payload_entrance.y45.s100.t1.webp"
   },
   "storm_building_kingscrest_core_dragon.y315.s100.t1": {
    "w": 387,
@@ -230,7 +248,7 @@
   "storm_building_owhana_gate.y285.s100.t1": {
    "w": 106,
    "h": 241,
-   "worldW": 4.076,
+   "worldW": 4.077,
    "worldH": 9.263,
    "anchorX": 0.5,
    "anchorY": 0.6027,
@@ -239,7 +257,7 @@
   "storm_building_owhana_gate.y285.s100.t0": {
    "w": 106,
    "h": 241,
-   "worldW": 4.076,
+   "worldW": 4.077,
    "worldH": 9.263,
    "anchorX": 0.5,
    "anchorY": 0.6027,
@@ -248,7 +266,7 @@
   "storm_building_owhana_gate.y225.s100.t1": {
    "w": 173,
    "h": 221,
-   "worldW": 6.673,
+   "worldW": 6.672,
    "worldH": 8.494,
    "anchorX": 0.5,
    "anchorY": 0.612,
@@ -257,7 +275,7 @@
   "storm_building_owhana_gate.y225.s100.t0": {
    "w": 173,
    "h": 221,
-   "worldW": 6.673,
+   "worldW": 6.672,
    "worldH": 8.494,
    "anchorX": 0.5,
    "anchorY": 0.612,
@@ -266,8 +284,8 @@
   "storm_building_owhana_gate.y315.s100.t0": {
    "w": 173,
    "h": 221,
-   "worldW": 6.671,
-   "worldH": 8.495,
+   "worldW": 6.672,
+   "worldH": 8.494,
    "anchorX": 0.5,
    "anchorY": 0.612,
    "file": "/replay/plates/hanamura-temple/storm_building_owhana_gate.y315.s100.t0.webp"
@@ -275,8 +293,8 @@
   "storm_building_owhana_gate.y315.s100.t1": {
    "w": 173,
    "h": 221,
-   "worldW": 6.671,
-   "worldH": 8.495,
+   "worldW": 6.672,
+   "worldH": 8.494,
    "anchorX": 0.5,
    "anchorY": 0.612,
    "file": "/replay/plates/hanamura-temple/storm_building_owhana_gate.y315.s100.t1.webp"
@@ -299,14 +317,14 @@
    "anchorY": 0.6648,
    "file": "/replay/plates/hanamura-temple/storm_building_kingscrest_manawell.y315.s100.t1.webp"
   },
-  "storm_building_owhana_fort.y45.s100.t0": {
+  "storm_building_owhana_fort.y315.s100.t0": {
    "w": 229,
    "h": 261,
    "worldW": 8.801,
    "worldH": 10.039,
    "anchorX": 0.5,
    "anchorY": 0.6184,
-   "file": "/replay/plates/hanamura-temple/storm_building_owhana_fort.y45.s100.t0.webp"
+   "file": "/replay/plates/hanamura-temple/storm_building_owhana_fort.y315.s100.t0.webp"
   },
   "storm_building_owhana_fort.y315.s100.t1": {
    "w": 229,
@@ -317,14 +335,14 @@
    "anchorY": 0.6184,
    "file": "/replay/plates/hanamura-temple/storm_building_owhana_fort.y315.s100.t1.webp"
   },
-  "storm_building_owhana_keep.y45.s100.t0": {
+  "storm_building_owhana_keep.y315.s100.t0": {
    "w": 230,
    "h": 271,
    "worldW": 8.827,
    "worldH": 10.41,
    "anchorX": 0.5,
    "anchorY": 0.6307,
-   "file": "/replay/plates/hanamura-temple/storm_building_owhana_keep.y45.s100.t0.webp"
+   "file": "/replay/plates/hanamura-temple/storm_building_owhana_keep.y315.s100.t0.webp"
   },
   "storm_building_owhana_keep.y315.s100.t1": {
    "w": 230,
@@ -343,7 +361,8 @@
    "y": 113.94,
    "z": 11.859,
    "r": 0.7851,
-   "sprite": "storm_building_owhana_largegate_00.y45.s100.tx"
+   "t": 0,
+   "sprite": "storm_building_owhana_largegate_00.y45.s100.t0"
   },
   {
    "m": "storm_building_owhana_largegate_00",
@@ -351,7 +370,8 @@
    "y": 112.078,
    "z": 11.873,
    "r": 5.4963,
-   "sprite": "storm_building_owhana_largegate_00.y315.s100.tx"
+   "t": 1,
+   "sprite": "storm_building_owhana_largegate_00.y315.s100.t1"
   },
   {
    "m": "storm_building_owhana_largegate_00",
@@ -359,7 +379,8 @@
    "y": 143.8,
    "z": 11.859,
    "r": 2.356,
-   "sprite": "storm_building_owhana_largegate_00.y135.s100.tx"
+   "t": 0,
+   "sprite": "storm_building_owhana_largegate_00.y135.s100.t0"
   },
   {
    "m": "storm_building_owhana_largegate_00",
@@ -367,7 +388,8 @@
    "y": 142.241,
    "z": 11.881,
    "r": 3.9255,
-   "sprite": "storm_building_owhana_largegate_00.y225.s100.tx"
+   "t": 1,
+   "sprite": "storm_building_owhana_largegate_00.y225.s100.t1"
   },
   {
    "m": "storm_building_owhana_payload_entrance",
@@ -375,7 +397,8 @@
    "y": 112,
    "z": 11.912,
    "r": 1.5705,
-   "sprite": "storm_building_owhana_payload_entrance.y90.s100.tx"
+   "t": 0,
+   "sprite": "storm_building_owhana_payload_entrance.y90.s100.t0"
   },
   {
    "m": "storm_building_owhana_payload_entrance",
@@ -383,7 +406,8 @@
    "y": 128,
    "z": 11.918,
    "r": 3.9267,
-   "sprite": "storm_building_owhana_payload_entrance.y225.s100.tx"
+   "t": 0,
+   "sprite": "storm_building_owhana_payload_entrance.y225.s100.t0"
   },
   {
    "m": "storm_building_owhana_payload_entrance",
@@ -391,7 +415,8 @@
    "y": 190,
    "z": 11.912,
    "r": 3.1413,
-   "sprite": "storm_building_owhana_payload_entrance.y180.s100.tx"
+   "t": 0,
+   "sprite": "storm_building_owhana_payload_entrance.y180.s100.t0"
   },
   {
    "m": "storm_building_owhana_payload_entrance",
@@ -399,7 +424,8 @@
    "y": 66.5,
    "z": 11.895,
    "r": 3.1413,
-   "sprite": "storm_building_owhana_payload_entrance.y180.s100.tx"
+   "t": 1,
+   "sprite": "storm_building_owhana_payload_entrance.y180.s100.t1"
   },
   {
    "m": "storm_building_owhana_payload_entrance",
@@ -407,7 +433,8 @@
    "y": 144,
    "z": 11.897,
    "r": 1.5705,
-   "sprite": "storm_building_owhana_payload_entrance.y90.s100.tx"
+   "t": 1,
+   "sprite": "storm_building_owhana_payload_entrance.y90.s100.t1"
   },
   {
    "m": "storm_building_owhana_payload_entrance",
@@ -415,7 +442,8 @@
    "y": 127.5,
    "z": 11.907,
    "r": 0.7851,
-   "sprite": "storm_building_owhana_payload_entrance.y45.s100.tx"
+   "t": 1,
+   "sprite": "storm_building_owhana_payload_entrance.y45.s100.t1"
   },
   {
    "m": "storm_building_kingscrest_core_dragon",
@@ -620,7 +648,7 @@
    "x": 104,
    "y": 167,
    "z": 11.866,
-   "r": 1.3088,
+   "r": 1.3089,
    "t": 0,
    "sprite": "storm_building_owhana_gate.y75.s100.t0"
   },
@@ -629,7 +657,7 @@
    "x": 152,
    "y": 89,
    "z": 11.866,
-   "r": 1.3088,
+   "r": 1.3089,
    "t": 1,
    "sprite": "storm_building_owhana_gate.y75.s100.t1"
   },
@@ -638,7 +666,7 @@
    "x": 151,
    "y": 169,
    "z": 11.879,
-   "r": 4.974,
+   "r": 4.9741,
    "t": 1,
    "sprite": "storm_building_owhana_gate.y285.s100.t1"
   },
@@ -647,7 +675,7 @@
    "x": 105,
    "y": 87,
    "z": 11.866,
-   "r": 4.974,
+   "r": 4.9741,
    "t": 0,
    "sprite": "storm_building_owhana_gate.y285.s100.t0"
   },
@@ -656,7 +684,7 @@
    "x": 189,
    "y": 156,
    "z": 11.879,
-   "r": 3.9267,
+   "r": 3.927,
    "t": 1,
    "sprite": "storm_building_owhana_gate.y225.s100.t1"
   },
@@ -665,7 +693,7 @@
    "x": 67,
    "y": 100,
    "z": 11.866,
-   "r": 3.9267,
+   "r": 3.927,
    "t": 0,
    "sprite": "storm_building_owhana_gate.y225.s100.t0"
   },
@@ -674,7 +702,7 @@
    "x": 67,
    "y": 164,
    "z": 11.879,
-   "r": 5.4975,
+   "r": 5.4978,
    "t": 0,
    "sprite": "storm_building_owhana_gate.y315.s100.t0"
   },
@@ -683,7 +711,7 @@
    "x": 189,
    "y": 92,
    "z": 11.866,
-   "r": 5.4975,
+   "r": 5.4978,
    "t": 1,
    "sprite": "storm_building_owhana_gate.y315.s100.t1"
   },
@@ -764,16 +792,16 @@
    "x": 94.5,
    "y": 85.5,
    "z": 11.866,
-   "r": 0.7851,
+   "r": 5.4978,
    "t": 0,
-   "sprite": "storm_building_owhana_fort.y45.s100.t0"
+   "sprite": "storm_building_owhana_fort.y315.s100.t0"
   },
   {
    "m": "storm_building_owhana_fort",
    "x": 163.5,
    "y": 86.5,
    "z": 11.866,
-   "r": 5.4975,
+   "r": 5.4978,
    "t": 1,
    "sprite": "storm_building_owhana_fort.y315.s100.t1"
   },
@@ -782,16 +810,16 @@
    "x": 93.5,
    "y": 170.5,
    "z": 11.879,
-   "r": 0.7851,
+   "r": 5.4978,
    "t": 0,
-   "sprite": "storm_building_owhana_fort.y45.s100.t0"
+   "sprite": "storm_building_owhana_fort.y315.s100.t0"
   },
   {
    "m": "storm_building_owhana_fort",
    "x": 162.5,
    "y": 171.5,
    "z": 11.866,
-   "r": 5.4975,
+   "r": 5.4978,
    "t": 1,
    "sprite": "storm_building_owhana_fort.y315.s100.t1"
   },
@@ -800,16 +828,16 @@
    "x": 59,
    "y": 155,
    "z": 11.866,
-   "r": 0.7851,
+   "r": 5.4978,
    "t": 0,
-   "sprite": "storm_building_owhana_keep.y45.s100.t0"
+   "sprite": "storm_building_owhana_keep.y315.s100.t0"
   },
   {
    "m": "storm_building_owhana_keep",
    "x": 197,
    "y": 148,
    "z": 11.879,
-   "r": 5.4975,
+   "r": 5.4978,
    "t": 1,
    "sprite": "storm_building_owhana_keep.y315.s100.t1"
   },
@@ -818,16 +846,16 @@
    "x": 59,
    "y": 108,
    "z": 11.879,
-   "r": 0.7851,
+   "r": 5.4978,
    "t": 0,
-   "sprite": "storm_building_owhana_keep.y45.s100.t0"
+   "sprite": "storm_building_owhana_keep.y315.s100.t0"
   },
   {
    "m": "storm_building_owhana_keep",
    "x": 197,
    "y": 101,
    "z": 11.866,
-   "r": 5.4975,
+   "r": 5.4978,
    "t": 1,
    "sprite": "storm_building_owhana_keep.y315.s100.t1"
   }

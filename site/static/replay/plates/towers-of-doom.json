@@ -2,32 +2,32 @@
  "scale": 16,
  "pitch": 60,
  "sprites": {
-  "storm_building_wintercrest_fortresstower.y30.s100.tx": {
+  "storm_building_wintercrest_fortresstower.y30.s100.t0": {
    "w": 119,
    "h": 179,
    "worldW": 4.591,
    "worldH": 6.893,
    "anchorX": 0.4771,
    "anchorY": 0.6746,
-   "file": "/replay/plates/towers-of-doom/storm_building_wintercrest_fortresstower.y30.s100.tx.webp"
+   "file": "/replay/plates/towers-of-doom/storm_building_wintercrest_fortresstower.y30.s100.t0.webp"
   },
-  "storm_building_wintercrest_fortresstower.y90.s100.tx": {
+  "storm_building_wintercrest_fortresstower.y90.s100.t0": {
    "w": 96,
    "h": 148,
    "worldW": 3.69,
    "worldH": 5.675,
    "anchorX": 0.4411,
    "anchorY": 0.7408,
-   "file": "/replay/plates/towers-of-doom/storm_building_wintercrest_fortresstower.y90.s100.tx.webp"
+   "file": "/replay/plates/towers-of-doom/storm_building_wintercrest_fortresstower.y90.s100.t0.webp"
   },
-  "storm_building_wintercrest_fortresstower.y323.s100.tx": {
+  "storm_building_wintercrest_fortresstower.y323.s100.t0": {
    "w": 123,
    "h": 181,
    "worldW": 4.748,
    "worldH": 6.968,
    "anchorX": 0.5282,
    "anchorY": 0.6751,
-   "file": "/replay/plates/towers-of-doom/storm_building_wintercrest_fortresstower.y323.s100.tx.webp"
+   "file": "/replay/plates/towers-of-doom/storm_building_wintercrest_fortresstower.y323.s100.t0.webp"
   },
   "storm_building_wintercrest_fortresstower.y102.s100.t0": {
    "w": 110,
@@ -73,15 +73,6 @@
    "anchorX": 0.5561,
    "anchorY": 0.7366,
    "file": "/replay/plates/towers-of-doom/storm_building_wintercrest_fortresstower.y266.s100.t1.webp"
-  },
-  "storm_building_wintercrest_fortresstower.y90.s100.t0": {
-   "w": 96,
-   "h": 147,
-   "worldW": 3.682,
-   "worldH": 5.667,
-   "anchorX": 0.441,
-   "anchorY": 0.741,
-   "file": "/replay/plates/towers-of-doom/storm_building_wintercrest_fortresstower.y90.s100.t0.webp"
   },
   "storm_building_wintercrest_fortresstower.y101.s100.t0": {
    "w": 109,
@@ -347,7 +338,7 @@
   "storm_building_wintercrest_gate_00.y285.s100.t0": {
    "w": 78,
    "h": 202,
-   "worldW": 2.997,
+   "worldW": 2.998,
    "worldH": 7.783,
    "anchorX": 0.5,
    "anchorY": 0.6217,
@@ -356,7 +347,7 @@
   "storm_building_wintercrest_gate_00.y285.s100.t1": {
    "w": 78,
    "h": 202,
-   "worldW": 2.997,
+   "worldW": 2.998,
    "worldH": 7.783,
    "anchorX": 0.5,
    "anchorY": 0.6217,
@@ -398,59 +389,23 @@
    "anchorY": 0.6931,
    "file": "/replay/plates/towers-of-doom/storm_building_wintercrest_manawell.y347.s100.t1.webp"
   },
-  "storm_building_wintercrest_fort_raven.y96.s100.t0": {
-   "w": 171,
-   "h": 269,
-   "worldW": 6.567,
-   "worldH": 10.354,
-   "anchorX": 0.4991,
-   "anchorY": 0.6327,
-   "file": "/replay/plates/towers-of-doom/storm_building_wintercrest_fort_raven.y96.s100.t0.webp"
+  "storm_building_wintercrest_fort_raven.y338.s100.t0": {
+   "w": 203,
+   "h": 297,
+   "worldW": 7.791,
+   "worldH": 11.429,
+   "anchorX": 0.5003,
+   "anchorY": 0.6199,
+   "file": "/replay/plates/towers-of-doom/storm_building_wintercrest_fort_raven.y338.s100.t0.webp"
   },
-  "storm_building_wintercrest_fort_necro.y264.s100.t1": {
-   "w": 171,
-   "h": 275,
-   "worldW": 6.568,
-   "worldH": 10.581,
-   "anchorX": 0.5009,
-   "anchorY": 0.6407,
-   "file": "/replay/plates/towers-of-doom/storm_building_wintercrest_fort_necro.y264.s100.t1.webp"
-  },
-  "storm_building_wintercrest_fort_raven.y98.s100.t0": {
-   "w": 176,
-   "h": 274,
-   "worldW": 6.773,
-   "worldH": 10.532,
-   "anchorX": 0.4992,
-   "anchorY": 0.6305,
-   "file": "/replay/plates/towers-of-doom/storm_building_wintercrest_fort_raven.y98.s100.t0.webp"
-  },
-  "storm_building_wintercrest_fort_necro.y262.s100.t1": {
-   "w": 176,
-   "h": 280,
-   "worldW": 6.775,
-   "worldH": 10.761,
-   "anchorX": 0.5008,
-   "anchorY": 0.6383,
-   "file": "/replay/plates/towers-of-doom/storm_building_wintercrest_fort_necro.y262.s100.t1.webp"
-  },
-  "storm_building_wintercrest_fort_raven.y90.s100.t0": {
-   "w": 158,
-   "h": 258,
-   "worldW": 6.081,
-   "worldH": 9.932,
-   "anchorX": 0.4991,
-   "anchorY": 0.6383,
-   "file": "/replay/plates/towers-of-doom/storm_building_wintercrest_fort_raven.y90.s100.t0.webp"
-  },
-  "storm_building_wintercrest_fort_necro.y270.s100.t1": {
-   "w": 158,
-   "h": 264,
-   "worldW": 6.082,
-   "worldH": 10.159,
-   "anchorX": 0.5009,
-   "anchorY": 0.6465,
-   "file": "/replay/plates/towers-of-doom/storm_building_wintercrest_fort_necro.y270.s100.t1.webp"
+  "storm_building_wintercrest_fort_necro.y338.s100.t1": {
+   "w": 203,
+   "h": 303,
+   "worldW": 7.791,
+   "worldH": 11.655,
+   "anchorX": 0.5003,
+   "anchorY": 0.6272,
+   "file": "/replay/plates/towers-of-doom/storm_building_wintercrest_fort_necro.y338.s100.t1.webp"
   },
   "storm_building_wintercrest_wall.y195.s100.t1": {
    "w": 101,
@@ -462,11 +417,11 @@
    "file": "/replay/plates/towers-of-doom/storm_building_wintercrest_wall.y195.s100.t1.webp"
   },
   "storm_building_wintercrest_wall.y180.s100.t1": {
-   "w": 68,
+   "w": 67,
    "h": 181,
-   "worldW": 2.598,
+   "worldW": 2.596,
    "worldH": 6.978,
-   "anchorX": 0.6467,
+   "anchorX": 0.6468,
    "anchorY": 0.6797,
    "file": "/replay/plates/towers-of-doom/storm_building_wintercrest_wall.y180.s100.t1.webp"
   },
@@ -482,7 +437,7 @@
   "storm_building_wintercrest_wall.y150.s100.t1": {
    "w": 128,
    "h": 191,
-   "worldW": 4.922,
+   "worldW": 4.923,
    "worldH": 7.361,
    "anchorX": 0.5409,
    "anchorY": 0.6887,
@@ -577,7 +532,8 @@
    "y": 63.811,
    "z": 14.902,
    "r": 0.5175,
-   "sprite": "storm_building_wintercrest_fortresstower.y30.s100.tx"
+   "t": 0,
+   "sprite": "storm_building_wintercrest_fortresstower.y30.s100.t0"
   },
   {
    "m": "storm_building_wintercrest_fortresstower",
@@ -585,7 +541,8 @@
    "y": 121.544,
    "z": 16.299,
    "r": 1.5737,
-   "sprite": "storm_building_wintercrest_fortresstower.y90.s100.tx"
+   "t": 0,
+   "sprite": "storm_building_wintercrest_fortresstower.y90.s100.t0"
   },
   {
    "m": "storm_building_wintercrest_fortresstower",
@@ -593,7 +550,8 @@
    "y": 74.076,
    "z": 16.315,
    "r": 5.6301,
-   "sprite": "storm_building_wintercrest_fortresstower.y323.s100.tx"
+   "t": 0,
+   "sprite": "storm_building_wintercrest_fortresstower.y323.s100.t0"
   },
   {
    "m": "storm_building_wintercrest_fortresstower",
@@ -1112,7 +1070,7 @@
    "x": 149,
    "y": 138,
    "z": 7.905,
-   "r": 1.3088,
+   "r": 1.3089,
    "t": 1,
    "sprite": "storm_building_wintercrest_gate_00.y75.s100.t1"
   },
@@ -1121,7 +1079,7 @@
    "x": 144,
    "y": 95,
    "z": 7.905,
-   "r": 1.3088,
+   "r": 1.3089,
    "t": 1,
    "sprite": "storm_building_wintercrest_gate_00.y75.s100.t1"
   },
@@ -1130,7 +1088,7 @@
    "x": 101,
    "y": 43,
    "z": 7.905,
-   "r": 1.3088,
+   "r": 1.3089,
    "t": 0,
    "sprite": "storm_building_wintercrest_gate_00.y75.s100.t0"
   },
@@ -1139,7 +1097,7 @@
    "x": 99,
    "y": 138,
    "z": 7.905,
-   "r": 4.974,
+   "r": 4.9741,
    "t": 0,
    "sprite": "storm_building_wintercrest_gate_00.y285.s100.t0"
   },
@@ -1148,7 +1106,7 @@
    "x": 104,
    "y": 95,
    "z": 7.905,
-   "r": 4.974,
+   "r": 4.9741,
    "t": 0,
    "sprite": "storm_building_wintercrest_gate_00.y285.s100.t0"
   },
@@ -1157,7 +1115,7 @@
    "x": 147,
    "y": 43,
    "z": 7.905,
-   "r": 4.974,
+   "r": 4.9741,
    "t": 1,
    "sprite": "storm_building_wintercrest_gate_00.y285.s100.t1"
   },
@@ -1220,54 +1178,54 @@
    "x": 93,
    "y": 92,
    "z": 7.905,
-   "r": 1.6672,
+   "r": 5.8905,
    "t": 0,
-   "sprite": "storm_building_wintercrest_fort_raven.y96.s100.t0"
+   "sprite": "storm_building_wintercrest_fort_raven.y338.s100.t0"
   },
   {
    "m": "storm_building_wintercrest_fort_necro",
    "x": 155,
    "y": 92,
    "z": 7.905,
-   "r": 4.6157,
+   "r": 5.8905,
    "t": 1,
-   "sprite": "storm_building_wintercrest_fort_necro.y264.s100.t1"
+   "sprite": "storm_building_wintercrest_fort_necro.y338.s100.t1"
   },
   {
    "m": "storm_building_wintercrest_fort_raven",
    "x": 83.5,
    "y": 135.5,
    "z": 7.905,
-   "r": 1.7082,
+   "r": 5.8905,
    "t": 0,
-   "sprite": "storm_building_wintercrest_fort_raven.y98.s100.t0"
+   "sprite": "storm_building_wintercrest_fort_raven.y338.s100.t0"
   },
   {
    "m": "storm_building_wintercrest_fort_necro",
    "x": 164.5,
    "y": 135.5,
    "z": 7.905,
-   "r": 4.5744,
+   "r": 5.8905,
    "t": 1,
-   "sprite": "storm_building_wintercrest_fort_necro.y262.s100.t1"
+   "sprite": "storm_building_wintercrest_fort_necro.y338.s100.t1"
   },
   {
    "m": "storm_building_wintercrest_fort_raven",
    "x": 88.5,
    "y": 47.5,
    "z": 7.905,
-   "r": 1.5776,
+   "r": 5.8905,
    "t": 0,
-   "sprite": "storm_building_wintercrest_fort_raven.y90.s100.t0"
+   "sprite": "storm_building_wintercrest_fort_raven.y338.s100.t0"
   },
   {
    "m": "storm_building_wintercrest_fort_necro",
    "x": 159.5,
    "y": 47.5,
    "z": 7.905,
-   "r": 4.7053,
+   "r": 5.8905,
    "t": 1,
-   "sprite": "storm_building_wintercrest_fort_necro.y270.s100.t1"
+   "sprite": "storm_building_wintercrest_fort_necro.y338.s100.t1"
   },
   {
    "m": "storm_building_wintercrest_wall",
@@ -1283,7 +1241,7 @@
    "x": 143.5,
    "y": 88,
    "z": 7.905,
-   "r": 3.1413,
+   "r": 3.1416,
    "t": 1,
    "sprite": "storm_building_wintercrest_wall.y180.s100.t1"
   },
@@ -1292,7 +1250,7 @@
    "x": 148.5,
    "y": 131,
    "z": 7.905,
-   "r": 3.1413,
+   "r": 3.1416,
    "t": 1,
    "sprite": "storm_building_wintercrest_wall.y180.s100.t1"
   },
@@ -1301,7 +1259,7 @@
    "x": 146.5,
    "y": 50,
    "z": 7.905,
-   "r": 2.8796,
+   "r": 2.8797,
    "t": 1,
    "sprite": "storm_building_wintercrest_wall.y165.s100.t1"
   },
@@ -1310,7 +1268,7 @@
    "x": 151.5,
    "y": 145,
    "z": 7.905,
-   "r": 2.618,
+   "r": 2.6179,
    "t": 1,
    "sprite": "storm_building_wintercrest_wall.y150.s100.t1"
   },
@@ -1319,7 +1277,7 @@
    "x": 146.5,
    "y": 101,
    "z": 7.905,
-   "r": 2.618,
+   "r": 2.6179,
    "t": 1,
    "sprite": "storm_building_wintercrest_wall.y150.s100.t1"
   },
@@ -1355,7 +1313,7 @@
    "x": 99.5,
    "y": 131,
    "z": 7.905,
-   "r": 6.0212,
+   "r": 6.0213,
    "t": 0,
    "sprite": "storm_building_wintercrest_wall.y345.s100.t0"
   },
@@ -1364,7 +1322,7 @@
    "x": 104.5,
    "y": 88,
    "z": 7.905,
-   "r": 6.0212,
+   "r": 6.0213,
    "t": 0,
    "sprite": "storm_building_wintercrest_wall.y345.s100.t0"
   },

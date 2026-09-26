@@ -1,6 +1,6 @@
 base_url = "https://hots.epixors.com"
 title = "HotSixors"
-description = "Heroes of the Storm hero data, talent builds, battlegrounds, a replay viewer and a mock draft tool, built from the game's own files."
+description = "Heroes of the Storm hero data, talent builds, battlegrounds, a replay viewer, mock draft tool, datamining tools and more!"
 compile_sass = false
 generate_feeds = false
 # The site ships its own index (static/site-search.json); Zola's elasticlunr

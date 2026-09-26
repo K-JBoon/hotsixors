@@ -230,7 +230,7 @@
   "storm_building_ds19kingscrest_gate_00.y285.s100.t0": {
    "w": 76,
    "h": 202,
-   "worldW": 2.904,
+   "worldW": 2.905,
    "worldH": 7.784,
    "anchorX": 0.5,
    "anchorY": 0.6217,
@@ -239,8 +239,8 @@
   "storm_building_ds19kingscrest_gate_00.y225.s100.t1": {
    "w": 143,
    "h": 175,
-   "worldW": 5.502,
-   "worldH": 6.741,
+   "worldW": 5.501,
+   "worldH": 6.742,
    "anchorX": 0.5,
    "anchorY": 0.6405,
    "file": "/replay/plates/dragon-shire/storm_building_ds19kingscrest_gate_00.y225.s100.t1.webp"
@@ -248,8 +248,8 @@
   "storm_building_ds19kingscrest_gate_00.y45.s100.t0": {
    "w": 143,
    "h": 175,
-   "worldW": 5.502,
-   "worldH": 6.741,
+   "worldW": 5.501,
+   "worldH": 6.742,
    "anchorX": 0.5,
    "anchorY": 0.6405,
    "file": "/replay/plates/dragon-shire/storm_building_ds19kingscrest_gate_00.y45.s100.t0.webp"
@@ -257,8 +257,8 @@
   "storm_building_ds19kingscrest_gate_00.y315.s100.t0": {
    "w": 143,
    "h": 175,
-   "worldW": 5.5,
-   "worldH": 6.743,
+   "worldW": 5.501,
+   "worldH": 6.742,
    "anchorX": 0.5,
    "anchorY": 0.6405,
    "file": "/replay/plates/dragon-shire/storm_building_ds19kingscrest_gate_00.y315.s100.t0.webp"
@@ -266,8 +266,8 @@
   "storm_building_ds19kingscrest_gate_00.y135.s100.t1": {
    "w": 143,
    "h": 175,
-   "worldW": 5.5,
-   "worldH": 6.743,
+   "worldW": 5.501,
+   "worldH": 6.742,
    "anchorX": 0.5,
    "anchorY": 0.6405,
    "file": "/replay/plates/dragon-shire/storm_building_ds19kingscrest_gate_00.y135.s100.t1.webp"
@@ -275,7 +275,7 @@
   "storm_building_ds19kingscrest_gate_00.y270.s100.t0": {
    "w": 34,
    "h": 201,
-   "worldW": 1.294,
+   "worldW": 1.292,
    "worldH": 7.749,
    "anchorX": 0.5,
    "anchorY": 0.6222,
@@ -284,7 +284,7 @@
   "storm_building_ds19kingscrest_gate_00.y270.s100.t1": {
    "w": 34,
    "h": 201,
-   "worldW": 1.294,
+   "worldW": 1.292,
    "worldH": 7.749,
    "anchorX": 0.5,
    "anchorY": 0.6222,
@@ -308,119 +308,47 @@
    "anchorY": 0.6648,
    "file": "/replay/plates/dragon-shire/storm_building_ds19kingscrest_manawell.y315.s100.t1.webp"
   },
-  "storm_building_kingscrest_fort.y110.s100.t0": {
-   "w": 172,
-   "h": 234,
-   "worldW": 6.618,
-   "worldH": 8.988,
-   "anchorX": 0.4444,
-   "anchorY": 0.6969,
-   "file": "/replay/plates/dragon-shire/storm_building_kingscrest_fort.y110.s100.t0.webp"
+  "storm_building_kingscrest_fort.y315.s100.t0": {
+   "w": 188,
+   "h": 249,
+   "worldW": 7.214,
+   "worldH": 9.595,
+   "anchorX": 0.5384,
+   "anchorY": 0.6473,
+   "file": "/replay/plates/dragon-shire/storm_building_kingscrest_fort.y315.s100.t0.webp"
   },
-  "storm_building_kingscrest_fort.y250.s100.t1": {
-   "w": 172,
-   "h": 234,
-   "worldW": 6.619,
-   "worldH": 8.989,
-   "anchorX": 0.5556,
-   "anchorY": 0.6968,
-   "file": "/replay/plates/dragon-shire/storm_building_kingscrest_fort.y250.s100.t1.webp"
+  "storm_building_kingscrest_fort.y315.s100.t1": {
+   "w": 188,
+   "h": 249,
+   "worldW": 7.214,
+   "worldH": 9.595,
+   "anchorX": 0.5384,
+   "anchorY": 0.6473,
+   "file": "/replay/plates/dragon-shire/storm_building_kingscrest_fort.y315.s100.t1.webp"
   },
-  "storm_building_kingscrest_fort.y100.s100.t0": {
-   "w": 157,
-   "h": 220,
-   "worldW": 6.034,
-   "worldH": 8.45,
-   "anchorX": 0.4361,
-   "anchorY": 0.7026,
-   "file": "/replay/plates/dragon-shire/storm_building_kingscrest_fort.y100.s100.t0.webp"
+  "storm_building_kingscrest_keep.y315.s100.t0": {
+   "w": 245,
+   "h": 310,
+   "worldW": 9.417,
+   "worldH": 11.928,
+   "anchorX": 0.5108,
+   "anchorY": 0.6066,
+   "file": "/replay/plates/dragon-shire/storm_building_kingscrest_keep.y315.s100.t0.webp"
   },
-  "storm_building_kingscrest_fort.y270.s100.t1": {
-   "w": 137,
-   "h": 202,
-   "worldW": 5.278,
-   "worldH": 7.767,
-   "anchorX": 0.5742,
-   "anchorY": 0.7129,
-   "file": "/replay/plates/dragon-shire/storm_building_kingscrest_fort.y270.s100.t1.webp"
-  },
-  "storm_building_kingscrest_fort.y260.s100.t1": {
-   "w": 157,
-   "h": 220,
-   "worldW": 6.035,
-   "worldH": 8.451,
-   "anchorX": 0.5639,
-   "anchorY": 0.7026,
-   "file": "/replay/plates/dragon-shire/storm_building_kingscrest_fort.y260.s100.t1.webp"
-  },
-  "storm_building_kingscrest_fort.y90.s100.t0": {
-   "w": 137,
-   "h": 202,
-   "worldW": 5.278,
-   "worldH": 7.767,
-   "anchorX": 0.4258,
-   "anchorY": 0.7129,
-   "file": "/replay/plates/dragon-shire/storm_building_kingscrest_fort.y90.s100.t0.webp"
-  },
-  "storm_building_kingscrest_keep.y95.s100.t0": {
-   "w": 183,
-   "h": 267,
-   "worldW": 7.051,
-   "worldH": 10.282,
-   "anchorX": 0.4273,
-   "anchorY": 0.7188,
-   "file": "/replay/plates/dragon-shire/storm_building_kingscrest_keep.y95.s100.t0.webp"
-  },
-  "storm_building_kingscrest_keep.y270.s100.t1": {
-   "w": 169,
-   "h": 256,
-   "worldW": 6.493,
-   "worldH": 9.839,
-   "anchorX": 0.5847,
-   "anchorY": 0.653,
-   "file": "/replay/plates/dragon-shire/storm_building_kingscrest_keep.y270.s100.t1.webp"
-  },
-  "storm_building_kingscrest_keep.y120.s100.t0": {
-   "w": 234,
-   "h": 305,
-   "worldW": 9.012,
-   "worldH": 11.74,
-   "anchorX": 0.4697,
-   "anchorY": 0.7045,
-   "file": "/replay/plates/dragon-shire/storm_building_kingscrest_keep.y120.s100.t0.webp"
-  },
-  "storm_building_kingscrest_keep.y65.s100.t0": {
-   "w": 227,
-   "h": 301,
-   "worldW": 8.744,
-   "worldH": 11.56,
-   "anchorX": 0.4234,
-   "anchorY": 0.6709,
-   "file": "/replay/plates/dragon-shire/storm_building_kingscrest_keep.y65.s100.t0.webp"
-  },
-  "storm_building_kingscrest_keep.y295.s100.t1": {
-   "w": 227,
-   "h": 301,
-   "worldW": 8.743,
-   "worldH": 11.559,
-   "anchorX": 0.5374,
-   "anchorY": 0.6157,
-   "file": "/replay/plates/dragon-shire/storm_building_kingscrest_keep.y295.s100.t1.webp"
-  },
-  "storm_building_kingscrest_keep.y240.s100.t1": {
-   "w": 234,
-   "h": 305,
-   "worldW": 9.013,
-   "worldH": 11.74,
-   "anchorX": 0.5754,
-   "anchorY": 0.6526,
-   "file": "/replay/plates/dragon-shire/storm_building_kingscrest_keep.y240.s100.t1.webp"
+  "storm_building_kingscrest_keep.y315.s100.t1": {
+   "w": 245,
+   "h": 310,
+   "worldW": 9.417,
+   "worldH": 11.928,
+   "anchorX": 0.5108,
+   "anchorY": 0.6066,
+   "file": "/replay/plates/dragon-shire/storm_building_kingscrest_keep.y315.s100.t1.webp"
   },
   "storm_building_kingscrest_townwall.y225.s100.t1": {
    "w": 143,
    "h": 151,
-   "worldW": 5.498,
-   "worldH": 5.812,
+   "worldW": 5.499,
+   "worldH": 5.811,
    "anchorX": 0.5686,
    "anchorY": 0.5802,
    "file": "/replay/plates/dragon-shire/storm_building_kingscrest_townwall.y225.s100.t1.webp"
@@ -437,9 +365,9 @@
   "storm_building_kingscrest_townwall.y180.s100.t1": {
    "w": 62,
    "h": 153,
-   "worldW": 2.386,
+   "worldW": 2.385,
    "worldH": 5.871,
-   "anchorX": 0.6154,
+   "anchorX": 0.6155,
    "anchorY": 0.6193,
    "file": "/replay/plates/dragon-shire/storm_building_kingscrest_townwall.y180.s100.t1.webp"
   },
@@ -455,16 +383,16 @@
   "storm_building_kingscrest_townwall.y150.s100.t1": {
    "w": 123,
    "h": 160,
-   "worldW": 4.739,
+   "worldW": 4.74,
    "worldH": 6.162,
-   "anchorX": 0.5232,
+   "anchorX": 0.5231,
    "anchorY": 0.6281,
    "file": "/replay/plates/dragon-shire/storm_building_kingscrest_townwall.y150.s100.t1.webp"
   },
   "storm_building_kingscrest_townwall.y135.s100.t1": {
    "w": 143,
    "h": 151,
-   "worldW": 5.5,
+   "worldW": 5.499,
    "worldH": 5.811,
    "anchorX": 0.5023,
    "anchorY": 0.6383,
@@ -482,8 +410,8 @@
   "storm_building_kingscrest_townwall.y45.s100.t0": {
    "w": 143,
    "h": 151,
-   "worldW": 5.498,
-   "worldH": 5.812,
+   "worldW": 5.499,
+   "worldH": 5.811,
    "anchorX": 0.4314,
    "anchorY": 0.5839,
    "file": "/replay/plates/dragon-shire/storm_building_kingscrest_townwall.y45.s100.t0.webp"
@@ -494,7 +422,7 @@
    "worldW": 4.739,
    "worldH": 6.162,
    "anchorX": 0.4224,
-   "anchorY": 0.5653,
+   "anchorY": 0.5654,
    "file": "/replay/plates/dragon-shire/storm_building_kingscrest_townwall.y30.s100.t0.webp"
   },
   "storm_building_kingscrest_townwall.y15.s100.t0": {
@@ -527,7 +455,7 @@
   "storm_building_kingscrest_townwall.y315.s100.t0": {
    "w": 143,
    "h": 151,
-   "worldW": 5.5,
+   "worldW": 5.499,
    "worldH": 5.811,
    "anchorX": 0.4977,
    "anchorY": 0.5258,
@@ -819,7 +747,7 @@
    "x": 144,
    "y": 141,
    "z": 7.932,
-   "r": 1.3088,
+   "r": 1.3089,
    "t": 1,
    "sprite": "storm_building_ds19kingscrest_gate_00.y75.s100.t1"
   },
@@ -828,7 +756,7 @@
    "x": 142,
    "y": 92,
    "z": 7.932,
-   "r": 1.3088,
+   "r": 1.3089,
    "t": 1,
    "sprite": "storm_building_ds19kingscrest_gate_00.y75.s100.t1"
   },
@@ -837,7 +765,7 @@
    "x": 144,
    "y": 56,
    "z": 7.932,
-   "r": 1.3088,
+   "r": 1.3089,
    "t": 1,
    "sprite": "storm_building_ds19kingscrest_gate_00.y75.s100.t1"
   },
@@ -846,7 +774,7 @@
    "x": 106,
    "y": 92,
    "z": 7.932,
-   "r": 4.974,
+   "r": 4.9741,
    "t": 0,
    "sprite": "storm_building_ds19kingscrest_gate_00.y285.s100.t0"
   },
@@ -855,7 +783,7 @@
    "x": 104,
    "y": 141,
    "z": 7.932,
-   "r": 4.974,
+   "r": 4.9741,
    "t": 0,
    "sprite": "storm_building_ds19kingscrest_gate_00.y285.s100.t0"
   },
@@ -864,7 +792,7 @@
    "x": 104,
    "y": 56,
    "z": 7.948,
-   "r": 4.974,
+   "r": 4.9741,
    "t": 0,
    "sprite": "storm_building_ds19kingscrest_gate_00.y285.s100.t0"
   },
@@ -873,7 +801,7 @@
    "x": 179,
    "y": 115,
    "z": 7.932,
-   "r": 3.9267,
+   "r": 3.927,
    "t": 1,
    "sprite": "storm_building_ds19kingscrest_gate_00.y225.s100.t1"
   },
@@ -882,7 +810,7 @@
    "x": 68,
    "y": 69,
    "z": 7.932,
-   "r": 0.7851,
+   "r": 0.7854,
    "t": 0,
    "sprite": "storm_building_ds19kingscrest_gate_00.y45.s100.t0"
   },
@@ -891,7 +819,7 @@
    "x": 69,
    "y": 115,
    "z": 7.932,
-   "r": 5.4975,
+   "r": 5.4978,
    "t": 0,
    "sprite": "storm_building_ds19kingscrest_gate_00.y315.s100.t0"
   },
@@ -900,7 +828,7 @@
    "x": 180,
    "y": 69,
    "z": 7.932,
-   "r": 2.356,
+   "r": 2.3562,
    "t": 1,
    "sprite": "storm_building_ds19kingscrest_gate_00.y135.s100.t1"
   },
@@ -909,7 +837,7 @@
    "x": 78,
    "y": 92,
    "z": 7.932,
-   "r": 4.7121,
+   "r": 4.7124,
    "t": 0,
    "sprite": "storm_building_ds19kingscrest_gate_00.y270.s100.t0"
   },
@@ -918,7 +846,7 @@
    "x": 170,
    "y": 92,
    "z": 7.932,
-   "r": 4.7121,
+   "r": 4.7124,
    "t": 1,
    "sprite": "storm_building_ds19kingscrest_gate_00.y270.s100.t1"
   },
@@ -1035,115 +963,115 @@
    "x": 95.5,
    "y": 89.5,
    "z": 7.932,
-   "r": 1.9196,
+   "r": 5.4978,
    "t": 0,
-   "sprite": "storm_building_kingscrest_fort.y110.s100.t0"
+   "sprite": "storm_building_kingscrest_fort.y315.s100.t0"
   },
   {
    "m": "storm_building_kingscrest_fort",
    "x": 152.5,
    "y": 89.5,
    "z": 7.932,
-   "r": 4.3632,
+   "r": 5.4978,
    "t": 1,
-   "sprite": "storm_building_kingscrest_fort.y250.s100.t1"
+   "sprite": "storm_building_kingscrest_fort.y315.s100.t1"
   },
   {
    "m": "storm_building_kingscrest_fort",
    "x": 91.5,
    "y": 54.5,
    "z": 7.935,
-   "r": 1.745,
+   "r": 5.4978,
    "t": 0,
-   "sprite": "storm_building_kingscrest_fort.y100.s100.t0"
+   "sprite": "storm_building_kingscrest_fort.y315.s100.t0"
   },
   {
    "m": "storm_building_kingscrest_fort",
    "x": 156.5,
    "y": 140.5,
    "z": 7.932,
-   "r": 4.7121,
+   "r": 5.4978,
    "t": 1,
-   "sprite": "storm_building_kingscrest_fort.y270.s100.t1"
+   "sprite": "storm_building_kingscrest_fort.y315.s100.t1"
   },
   {
    "m": "storm_building_kingscrest_fort",
    "x": 156.5,
    "y": 54.5,
    "z": 7.932,
-   "r": 4.5378,
+   "r": 5.4978,
    "t": 1,
-   "sprite": "storm_building_kingscrest_fort.y260.s100.t1"
+   "sprite": "storm_building_kingscrest_fort.y315.s100.t1"
   },
   {
    "m": "storm_building_kingscrest_fort",
    "x": 91.5,
    "y": 140.5,
    "z": 7.932,
-   "r": 1.5705,
+   "r": 5.4978,
    "t": 0,
-   "sprite": "storm_building_kingscrest_fort.y90.s100.t0"
+   "sprite": "storm_building_kingscrest_fort.y315.s100.t0"
   },
   {
    "m": "storm_building_kingscrest_keep",
    "x": 64,
    "y": 91,
    "z": 7.932,
-   "r": 1.658,
+   "r": 5.4978,
    "t": 0,
-   "sprite": "storm_building_kingscrest_keep.y95.s100.t0"
+   "sprite": "storm_building_kingscrest_keep.y315.s100.t0"
   },
   {
    "m": "storm_building_kingscrest_keep",
    "x": 184,
    "y": 91,
    "z": 7.932,
-   "r": 4.7121,
+   "r": 5.4978,
    "t": 1,
-   "sprite": "storm_building_kingscrest_keep.y270.s100.t1"
+   "sprite": "storm_building_kingscrest_keep.y315.s100.t1"
   },
   {
    "m": "storm_building_kingscrest_keep",
    "x": 58,
    "y": 109,
    "z": 7.932,
-   "r": 2.0942,
+   "r": 5.4978,
    "t": 0,
-   "sprite": "storm_building_kingscrest_keep.y120.s100.t0"
+   "sprite": "storm_building_kingscrest_keep.y315.s100.t0"
   },
   {
    "m": "storm_building_kingscrest_keep",
    "x": 58,
    "y": 76,
    "z": 7.932,
-   "r": 1.1342,
+   "r": 5.4978,
    "t": 0,
-   "sprite": "storm_building_kingscrest_keep.y65.s100.t0"
+   "sprite": "storm_building_kingscrest_keep.y315.s100.t0"
   },
   {
    "m": "storm_building_kingscrest_keep",
    "x": 190,
    "y": 76,
    "z": 7.932,
-   "r": 5.1486,
+   "r": 5.4978,
    "t": 1,
-   "sprite": "storm_building_kingscrest_keep.y295.s100.t1"
+   "sprite": "storm_building_kingscrest_keep.y315.s100.t1"
   },
   {
    "m": "storm_building_kingscrest_keep",
    "x": 190,
    "y": 109,
    "z": 7.932,
-   "r": 4.1887,
+   "r": 5.4978,
    "t": 1,
-   "sprite": "storm_building_kingscrest_keep.y240.s100.t1"
+   "sprite": "storm_building_kingscrest_keep.y315.s100.t1"
   },
   {
    "m": "storm_building_kingscrest_townwall",
    "x": 185.5,
    "y": 64.5,
    "z": 7.932,
-   "r": 3.9267,
+   "r": 3.927,
    "t": 1,
    "sprite": "storm_building_kingscrest_townwall.y225.s100.t1"
   },
@@ -1152,7 +1080,7 @@
    "x": 175.5,
    "y": 74.5,
    "z": 7.932,
-   "r": 3.665,
+   "r": 3.6651,
    "t": 1,
    "sprite": "storm_building_kingscrest_townwall.y210.s100.t1"
   },
@@ -1161,7 +1089,7 @@
    "x": 170.5,
    "y": 85,
    "z": 7.932,
-   "r": 3.1413,
+   "r": 3.1416,
    "t": 1,
    "sprite": "storm_building_kingscrest_townwall.y180.s100.t1"
   },
@@ -1170,7 +1098,7 @@
    "x": 142.5,
    "y": 49,
    "z": 7.932,
-   "r": 2.8796,
+   "r": 2.8797,
    "t": 1,
    "sprite": "storm_building_kingscrest_townwall.y165.s100.t1"
   },
@@ -1179,7 +1107,7 @@
    "x": 142.5,
    "y": 134,
    "z": 7.932,
-   "r": 2.8796,
+   "r": 2.8797,
    "t": 1,
    "sprite": "storm_building_kingscrest_townwall.y165.s100.t1"
   },
@@ -1188,7 +1116,7 @@
    "x": 140.5,
    "y": 85,
    "z": 7.932,
-   "r": 2.8796,
+   "r": 2.8797,
    "t": 1,
    "sprite": "storm_building_kingscrest_townwall.y165.s100.t1"
   },
@@ -1197,7 +1125,7 @@
    "x": 145.5,
    "y": 63,
    "z": 7.932,
-   "r": 2.8796,
+   "r": 2.8797,
    "t": 1,
    "sprite": "storm_building_kingscrest_townwall.y165.s100.t1"
   },
@@ -1206,7 +1134,7 @@
    "x": 170.5,
    "y": 99,
    "z": 7.932,
-   "r": 2.8796,
+   "r": 2.8797,
    "t": 1,
    "sprite": "storm_building_kingscrest_townwall.y165.s100.t1"
   },
@@ -1215,7 +1143,7 @@
    "x": 146.5,
    "y": 147,
    "z": 7.932,
-   "r": 2.618,
+   "r": 2.6179,
    "t": 1,
    "sprite": "storm_building_kingscrest_townwall.y150.s100.t1"
   },
@@ -1224,7 +1152,7 @@
    "x": 144.5,
    "y": 98,
    "z": 7.932,
-   "r": 2.618,
+   "r": 2.6179,
    "t": 1,
    "sprite": "storm_building_kingscrest_townwall.y150.s100.t1"
   },
@@ -1233,7 +1161,7 @@
    "x": 174.5,
    "y": 109.5,
    "z": 7.932,
-   "r": 2.356,
+   "r": 2.3562,
    "t": 1,
    "sprite": "storm_building_kingscrest_townwall.y135.s100.t1"
   },
@@ -1242,7 +1170,7 @@
    "x": 184.5,
    "y": 119.5,
    "z": 7.932,
-   "r": 2.0942,
+   "r": 2.0943,
    "t": 1,
    "sprite": "storm_building_kingscrest_townwall.y120.s100.t1"
   },
@@ -1251,7 +1179,7 @@
    "x": 63.5,
    "y": 119.5,
    "z": 7.932,
-   "r": 0.7851,
+   "r": 0.7854,
    "t": 0,
    "sprite": "storm_building_kingscrest_townwall.y45.s100.t0"
   },
@@ -1260,7 +1188,7 @@
    "x": 73.5,
    "y": 109.5,
    "z": 7.932,
-   "r": 0.5234,
+   "r": 0.5235,
    "t": 0,
    "sprite": "storm_building_kingscrest_townwall.y30.s100.t0"
   },
@@ -1332,7 +1260,7 @@
    "x": 77.5,
    "y": 85,
    "z": 7.932,
-   "r": 6.0212,
+   "r": 6.0213,
    "t": 0,
    "sprite": "storm_building_kingscrest_townwall.y345.s100.t0"
   },
@@ -1341,7 +1269,7 @@
    "x": 72.5,
    "y": 74.5,
    "z": 7.932,
-   "r": 5.4975,
+   "r": 5.4978,
    "t": 0,
    "sprite": "storm_building_kingscrest_townwall.y315.s100.t0"
   },
@@ -1350,7 +1278,7 @@
    "x": 62.5,
    "y": 64.5,
    "z": 7.95,
-   "r": 5.2358,
+   "r": 5.2359,
    "t": 0,
    "sprite": "storm_building_kingscrest_townwall.y300.s100.t0"
   }

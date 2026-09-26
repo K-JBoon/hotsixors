@@ -67,7 +67,12 @@ const add = () => new THREE.ShaderMaterial({
       gl_FragColor = vec4( texture2D( source, vUv ).rgb, 1.0 );
     }
   `,
-  blending: THREE.AdditiveBlending,
+  // Adds colour only, so a transparent frame keeps its alpha.
+  blending: THREE.CustomBlending,
+  blendSrc: THREE.OneFactor,
+  blendDst: THREE.OneFactor,
+  blendSrcAlpha: THREE.ZeroFactor,
+  blendDstAlpha: THREE.OneFactor,
   depthTest: false,
   depthWrite: false,
   transparent: true,

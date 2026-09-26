@@ -266,16 +266,16 @@
   "storm_building_wcav_alliance_gate.y90.s100.t0": {
    "w": 44,
    "h": 222,
-   "worldW": 1.707,
+   "worldW": 1.705,
    "worldH": 8.539,
-   "anchorX": 0.4692,
+   "anchorX": 0.4691,
    "anchorY": 0.6108,
    "file": "/replay/plates/alterac-pass/storm_building_wcav_alliance_gate.y90.s100.t0.webp"
   },
   "storm_building_wcav_horde_gate_00.y270.s100.t1": {
    "w": 34,
    "h": 202,
-   "worldW": 1.316,
+   "worldW": 1.314,
    "worldH": 7.776,
    "anchorX": 0.5011,
    "anchorY": 0.6218,
@@ -284,8 +284,8 @@
   "storm_building_wcav_horde_gate_00.y225.s100.t1": {
    "w": 144,
    "h": 176,
-   "worldW": 5.54,
-   "worldH": 6.774,
+   "worldW": 5.539,
+   "worldH": 6.775,
    "anchorX": 0.5002,
    "anchorY": 0.6399,
    "file": "/replay/plates/alterac-pass/storm_building_wcav_horde_gate_00.y225.s100.t1.webp"
@@ -293,8 +293,8 @@
   "storm_building_wcav_alliance_gate.y45.s100.t0": {
    "w": 167,
    "h": 196,
-   "worldW": 6.438,
-   "worldH": 7.554,
+   "worldW": 6.436,
+   "worldH": 7.555,
    "anchorX": 0.4942,
    "anchorY": 0.6209,
    "file": "/replay/plates/alterac-pass/storm_building_wcav_alliance_gate.y45.s100.t0.webp"
@@ -302,7 +302,7 @@
   "storm_building_wcav_alliance_gate.y135.s100.t0": {
    "w": 167,
    "h": 196,
-   "worldW": 6.435,
+   "worldW": 6.436,
    "worldH": 7.555,
    "anchorX": 0.4942,
    "anchorY": 0.6295,
@@ -311,10 +311,10 @@
   "storm_building_wcav_horde_gate_00.y315.s100.t1": {
    "w": 144,
    "h": 176,
-   "worldW": 5.538,
-   "worldH": 6.776,
+   "worldW": 5.539,
+   "worldH": 6.775,
    "anchorX": 0.5002,
-   "anchorY": 0.6396,
+   "anchorY": 0.6397,
    "file": "/replay/plates/alterac-pass/storm_building_wcav_horde_gate_00.y315.s100.t1.webp"
   },
   "storm_building_wcav_horde_manawell.y303.s100.t1": {
@@ -429,9 +429,9 @@
    "w": 120,
    "h": 161,
    "worldW": 4.63,
-   "worldH": 6.196,
+   "worldH": 6.195,
    "anchorX": 0.559,
-   "anchorY": 0.5716,
+   "anchorY": 0.5715,
    "file": "/replay/plates/alterac-pass/storm_building_wcav_horde_wall_00.y210.s100.t1.webp"
   },
   "storm_building_wcav_horde_wall_03.y195.s100.t1": {
@@ -446,17 +446,17 @@
   "storm_building_wcav_horde_wall_06.y180.s100.t1": {
    "w": 57,
    "h": 156,
-   "worldW": 2.203,
-   "worldH": 5.99,
-   "anchorX": 0.6289,
+   "worldW": 2.201,
+   "worldH": 5.989,
+   "anchorX": 0.629,
    "anchorY": 0.5954,
    "file": "/replay/plates/alterac-pass/storm_building_wcav_horde_wall_06.y180.s100.t1.webp"
   },
   "storm_building_wcav_horde_wall_01.y180.s100.t1": {
    "w": 63,
    "h": 156,
-   "worldW": 2.432,
-   "worldH": 6.012,
+   "worldW": 2.43,
+   "worldH": 6.011,
    "anchorX": 0.5955,
    "anchorY": 0.5508,
    "file": "/replay/plates/alterac-pass/storm_building_wcav_horde_wall_01.y180.s100.t1.webp"
@@ -464,16 +464,16 @@
   "storm_building_wcav_horde_wall_07.y180.s100.t1": {
    "w": 63,
    "h": 156,
-   "worldW": 2.439,
-   "worldH": 6.012,
-   "anchorX": 0.5966,
+   "worldW": 2.437,
+   "worldH": 6.011,
+   "anchorX": 0.5967,
    "anchorY": 0.5508,
    "file": "/replay/plates/alterac-pass/storm_building_wcav_horde_wall_07.y180.s100.t1.webp"
   },
   "storm_building_wcav_horde_wall_05.y165.s100.t1": {
    "w": 92,
    "h": 163,
-   "worldW": 3.537,
+   "worldW": 3.536,
    "worldH": 6.261,
    "anchorX": 0.571,
    "anchorY": 0.6009,
@@ -482,7 +482,7 @@
   "storm_building_wcav_horde_wall_08.y165.s100.t1": {
    "w": 90,
    "h": 157,
-   "worldW": 3.463,
+   "worldW": 3.462,
    "worldH": 6.038,
    "anchorX": 0.5634,
    "anchorY": 0.6231,
@@ -491,8 +491,8 @@
   "storm_building_wcav_horde_wall_03.y135.s100.t1": {
    "w": 145,
    "h": 154,
-   "worldW": 5.588,
-   "worldH": 5.932,
+   "worldW": 5.587,
+   "worldH": 5.933,
    "anchorX": 0.5585,
    "anchorY": 0.5843,
    "file": "/replay/plates/alterac-pass/storm_building_wcav_horde_wall_03.y135.s100.t1.webp"
@@ -509,8 +509,8 @@
   "storm_building_wcav_alliance_wall_09.y45.s100.t0": {
    "w": 165,
    "h": 186,
-   "worldW": 6.332,
-   "worldH": 7.151,
+   "worldW": 6.333,
+   "worldH": 7.15,
    "anchorX": 0.4941,
    "anchorY": 0.6524,
    "file": "/replay/plates/alterac-pass/storm_building_wcav_alliance_wall_09.y45.s100.t0.webp"
@@ -520,7 +520,7 @@
    "h": 178,
    "worldW": 4.864,
    "worldH": 6.838,
-   "anchorX": 0.4013,
+   "anchorX": 0.4014,
    "anchorY": 0.6161,
    "file": "/replay/plates/alterac-pass/storm_building_wcav_alliance_wall_02.y30.s100.t0.webp"
   },
@@ -554,7 +554,7 @@
   "storm_building_wcav_alliance_wall_00.y345.s100.t0": {
    "w": 112,
    "h": 185,
-   "worldW": 4.293,
+   "worldW": 4.292,
    "worldH": 7.1,
    "anchorX": 0.4703,
    "anchorY": 0.5908,
@@ -563,7 +563,7 @@
   "storm_building_wcav_alliance_wall_06.y345.s100.t0": {
    "w": 113,
    "h": 184,
-   "worldW": 4.361,
+   "worldW": 4.36,
    "worldH": 7.082,
    "anchorX": 0.4812,
    "anchorY": 0.5897,
@@ -572,7 +572,7 @@
   "storm_building_wcav_alliance_wall_03.y315.s100.t0": {
    "w": 156,
    "h": 178,
-   "worldW": 5.988,
+   "worldW": 5.987,
    "worldH": 6.851,
    "anchorX": 0.4083,
    "anchorY": 0.6337,
@@ -582,7 +582,7 @@
    "w": 155,
    "h": 153,
    "worldW": 5.972,
-   "worldH": 5.878,
+   "worldH": 5.879,
    "anchorX": 0.501,
    "anchorY": 0.5652,
    "file": "/replay/plates/alterac-pass/storm_building_wcav_alliance_wall_02.y300.s100.t0.webp"
@@ -878,7 +878,7 @@
    "x": 135,
    "y": 160,
    "z": 7.907,
-   "r": 4.974,
+   "r": 4.9741,
    "t": 1,
    "sprite": "storm_building_wcav_horde_gate_00.y285.s100.t1"
   },
@@ -887,7 +887,7 @@
    "x": 148,
    "y": 57,
    "z": 7.907,
-   "r": 4.974,
+   "r": 4.9741,
    "t": 1,
    "sprite": "storm_building_wcav_horde_gate_00.y285.s100.t1"
   },
@@ -914,7 +914,7 @@
    "x": 105,
    "y": 109,
    "z": 7.907,
-   "r": 1.5705,
+   "r": 1.5708,
    "t": 0,
    "sprite": "storm_building_wcav_alliance_gate.y90.s100.t0"
   },
@@ -923,7 +923,7 @@
    "x": 143,
    "y": 107,
    "z": 7.907,
-   "r": 4.7121,
+   "r": 4.7124,
    "t": 1,
    "sprite": "storm_building_wcav_horde_gate_00.y270.s100.t1"
   },
@@ -932,7 +932,7 @@
    "x": 182,
    "y": 142,
    "z": 7.907,
-   "r": 3.9267,
+   "r": 3.927,
    "t": 1,
    "sprite": "storm_building_wcav_horde_gate_00.y225.s100.t1"
   },
@@ -941,7 +941,7 @@
    "x": 66,
    "y": 74,
    "z": 7.907,
-   "r": 0.7851,
+   "r": 0.7854,
    "t": 0,
    "sprite": "storm_building_wcav_alliance_gate.y45.s100.t0"
   },
@@ -950,7 +950,7 @@
    "x": 60,
    "y": 134,
    "z": 7.907,
-   "r": 2.356,
+   "r": 2.3562,
    "t": 0,
    "sprite": "storm_building_wcav_alliance_gate.y135.s100.t0"
   },
@@ -959,7 +959,7 @@
    "x": 188,
    "y": 82,
    "z": 7.907,
-   "r": 5.4975,
+   "r": 5.4978,
    "t": 1,
    "sprite": "storm_building_wcav_horde_gate_00.y315.s100.t1"
   },
@@ -968,7 +968,7 @@
    "x": 75,
    "y": 105,
    "z": 7.907,
-   "r": 1.5705,
+   "r": 1.5708,
    "t": 0,
    "sprite": "storm_building_wcav_alliance_gate.y90.s100.t0"
   },
@@ -977,7 +977,7 @@
    "x": 173,
    "y": 111,
    "z": 7.907,
-   "r": 4.7121,
+   "r": 4.7124,
    "t": 1,
    "sprite": "storm_building_wcav_horde_gate_00.y270.s100.t1"
   },
@@ -1202,7 +1202,7 @@
    "x": 193.5,
    "y": 77.5,
    "z": 7.907,
-   "r": 3.9267,
+   "r": 3.927,
    "t": 1,
    "sprite": "storm_building_wcav_horde_wall_03.y225.s100.t1"
   },
@@ -1211,7 +1211,7 @@
    "x": 183.5,
    "y": 87.5,
    "z": 7.907,
-   "r": 3.665,
+   "r": 3.6651,
    "t": 1,
    "sprite": "storm_building_wcav_horde_wall_00.y210.s100.t1"
   },
@@ -1238,7 +1238,7 @@
    "x": 146.5,
    "y": 64,
    "z": 7.907,
-   "r": 3.1413,
+   "r": 3.1416,
    "t": 1,
    "sprite": "storm_building_wcav_horde_wall_06.y180.s100.t1"
   },
@@ -1247,7 +1247,7 @@
    "x": 143.5,
    "y": 100,
    "z": 7.907,
-   "r": 3.1413,
+   "r": 3.1416,
    "t": 1,
    "sprite": "storm_building_wcav_horde_wall_01.y180.s100.t1"
   },
@@ -1256,7 +1256,7 @@
    "x": 133.5,
    "y": 167,
    "z": 7.907,
-   "r": 3.1413,
+   "r": 3.1416,
    "t": 1,
    "sprite": "storm_building_wcav_horde_wall_06.y180.s100.t1"
   },
@@ -1265,7 +1265,7 @@
    "x": 173.5,
    "y": 104,
    "z": 7.907,
-   "r": 3.1413,
+   "r": 3.1416,
    "t": 1,
    "sprite": "storm_building_wcav_horde_wall_07.y180.s100.t1"
   },
@@ -1274,7 +1274,7 @@
    "x": 143.5,
    "y": 114,
    "z": 7.907,
-   "r": 2.8796,
+   "r": 2.8797,
    "t": 1,
    "sprite": "storm_building_wcav_horde_wall_05.y165.s100.t1"
   },
@@ -1283,7 +1283,7 @@
    "x": 173.5,
    "y": 118,
    "z": 7.907,
-   "r": 2.8796,
+   "r": 2.8797,
    "t": 1,
    "sprite": "storm_building_wcav_horde_wall_08.y165.s100.t1"
   },
@@ -1292,7 +1292,7 @@
    "x": 177.5,
    "y": 136.5,
    "z": 7.907,
-   "r": 2.356,
+   "r": 2.3562,
    "t": 1,
    "sprite": "storm_building_wcav_horde_wall_03.y135.s100.t1"
   },
@@ -1301,7 +1301,7 @@
    "x": 187.5,
    "y": 146.5,
    "z": 7.907,
-   "r": 2.0942,
+   "r": 2.0943,
    "t": 1,
    "sprite": "storm_building_wcav_horde_wall_02.y120.s100.t1"
   },
@@ -1310,7 +1310,7 @@
    "x": 54.5,
    "y": 138.5,
    "z": 7.907,
-   "r": 0.7851,
+   "r": 0.7854,
    "t": 0,
    "sprite": "storm_building_wcav_alliance_wall_09.y45.s100.t0"
   },
@@ -1319,7 +1319,7 @@
    "x": 64.5,
    "y": 128.5,
    "z": 7.907,
-   "r": 0.5234,
+   "r": 0.5235,
    "t": 0,
    "sprite": "storm_building_wcav_alliance_wall_02.y30.s100.t0"
   },
@@ -1382,7 +1382,7 @@
    "x": 104.5,
    "y": 102,
    "z": 7.907,
-   "r": 6.0212,
+   "r": 6.0213,
    "t": 0,
    "sprite": "storm_building_wcav_alliance_wall_00.y345.s100.t0"
   },
@@ -1391,7 +1391,7 @@
    "x": 74.5,
    "y": 98,
    "z": 7.907,
-   "r": 6.0212,
+   "r": 6.0213,
    "t": 0,
    "sprite": "storm_building_wcav_alliance_wall_06.y345.s100.t0"
   },
@@ -1400,7 +1400,7 @@
    "x": 70.5,
    "y": 79.5,
    "z": 7.907,
-   "r": 5.4975,
+   "r": 5.4978,
    "t": 0,
    "sprite": "storm_building_wcav_alliance_wall_03.y315.s100.t0"
   },
@@ -1409,7 +1409,7 @@
    "x": 60.5,
    "y": 69.5,
    "z": 7.907,
-   "r": 5.2358,
+   "r": 5.2359,
    "t": 0,
    "sprite": "storm_building_wcav_alliance_wall_02.y300.s100.t0"
   }

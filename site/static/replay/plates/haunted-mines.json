@@ -221,8 +221,8 @@
   "storm_building_kingscrest_ravencourt_gate_00.y90.s100.t1": {
    "w": 36,
    "h": 201,
-   "worldW": 1.398,
-   "worldH": 7.725,
+   "worldW": 1.396,
+   "worldH": 7.724,
    "anchorX": 0.5,
    "anchorY": 0.6226,
    "file": "/replay/plates/haunted-mines/storm_building_kingscrest_ravencourt_gate_00.y90.s100.t1.webp"
@@ -230,16 +230,16 @@
   "storm_building_kingscrest_ravencourt_gate_00.y90.s100.t0": {
    "w": 36,
    "h": 201,
-   "worldW": 1.398,
-   "worldH": 7.725,
+   "worldW": 1.396,
+   "worldH": 7.724,
    "anchorX": 0.5,
    "anchorY": 0.6226,
    "file": "/replay/plates/haunted-mines/storm_building_kingscrest_ravencourt_gate_00.y90.s100.t0.webp"
   },
   "storm_building_kingscrest_ravencourt_gate_00.y225.s100.t1": {
    "w": 144,
-   "h": 176,
-   "worldW": 5.555,
+   "h": 177,
+   "worldW": 5.554,
    "worldH": 6.788,
    "anchorX": 0.5,
    "anchorY": 0.6395,
@@ -247,8 +247,8 @@
   },
   "storm_building_kingscrest_ravencourt_gate_00.y45.s100.t0": {
    "w": 144,
-   "h": 176,
-   "worldW": 5.555,
+   "h": 177,
+   "worldW": 5.554,
    "worldH": 6.788,
    "anchorX": 0.5,
    "anchorY": 0.6395,
@@ -256,18 +256,18 @@
   },
   "storm_building_kingscrest_ravencourt_gate_00.y135.s100.t0": {
    "w": 144,
-   "h": 177,
+   "h": 176,
    "worldW": 5.554,
-   "worldH": 6.789,
+   "worldH": 6.788,
    "anchorX": 0.5,
    "anchorY": 0.6395,
    "file": "/replay/plates/haunted-mines/storm_building_kingscrest_ravencourt_gate_00.y135.s100.t0.webp"
   },
   "storm_building_kingscrest_ravencourt_gate_00.y315.s100.t1": {
    "w": 144,
-   "h": 177,
-   "worldW": 5.553,
-   "worldH": 6.789,
+   "h": 176,
+   "worldW": 5.554,
+   "worldH": 6.788,
    "anchorX": 0.5,
    "anchorY": 0.6395,
    "file": "/replay/plates/haunted-mines/storm_building_kingscrest_ravencourt_gate_00.y315.s100.t1.webp"
@@ -290,77 +290,41 @@
    "anchorY": 0.6648,
    "file": "/replay/plates/haunted-mines/storm_building_kingscrest_ravencourt_manawell.y315.s100.t1.webp"
   },
-  "storm_building_kingscrest_ravencourt_castleupgrade.y153.s100.t0": {
-   "w": 177,
-   "h": 240,
-   "worldW": 6.82,
-   "worldH": 9.22,
-   "anchorX": 0.4744,
-   "anchorY": 0.7068,
-   "file": "/replay/plates/haunted-mines/storm_building_kingscrest_ravencourt_castleupgrade.y153.s100.t0.webp"
+  "storm_building_kingscrest_ravencourt_castleupgrade.y315.s100.t0": {
+   "w": 188,
+   "h": 247,
+   "worldW": 7.214,
+   "worldH": 9.494,
+   "anchorX": 0.5384,
+   "anchorY": 0.6436,
+   "file": "/replay/plates/haunted-mines/storm_building_kingscrest_ravencourt_castleupgrade.y315.s100.t0.webp"
   },
-  "storm_building_kingscrest_ravencourt_castleupgrade.y283.s100.t1": {
-   "w": 162,
-   "h": 222,
-   "worldW": 6.244,
-   "worldH": 8.541,
-   "anchorX": 0.561,
-   "anchorY": 0.6786,
-   "file": "/replay/plates/haunted-mines/storm_building_kingscrest_ravencourt_castleupgrade.y283.s100.t1.webp"
+  "storm_building_kingscrest_ravencourt_castleupgrade.y315.s100.t1": {
+   "w": 188,
+   "h": 247,
+   "worldW": 7.214,
+   "worldH": 9.494,
+   "anchorX": 0.5384,
+   "anchorY": 0.6436,
+   "file": "/replay/plates/haunted-mines/storm_building_kingscrest_ravencourt_castleupgrade.y315.s100.t1.webp"
   },
-  "storm_building_kingscrest_ravencourt_castleupgrade.y103.s100.t0": {
-   "w": 162,
-   "h": 222,
-   "worldW": 6.245,
-   "worldH": 8.542,
-   "anchorX": 0.439,
-   "anchorY": 0.6968,
-   "file": "/replay/plates/haunted-mines/storm_building_kingscrest_ravencourt_castleupgrade.y103.s100.t0.webp"
+  "storm_building_kingscrest_ravencourt_castlesuperior.y315.s100.t0": {
+   "w": 245,
+   "h": 308,
+   "worldW": 9.417,
+   "worldH": 11.827,
+   "anchorX": 0.5108,
+   "anchorY": 0.6033,
+   "file": "/replay/plates/haunted-mines/storm_building_kingscrest_ravencourt_castlesuperior.y315.s100.t0.webp"
   },
-  "storm_building_kingscrest_ravencourt_castleupgrade.y333.s100.t1": {
-   "w": 177,
-   "h": 240,
-   "worldW": 6.82,
-   "worldH": 9.22,
-   "anchorX": 0.5256,
-   "anchorY": 0.641,
-   "file": "/replay/plates/haunted-mines/storm_building_kingscrest_ravencourt_castleupgrade.y333.s100.t1.webp"
-  },
-  "storm_building_kingscrest_ravencourt_castlesuperior.y174.s100.t0": {
-   "w": 197,
-   "h": 256,
-   "worldW": 7.583,
-   "worldH": 9.841,
-   "anchorX": 0.5461,
-   "anchorY": 0.7353,
-   "file": "/replay/plates/haunted-mines/storm_building_kingscrest_ravencourt_castlesuperior.y174.s100.t0.webp"
-  },
-  "storm_building_kingscrest_ravencourt_castlesuperior.y202.s100.t1": {
-   "w": 230,
-   "h": 288,
-   "worldW": 8.849,
-   "worldH": 11.092,
-   "anchorX": 0.566,
-   "anchorY": 0.6906,
-   "file": "/replay/plates/haunted-mines/storm_building_kingscrest_ravencourt_castlesuperior.y202.s100.t1.webp"
-  },
-  "storm_building_kingscrest_ravencourt_castlesuperior.y22.s100.t0": {
-   "w": 230,
-   "h": 288,
-   "worldW": 8.849,
-   "worldH": 11.092,
-   "anchorX": 0.434,
-   "anchorY": 0.6352,
-   "file": "/replay/plates/haunted-mines/storm_building_kingscrest_ravencourt_castlesuperior.y22.s100.t0.webp"
-  },
-  "storm_building_kingscrest_ravencourt_castlesuperior.y354.s100.t1": {
-   "w": 197,
-   "h": 256,
-   "worldW": 7.583,
-   "worldH": 9.841,
-   "anchorX": 0.4539,
-   "anchorY": 0.6319,
-   "file": "/replay/plates/haunted-mines/storm_building_kingscrest_ravencourt_castlesuperior.y354.s100.t1.webp"
+  "storm_building_kingscrest_ravencourt_castlesuperior.y315.s100.t1": {
+   "w": 245,
+   "h": 308,
+   "worldW": 9.417,
+   "worldH": 11.827,
+   "anchorX": 0.5108,
+   "anchorY": 0.6033,
+   "file": "/replay/plates/haunted-mines/storm_building_kingscrest_ravencourt_castlesuperior.y315.s100.t1.webp"
   },
   "storm_building_kingscrest_watchtower.y0.s100.tx": {
    "w": 228,
@@ -576,7 +540,7 @@
    "x": 148,
    "y": 149,
    "z": 7.926,
-   "r": 1.3088,
+   "r": 1.3089,
    "t": 1,
    "sprite": "storm_building_kingscrest_ravencourt_gate_00.y75.s100.t1"
   },
@@ -585,7 +549,7 @@
    "x": 108,
    "y": 219,
    "z": 7.913,
-   "r": 1.3088,
+   "r": 1.3089,
    "t": 0,
    "sprite": "storm_building_kingscrest_ravencourt_gate_00.y75.s100.t0"
   },
@@ -594,7 +558,7 @@
    "x": 149,
    "y": 220,
    "z": 7.913,
-   "r": 1.5705,
+   "r": 1.5708,
    "t": 1,
    "sprite": "storm_building_kingscrest_ravencourt_gate_00.y90.s100.t1"
   },
@@ -603,7 +567,7 @@
    "x": 107,
    "y": 148,
    "z": 7.926,
-   "r": 1.5705,
+   "r": 1.5708,
    "t": 0,
    "sprite": "storm_building_kingscrest_ravencourt_gate_00.y90.s100.t0"
   },
@@ -612,7 +576,7 @@
    "x": 80,
    "y": 181,
    "z": 7.913,
-   "r": 1.3088,
+   "r": 1.3089,
    "t": 0,
    "sprite": "storm_building_kingscrest_ravencourt_gate_00.y75.s100.t0"
   },
@@ -621,7 +585,7 @@
    "x": 176,
    "y": 187,
    "z": 7.926,
-   "r": 1.3088,
+   "r": 1.3089,
    "t": 1,
    "sprite": "storm_building_kingscrest_ravencourt_gate_00.y75.s100.t1"
   },
@@ -630,7 +594,7 @@
    "x": 186,
    "y": 209,
    "z": 7.926,
-   "r": 3.9267,
+   "r": 3.927,
    "t": 1,
    "sprite": "storm_building_kingscrest_ravencourt_gate_00.y225.s100.t1"
   },
@@ -639,7 +603,7 @@
    "x": 70,
    "y": 157,
    "z": 7.913,
-   "r": 0.7851,
+   "r": 0.7854,
    "t": 0,
    "sprite": "storm_building_kingscrest_ravencourt_gate_00.y45.s100.t0"
   },
@@ -648,7 +612,7 @@
    "x": 70,
    "y": 209,
    "z": 7.913,
-   "r": 2.356,
+   "r": 2.3562,
    "t": 0,
    "sprite": "storm_building_kingscrest_ravencourt_gate_00.y135.s100.t0"
   },
@@ -657,7 +621,7 @@
    "x": 186,
    "y": 157,
    "z": 7.926,
-   "r": 5.4975,
+   "r": 5.4978,
    "t": 1,
    "sprite": "storm_building_kingscrest_ravencourt_gate_00.y315.s100.t1"
   },
@@ -738,72 +702,72 @@
    "x": 96,
    "y": 148,
    "z": 7.913,
-   "r": 2.6784,
+   "r": 5.4978,
    "t": 0,
-   "sprite": "storm_building_kingscrest_ravencourt_castleupgrade.y153.s100.t0"
+   "sprite": "storm_building_kingscrest_ravencourt_castleupgrade.y315.s100.t0"
   },
   {
    "m": "storm_building_kingscrest_ravencourt_castleupgrade",
    "x": 161,
    "y": 148,
    "z": 7.913,
-   "r": 4.9433,
+   "r": 5.4978,
    "t": 1,
-   "sprite": "storm_building_kingscrest_ravencourt_castleupgrade.y283.s100.t1"
+   "sprite": "storm_building_kingscrest_ravencourt_castleupgrade.y315.s100.t1"
   },
   {
    "m": "storm_building_kingscrest_ravencourt_castleupgrade",
    "x": 95,
    "y": 220,
    "z": 7.913,
-   "r": 1.802,
+   "r": 5.4978,
    "t": 0,
-   "sprite": "storm_building_kingscrest_ravencourt_castleupgrade.y103.s100.t0"
+   "sprite": "storm_building_kingscrest_ravencourt_castleupgrade.y315.s100.t0"
   },
   {
    "m": "storm_building_kingscrest_ravencourt_castleupgrade",
    "x": 160,
    "y": 220,
    "z": 7.913,
-   "r": 5.82,
+   "r": 5.4978,
    "t": 1,
-   "sprite": "storm_building_kingscrest_ravencourt_castleupgrade.y333.s100.t1"
+   "sprite": "storm_building_kingscrest_ravencourt_castleupgrade.y315.s100.t1"
   },
   {
    "m": "storm_building_kingscrest_ravencourt_castlesuperior",
    "x": 61,
    "y": 201,
    "z": 7.926,
-   "r": 3.0424,
+   "r": 5.4978,
    "t": 0,
-   "sprite": "storm_building_kingscrest_ravencourt_castlesuperior.y174.s100.t0"
+   "sprite": "storm_building_kingscrest_ravencourt_castlesuperior.y315.s100.t0"
   },
   {
    "m": "storm_building_kingscrest_ravencourt_castlesuperior",
    "x": 196,
    "y": 202,
    "z": 7.926,
-   "r": 3.5302,
+   "r": 5.4978,
    "t": 1,
-   "sprite": "storm_building_kingscrest_ravencourt_castlesuperior.y202.s100.t1"
+   "sprite": "storm_building_kingscrest_ravencourt_castlesuperior.y315.s100.t1"
   },
   {
    "m": "storm_building_kingscrest_ravencourt_castlesuperior",
    "x": 61,
    "y": 165,
    "z": 7.926,
-   "r": 0.3886,
+   "r": 5.4978,
    "t": 0,
-   "sprite": "storm_building_kingscrest_ravencourt_castlesuperior.y22.s100.t0"
+   "sprite": "storm_building_kingscrest_ravencourt_castlesuperior.y315.s100.t0"
   },
   {
    "m": "storm_building_kingscrest_ravencourt_castlesuperior",
    "x": 195,
    "y": 167,
    "z": 7.926,
-   "r": 6.184,
+   "r": 5.4978,
    "t": 1,
-   "sprite": "storm_building_kingscrest_ravencourt_castlesuperior.y354.s100.t1"
+   "sprite": "storm_building_kingscrest_ravencourt_castlesuperior.y315.s100.t1"
   },
   {
    "m": "storm_building_kingscrest_watchtower",

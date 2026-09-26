@@ -336,3 +336,239 @@ body:has(.nexus-page) .site-footer {
     display: none;
   }
 }
+
+/* Pointer passes through to the canvas so the inspected model still orbits. */
+.nexus-inspect {
+  --nexus-panel-width: 22rem;
+  position: absolute;
+  inset: 3.5rem 1rem 1rem;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.nexus-inspect[hidden],
+.nexus-inspect-hint[hidden] {
+  display: none;
+}
+
+.nexus-inspect__bar,
+.nexus-inspect__panel,
+.nexus-inspect-hint {
+  border: 1px solid rgba(140, 160, 220, 0.35);
+  border-radius: 10px;
+  background: rgba(12, 14, 22, 0.9);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+
+.nexus-inspect__bar {
+  display: grid;
+  gap: 0.6rem;
+  width: fit-content;
+  max-width: calc(100% - var(--nexus-panel-width) - 1rem);
+  padding: 0.6rem 0.8rem;
+  pointer-events: auto;
+}
+
+.nexus-inspect__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.nexus-inspect__title {
+  margin: 0;
+  overflow: hidden;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  opacity: 0.8;
+}
+
+.nexus-inspect__close {
+  flex: none;
+  padding: 0.25rem 0.6rem;
+  border: 1px solid rgba(140, 160, 220, 0.4);
+  border-radius: 6px;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.nexus-inspect__stages {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.nexus-inspect__stages li {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.nexus-inspect__stages li + li::before {
+  content: '›';
+  opacity: 0.45;
+}
+
+.nexus-inspect__stages button {
+  padding: 0.3rem 0.55rem;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: none;
+  color: #b6bfd6;
+  font: inherit;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+
+.nexus-inspect__stages button:hover:not(:disabled) {
+  background: rgba(140, 160, 220, 0.15);
+}
+
+.nexus-inspect__stages button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.nexus-inspect__stages button[aria-current='true'] {
+  border-color: rgba(90, 150, 255, 0.9);
+  background: rgba(90, 150, 255, 0.3);
+  color: #fff;
+  opacity: 1;
+}
+
+
+.nexus-inspect-hint {
+  position: absolute;
+  bottom: 2.5rem;
+  left: 50%;
+  z-index: 3;
+  margin: 0;
+  padding: 0.45rem 0.8rem;
+  color: #ccd3e6;
+  font-size: 0.82rem;
+  pointer-events: none;
+  transform: translateX(-50%);
+}
+
+.nexus-inspect__panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  width: var(--nexus-panel-width);
+  max-width: 100%;
+  font-size: 0.78rem;
+  pointer-events: auto;
+}
+
+.nexus-inspect__actions {
+  display: flex;
+  gap: 0.4rem;
+  padding: 0.6rem 0.8rem;
+  border-bottom: 1px solid rgba(140, 160, 220, 0.2);
+}
+
+.nexus-inspect__details {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 0.8rem 0.8rem;
+}
+
+.nexus-inspect__section h3 {
+  margin: 0.9rem 0 0.4rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.6;
+  overflow-wrap: anywhere;
+}
+
+.nexus-inspect__values {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.15rem 0.7rem;
+  margin: 0 0 0.4rem;
+}
+
+.nexus-inspect__values dt {
+  color: #8f99b3;
+}
+
+.nexus-inspect__values dd {
+  margin: 0;
+  color: #dfe6f7;
+  font-family: ui-monospace, monospace;
+  overflow-wrap: anywhere;
+}
+
+.nexus-inspect__slider {
+  display: grid;
+  grid-template-columns: 6.5rem 1fr 5rem;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.1rem 0;
+  color: #b6bfd6;
+}
+
+.nexus-inspect__slider.is-changed span {
+  color: #ffd24a;
+}
+
+.nexus-inspect__slider input[type='range'] {
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+}
+
+.nexus-inspect__slider input[type='number'] {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 0.1rem 0.25rem;
+  border: 1px solid rgba(140, 160, 220, 0.35);
+  border-radius: 4px;
+  background: rgba(12, 16, 26, 0.85);
+  color: inherit;
+  font: inherit;
+  font-family: ui-monospace, monospace;
+}
+
+.nexus-inspect__actions button {
+  padding: 0.25rem 0.6rem;
+  border: 1px solid rgba(140, 160, 220, 0.4);
+  border-radius: 6px;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.nexus-stats {
+  position: absolute;
+  bottom: 1rem;
+  left: 1rem;
+  z-index: 2;
+  margin: 0;
+  padding: 0.5rem 0.7rem;
+  border: 1px solid rgba(140, 160, 220, 0.35);
+  border-radius: 8px;
+  background: rgba(12, 14, 22, 0.85);
+  color: #ccd3e6;
+  font: 0.72rem/1.4 ui-monospace, monospace;
+  pointer-events: none;
+}
+
+.nexus-stats[hidden] {
+  display: none;
+}

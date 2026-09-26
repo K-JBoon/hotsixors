@@ -54,6 +54,8 @@ function sceneReady() {
     });
     nexus.setShadows(shadowsWanted);
     nexus.setParticles(particlesWanted);
+    if (stagesBox.checked) setStages(true);
+    nexus.setStats(statsBox.checked);
     return nexus;
   })();
   return scenePromise;
@@ -61,6 +63,7 @@ function sceneReady() {
 
 async function loadMap(slug) {
   const scene = await sceneReady();
+  stageView?.close();
   const ok = await scene.loadMap(slug, setStatus);
   if (!ok) return;
   scene.frame({
@@ -248,6 +251,58 @@ setParticles(particlesWanted);
 // Everything the guessing game needs loads on demand.
 const gameButton = document.getElementById('nexus-game');
 
+const stagesBox = document.getElementById('nexus-stages-toggle');
+let stageView = null;
+
+// Waits for a loaded scene; sceneReady applies the switch once there is one.
+async function setStages(on) {
+  stagesBox.checked = on;
+  if (!nexus || (!on && !stageView)) return;
+  if (!stageView) {
+    const { createStageView } = await import('/lost-in-the-nexus/nexus-debug.js');
+    stageView ||= createStageView({
+      nexus,
+      overlay: document.getElementById('nexus-inspect'),
+      hint: document.getElementById('nexus-inspect-hint'),
+    });
+  }
+  stageView.setEnabled(stagesBox.checked);
+}
+
+stagesBox.onchange = () => {
+  // Keeping focus would send WASD into the checkbox.
+  stagesBox.blur();
+  setStages(stagesBox.checked);
+};
+
+const STATS = 'hotsixors.nexus.stats';
+const statsBox = document.getElementById('nexus-stats-toggle');
+const statsPanel = document.getElementById('nexus-stats');
+let statsTicker = 0;
+
+function setStats(on) {
+  statsBox.checked = on;
+  statsPanel.hidden = !on;
+  remember(STATS, on);
+  nexus?.setStats(on);
+  clearInterval(statsTicker);
+  if (!on) return;
+  statsTicker = setInterval(() => {
+    statsPanel.textContent = nexus?.statsText() || 'Waiting for a map…';
+  }, 500);
+}
+
+statsBox.onchange = () => {
+  // Keeping focus would send WASD into the checkbox.
+  statsBox.blur();
+  setStats(statsBox.checked);
+};
+try {
+  setStats(localStorage.getItem(STATS) === 'true');
+} catch {
+  // Private mode: default off.
+}
+
 let gameStarted = false;
 async function startGame(lobbyCode) {
   if (gameStarted) return;
@@ -256,6 +311,7 @@ async function startGame(lobbyCode) {
   gate.hidden = true;
   const scene = await sceneReady();
   status.hidden = true;
+  setStages(false);
   const { createNexusGame } = await import('/lost-in-the-nexus/nexus-game.js');
   createNexusGame({ nexus: scene, page: document.querySelector('.nexus-page'), lobbyCode, setStatus });
 }

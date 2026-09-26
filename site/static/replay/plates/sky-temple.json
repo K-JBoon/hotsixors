@@ -428,7 +428,7 @@
   "storm_building_luxbazaar_gate_00.y75.s100.t1": {
    "w": 78,
    "h": 205,
-   "worldW": 2.989,
+   "worldW": 2.988,
    "worldH": 7.886,
    "anchorX": 0.5,
    "anchorY": 0.6318,
@@ -446,7 +446,7 @@
   "storm_building_luxbazaar_gate_00.y90.s100.t0": {
    "w": 37,
    "h": 203,
-   "worldW": 1.414,
+   "worldW": 1.413,
    "worldH": 7.821,
    "anchorX": 0.5,
    "anchorY": 0.6329,
@@ -455,7 +455,7 @@
   "storm_building_luxbazaar_gate_00.y270.s100.t1": {
    "w": 37,
    "h": 203,
-   "worldW": 1.414,
+   "worldW": 1.413,
    "worldH": 7.821,
    "anchorX": 0.5,
    "anchorY": 0.6329,
@@ -464,8 +464,8 @@
   "storm_building_luxbazaar_gate_00.y225.s100.t1": {
    "w": 143,
    "h": 180,
-   "worldW": 5.495,
-   "worldH": 6.92,
+   "worldW": 5.494,
+   "worldH": 6.921,
    "anchorX": 0.5,
    "anchorY": 0.6502,
    "file": "/replay/plates/sky-temple/storm_building_luxbazaar_gate_00.y225.s100.t1.webp"
@@ -473,8 +473,8 @@
   "storm_building_luxbazaar_gate_00.y45.s100.t0": {
    "w": 143,
    "h": 180,
-   "worldW": 5.495,
-   "worldH": 6.92,
+   "worldW": 5.494,
+   "worldH": 6.921,
    "anchorX": 0.5,
    "anchorY": 0.6502,
    "file": "/replay/plates/sky-temple/storm_building_luxbazaar_gate_00.y45.s100.t0.webp"
@@ -482,8 +482,8 @@
   "storm_building_luxbazaar_gate_00.y135.s100.t0": {
    "w": 143,
    "h": 180,
-   "worldW": 5.493,
-   "worldH": 6.922,
+   "worldW": 5.494,
+   "worldH": 6.921,
    "anchorX": 0.5,
    "anchorY": 0.6502,
    "file": "/replay/plates/sky-temple/storm_building_luxbazaar_gate_00.y135.s100.t0.webp"
@@ -491,8 +491,8 @@
   "storm_building_luxbazaar_gate_00.y315.s100.t1": {
    "w": 143,
    "h": 180,
-   "worldW": 5.493,
-   "worldH": 6.922,
+   "worldW": 5.494,
+   "worldH": 6.921,
    "anchorX": 0.5,
    "anchorY": 0.6502,
    "file": "/replay/plates/sky-temple/storm_building_luxbazaar_gate_00.y315.s100.t1.webp"
@@ -515,86 +515,50 @@
    "anchorY": 0.6406,
    "file": "/replay/plates/sky-temple/storm_building_luxbazaar_moonwell.y315.s100.t1.webp"
   },
-  "storm_building_luxbazaar_fort.y105.s100.t0": {
-   "w": 183,
-   "h": 230,
-   "worldW": 7.049,
-   "worldH": 8.839,
-   "anchorX": 0.4478,
-   "anchorY": 0.6802,
-   "file": "/replay/plates/sky-temple/storm_building_luxbazaar_fort.y105.s100.t0.webp"
-  },
-  "storm_building_luxbazaar_fort_water.y105.s100.t0": {
-   "w": 80,
-   "h": 122,
-   "worldW": 3.079,
-   "worldH": 4.678,
-   "anchorX": 0.2274,
-   "anchorY": 0.8046,
-   "file": "/replay/plates/sky-temple/storm_building_luxbazaar_fort_water.y105.s100.t0.webp"
-  },
-  "storm_building_luxbazaar_fort.y255.s100.t1": {
-   "w": 183,
-   "h": 230,
-   "worldW": 7.05,
-   "worldH": 8.84,
-   "anchorX": 0.5522,
-   "anchorY": 0.6802,
-   "file": "/replay/plates/sky-temple/storm_building_luxbazaar_fort.y255.s100.t1.webp"
-  },
-  "storm_building_luxbazaar_fort_water.y255.s100.t1": {
-   "w": 80,
-   "h": 122,
-   "worldW": 3.08,
-   "worldH": 4.679,
-   "anchorX": 0.7725,
-   "anchorY": 0.8046,
-   "file": "/replay/plates/sky-temple/storm_building_luxbazaar_fort_water.y255.s100.t1.webp"
-  },
-  "storm_building_luxbazaar_fort.y133.s100.t1": {
+  "storm_building_luxbazaar_fort.y315.s100.t0": {
    "w": 205,
    "h": 257,
-   "worldW": 7.885,
-   "worldH": 9.871,
-   "anchorX": 0.4646,
-   "anchorY": 0.6755,
-   "file": "/replay/plates/sky-temple/storm_building_luxbazaar_fort.y133.s100.t1.webp"
+   "worldW": 7.876,
+   "worldH": 9.888,
+   "anchorX": 0.5342,
+   "anchorY": 0.6289,
+   "file": "/replay/plates/sky-temple/storm_building_luxbazaar_fort.y315.s100.t0.webp"
   },
-  "storm_building_luxbazaar_fort_water.y133.s100.t1": {
+  "storm_building_luxbazaar_fort_water.y315.s100.t0": {
    "w": 95,
    "h": 129,
-   "worldW": 3.651,
-   "worldH": 4.962,
-   "anchorX": 0.3256,
-   "anchorY": 0.8512,
-   "file": "/replay/plates/sky-temple/storm_building_luxbazaar_fort_water.y133.s100.t1.webp"
+   "worldW": 3.664,
+   "worldH": 4.956,
+   "anchorX": 0.6677,
+   "anchorY": 0.641,
+   "file": "/replay/plates/sky-temple/storm_building_luxbazaar_fort_water.y315.s100.t0.webp"
   },
-  "storm_building_luxbazaar_fort.y114.s100.t0": {
-   "w": 195,
-   "h": 242,
-   "worldW": 7.492,
-   "worldH": 9.312,
-   "anchorX": 0.4534,
-   "anchorY": 0.6761,
-   "file": "/replay/plates/sky-temple/storm_building_luxbazaar_fort.y114.s100.t0.webp"
+  "storm_building_luxbazaar_fort.y315.s100.t1": {
+   "w": 205,
+   "h": 257,
+   "worldW": 7.876,
+   "worldH": 9.888,
+   "anchorX": 0.5342,
+   "anchorY": 0.6289,
+   "file": "/replay/plates/sky-temple/storm_building_luxbazaar_fort.y315.s100.t1.webp"
   },
-  "storm_building_luxbazaar_fort_water.y114.s100.t0": {
-   "w": 87,
-   "h": 126,
-   "worldW": 3.334,
-   "worldH": 4.838,
-   "anchorX": 0.2612,
-   "anchorY": 0.8166,
-   "file": "/replay/plates/sky-temple/storm_building_luxbazaar_fort_water.y114.s100.t0.webp"
+  "storm_building_luxbazaar_fort_water.y315.s100.t1": {
+   "w": 95,
+   "h": 129,
+   "worldW": 3.664,
+   "worldH": 4.956,
+   "anchorX": 0.6677,
+   "anchorY": 0.641,
+   "file": "/replay/plates/sky-temple/storm_building_luxbazaar_fort_water.y315.s100.t1.webp"
   },
-  "storm_building_luxbazaar_keep.y45.s100.t0": {
+  "storm_building_luxbazaar_keep.y315.s100.t0": {
    "w": 245,
    "h": 304,
    "worldW": 9.427,
    "worldH": 11.677,
-   "anchorX": 0.4799,
+   "anchorX": 0.5201,
    "anchorY": 0.6345,
-   "file": "/replay/plates/sky-temple/storm_building_luxbazaar_keep.y45.s100.t0.webp"
+   "file": "/replay/plates/sky-temple/storm_building_luxbazaar_keep.y315.s100.t0.webp"
   },
   "storm_building_luxbazaar_keep.y315.s100.t1": {
    "w": 245,
@@ -605,28 +569,10 @@
    "anchorY": 0.6345,
    "file": "/replay/plates/sky-temple/storm_building_luxbazaar_keep.y315.s100.t1.webp"
   },
-  "storm_building_luxbazaar_keep.y146.s100.t0": {
-   "w": 240,
-   "h": 301,
-   "worldW": 9.246,
-   "worldH": 11.567,
-   "anchorX": 0.4836,
-   "anchorY": 0.6665,
-   "file": "/replay/plates/sky-temple/storm_building_luxbazaar_keep.y146.s100.t0.webp"
-  },
-  "storm_building_luxbazaar_keep.y214.s100.t1": {
-   "w": 240,
-   "h": 301,
-   "worldW": 9.245,
-   "worldH": 11.566,
-   "anchorX": 0.5164,
-   "anchorY": 0.6665,
-   "file": "/replay/plates/sky-temple/storm_building_luxbazaar_keep.y214.s100.t1.webp"
-  },
   "storm_building_luxoria_townwall.y225.s100.t1": {
    "w": 149,
    "h": 159,
-   "worldW": 5.747,
+   "worldW": 5.748,
    "worldH": 6.133,
    "anchorX": 0.5349,
    "anchorY": 0.5754,
@@ -635,7 +581,7 @@
   "storm_building_luxoria_townwall.y210.s100.t1": {
    "w": 130,
    "h": 168,
-   "worldW": 4.988,
+   "worldW": 4.989,
    "worldH": 6.468,
    "anchorX": 0.5433,
    "anchorY": 0.5788,
@@ -644,7 +590,7 @@
   "storm_building_luxoria_townwall.y180.s100.t1": {
    "w": 67,
    "h": 159,
-   "worldW": 2.588,
+   "worldW": 2.587,
    "worldH": 6.107,
    "anchorX": 0.5782,
    "anchorY": 0.5994,
@@ -653,8 +599,8 @@
   "storm_building_luxoria_townwall.y165.s100.t1": {
    "w": 102,
    "h": 168,
-   "worldW": 3.912,
-   "worldH": 6.46,
+   "worldW": 3.911,
+   "worldH": 6.459,
    "anchorX": 0.5446,
    "anchorY": 0.6006,
    "file": "/replay/plates/sky-temple/storm_building_luxoria_townwall.y165.s100.t1.webp"
@@ -672,7 +618,7 @@
    "w": 149,
    "h": 159,
    "worldW": 5.748,
-   "worldH": 6.132,
+   "worldH": 6.133,
    "anchorX": 0.5149,
    "anchorY": 0.6158,
    "file": "/replay/plates/sky-temple/storm_building_luxoria_townwall.y135.s100.t1.webp"
@@ -682,14 +628,14 @@
    "h": 142,
    "worldW": 6.135,
    "worldH": 5.475,
-   "anchorX": 0.505,
+   "anchorX": 0.5051,
    "anchorY": 0.6322,
    "file": "/replay/plates/sky-temple/storm_building_luxoria_townwall.y120.s100.t1.webp"
   },
   "storm_building_luxoria_townwall.y45.s100.t0": {
    "w": 149,
    "h": 159,
-   "worldW": 5.747,
+   "worldW": 5.748,
    "worldH": 6.133,
    "anchorX": 0.4651,
    "anchorY": 0.5996,
@@ -698,7 +644,7 @@
   "storm_building_luxoria_townwall.y30.s100.t0": {
    "w": 130,
    "h": 168,
-   "worldW": 4.988,
+   "worldW": 4.989,
    "worldH": 6.468,
    "anchorX": 0.4567,
    "anchorY": 0.5871,
@@ -725,8 +671,8 @@
   "storm_building_luxoria_townwall.y345.s100.t0": {
    "w": 102,
    "h": 168,
-   "worldW": 3.912,
-   "worldH": 6.46,
+   "worldW": 3.911,
+   "worldH": 6.459,
    "anchorX": 0.4554,
    "anchorY": 0.5656,
    "file": "/replay/plates/sky-temple/storm_building_luxoria_townwall.y345.s100.t0.webp"
@@ -735,7 +681,7 @@
    "w": 149,
    "h": 159,
    "worldW": 5.748,
-   "worldH": 6.132,
+   "worldH": 6.133,
    "anchorX": 0.4851,
    "anchorY": 0.5592,
    "file": "/replay/plates/sky-temple/storm_building_luxoria_townwall.y315.s100.t0.webp"
@@ -745,7 +691,7 @@
    "h": 142,
    "worldW": 6.135,
    "worldH": 5.475,
-   "anchorX": 0.495,
+   "anchorX": 0.4949,
    "anchorY": 0.5639,
    "file": "/replay/plates/sky-temple/storm_building_luxoria_townwall.y300.s100.t0.webp"
   },
@@ -757,6 +703,15 @@
    "anchorX": 0.5005,
    "anchorY": 0.534,
    "file": "/replay/plates/sky-temple/storm_building_luxoria_watchtower.y0.s100.tx.webp"
+  },
+  "storm_building_luxoria_watchtower_splat.y0.s100.t2": {
+   "w": 221,
+   "h": 208,
+   "worldW": 8.515,
+   "worldH": 8.005,
+   "anchorX": 0.5,
+   "anchorY": 0.5331,
+   "file": "/replay/plates/sky-temple/storm_building_luxoria_watchtower_splat.y0.s100.t2.webp"
   }
  },
  "buildings": [
@@ -1206,7 +1161,7 @@
    "x": 145,
    "y": 156,
    "z": 7.918,
-   "r": 1.3088,
+   "r": 1.3089,
    "t": 1,
    "sprite": "storm_building_luxbazaar_gate_00.y75.s100.t1"
   },
@@ -1215,7 +1170,7 @@
    "x": 143,
    "y": 54,
    "z": 7.921,
-   "r": 1.3088,
+   "r": 1.3089,
    "t": 1,
    "sprite": "storm_building_luxbazaar_gate_00.y75.s100.t1"
   },
@@ -1224,7 +1179,7 @@
    "x": 103,
    "y": 156,
    "z": 7.918,
-   "r": 4.974,
+   "r": 4.9741,
    "t": 0,
    "sprite": "storm_building_luxbazaar_gate_00.y285.s100.t0"
   },
@@ -1233,7 +1188,7 @@
    "x": 105,
    "y": 54,
    "z": 7.921,
-   "r": 4.974,
+   "r": 4.9741,
    "t": 0,
    "sprite": "storm_building_luxbazaar_gate_00.y285.s100.t0"
   },
@@ -1242,7 +1197,7 @@
    "x": 106,
    "y": 102,
    "z": 7.921,
-   "r": 1.5705,
+   "r": 1.5708,
    "t": 0,
    "sprite": "storm_building_luxbazaar_gate_00.y90.s100.t0"
   },
@@ -1251,7 +1206,7 @@
    "x": 142,
    "y": 102,
    "z": 7.921,
-   "r": 4.7121,
+   "r": 4.7124,
    "t": 1,
    "sprite": "storm_building_luxbazaar_gate_00.y270.s100.t1"
   },
@@ -1260,7 +1215,7 @@
    "x": 181,
    "y": 141,
    "z": 7.918,
-   "r": 3.9267,
+   "r": 3.927,
    "t": 1,
    "sprite": "storm_building_luxbazaar_gate_00.y225.s100.t1"
   },
@@ -1269,7 +1224,7 @@
    "x": 61,
    "y": 87,
    "z": 7.921,
-   "r": 0.7851,
+   "r": 0.7854,
    "t": 0,
    "sprite": "storm_building_luxbazaar_gate_00.y45.s100.t0"
   },
@@ -1278,7 +1233,7 @@
    "x": 67,
    "y": 141,
    "z": 7.918,
-   "r": 2.356,
+   "r": 2.3562,
    "t": 0,
    "sprite": "storm_building_luxbazaar_gate_00.y135.s100.t0"
   },
@@ -1287,7 +1242,7 @@
    "x": 187,
    "y": 87,
    "z": 7.921,
-   "r": 5.4975,
+   "r": 5.4978,
    "t": 1,
    "sprite": "storm_building_luxbazaar_gate_00.y315.s100.t1"
   },
@@ -1296,7 +1251,7 @@
    "x": 79,
    "y": 110,
    "z": 7.918,
-   "r": 1.5705,
+   "r": 1.5708,
    "t": 0,
    "sprite": "storm_building_luxbazaar_gate_00.y90.s100.t0"
   },
@@ -1305,7 +1260,7 @@
    "x": 169,
    "y": 110,
    "z": 7.918,
-   "r": 4.7121,
+   "r": 4.7124,
    "t": 1,
    "sprite": "storm_building_luxbazaar_gate_00.y270.s100.t1"
   },
@@ -1422,225 +1377,225 @@
    "x": 93.5,
    "y": 101.5,
    "z": 7.918,
-   "r": 1.8315,
+   "r": 5.4978,
    "t": 0,
-   "sprite": "storm_building_luxbazaar_fort.y105.s100.t0"
+   "sprite": "storm_building_luxbazaar_fort.y315.s100.t0"
   },
   {
    "m": "storm_building_luxbazaar_fort_water",
    "x": 93.5,
    "y": 101.5,
    "z": 7.918,
-   "r": 1.8315,
+   "r": 5.4978,
    "t": 0,
-   "sprite": "storm_building_luxbazaar_fort_water.y105.s100.t0"
+   "sprite": "storm_building_luxbazaar_fort_water.y315.s100.t0"
   },
   {
    "m": "storm_building_luxbazaar_fort_water",
    "x": 93.5,
    "y": 101.5,
    "z": 7.918,
-   "r": 1.8315,
+   "r": 5.4978,
    "t": 0,
-   "sprite": "storm_building_luxbazaar_fort_water.y105.s100.t0"
+   "sprite": "storm_building_luxbazaar_fort_water.y315.s100.t0"
   },
   {
    "m": "storm_building_luxbazaar_fort_water",
    "x": 93.5,
    "y": 101.5,
    "z": 7.918,
-   "r": 1.8315,
+   "r": 5.4978,
    "t": 0,
-   "sprite": "storm_building_luxbazaar_fort_water.y105.s100.t0"
+   "sprite": "storm_building_luxbazaar_fort_water.y315.s100.t0"
   },
   {
    "m": "storm_building_luxbazaar_fort",
    "x": 153.5,
    "y": 98.5,
    "z": 7.918,
-   "r": 4.4514,
+   "r": 5.4978,
    "t": 1,
-   "sprite": "storm_building_luxbazaar_fort.y255.s100.t1"
+   "sprite": "storm_building_luxbazaar_fort.y315.s100.t1"
   },
   {
    "m": "storm_building_luxbazaar_fort_water",
    "x": 153.5,
    "y": 98.5,
    "z": 7.918,
-   "r": 4.4514,
+   "r": 5.4978,
    "t": 1,
-   "sprite": "storm_building_luxbazaar_fort_water.y255.s100.t1"
+   "sprite": "storm_building_luxbazaar_fort_water.y315.s100.t1"
   },
   {
    "m": "storm_building_luxbazaar_fort_water",
    "x": 153.5,
    "y": 98.5,
    "z": 7.918,
-   "r": 4.4514,
+   "r": 5.4978,
    "t": 1,
-   "sprite": "storm_building_luxbazaar_fort_water.y255.s100.t1"
+   "sprite": "storm_building_luxbazaar_fort_water.y315.s100.t1"
   },
   {
    "m": "storm_building_luxbazaar_fort_water",
    "x": 153.5,
    "y": 98.5,
    "z": 7.918,
-   "r": 4.4514,
+   "r": 5.4978,
    "t": 1,
-   "sprite": "storm_building_luxbazaar_fort_water.y255.s100.t1"
+   "sprite": "storm_building_luxbazaar_fort_water.y315.s100.t1"
   },
   {
    "m": "storm_building_luxbazaar_fort",
    "x": 92.5,
    "y": 56.5,
    "z": 7.921,
-   "r": 1.8317,
+   "r": 5.4978,
    "t": 0,
-   "sprite": "storm_building_luxbazaar_fort.y105.s100.t0"
+   "sprite": "storm_building_luxbazaar_fort.y315.s100.t0"
   },
   {
    "m": "storm_building_luxbazaar_fort_water",
    "x": 92.5,
    "y": 56.5,
    "z": 7.921,
-   "r": 1.8317,
+   "r": 5.4978,
    "t": 0,
-   "sprite": "storm_building_luxbazaar_fort_water.y105.s100.t0"
+   "sprite": "storm_building_luxbazaar_fort_water.y315.s100.t0"
   },
   {
    "m": "storm_building_luxbazaar_fort_water",
    "x": 92.5,
    "y": 56.5,
    "z": 7.921,
-   "r": 1.8317,
+   "r": 5.4978,
    "t": 0,
-   "sprite": "storm_building_luxbazaar_fort_water.y105.s100.t0"
+   "sprite": "storm_building_luxbazaar_fort_water.y315.s100.t0"
   },
   {
    "m": "storm_building_luxbazaar_fort_water",
    "x": 92.5,
    "y": 56.5,
    "z": 7.921,
-   "r": 1.8317,
+   "r": 5.4978,
    "t": 0,
-   "sprite": "storm_building_luxbazaar_fort_water.y105.s100.t0"
+   "sprite": "storm_building_luxbazaar_fort_water.y315.s100.t0"
   },
   {
    "m": "storm_building_luxbazaar_fort",
    "x": 154.5,
    "y": 149.5,
    "z": 7.918,
-   "r": 2.3188,
+   "r": 5.4978,
    "t": 1,
-   "sprite": "storm_building_luxbazaar_fort.y133.s100.t1"
+   "sprite": "storm_building_luxbazaar_fort.y315.s100.t1"
   },
   {
    "m": "storm_building_luxbazaar_fort_water",
    "x": 154.5,
    "y": 149.5,
    "z": 7.918,
-   "r": 2.3188,
+   "r": 5.4978,
    "t": 1,
-   "sprite": "storm_building_luxbazaar_fort_water.y133.s100.t1"
+   "sprite": "storm_building_luxbazaar_fort_water.y315.s100.t1"
   },
   {
    "m": "storm_building_luxbazaar_fort_water",
    "x": 154.5,
    "y": 149.5,
    "z": 7.918,
-   "r": 2.3188,
+   "r": 5.4978,
    "t": 1,
-   "sprite": "storm_building_luxbazaar_fort_water.y133.s100.t1"
+   "sprite": "storm_building_luxbazaar_fort_water.y315.s100.t1"
   },
   {
    "m": "storm_building_luxbazaar_fort_water",
    "x": 154.5,
    "y": 149.5,
    "z": 7.918,
-   "r": 2.3188,
+   "r": 5.4978,
    "t": 1,
-   "sprite": "storm_building_luxbazaar_fort_water.y133.s100.t1"
+   "sprite": "storm_building_luxbazaar_fort_water.y315.s100.t1"
   },
   {
    "m": "storm_building_luxbazaar_fort",
    "x": 156.5,
    "y": 56.5,
    "z": 7.921,
-   "r": 4.4511,
+   "r": 5.4978,
    "t": 1,
-   "sprite": "storm_building_luxbazaar_fort.y255.s100.t1"
+   "sprite": "storm_building_luxbazaar_fort.y315.s100.t1"
   },
   {
    "m": "storm_building_luxbazaar_fort_water",
    "x": 156.5,
    "y": 56.5,
    "z": 7.921,
-   "r": 4.4511,
+   "r": 5.4978,
    "t": 1,
-   "sprite": "storm_building_luxbazaar_fort_water.y255.s100.t1"
+   "sprite": "storm_building_luxbazaar_fort_water.y315.s100.t1"
   },
   {
    "m": "storm_building_luxbazaar_fort_water",
    "x": 156.5,
    "y": 56.5,
    "z": 7.921,
-   "r": 4.4511,
+   "r": 5.4978,
    "t": 1,
-   "sprite": "storm_building_luxbazaar_fort_water.y255.s100.t1"
+   "sprite": "storm_building_luxbazaar_fort_water.y315.s100.t1"
   },
   {
    "m": "storm_building_luxbazaar_fort_water",
    "x": 156.5,
    "y": 56.5,
    "z": 7.921,
-   "r": 4.4511,
+   "r": 5.4978,
    "t": 1,
-   "sprite": "storm_building_luxbazaar_fort_water.y255.s100.t1"
+   "sprite": "storm_building_luxbazaar_fort_water.y315.s100.t1"
   },
   {
    "m": "storm_building_luxbazaar_fort",
    "x": 93.5,
    "y": 149.5,
    "z": 7.918,
-   "r": 1.982,
+   "r": 5.4978,
    "t": 0,
-   "sprite": "storm_building_luxbazaar_fort.y114.s100.t0"
+   "sprite": "storm_building_luxbazaar_fort.y315.s100.t0"
   },
   {
    "m": "storm_building_luxbazaar_fort_water",
    "x": 93.5,
    "y": 149.5,
    "z": 7.918,
-   "r": 1.982,
+   "r": 5.4978,
    "t": 0,
-   "sprite": "storm_building_luxbazaar_fort_water.y114.s100.t0"
+   "sprite": "storm_building_luxbazaar_fort_water.y315.s100.t0"
   },
   {
    "m": "storm_building_luxbazaar_fort_water",
    "x": 93.5,
    "y": 149.5,
    "z": 7.918,
-   "r": 1.982,
+   "r": 5.4978,
    "t": 0,
-   "sprite": "storm_building_luxbazaar_fort_water.y114.s100.t0"
+   "sprite": "storm_building_luxbazaar_fort_water.y315.s100.t0"
   },
   {
    "m": "storm_building_luxbazaar_fort_water",
    "x": 93.5,
    "y": 149.5,
    "z": 7.918,
-   "r": 1.982,
+   "r": 5.4978,
    "t": 0,
-   "sprite": "storm_building_luxbazaar_fort_water.y114.s100.t0"
+   "sprite": "storm_building_luxbazaar_fort_water.y315.s100.t0"
   },
   {
    "m": "storm_building_luxbazaar_keep",
    "x": 64,
    "y": 115,
    "z": 7.918,
-   "r": 0.785,
+   "r": 5.4978,
    "t": 0,
-   "sprite": "storm_building_luxbazaar_keep.y45.s100.t0"
+   "sprite": "storm_building_luxbazaar_keep.y315.s100.t0"
   },
   {
    "m": "storm_building_luxbazaar_keep",
@@ -1656,18 +1611,18 @@
    "x": 54,
    "y": 133,
    "z": 7.918,
-   "r": 2.5402,
+   "r": 5.4978,
    "t": 0,
-   "sprite": "storm_building_luxbazaar_keep.y146.s100.t0"
+   "sprite": "storm_building_luxbazaar_keep.y315.s100.t0"
   },
   {
    "m": "storm_building_luxbazaar_keep",
    "x": 53,
    "y": 97,
    "z": 7.918,
-   "r": 0.7851,
+   "r": 5.4978,
    "t": 0,
-   "sprite": "storm_building_luxbazaar_keep.y45.s100.t0"
+   "sprite": "storm_building_luxbazaar_keep.y315.s100.t0"
   },
   {
    "m": "storm_building_luxbazaar_keep",
@@ -1683,16 +1638,16 @@
    "x": 194,
    "y": 133,
    "z": 7.918,
-   "r": 3.7426,
+   "r": 5.4978,
    "t": 1,
-   "sprite": "storm_building_luxbazaar_keep.y214.s100.t1"
+   "sprite": "storm_building_luxbazaar_keep.y315.s100.t1"
   },
   {
    "m": "storm_building_luxoria_townwall",
    "x": 192.5,
    "y": 82.5,
    "z": 7.921,
-   "r": 3.9267,
+   "r": 3.927,
    "t": 1,
    "sprite": "storm_building_luxoria_townwall.y225.s100.t1"
   },
@@ -1701,7 +1656,7 @@
    "x": 182.5,
    "y": 92.5,
    "z": 7.918,
-   "r": 3.665,
+   "r": 3.6651,
    "t": 1,
    "sprite": "storm_building_luxoria_townwall.y210.s100.t1"
   },
@@ -1710,7 +1665,7 @@
    "x": 142.5,
    "y": 47,
    "z": 7.921,
-   "r": 3.1413,
+   "r": 3.1416,
    "t": 1,
    "sprite": "storm_building_luxoria_townwall.y180.s100.t1"
   },
@@ -1719,7 +1674,7 @@
    "x": 142.5,
    "y": 95,
    "z": 7.918,
-   "r": 3.1413,
+   "r": 3.1416,
    "t": 1,
    "sprite": "storm_building_luxoria_townwall.y180.s100.t1"
   },
@@ -1728,7 +1683,7 @@
    "x": 169.5,
    "y": 103,
    "z": 7.918,
-   "r": 3.1413,
+   "r": 3.1416,
    "t": 1,
    "sprite": "storm_building_luxoria_townwall.y180.s100.t1"
   },
@@ -1737,7 +1692,7 @@
    "x": 143.5,
    "y": 149,
    "z": 7.918,
-   "r": 2.8796,
+   "r": 2.8797,
    "t": 1,
    "sprite": "storm_building_luxoria_townwall.y165.s100.t1"
   },
@@ -1746,7 +1701,7 @@
    "x": 142.5,
    "y": 109,
    "z": 7.921,
-   "r": 2.8796,
+   "r": 2.8797,
    "t": 1,
    "sprite": "storm_building_luxoria_townwall.y165.s100.t1"
   },
@@ -1755,7 +1710,7 @@
    "x": 169.5,
    "y": 117,
    "z": 7.918,
-   "r": 2.8796,
+   "r": 2.8797,
    "t": 1,
    "sprite": "storm_building_luxoria_townwall.y165.s100.t1"
   },
@@ -1764,7 +1719,7 @@
    "x": 145.5,
    "y": 60,
    "z": 7.921,
-   "r": 2.618,
+   "r": 2.6179,
    "t": 1,
    "sprite": "storm_building_luxoria_townwall.y150.s100.t1"
   },
@@ -1773,7 +1728,7 @@
    "x": 147.5,
    "y": 162,
    "z": 7.918,
-   "r": 2.618,
+   "r": 2.6179,
    "t": 1,
    "sprite": "storm_building_luxoria_townwall.y150.s100.t1"
   },
@@ -1782,7 +1737,7 @@
    "x": 176.5,
    "y": 135.5,
    "z": 7.918,
-   "r": 2.356,
+   "r": 2.3562,
    "t": 1,
    "sprite": "storm_building_luxoria_townwall.y135.s100.t1"
   },
@@ -1791,7 +1746,7 @@
    "x": 186.5,
    "y": 145.5,
    "z": 7.918,
-   "r": 2.0942,
+   "r": 2.0943,
    "t": 1,
    "sprite": "storm_building_luxoria_townwall.y120.s100.t1"
   },
@@ -1800,7 +1755,7 @@
    "x": 61.5,
    "y": 145.5,
    "z": 7.918,
-   "r": 0.7851,
+   "r": 0.7854,
    "t": 0,
    "sprite": "storm_building_luxoria_townwall.y45.s100.t0"
   },
@@ -1809,7 +1764,7 @@
    "x": 71.5,
    "y": 135.5,
    "z": 7.918,
-   "r": 0.5234,
+   "r": 0.5235,
    "t": 0,
    "sprite": "storm_building_luxoria_townwall.y30.s100.t0"
   },
@@ -1863,7 +1818,7 @@
    "x": 105.5,
    "y": 95,
    "z": 7.918,
-   "r": 6.0212,
+   "r": 6.0213,
    "t": 0,
    "sprite": "storm_building_luxoria_townwall.y345.s100.t0"
   },
@@ -1872,7 +1827,7 @@
    "x": 105.5,
    "y": 47,
    "z": 7.921,
-   "r": 6.0212,
+   "r": 6.0213,
    "t": 0,
    "sprite": "storm_building_luxoria_townwall.y345.s100.t0"
   },
@@ -1881,7 +1836,7 @@
    "x": 78.5,
    "y": 103,
    "z": 7.918,
-   "r": 6.0212,
+   "r": 6.0213,
    "t": 0,
    "sprite": "storm_building_luxoria_townwall.y345.s100.t0"
   },
@@ -1890,7 +1845,7 @@
    "x": 65.5,
    "y": 92.5,
    "z": 7.918,
-   "r": 5.4975,
+   "r": 5.4978,
    "t": 0,
    "sprite": "storm_building_luxoria_townwall.y315.s100.t0"
   },
@@ -1899,7 +1854,7 @@
    "x": 55.5,
    "y": 82.5,
    "z": 7.921,
-   "r": 5.2358,
+   "r": 5.2359,
    "t": 0,
    "sprite": "storm_building_luxoria_townwall.y300.s100.t0"
   },
@@ -1910,6 +1865,51 @@
    "z": 7.918,
    "r": 0,
    "sprite": "storm_building_luxoria_watchtower.y0.s100.tx"
+  },
+  {
+   "m": "storm_building_luxoria_watchtower_splat",
+   "x": 100.637,
+   "y": 74.247,
+   "z": 7.921,
+   "r": 0,
+   "t": 2,
+   "sprite": "storm_building_luxoria_watchtower_splat.y0.s100.t2"
+  },
+  {
+   "m": "storm_building_luxoria_watchtower_splat",
+   "x": 90,
+   "y": 130.5,
+   "z": 7.918,
+   "r": 0,
+   "t": 2,
+   "sprite": "storm_building_luxoria_watchtower_splat.y0.s100.t2"
+  },
+  {
+   "m": "storm_building_luxoria_watchtower_splat",
+   "x": 158,
+   "y": 130.5,
+   "z": 7.918,
+   "r": 0,
+   "t": 2,
+   "sprite": "storm_building_luxoria_watchtower_splat.y0.s100.t2"
+  },
+  {
+   "m": "storm_building_luxoria_watchtower_splat",
+   "x": 147.518,
+   "y": 73.816,
+   "z": 7.921,
+   "r": 0,
+   "t": 2,
+   "sprite": "storm_building_luxoria_watchtower_splat.y0.s100.t2"
+  },
+  {
+   "m": "storm_building_luxoria_watchtower_splat",
+   "x": 123.931,
+   "y": 79.408,
+   "z": 7.918,
+   "r": 0,
+   "t": 2,
+   "sprite": "storm_building_luxoria_watchtower_splat.y0.s100.t2"
   }
  ]
 }

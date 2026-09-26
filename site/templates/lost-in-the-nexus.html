@@ -34,11 +34,33 @@
             <div class="nexus-settings__sep"></div>
             <div class="nexus-settings__legend">Game</div>
             <label class="rp-switch"><input type="checkbox" id="nexus-streamer"><span class="rp-switch__track"></span>Streamer mode</label>
+            <div class="nexus-settings__sep"></div>
+            <div class="nexus-settings__legend">Debug</div>
+            <label class="rp-switch"><input type="checkbox" id="nexus-stages-toggle"><span class="rp-switch__track"></span>Render stages</label>
+            <label class="rp-switch"><input type="checkbox" id="nexus-stats-toggle"><span class="rp-switch__track"></span>Frame stats</label>
           </div>
         </div>
       </div>
-      <p class="nexus-hint">Drag to orbit, wheel to zoom, right-drag to pan, WASD/QE to move, C for a flat camera, G for the game camera, H for shadows, B for bloom, R to reset.</p>
+      <p class="nexus-hint">Drag to orbit, wheel to zoom, right-drag to pan, WASD/QE to move, C for a flat camera, G for the game camera, R to reset.</p>
     </div>
+    <div class="nexus-inspect" id="nexus-inspect" hidden>
+      <div class="nexus-inspect__bar">
+        <div class="nexus-inspect__head">
+          <h2 class="nexus-inspect__title"></h2>
+          <button type="button" class="nexus-inspect__close">Back to map</button>
+        </div>
+        <ol class="nexus-inspect__stages" aria-label="Render stages"></ol>
+      </div>
+      <aside class="nexus-inspect__panel" aria-label="Technical values">
+        <div class="nexus-inspect__actions">
+          <button type="button" class="nexus-inspect__reset">Reset</button>
+          <button type="button" class="nexus-inspect__copy">Copy changes</button>
+        </div>
+        <div class="nexus-inspect__details"></div>
+      </aside>
+    </div>
+    <pre class="nexus-stats" id="nexus-stats" hidden></pre>
+    <p class="nexus-inspect-hint" id="nexus-inspect-hint" hidden>Click a model to inspect its render stages.</p>
     <div class="nexus-status" id="nexus-status">Loading…</div>
     <div class="nexus-gate" id="nexus-gate" hidden>
       <div class="nexus-gate__panel">
