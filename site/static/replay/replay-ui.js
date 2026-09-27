@@ -304,7 +304,7 @@ function buildViewer(model, { draftData, shortcodeData, mapsData, footprints, ab
     objectives: true,
     camera: true, // only drawn for the selected hero
     selected: null, // playerId
-    feedKinds: new Set(FEED_KINDS.map((k) => k.id)),
+    feedKinds: new Set(FEED_KINDS.filter((k) => !k.off).map((k) => k.id)),
     feedHeroes: new Set(players.map((p) => p.playerId)),
     feedQuery: '',
     lastTick: 0,
@@ -466,7 +466,7 @@ function renderShell() {
           <div class="feed-filter-row" data-kind-row>
             <button class="feed-filter feed-filter--all" data-kind-all>None</button>
             ${FEED_KINDS.map(
-              (k) => `<button class="feed-filter is-on" data-kind="${k.id}">${k.label}</button>`
+              (k) => `<button class="feed-filter${k.off ? '' : ' is-on'}" data-kind="${k.id}">${k.label}</button>`
             ).join('')}
           </div>
           <div class="feed-filter-row" data-hero-row>

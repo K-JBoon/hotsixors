@@ -41,6 +41,7 @@ export function objectiveBandHtml(model) {
 }
 export const FEED_KINDS = [
   { id: 'ultimate', label: 'Ultimates' },
+  { id: 'ability', label: 'Abilities', off: true },
   { id: 'death', label: 'Deaths' },
   { id: 'level', label: 'Level ups' },
   { id: 'merc', label: 'Mercs' },
@@ -57,11 +58,10 @@ export function buildFeed() {
     if (state.selected && !selected) continue;
     for (const c of p.casts) {
       const { label, icon, slot } = castLabel(p, c);
-      if (!state.selected && slot !== 'R') continue;
       if (slot === 'A' || slot === 'S' || slot === 'Z') continue;
       items.push({
         loop: c.loop,
-        kind: 'ultimate',
+        kind: slot === 'R' ? 'ultimate' : 'ability',
         playerId: p.playerId,
         text: `${p.hero} ${p.name} ${label}`,
         html: `${portraitHtml(p)} ${icon ? `<img class="feed-icon" src="/images/abilitytalents/${icon}" alt="">` : ''} <span>${escapeHtml(label)}${
