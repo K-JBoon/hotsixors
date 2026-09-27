@@ -46,7 +46,6 @@ export const FEED_KINDS = [
   { id: 'merc', label: 'Mercs' },
   { id: 'structure', label: 'Structures' },
   { id: 'objective', label: 'Objectives' },
-  { id: 'verbose', label: 'Verbose', off: true },
 ];
 
 export function buildFeed() {
@@ -108,13 +107,14 @@ export function buildFeed() {
       });
     }
     for (const o of model.objectives) {
+      if (o.kind === 'verbose') continue;
       const color = o.team === 0 || o.team === 1 ? TEAM_COLORS[o.team] : 'inherit';
       items.push({
         loop: o.loop,
-        kind: o.kind || 'objective',
+        kind: 'objective',
         text: o.text,
         html: `<span style="color:${color}">${icon('target')} ${escapeHtml(o.text)}</span>`,
-        cls: o.kind === 'verbose' ? 'is-objective is-verbose' : 'is-objective',
+        cls: 'is-objective',
       });
     }
     for (const t of [0, 1]) {
