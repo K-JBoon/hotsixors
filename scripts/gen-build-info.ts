@@ -1,5 +1,5 @@
 import * as path from "node:path";
-import { SITE_DATA, gameVersion, readHdpInfo } from "./lib/paths.ts";
+import { SITE_DATA, SITE_STATIC, gameVersion, readHdpInfo } from "./lib/paths.ts";
 import { writeText } from "./lib/fs.ts";
 import { runScript } from "./lib/script.ts";
 
@@ -71,7 +71,9 @@ async function main(): Promise<void> {
     ],
   };
 
-  await writeText(path.join(SITE_DATA, "build-info.json"), JSON.stringify(buildInfo, null, 2) + "\n");
+  const json = JSON.stringify(buildInfo, null, 2) + "\n";
+  await writeText(path.join(SITE_DATA, "build-info.json"), json);
+  await writeText(path.join(SITE_STATIC, "build-info.json"), json);
   console.log(`gen-build-info: wrote build-info.json for ${version}`);
 }
 

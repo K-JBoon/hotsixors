@@ -41,6 +41,7 @@ jobs:
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       HOTS_PTR: ${{ inputs.ptr && '1' || '0' }}
       CASC_KEY_PREFIX: casc-${{ inputs.ptr && 'ptr' || 'live' }}
+      SITE_URL: ${{ inputs.ptr && 'https://hots-ptr.epixors.com' || 'https://hots.epixors.com' }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -54,8 +55,6 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # The patch server names the build before anything downloads, so a run
-      # that would redeploy a build this commit already deployed can stop here.
       - name: Resolve the served build
         id: target
         run: |
@@ -71,7 +70,6 @@ jobs:
           [ "$code" -eq 0 ] || exit "$code"
           echo "build=$build" >> "$GITHUB_OUTPUT"
 
-      # A manual run always rebuilds.
       - name: Look for an earlier deploy
         id: deployed
         if: ${{ env.SKIP != 'true' && github.event_name != 'workflow_dispatch' }}
@@ -102,8 +100,6 @@ jobs:
             !.hdp/casc
           key: hdp-${{ runner.os }}-${{ hashFiles('scripts/extract-gamedata.ts') }}
 
-      # The CASC cache holds the archives the extract downloads. A build shares
-      # most of them with the one before it, so restore the newest entry.
       - name: Restore CASC cache
         id: casc
         if: ${{ env.SKIP != 'true' }}
@@ -113,8 +109,6 @@ jobs:
           key: ${{ env.CASC_KEY_PREFIX }}-${{ github.run_id }}
           restore-keys: ${{ env.CASC_KEY_PREFIX }}-
 
-      # Exit code 75 means the PTR product has no build of its own, or its
-      # build went away mid-run. Stop the job without failing it.
       - name: Extract game data
         id: extract
         if: ${{ env.SKIP != 'true' }}
@@ -145,8 +139,6 @@ jobs:
         env:
           ZOLA_BASE_URL: ${{ inputs.ptr && 'https://hots-ptr.epixors.com' || '' }}
 
-      # The catalog of a build does not change. Keep it, for live and PTR
-      # replays of a build that is no longer current.
       - name: Commit new ability-link catalog
         if: ${{ github.event_name != 'pull_request' && env.SKIP != 'true' }}
         run: |
@@ -158,7 +150,6 @@ jobs:
             exit 0
           fi
           git commit -m "chore: add ability-link catalog for new build"
-          # The live and PTR workflows share this store and can run at once.
           for i in 1 2 3 4 5; do
             if git pull --rebase origin "$GITHUB_REF_NAME" &&
                git push origin "HEAD:$GITHUB_REF_NAME"; then
@@ -175,6 +166,13 @@ jobs:
           test -n "$CLOUDFLARE_API_TOKEN" || { echo "CLOUDFLARE_API_TOKEN is required"; exit 1; }
           test -n "$CLOUDFLARE_ACCOUNT_ID" || { echo "CLOUDFLARE_ACCOUNT_ID is required"; exit 1; }
 
+      - name: Read the served game version
+        id: served
+        if: ${{ env.SKIP != 'true' }}
+        run: |
+          version=$(curl -fsS "$SITE_URL/build-info.json?run=$GITHUB_RUN_ID" | jq -r '.game_version // empty' || true)
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
       - name: Deploy to Cloudflare Pages
         if: ${{ env.SKIP != 'true' }}
         run: |
@@ -183,8 +181,27 @@ jobs:
             --branch="${GITHUB_REF_NAME}" \
             --commit-hash="${GITHUB_SHA}"
 
-      # Keyed on HEAD, which the catalog step may have moved: the next run
-      # checks out that commit and matches.
+      - name: Announce a new game version
+        if: ${{ env.SKIP != 'true' && steps.served.outputs.version != '' }}
+        continue-on-error: true
+        env:
+          DISCORD_WEBHOOK: ${{ secrets[inputs.ptr && 'DISCORD_WEBHOOK_PTR' || 'DISCORD_WEBHOOK_LIVE'] }}
+          SERVED_VERSION: ${{ steps.served.outputs.version }}
+          REALM: ${{ inputs.ptr && 'PTR' || 'Live' }}
+          GAME_VERSION: ${{ steps.extract.outputs.version }}
+        run: |
+          version=$(jq -r .game_version site/data/build-info.json)
+          if [ "$version" = "$SERVED_VERSION" ]; then
+            exit 0
+          fi
+          if [ -z "$DISCORD_WEBHOOK" ]; then
+            echo "No Discord webhook for $REALM."
+            exit 0
+          fi
+          jq -n --arg content "New $REALM version $GAME_VERSION is up on $SITE_URL" \
+            '{content: $content, allowed_mentions: {parse: []}, flags: 4}' \
+            | curl -fsS -H "Content-Type: application/json" --data @- "$DISCORD_WEBHOOK"
+
       - name: Record the deploy
         if: ${{ env.SKIP != 'true' }}
         run: |
