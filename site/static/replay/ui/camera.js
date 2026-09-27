@@ -63,7 +63,7 @@ export function cameraQuad(x, y, distance = DEFAULT_DISTANCE) {
   ];
 }
 
-export function cameraAt(p, loop) {
+export function cameraAt(p, loop, heroAt) {
   const cam = p.camera;
   if (!cam || !cam.length || cam[0].loop > loop) return null;
   let lo = 0;
@@ -74,8 +74,12 @@ export function cameraAt(p, loop) {
     else hi = mid - 1;
   }
   const a = cam[lo];
+  if (a.follow) {
+    const pos = heroAt(p, loop);
+    return pos && { x: pos[0], y: pos[1], d: a.d };
+  }
   const b = cam[lo + 1];
-  if (!b || b.loop - a.loop > JUMP_LOOPS || Math.hypot(b.x - a.x, b.y - a.y) > JUMP_DIST) return a;
+  if (!b || b.follow || b.loop - a.loop > JUMP_LOOPS || Math.hypot(b.x - a.x, b.y - a.y) > JUMP_DIST) return a;
   const f = (loop - a.loop) / (b.loop - a.loop);
   return { x: a.x + (b.x - a.x) * f, y: a.y + (b.y - a.y) * f, d: a.d };
 }

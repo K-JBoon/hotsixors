@@ -43,7 +43,7 @@ function hearthLandings(player, anchors, hearthLinks, hall) {
     const from = c.loop + HEARTH_EVIDENCE[0];
     const to = c.loop + HEARTH_EVIDENCE[1];
     const sawHall =
-      camera.some((s) => s.loop >= from && s.loop <= to && nearHall(s)) ||
+      camera.some((s) => !s.follow && s.loop >= from && s.loop <= to && nearHall(s)) ||
       anchors.some((a) => a.loop >= from && a.loop <= c.loop + 400 && nearHall(a));
     if (sawHall) out.push({ loop: c.loop + HEARTH_CHANNEL, x: hall.x, y: hall.y });
   }

@@ -41,18 +41,14 @@ export function runGamePass(data, protocol, model, reg) {
 }
 
 const HANDLERS = {
+  // Locked Camera; players who have it may log no camera events at all
+  'NNet.Game.SUserOptionsEvent': (ctx, ev, p, uid) => {
+    if (ev.m_cameraFollow && !p.camera?.length) pushCamera(ctx, p, uid, ev._gameloop, null);
+  },
   'NNet.Game.SCameraUpdateEvent': (ctx, ev, p, uid) => {
     if (ev.m_distance != null) ctx.zoom.set(uid, ev.m_distance / CAMERA_FIXED);
-    if (!ev.m_target) return;
-    const cam = (p.camera ||= []);
-    const last = cam[cam.length - 1];
-    if (last && ev._gameloop - last.loop < CAMERA_MIN_GAP) return;
-    cam.push({
-      loop: ev._gameloop,
-      x: ev.m_target.x / CAMERA_FIXED,
-      y: ev.m_target.y / CAMERA_FIXED,
-      d: ctx.zoom.get(uid),
-    });
+    if (ev.m_follow) pushCamera(ctx, p, uid, ev._gameloop, null);
+    else if (ev.m_target) pushCamera(ctx, p, uid, ev._gameloop, ev.m_target);
   },
   'NNet.Game.STriggerKeyPressedEvent': (ctx, ev, p, uid) => {
     if (ev.m_flags === 8) ctx.lastKey.set(uid, { key: ev.m_key, loop: ev._gameloop });
@@ -75,6 +71,16 @@ const HANDLERS = {
   },
   'NNet.Game.SCmdEvent': onCmd,
 };
+
+/* A follow sample (no target) keeps the camera on the hero until the next
+   target sample. */
+function pushCamera(ctx, p, uid, loop, target) {
+  const cam = (p.camera ||= []);
+  const last = cam[cam.length - 1];
+  if (last && !last.follow === !!target && loop - last.loop < CAMERA_MIN_GAP) return;
+  const d = ctx.zoom.get(uid);
+  cam.push(target ? { loop, x: target.x / CAMERA_FIXED, y: target.y / CAMERA_FIXED, d } : { loop, follow: true, d });
+}
 
 function selectionOf(ctx, id) {
   let s = ctx.selections.get(id);

@@ -199,7 +199,7 @@ function drawCompanions(loop) {
 /* What the player had on screen: the ground the game camera covered. */
 function drawCameraBox(loop, p) {
   if (!p) return;
-  const cam = cameraAt(p, loop);
+  const cam = cameraAt(p, loop, positionAt);
   if (!cam) return;
   const { ctx } = state;
   const quad = cameraQuad(cam.x, cam.y, cam.d);

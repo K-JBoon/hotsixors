@@ -512,6 +512,7 @@ test("camera targets decode onto the map, near their own hero", { skip: !haveRep
   for (const p of model.players) {
     assert.ok(p.camera.length > 0, `no camera samples for ${p.hero}`);
     for (const s of p.camera) {
+      if (s.follow) continue;
       assert.ok(s.x >= b.minX - 30 && s.x <= b.maxX + 30, `camera x ${s.x} off map`);
       assert.ok(s.y >= b.minY - 30 && s.y <= b.maxY + 30, `camera y ${s.y} off map`);
     }
@@ -521,7 +522,7 @@ test("camera targets decode onto the map, near their own hero", { skip: !haveRep
     for (const a of p.anchors) {
       while (j < p.camera.length - 1 && p.camera[j + 1].loop <= a.loop) j++;
       const s = p.camera[j];
-      if (!s || a.loop - s.loop > 8 || a.loop < s.loop) continue;
+      if (!s || s.follow || a.loop - s.loop > 8 || a.loop < s.loop) continue;
       compared++;
       if (Math.hypot(s.x - a.x, s.y - a.y) < 15) close++;
     }
