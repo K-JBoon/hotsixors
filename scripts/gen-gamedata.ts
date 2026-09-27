@@ -233,7 +233,7 @@ function sectionPage(title: string, dirPath: string): string {
   const description = dirPath
     ? `Heroes of the Storm game data files in ${dirPath}.`
     : "Browse the Heroes of the Storm game files: XML data, Galaxy scripts and game strings.";
-  return frontmatter({ title, template: "gamedata/list.html", description }, { dir_path: dirPath, noindex: true });
+  return frontmatter({ title, template: "gamedata/list.html", description }, { dir_path: dirPath, noindex: Boolean(dirPath) });
 }
 
 function pruneEmptyDirs(node: FileTreeNode): boolean {

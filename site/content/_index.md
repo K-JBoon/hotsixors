@@ -1,5 +1,5 @@
 +++
 title = "HotSixors"
-description = "Heroes of the Storm hero talents, abilities, battlegrounds, a replay viewer and a mock draft tool, built from the game's own files."
+description = "Heroes of the Storm (HotS) talent builder, replay viewer, hero abilities, battlegrounds, mock draft and datamining tools."
 template = "index.html"
 +++
