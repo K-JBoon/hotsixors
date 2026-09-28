@@ -150,7 +150,11 @@ async function main() {
   await writeJson(path.join(SITE_DATA, "structures.json"), { groups }, 2);
   await writeText(
     path.join(SITE_CONTENT, "structures.md"),
-    frontmatter({ title: "Structures", template: "structures.html" }),
+    frontmatter({
+      title: "Structures",
+      description: "HP, shields, scaling, weapons and XP for the Core, Forts, Keeps, towers and gates in Heroes of the Storm.",
+      template: "structures.html",
+    }),
   );
   console.log(`gen-structures: wrote ${groups.reduce((sum, group) => sum + group.units.length, 0)} structures`);
 }

@@ -385,7 +385,11 @@ async function main() {
   await writeJson(path.join(SITE_DATA, "minions-and-mercs.json"), { groups, timings: await timings() }, 2);
   await writeText(
     path.join(SITE_CONTENT, "minions-and-mercs.md"),
-    frontmatter({ title: "Minions & Mercs", template: "minions-and-mercs.html" }),
+    frontmatter({
+      title: "Minions & Mercs",
+      description: "Lane minion, mercenary camp and boss stats in Heroes of the Storm: HP, damage, scaling, XP and spawn timers.",
+      template: "minions-and-mercs.html",
+    }),
   );
   console.log(`gen-minions: wrote ${groups.reduce((sum, group) => sum + group.units.length, 0)} units`);
 }

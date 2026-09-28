@@ -36,7 +36,11 @@ async function main() {
   await writeJson(path.join(SITE_DATA, "experience.json"), data, 2);
   await writeText(
     path.join(SITE_CONTENT, "experience.md"),
-    frontmatter({ title: "Experience", template: "experience.html" }),
+    frontmatter({
+      title: "Experience",
+      description: "XP needed per level in Heroes of the Storm, with a kill XP calculator.",
+      template: "experience.html",
+    }),
   );
   console.log(`gen-experience: wrote ${levels.length} levels`);
 }
