@@ -23,6 +23,7 @@ export const REF_FIELDS = [
   "CaseDefault",
   "ContinuousEffect",
   "CancelEffect",
+  "TargetingEnterEffect",
   "AreaEffect",
   "DamageEffect",
   "LeechValidator",
