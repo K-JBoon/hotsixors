@@ -151,7 +151,7 @@ jobs:
           fi
           git commit -m "chore: add ability-link catalog for new build"
           for i in 1 2 3 4 5; do
-            if git pull --rebase origin "$GITHUB_REF_NAME" &&
+            if git pull --rebase --autostash origin "$GITHUB_REF_NAME" &&
                git push origin "HEAD:$GITHUB_REF_NAME"; then
               exit 0
             fi
