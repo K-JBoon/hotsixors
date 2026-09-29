@@ -382,6 +382,45 @@ test("findMechanicApplications credits locally talent-named effects to that tale
   assert.deepEqual(result[0].entries.map((e) => e.nameId), ["DVaBoostersHitTheNitrous"]);
 });
 
+test("findMechanicApplications credits token-count gated effects to the talent granting the token", () => {
+  const files = [{
+    path: "x.xml",
+    content: `<Catalog>
+      <CAbilEffectTarget id="AlarakLightningSurge"><Effect value="AlarakLightningSurgeImpactSet" /></CAbilEffectTarget>
+      <CEffectSet id="AlarakLightningSurgeImpactSet">
+        <EffectArray value="AlarakLightningSurgeDamage" />
+        <EffectArray value="AlarakLightningSurgeApplyExtendedLightningTalentSlow" />
+      </CEffectSet>
+      <CEffectDamage id="AlarakLightningSurgeDamage" />
+      <CEffectApplyBehavior id="AlarakLightningSurgeApplyExtendedLightningTalentSlow">
+        <ValidatorArray value="AlarakHas15ExtendedLightningTokens" />
+        <Behavior value="AlarakLightningSurgeExtendedLightningTalentSlow" />
+      </CEffectApplyBehavior>
+      <CBehaviorBuff id="AlarakLightningSurgeExtendedLightningTalentSlow" parent="StormSlowParent" />
+      <CBehaviorBuff id="StormSlowParent" />
+      <CBehaviorTokenCounter id="AlarakLightningSurgeExtendedLightningTalentTokenCounter" />
+      <CValidatorUnitCompareTokenCount id="AlarakHas15ExtendedLightningTokens">
+        <Value value="15" />
+        <TokenId value="AlarakLightningSurgeExtendedLightningTalentTokenCounter" />
+      </CValidatorUnitCompareTokenCount>
+      <CTalent id="AlarakExtendedLightning">
+        <Abil value="AlarakLightningSurge" />
+        <RankArray><BehaviorArray value="AlarakLightningSurgeExtendedLightningTalentTokenCounter" /></RankArray>
+      </CTalent>
+    </Catalog>`,
+  }];
+  const result = runGraph(files, `
+    const g = G.buildEffectGraph(files);
+    const anchorToEntry = {
+      AlarakLightningSurge: { kind: "ability", nameId: "AlarakLightningSurge", buttonId: "AlarakLightningSurge", heroSlug: "alarak", heroName: "Alarak", name: "Lightning Surge", icon: "i.png", abilityType: "E" },
+      AlarakExtendedLightning: { kind: "talent", nameId: "AlarakExtendedLightning", buttonId: "AlarakExtendedLightning", heroSlug: "alarak", heroName: "Alarak", name: "Extended Lightning", icon: "j.png" },
+    };
+    const mechanics = [{ slug: "slowed", name: "Slowed", category: "Crowd Control", primaryBehavior: "StormSlowParent", sourceIds: [] }];
+    return G.findMechanicApplications(g, anchorToEntry, mechanics);
+  `);
+  assert.deepEqual(result[0].entries.map((e) => e.nameId), ["AlarakExtendedLightning"]);
+});
+
 test("findMechanicApplications prefers talents from validator-gated containing effects", () => {
   const files = [{
     path: "x.xml",

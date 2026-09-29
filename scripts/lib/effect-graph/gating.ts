@@ -94,6 +94,18 @@ function talentIdsGrantingBehavior(
   return talentGrantIndex(graph, anchorToEntry).get(behaviorId) ?? [];
 }
 
+function passesAtZeroTokens(graph: EffectGraph, node: GraphNode): boolean {
+  const value = resolvedNumber(graph, valuesOfDirectChildren(node.elements, "Value")[0] ?? "0") ?? 0;
+  switch ((valuesOfDirectChildren(node.elements, "Compare")[0] ?? "eq").toLowerCase()) {
+    case "ne": return value !== 0;
+    case "lt": return 0 < value;
+    case "le": return 0 <= value;
+    case "gt": return 0 > value;
+    case "ge": return 0 >= value;
+    default: return value === 0;
+  }
+}
+
 function isTriviallyPassableValidator(
   graph: EffectGraph,
   validatorId: string,
@@ -103,6 +115,7 @@ function isTriviallyPassableValidator(
   seen.add(validatorId);
   const node = graph.nodes.get(validatorId);
   if (!node) return false;
+  if (node.tag === "CValidatorUnitCompareTokenCount") return passesAtZeroTokens(graph, node);
   if (node.tag === "CValidatorUnitCompareBehaviorCount") {
     const valueStr = valuesOfDirectChildren(node.elements, "Value")[0] ?? "0";
     const value = resolvedNumber(graph, valueStr) ?? 0;
@@ -135,6 +148,12 @@ export function validatorTalentIds(
   if (node.tag === "CValidatorUnitCompareBehaviorCount") {
     return (node.refs["Behavior"] ?? []).flatMap((behaviorId) =>
       talentIdsGrantingBehavior(graph, anchorToEntry, behaviorId)
+    );
+  }
+  if (node.tag === "CValidatorUnitCompareTokenCount") {
+    if (passesAtZeroTokens(graph, node)) return [];
+    return valuesOfDirectChildren(node.elements, "TokenId").flatMap((tokenId) =>
+      talentIdsGrantingBehavior(graph, anchorToEntry, tokenId)
     );
   }
 
