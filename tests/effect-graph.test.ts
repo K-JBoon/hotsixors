@@ -702,6 +702,38 @@ test("findMechanicApplications separates shield descendants from protected", () 
   assert.deepEqual(result[1].entries.map((e) => e.nameId), ["TassadarPlasmaShield"]);
 });
 
+test("findMechanicApplications counts inline protect behaviors as protected, not invulnerable ones", () => {
+  const files = [{
+    path: "x.xml",
+    content: `<Catalog>
+      <CBehaviorBuff id="StormProtect" />
+      <CBehaviorBuff id="StormUnstoppableParent" />
+      <CBehaviorBuff id="StormInvulnerable" parent="StormUnstoppableParent">
+        <DamageResponse Chance="1" ModifyFraction="0" />
+      </CBehaviorBuff>
+      <CAbilEffectTarget id="AlarakCounterStrike"><Effect value="AlarakCounterStrikeApplyShield" /></CAbilEffectTarget>
+      <CEffectApplyBehavior id="AlarakCounterStrikeApplyShield"><Behavior value="AlarakCounterStrikeShield" /></CEffectApplyBehavior>
+      <CBehaviorBuff id="AlarakCounterStrikeShield" parent="StormUnstoppableParent">
+        <DamageResponse Chance="1" ModifyFraction="0" />
+        <BehaviorCategories index="Protected" value="1" />
+      </CBehaviorBuff>
+      <CAbilEffectTarget id="JainaIceBlock"><Effect value="JainaIceColdApply" /></CAbilEffectTarget>
+      <CEffectApplyBehavior id="JainaIceColdApply"><Behavior value="JainaIceCold" /></CEffectApplyBehavior>
+      <CBehaviorBuff id="JainaIceCold" parent="StormInvulnerable">
+        <BehaviorCategories index="Protected" value="1" />
+      </CBehaviorBuff>
+    </Catalog>`,
+  }];
+  const result = runGraph(files, `
+    const g = G.buildEffectGraph(files);
+    const ability = (id) => ({ kind: "ability", nameId: id, heroSlug: "hero", heroName: "Hero", name: id, icon: "i.png" });
+    const anchorToEntry = { AlarakCounterStrike: ability("AlarakCounterStrike"), JainaIceBlock: ability("JainaIceBlock") };
+    const mechanics = [{ slug: "protected", name: "Protected", category: "Protection", primaryBehavior: "StormProtect", sourceIds: [] }];
+    return G.findMechanicApplications(g, anchorToEntry, mechanics);
+  `);
+  assert.deepEqual(result[0].entries.map((e) => e.nameId), ["AlarakCounterStrike"]);
+});
+
 test("findMechanicApplications separates talent-granted shields from protected", () => {
   const files = [{
     path: "x.xml",

@@ -39,6 +39,7 @@ import {
   resolveEffectOwners,
 } from "./owners.ts";
 import { behaviorMatchesMechanicKind, nodePassesMechanicFilter } from "./filter.ts";
+import { inlineProtectBehaviorIds, protectionKindForMechanic, protectionKindOfBehavior } from "./protection.ts";
 import {
   excludedBehaviorDescendantsForMechanic,
   excludedAppliedBehaviorDescendantsForMechanic,
@@ -54,6 +55,12 @@ function behaviorIdsForMechanic(graph: EffectGraph, mechanic: MechanicLike): str
   );
   const ids = [mechanic.primaryBehavior, ...sourceBehaviors].filter((id) => id && !id.startsWith("lib"));
   return [...new Set(ids)];
+}
+
+function inlineProtectBehaviorIdsForMechanic(graph: EffectGraph, mechanic: MechanicLike): string[] {
+  const kind = protectionKindForMechanic(mechanic);
+  if (kind === null) return [];
+  return inlineProtectBehaviorIds(graph).filter((id) => protectionKindOfBehavior(graph, id) === kind);
 }
 
 function isSharedStormApplyEffect(graph: EffectGraph, effectId: string): boolean {
@@ -365,6 +372,7 @@ export function findMechanicApplications(
     const armorBehaviorIds = armorModBehaviorIds(graph, mech);
     const behaviorIds = [...new Set([
       ...behaviorIdsForMechanic(graph, mech),
+      ...inlineProtectBehaviorIdsForMechanic(graph, mech),
       ...healingBehaviorIds,
       ...lifestealBehaviorIds,
       ...statBehaviorIds,

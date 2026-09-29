@@ -56,9 +56,37 @@ function behaviorRestrictsDamageKinds(graph: EffectGraph, behaviorId: string): b
   return false;
 }
 
+function behaviorNullifiesDamage(graph: EffectGraph, behaviorId: string): boolean {
+  for (const id of parentChain(graph, behaviorId)) {
+    const node = graph.nodes.get(id);
+    if (!node) continue;
+    for (const dr of findAll(node.elements, "DamageResponse")) {
+      if (dr.attrs.Chance === "1" && dr.attrs.ModifyFraction === "0") return true;
+    }
+  }
+  return false;
+}
+
+// Protect-family behaviors that inline StormProtect's damage response instead of inheriting it.
+function isInlineProtect(graph: EffectGraph, behaviorId: string, chain: string[]): boolean {
+  return !chain.includes("StormInvulnerable")
+    && behaviorHasCategory(graph, behaviorId, "Protected")
+    && behaviorNullifiesDamage(graph, behaviorId);
+}
+
+export function inlineProtectBehaviorIds(graph: EffectGraph): string[] {
+  const out: string[] = [];
+  for (const [id, node] of graph.nodes) {
+    if (!node.tag.startsWith("CBehavior")) continue;
+    const chain = parentChain(graph, id);
+    if (!chain.includes("StormProtect") && isInlineProtect(graph, id, chain)) out.push(id);
+  }
+  return out;
+}
+
 export function protectionKindOfBehavior(graph: EffectGraph, behaviorId: string): ProtectionKind | null {
   const chain = parentChain(graph, behaviorId);
-  if (!chain.includes("StormProtect")) return null;
+  if (!chain.includes("StormProtect") && !isInlineProtect(graph, behaviorId, chain)) return null;
   if (chain.includes("StormShield") || behaviorHasDamageResponseModifyLimit(graph, behaviorId)) return "shield";
   if (chain.includes("StormEvasion") || behaviorHasCategory(graph, behaviorId, "Evasion")) return "evasion";
   const ownNode = graph.nodes.get(behaviorId);
