@@ -106,7 +106,7 @@ function talentIdsGrantingBehavior(
   return talentGrantIndex(graph, anchorToEntry).get(behaviorId) ?? [];
 }
 
-function passesAtZeroTokens(graph: EffectGraph, node: GraphNode): boolean {
+function passesAtZeroCount(graph: EffectGraph, node: GraphNode): boolean {
   const value = resolvedNumber(graph, valuesOfDirectChildren(node.elements, "Value")[0] ?? "0") ?? 0;
   switch ((valuesOfDirectChildren(node.elements, "Compare")[0] ?? "eq").toLowerCase()) {
     case "ne": return value !== 0;
@@ -128,13 +128,8 @@ function isTriviallyPassableValidator(
   const node = graph.nodes.get(validatorId);
   if (!node) return false;
   if (node.tag === "CValidatorPlayerTalent") return isNegatedTalentValidator(node);
-  if (node.tag === "CValidatorUnitCompareTokenCount") return passesAtZeroTokens(graph, node);
-  if (node.tag === "CValidatorUnitCompareBehaviorCount") {
-    const valueStr = valuesOfDirectChildren(node.elements, "Value")[0] ?? "0";
-    const value = resolvedNumber(graph, valueStr) ?? 0;
-    const compare = (valuesOfDirectChildren(node.elements, "Compare")[0] ?? "eq").toLowerCase();
-    return (compare === "eq" || compare === "lt" || compare === "lte" || compare === "max") && value === 0;
-  }
+  if (node.tag === "CValidatorUnitCompareTokenCount") return passesAtZeroCount(graph, node);
+  if (node.tag === "CValidatorUnitCompareBehaviorCount") return passesAtZeroCount(graph, node);
   if (node.tag === "CValidatorCombine") {
     const isAnd = valuesOfDirectChildren(node.elements, "Type")[0]?.toLowerCase() === "and";
     const children = node.refs["CombineArray"] ?? [];
@@ -161,12 +156,13 @@ export function validatorTalentIds(
     return isNegatedTalentValidator(node) ? [] : valuesOfDirectChildren(node.elements, "Value");
   }
   if (node.tag === "CValidatorUnitCompareBehaviorCount") {
+    if (passesAtZeroCount(graph, node)) return [];
     return (node.refs["Behavior"] ?? []).flatMap((behaviorId) =>
       talentIdsGrantingBehavior(graph, anchorToEntry, behaviorId)
     );
   }
   if (node.tag === "CValidatorUnitCompareTokenCount") {
-    if (passesAtZeroTokens(graph, node)) return [];
+    if (passesAtZeroCount(graph, node)) return [];
     return valuesOfDirectChildren(node.elements, "TokenId").flatMap((tokenId) =>
       talentIdsGrantingBehavior(graph, anchorToEntry, tokenId)
     );
@@ -174,6 +170,7 @@ export function validatorTalentIds(
 
   const combineChildren = node.refs["CombineArray"] ?? [];
   if (combineChildren.length === 0) return [];
+  if (valuesOfDirectChildren(node.elements, "Negate")[0] === "1") return [];
 
   if (node.tag === "CValidatorCombine") {
     const isAnd = valuesOfDirectChildren(node.elements, "Type")[0]?.toLowerCase() === "and";

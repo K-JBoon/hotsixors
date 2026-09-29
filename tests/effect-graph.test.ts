@@ -126,8 +126,8 @@ test("findMechanicApplications credits ownerless weapon effect paths to validato
       <CBehaviorBuff id="StormStun" />
       <CBehaviorBuff id="MuradinSkullcracker" />
       <CBehaviorBuff id="SkullcrackerStack" />
-      <CValidatorUnitCompareBehaviorCount id="HasSkullcracker"><Behavior value="MuradinSkullcracker" /></CValidatorUnitCompareBehaviorCount>
-      <CValidatorUnitCompareBehaviorCount id="Has3StackSkullcracker"><Behavior value="SkullcrackerStack" /></CValidatorUnitCompareBehaviorCount>
+      <CValidatorUnitCompareBehaviorCount id="HasSkullcracker"><Value value="1" /><Behavior value="MuradinSkullcracker" /></CValidatorUnitCompareBehaviorCount>
+      <CValidatorUnitCompareBehaviorCount id="Has3StackSkullcracker"><Value value="2" /><Behavior value="SkullcrackerStack" /></CValidatorUnitCompareBehaviorCount>
       <CTalent id="MuradinCombatStyleSkullcracker"><BehaviorArray value="MuradinSkullcracker" /></CTalent>
     </Catalog>`,
   }];
@@ -1892,4 +1892,32 @@ test("computeMechanicMembership: a node belonging to multiple mechanics gets mul
   assert.equal(combo.length, 2);
   assert.ok(combo.includes("slowed"));
   assert.ok(combo.includes("blinded"));
+});
+
+test("findMechanicApplications ignores zero-count behavior validators as gates", () => {
+  const files = [{
+    path: "x.xml",
+    content: `<Catalog>
+      <CAbilEffectTarget id="HeroStrike"><Effect value="HeroStrikeApplyStun" /></CAbilEffectTarget>
+      <CEffectApplyBehavior id="HeroStrikeApplyStun">
+        <ValidatorArray value="HeroDoesNotHaveUpgradeBehavior" />
+        <Behavior value="HeroStrikeStun" />
+      </CEffectApplyBehavior>
+      <CBehaviorBuff id="HeroStrikeStun" parent="StormStun" />
+      <CBehaviorBuff id="StormStun" />
+      <CBehaviorBuff id="HeroUpgradeBehavior" />
+      <CValidatorUnitCompareBehaviorCount id="HeroDoesNotHaveUpgradeBehavior"><Behavior value="HeroUpgradeBehavior" /></CValidatorUnitCompareBehaviorCount>
+      <CTalent id="HeroUpgrade"><BehaviorArray value="HeroUpgradeBehavior" /></CTalent>
+    </Catalog>`,
+  }];
+  const result = runGraph(files, `
+    const g = G.buildEffectGraph(files);
+    const anchorToEntry = {
+      HeroStrike: { kind: "ability", nameId: "HeroStrike", buttonId: "HeroStrike", heroSlug: "hero", heroName: "Hero", name: "Strike", icon: "i.png", abilityType: "Q" },
+      HeroUpgrade: { kind: "talent", nameId: "HeroUpgrade", buttonId: "HeroUpgradeTalent", heroSlug: "hero", heroName: "Hero", name: "Upgrade", icon: "j.png" },
+    };
+    const mechanics = [{ slug: "stunned", name: "Stunned", category: "Crowd Control", primaryBehavior: "StormStun", sourceIds: [] }];
+    return G.findMechanicApplications(g, anchorToEntry, mechanics);
+  `);
+  assert.deepEqual(result[0].entries.map((e) => e.nameId), ["HeroStrike"]);
 });
