@@ -1921,3 +1921,34 @@ test("findMechanicApplications ignores zero-count behavior validators as gates",
   `);
   assert.deepEqual(result[0].entries.map((e) => e.nameId), ["HeroStrike"]);
 });
+
+test("findMechanicApplications credits hero-wide damage MMAs to their accumulator source", () => {
+  const damage = (id: string) => `
+      <CAbilEffectTarget id="${id}"><Effect value="${id}Damage" /></CAbilEffectTarget>
+      <CEffectDamage id="${id}Damage" parent="StormSpell">
+        <MultiplicativeModifierArray index="HeroTrait" Validator="TargetIsHero" Accumulator="HeroTraitAccumulator" />
+        <MultiplicativeModifierArray index="HeroDamage" Validator="TargetIsHero" Modifier="1" />
+      </CEffectDamage>`;
+  const files = [{
+    path: "x.xml",
+    content: `<Catalog>
+      <CEffectDamage id="StormSpell" />
+      ${damage("HeroQ")}${damage("HeroW")}${damage("HeroE")}
+      <CAccumulatorToken id="HeroTraitAccumulator"><Scale value="1" /></CAccumulatorToken>
+      <CAbilEffectInstant id="HeroTrait" />
+    </Catalog>`,
+  }];
+  const result = runGraph(files, `
+    const g = G.buildEffectGraph(files);
+    const ability = (id, abilityType) => ({ kind: "ability", nameId: id, buttonId: id, heroSlug: "hero", heroName: "Hero", name: id, icon: "i.png", abilityType });
+    const anchorToEntry = {
+      HeroQ: ability("HeroQ", "Q"),
+      HeroW: ability("HeroW", "W"),
+      HeroE: ability("HeroE", "E"),
+      HeroTrait: ability("HeroTrait", "Trait"),
+    };
+    const mechanics = [{ slug: "damage-increase", name: "Damage Increase", category: "Buff", primaryBehavior: "", sourceIds: [], statModifier: "damage", statPolarity: "increase", statDamageKind: "general" }];
+    return G.findMechanicApplications(g, anchorToEntry, mechanics);
+  `);
+  assert.deepEqual(result[0].entries.map((e) => e.nameId), ["HeroTrait"]);
+});

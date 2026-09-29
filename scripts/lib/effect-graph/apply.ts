@@ -269,10 +269,9 @@ function damageMmaApplications(
           continue;
         }
       }
-      if (isHeroWideTraitMma(mma.attrs)) {
-        for (const entry of resolveEffectOwners(graph, reverseRefs, anchorToEntry, chanceEnablers, node.id, { ignoreSpawnSetupRefs, bucketEnablers })) {
-          out.push(entry);
-        }
+      if (isHeroWideTraitMma(mma.attrs) && accumulatorId) {
+        const owner = entryForNamedId(anchorToEntry, accumulatorId);
+        if (owner) out.push(owner);
       }
     }
   }
