@@ -15,6 +15,7 @@ import {
   targetBehaviorOf,
 } from "./walk.ts";
 import {
+  abilityIdsFromValidators,
   gatingTalentIds,
   isDormantEffectWithoutEnabler,
   talentIdsFromBehaviorValidators,
@@ -224,6 +225,7 @@ interface WalkItem {
   node: GraphNode;
   pathGates: Set<string>;
   ownerGates: Set<string>;
+  abilityGates: Set<string>;
 }
 
 // Walk upward from an apply-behavior effect and credit the owning ability/talent.
@@ -271,14 +273,16 @@ export function resolveEffectOwners(
     return [namedSource.entry];
   }
 
+  const initialAbilityGates = seedNode ? abilityIdsFromValidators(graph, reverseRefs, anchorToEntry, seedNode) : [];
   const queue: WalkItem[] = containingRefs.map(({ node }) => ({
     node,
     pathGates: new Set(initialGates),
     ownerGates: new Set(initialOwnerGates),
+    abilityGates: new Set(initialAbilityGates),
   }));
 
   while (queue.length) {
-    const { node, pathGates, ownerGates } = queue.shift()!;
+    const { node, pathGates, ownerGates, abilityGates } = queue.shift()!;
     if (isDormantEffectWithoutEnabler(graph, node, chanceEnablers)) continue;
 
     const nextGates = new Set(pathGates);
@@ -294,15 +298,21 @@ export function resolveEffectOwners(
         ownerGateTalentIdsSeen.add(t);
       }
     }
-    const key = `${node.id} ${[...nextGates].sort().join(",")}`;
+    const nextAbilityGates = new Set(abilityGates);
+    for (const a of abilityIdsFromValidators(graph, reverseRefs, anchorToEntry, node)) nextAbilityGates.add(a);
+    const key = `${node.id} ${[...nextGates].sort().join(",")} ${[...nextAbilityGates].sort().join(",")}`;
     if (seen.has(key)) continue;
     seen.add(key);
 
     const entry = anchorToEntry[node.id];
     if (entry) {
       if (nextGates.size === 0) {
-        const existing = ungated.get(entry.nameId);
-        if (!existing || node.id.length > existing.id.length) ungated.set(entry.nameId, { id: node.id, entry });
+        // An ability gate means another ability primed this path.
+        for (const id of nextAbilityGates.size > 0 ? nextAbilityGates : [node.id]) {
+          const owner = anchorToEntry[id];
+          const existing = ungated.get(owner.nameId);
+          if (!existing || id.length > existing.id.length) ungated.set(owner.nameId, { id, entry: owner });
+        }
       } else {
         // Fall through by specificity.
         const talentIds = localMechanicGates.size > 0
@@ -332,7 +342,7 @@ export function resolveEffectOwners(
     const owningRoots = rootOwners(reverseRefs, anchorToEntry, node.id);
     if (owningRoots.length > 0) {
       for (const parent of owningRoots) {
-        queue.push({ node: parent, pathGates: nextGates, ownerGates: nextOwnerGates });
+        queue.push({ node: parent, pathGates: nextGates, ownerGates: nextOwnerGates, abilityGates: nextAbilityGates });
       }
       continue;
     }
@@ -347,7 +357,7 @@ export function resolveEffectOwners(
         && !isSpawnInstalledBehavior(reverseRefs, ref.node.id)
         && !(reverseRefs.get(ref.node.id) ?? []).some((r) => r.node.tag === "CEffectApplyBehavior")
       ) continue;
-      queue.push({ node: ref.node, pathGates: nextGates, ownerGates: nextOwnerGates });
+      queue.push({ node: ref.node, pathGates: nextGates, ownerGates: nextOwnerGates, abilityGates: nextAbilityGates });
     }
   }
 

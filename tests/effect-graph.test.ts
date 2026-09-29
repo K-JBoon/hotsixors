@@ -1952,3 +1952,38 @@ test("findMechanicApplications credits hero-wide damage MMAs to their accumulato
   `);
   assert.deepEqual(result[0].entries.map((e) => e.nameId), ["HeroTrait"]);
 });
+
+test("findMechanicApplications credits primed basic-attack effects to the priming ability", () => {
+  const files = [{
+    path: "x.xml",
+    content: `<Catalog>
+      <CWeaponLegacy id="HeroWeapon"><Effect value="HeroWeaponImpactSet" /></CWeaponLegacy>
+      <CAbilEffectTarget id="HeroDash"><Effect value="HeroDashImpactSet" /></CAbilEffectTarget>
+      <CEffectSet id="HeroDashImpactSet"><EffectArray value="HeroWeaponImpactSet" /></CEffectSet>
+      <CEffectSet id="HeroWeaponImpactSet"><EffectArray value="HeroPrimedSet" /></CEffectSet>
+      <CEffectSet id="HeroPrimedSet">
+        <ValidatorArray value="HeroCasterHasPrimed" />
+        <EffectArray value="HeroPrimedApplyStun" />
+      </CEffectSet>
+      <CEffectApplyBehavior id="HeroPrimedApplyStun"><Behavior value="HeroPrimedStun" /></CEffectApplyBehavior>
+      <CBehaviorBuff id="HeroPrimedStun" parent="StormStun" />
+      <CBehaviorBuff id="StormStun" />
+      <CAbilEffectInstant id="HeroPrime"><Effect value="HeroPrimeApplyPrimed" /></CAbilEffectInstant>
+      <CEffectApplyBehavior id="HeroPrimeApplyPrimed"><Behavior value="HeroPrimed" /></CEffectApplyBehavior>
+      <CBehaviorBuff id="HeroPrimed" />
+      <CValidatorUnitCompareBehaviorCount id="HeroCasterHasPrimed">
+        <WhichUnit Value="Caster" />
+        <Value value="1" />
+        <Behavior value="HeroPrimed" />
+      </CValidatorUnitCompareBehaviorCount>
+    </Catalog>`,
+  }];
+  const result = runGraph(files, `
+    const g = G.buildEffectGraph(files);
+    const ability = (id, abilityType) => ({ kind: "ability", nameId: id, buttonId: id, heroSlug: "hero", heroName: "Hero", name: id, icon: "i.png", abilityType });
+    const anchorToEntry = { HeroDash: ability("HeroDash", "Q"), HeroPrime: ability("HeroPrime", "E") };
+    const mechanics = [{ slug: "stunned", name: "Stunned", category: "Crowd Control", primaryBehavior: "StormStun", sourceIds: [] }];
+    return G.findMechanicApplications(g, anchorToEntry, mechanics);
+  `);
+  assert.deepEqual(result[0].entries.map((e) => e.nameId), ["HeroPrime"]);
+});

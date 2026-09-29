@@ -145,6 +145,34 @@ export function rootAbilityAnchorIds(
   return out;
 }
 
+const weaponRootedCaches = new WeakMap<Map<string, ReverseRef[]>, Map<string, boolean>>();
+
+// Whether a hero weapon's effect tree contains `effectId`.
+export function isWeaponRooted(reverseRefs: Map<string, ReverseRef[]>, effectId: string): boolean {
+  let cache = weaponRootedCaches.get(reverseRefs);
+  if (!cache) {
+    cache = new Map();
+    weaponRootedCaches.set(reverseRefs, cache);
+  }
+  const hit = cache.get(effectId);
+  if (hit !== undefined) return hit;
+
+  let found = false;
+  const seen = new Set<string>();
+  const queue: string[] = [effectId];
+  while (queue.length && !found) {
+    const id = queue.shift()!;
+    if (seen.has(id)) continue;
+    seen.add(id);
+    for (const { node } of reverseRefs.get(id) ?? []) {
+      if (node.tag.startsWith("CWeapon")) found = true;
+      else if (node.tag.startsWith("CEffect")) queue.push(node.id);
+    }
+  }
+  cache.set(effectId, found);
+  return found;
+}
+
 // Every CEffectApplyBehavior that can resolve to a given behavior, with the
 // chains that decide whether it really does. This narrows a query to a handful
 // of candidates instead of walking all ~60k nodes once per behavior. Buckets

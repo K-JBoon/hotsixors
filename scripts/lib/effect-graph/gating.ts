@@ -1,7 +1,7 @@
 // Talent-gating resolution.
 
-import type { EffectGraph, GraphNode, AnchorIndex, Element } from "./types.ts";
-import { parentChain } from "./walk.ts";
+import type { EffectGraph, GraphNode, AnchorIndex, Element, ReverseRef } from "./types.ts";
+import { effectsApplyingBehavior, isWeaponRooted, parentChain, rootAbilityAnchorIds } from "./walk.ts";
 import { resolvedNumber } from "./xml.ts";
 import { descendantsOf, findAll, findFirst } from "./traverse.ts";
 
@@ -203,6 +203,57 @@ export function talentIdsFromValidators(
     for (const tid of validatorTalentIds(graph, anchorToEntry, validatorId)) out.add(tid);
   }
   return [...out];
+}
+
+const abilityGateCaches = new WeakMap<AnchorIndex, Map<string, string[]>>();
+
+// A caster behavior-count check whose behavior only one ability applies, such as
+// a "primed" buff that one ability grants to empower the next basic attack.
+function validatorAbilityIds(
+  graph: EffectGraph,
+  reverseRefs: Map<string, ReverseRef[]>,
+  anchorToEntry: AnchorIndex,
+  validatorId: string,
+): string[] {
+  let cache = abilityGateCaches.get(anchorToEntry);
+  if (!cache) {
+    cache = new Map();
+    abilityGateCaches.set(anchorToEntry, cache);
+  }
+  const hit = cache.get(validatorId);
+  if (hit) return hit;
+
+  const node = graph.nodes.get(validatorId);
+  let out: string[] = [];
+  if (
+    node?.tag === "CValidatorUnitCompareBehaviorCount"
+    && findFirst(node.elements, "WhichUnit")?.attrs.Value === "Caster"
+    && !passesAtZeroCount(graph, node)
+  ) {
+    const roots = new Set<string>();
+    for (const behaviorId of node.refs["Behavior"] ?? []) {
+      for (const effectId of effectsApplyingBehavior(graph, behaviorId, { includeBehaviorDescendants: false })) {
+        for (const root of rootAbilityAnchorIds(reverseRefs, anchorToEntry, effectId)) roots.add(root);
+      }
+    }
+    if (roots.size === 1) out = [...roots];
+  }
+  cache.set(validatorId, out);
+  return out;
+}
+
+export function abilityIdsFromValidators(
+  graph: EffectGraph,
+  reverseRefs: Map<string, ReverseRef[]>,
+  anchorToEntry: AnchorIndex,
+  node: GraphNode,
+): string[] {
+  if (!isWeaponRooted(reverseRefs, node.id)) return [];
+  return [...new Set(
+    directChildRefs(node.elements, "ValidatorArray").flatMap((id) =>
+      validatorAbilityIds(graph, reverseRefs, anchorToEntry, id)
+    ),
+  )];
 }
 
 export function talentIdsFromBehaviorValidators(
