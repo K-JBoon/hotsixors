@@ -334,7 +334,7 @@ test("findMechanicApplications prefers talents from direct talent validators", (
       </CEffectApplyBehavior>
       <CBehaviorBuff id="LeoricEntombBuriedAliveSilenceDebuff" parent="StormSilence" />
       <CBehaviorBuff id="StormSilence" />
-      <CValidatorPlayerTalent id="HasLeoricMasteryBuriedAlive"><Value value="LeoricMasteryBuriedAliveEntomb" /></CValidatorPlayerTalent>
+      <CValidatorPlayerTalent id="HasLeoricMasteryBuriedAlive"><Find value="1" /><Value value="LeoricMasteryBuriedAliveEntomb" /></CValidatorPlayerTalent>
       <CTalent id="LeoricMasteryBuriedAliveEntomb"><Abil value="LeoricEntomb" /></CTalent>
     </Catalog>`,
   }];
@@ -421,6 +421,62 @@ test("findMechanicApplications credits token-count gated effects to the talent g
   assert.deepEqual(result[0].entries.map((e) => e.nameId), ["AlarakExtendedLightning"]);
 });
 
+test("findMechanicApplications ignores negated talent validators as gates", () => {
+  const files = [{
+    path: "x.xml",
+    content: `<Catalog>
+      <CAbilEffectTarget id="HeroStrike"><Effect value="HeroStrikeApplyStun" /></CAbilEffectTarget>
+      <CEffectApplyBehavior id="HeroStrikeApplyStun">
+        <ValidatorArray value="HeroDoesNotHaveUpgradeTalent" />
+        <Behavior value="HeroStrikeStun" />
+      </CEffectApplyBehavior>
+      <CBehaviorBuff id="HeroStrikeStun" parent="StormStun" />
+      <CBehaviorBuff id="StormStun" />
+      <CValidatorPlayerTalent id="HeroDoesNotHaveUpgradeTalent"><Value value="HeroUpgrade" /></CValidatorPlayerTalent>
+      <CTalent id="HeroUpgrade"><Trait value="1" /></CTalent>
+    </Catalog>`,
+  }];
+  const result = runGraph(files, `
+    const g = G.buildEffectGraph(files);
+    const anchorToEntry = {
+      HeroStrike: { kind: "ability", nameId: "HeroStrike", buttonId: "HeroStrike", heroSlug: "hero", heroName: "Hero", name: "Strike", icon: "i.png", abilityType: "Q" },
+      HeroUpgrade: { kind: "talent", nameId: "HeroUpgrade", buttonId: "HeroUpgradeTalent", heroSlug: "hero", heroName: "Hero", name: "Upgrade", icon: "j.png" },
+    };
+    const mechanics = [{ slug: "stunned", name: "Stunned", category: "Crowd Control", primaryBehavior: "StormStun", sourceIds: [] }];
+    return G.findMechanicApplications(g, anchorToEntry, mechanics);
+  `);
+  assert.deepEqual(result[0].entries.map((e) => e.nameId), ["HeroStrike"]);
+});
+
+test("findMechanicApplications ignores validators nested in behavior sub-elements", () => {
+  const files = [{
+    path: "x.xml",
+    content: `<Catalog>
+      <CAbilEffectTarget id="UtherEternalDevotion"><Effect value="UtherEternalDevotionApplyTargetArmorBuff" /></CAbilEffectTarget>
+      <CEffectApplyBehavior id="UtherEternalDevotionApplyTargetArmorBuff"><Behavior value="UtherEternalDevotionArmor" /></CEffectApplyBehavior>
+      <CBehaviorBuff id="UtherEternalDevotionArmor" parent="StormArmor">
+        <DurationOverride Duration="2"><ValidatorArray value="UtherHasTalentDivineProtection" /></DurationOverride>
+      </CBehaviorBuff>
+      <CBehaviorBuff id="StormArmor" />
+      <CValidatorPlayerTalent id="UtherHasTalentDivineProtection">
+        <Find value="1" />
+        <Value value="UtherEternalDevotionDivineProtection" />
+      </CValidatorPlayerTalent>
+      <CTalent id="UtherEternalDevotionDivineProtection"><Trait value="1" /></CTalent>
+    </Catalog>`,
+  }];
+  const result = runGraph(files, `
+    const g = G.buildEffectGraph(files);
+    const anchorToEntry = {
+      UtherEternalDevotion: { kind: "ability", nameId: "UtherEternalDevotion", buttonId: "UtherEternalDevotion", heroSlug: "uther", heroName: "Uther", name: "Devotion", icon: "i.png", abilityType: "Trait" },
+      UtherEternalDevotionDivineProtection: { kind: "talent", nameId: "UtherEternalDevotionDivineProtection", buttonId: "UtherEternalDevotionDivineProtectionTalent", heroSlug: "uther", heroName: "Uther", name: "Divine Protection", icon: "j.png" },
+    };
+    const mechanics = [{ slug: "armor", name: "Armor", category: "Defense", primaryBehavior: "StormArmor", sourceIds: [] }];
+    return G.findMechanicApplications(g, anchorToEntry, mechanics);
+  `);
+  assert.deepEqual(result[0].entries.map((e) => e.nameId), ["UtherEternalDevotion"]);
+});
+
 test("findMechanicApplications prefers talents from validator-gated containing effects", () => {
   const files = [{
     path: "x.xml",
@@ -433,7 +489,7 @@ test("findMechanicApplications prefers talents from validator-gated containing e
       <CEffectApplyBehavior id="DehakaEssenceCollectionEssenceClawsTalentApplySlow"><Behavior value="DehakaEssenceCollectionEssenceClawsTalentSlow" /></CEffectApplyBehavior>
       <CBehaviorBuff id="DehakaEssenceCollectionEssenceClawsTalentSlow" parent="StormSlowParent" />
       <CBehaviorBuff id="StormSlowParent" />
-      <CValidatorPlayerTalent id="DehakaHasEssenceClawsTalent"><Value value="DehakaEssenceClaws" /></CValidatorPlayerTalent>
+      <CValidatorPlayerTalent id="DehakaHasEssenceClawsTalent"><Find value="1" /><Value value="DehakaEssenceClaws" /></CValidatorPlayerTalent>
       <CTalent id="DehakaEssenceClaws"><Abil value="DehakaEssenceCollection" /></CTalent>
     </Catalog>`,
   }];
@@ -506,7 +562,7 @@ test("findMechanicApplications prefers talents from behavior-level disable valid
         <DisableValidatorArray value="StitchesHasPutrefactionTalent" />
       </CBehaviorBuff>
       <CBehaviorBuff id="StormHealReduction" />
-      <CValidatorPlayerTalent id="StitchesHasPutrefactionTalent"><Value value="StitchesPutrefaction" /></CValidatorPlayerTalent>
+      <CValidatorPlayerTalent id="StitchesHasPutrefactionTalent"><Find value="1" /><Value value="StitchesPutrefaction" /></CValidatorPlayerTalent>
       <CTalent id="StitchesPutrefaction" />
       <CTalent id="StitchesVileCleaver">
         <Abil value="StitchesSlam" />
@@ -964,7 +1020,7 @@ test("findMechanicApplications does not credit dormant sibling effects enabled e
         <ValidatorArray value="LiLiHasWindSerpentTalent" />
         <AreaArray Effect="LiliBlindingWindLaunchSet" />
       </CEffectEnumArea>
-      <CValidatorPlayerTalent id="LiLiHasWindSerpentTalent"><Value value="LiLiWindSerpent" /></CValidatorPlayerTalent>
+      <CValidatorPlayerTalent id="LiLiHasWindSerpentTalent"><Find value="1" /><Value value="LiLiWindSerpent" /></CValidatorPlayerTalent>
       <CTalent id="LiLiWindSerpent">
         <Abil value="LiLiCloudSerpent" />
         <AbilityModificationArray>

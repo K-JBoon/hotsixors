@@ -13,6 +13,18 @@ function valuesOfDirectChildren(elements: readonly Element[], tag: string): stri
   return [...out];
 }
 
+function directChildRefs(elements: readonly Element[], tag: string): string[] {
+  return elements
+    .filter((el) => el.tag === tag)
+    .map((el) => el.attrs.value ?? el.attrs.Link)
+    .filter((v): v is string => v !== undefined);
+}
+
+// CValidatorPlayerTalent without Find=1 passes when the talent is absent.
+function isNegatedTalentValidator(node: GraphNode): boolean {
+  return valuesOfDirectChildren(node.elements, "Find")[0] !== "1";
+}
+
 function blockHas(mod: Element, tag: string, predicate: (el: Element) => boolean): boolean {
   return mod.children.some((c) => c.tag === tag && predicate(c));
 }
@@ -115,6 +127,7 @@ function isTriviallyPassableValidator(
   seen.add(validatorId);
   const node = graph.nodes.get(validatorId);
   if (!node) return false;
+  if (node.tag === "CValidatorPlayerTalent") return isNegatedTalentValidator(node);
   if (node.tag === "CValidatorUnitCompareTokenCount") return passesAtZeroTokens(graph, node);
   if (node.tag === "CValidatorUnitCompareBehaviorCount") {
     const valueStr = valuesOfDirectChildren(node.elements, "Value")[0] ?? "0";
@@ -144,7 +157,9 @@ export function validatorTalentIds(
 
   const node = graph.nodes.get(validatorId);
   if (!node) return [];
-  if (node.tag === "CValidatorPlayerTalent") return valuesOfDirectChildren(node.elements, "Value");
+  if (node.tag === "CValidatorPlayerTalent") {
+    return isNegatedTalentValidator(node) ? [] : valuesOfDirectChildren(node.elements, "Value");
+  }
   if (node.tag === "CValidatorUnitCompareBehaviorCount") {
     return (node.refs["Behavior"] ?? []).flatMap((behaviorId) =>
       talentIdsGrantingBehavior(graph, anchorToEntry, behaviorId)
@@ -184,9 +199,9 @@ export function talentIdsFromValidators(
 ): string[] {
   const out = new Set<string>();
   for (const validatorId of [
-    ...(node.refs["ValidatorArray"] ?? []),
-    ...(node.refs["DisableValidatorArray"] ?? []),
-    ...(node.refs["LeechValidator"] ?? []),
+    ...directChildRefs(node.elements, "ValidatorArray"),
+    ...directChildRefs(node.elements, "DisableValidatorArray"),
+    ...directChildRefs(node.elements, "LeechValidator"),
   ]) {
     for (const tid of validatorTalentIds(graph, anchorToEntry, validatorId)) out.add(tid);
   }
