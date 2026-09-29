@@ -48,9 +48,13 @@ export function excludedEntryIdsForMechanic(mechanic: MechanicLike): string[] {
     case "physical-damage-increase":
       // Powerslide itself is not a damage increase.
       return ["L90ETCPowerslide"];
+    case "damage-increase":
+      // Pure Malice only scales the Sadism multiplier.
+      return ["AlarakPureMalice"];
     case "spell-power-increase":
       // Siegebreaker increases both spell and summon-unit weapon damage.
-      return ["AzmodanSiegebreaker"];
+      // Pure Malice only scales the Sadism multiplier.
+      return ["AzmodanSiegebreaker", "AlarakPureMalice"];
     default:
       return [];
   }
