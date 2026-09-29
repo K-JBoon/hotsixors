@@ -137,13 +137,13 @@
 <div class="hero-stats__grid">
   <div class="stat-card">
     <div class="stat-card__label">Health</div>
-    <div class="stat-card__value"><span class="storm-scale" data-base="{{ st.life.amount }}" data-scale="{{ st.life.scale }}" title="+{{ (st.life.scale * 100) | round }}% per level">{{ st.life.amount | round }}</span></div>
+    <div class="stat-card__value"><span class="storm-scale" data-base="{{ st.life.amount }}" data-scale="{{ st.life.scale }}" data-round="up" title="+{{ (st.life.scale * 100) | round }}% per level">{{ st.life.amount | round }}</span></div>
     {% if st.life.scale > 0 %}<div class="stat-card__scaling">+{{ (st.life.scale * 100) | round }}% per level</div>{% endif %}
   </div>
 
   <div class="stat-card">
     <div class="stat-card__label">Health Regen</div>
-    <div class="stat-card__value"><span class="storm-scale" data-base="{{ st.life.regenRate }}" data-scale="{{ st.life.regenScale }}" data-decimals="2" title="+{{ (st.life.regenScale * 100) | round }}% per level">{{ st.life.regenRate | round(precision=2) }}</span></div>
+    <div class="stat-card__value"><span class="storm-scale" data-base="{{ st.life.regenRate }}" data-scale="{{ st.life.regenScale }}" data-decimals="2" data-per-tick title="+{{ (st.life.regenScale * 100) | round }}% per level">{{ st.life.regenRate | round(precision=2) }}</span></div>
     {% if st.life.regenScale > 0 %}<div class="stat-card__scaling">+{{ (st.life.regenScale * 100) | round }}% per level</div>{% endif %}
   </div>
 
