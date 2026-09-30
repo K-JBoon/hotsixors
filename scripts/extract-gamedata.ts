@@ -21,11 +21,12 @@ const SCRIPT_PATH = fileURLToPath(import.meta.url);
 const REPO_ROOT = path.resolve(path.dirname(SCRIPT_PATH), "..");
 
 // Pinned: the output layout changes between releases.
-const HDP_VERSION = "5.0.4";
+const HDP_VERSION = "5.1.0";
 const HDP_HOME = path.join(REPO_ROOT, ".hdp");
-// The parser writes its CASC cache to the working directory. Keep it out of the
-// data root, which every run clears, so a rerun downloads less.
+// The parser writes its CASC cache and logs to HEROESDATAPARSER_DATA_DIR. Keep
+// it out of the data root, which every run clears, so a rerun downloads less.
 const CASC_CACHE = path.join(HDP_HOME, "casc");
+const PARSER_ENV = { ...process.env, HEROESDATAPARSER_DATA_DIR: CASC_CACHE };
 
 // `:hdp:` selects the XML, packaged maps and layout files.
 // Some minimap art is not named for the minimap, so list those files.
@@ -67,9 +68,9 @@ function target(): string {
   return `${platform}-${arch}`;
 }
 
-async function run(command: string, args: string[], cwd?: string): Promise<void> {
+async function run(command: string, args: string[], env?: NodeJS.ProcessEnv): Promise<void> {
   await new Promise<void>((resolve, reject) => {
-    const child = spawn(command, args, { cwd, stdio: "inherit" });
+    const child = spawn(command, args, { env, stdio: "inherit" });
     child.on("error", reject);
     child.on("close", (code) =>
       code === 0 ? resolve() : reject(new Error(`${path.basename(command)} exited with ${code}`))
@@ -192,7 +193,7 @@ export async function extract({ onModsReady }: ExtractOptions = {}): Promise<voi
     ...CASC_FILTERS.flatMap((filter) => ["-i", filter]),
     "-o",
     DATA_ROOT,
-  ], CASC_CACHE);
+  ], PARSER_ENV);
 
   // A PTR build can leave the CDN while a run reads it.
   if (ptr) {
@@ -222,7 +223,7 @@ export async function extract({ onModsReady }: ExtractOptions = {}): Promise<voi
     ...GAMESTRING_FLAGS,
     "-o",
     DATA_ROOT,
-  ], CASC_CACHE);
+  ], PARSER_ENV);
 
   const info = await readHdpInfo();
   if (target && gameBuild(info) !== target.build) {
