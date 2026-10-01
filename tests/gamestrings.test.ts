@@ -31,6 +31,12 @@ test("game string renderer keeps colors and line breaks while removing inline im
   assert.equal(text, "Quest: Gain 1 Blight.\n\nBlight: 0/30");
 });
 
+test("game string renderer reads short color values as RGB integers", () => {
+  const { html } = renderGameStringMarkup("<c val=\"ff00\">Verdant Spheres</c>");
+
+  assert.match(html, /<span class="storm-color" style="color: #00ff00">Verdant Spheres<\/span>/);
+});
+
 test("game string renderer escapes normal text and preserves style markers as safe spans", () => {
   const input = "<s val=\"Storm_Damage_Kicker_2\"><c val=\"FFFF00\">Health <script></c></s> 100~~0.04~~";
   const { html } = renderGameStringMarkup(input);

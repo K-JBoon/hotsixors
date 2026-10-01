@@ -25,6 +25,8 @@ import { readJsonSafe, writeJson, writeText } from "./lib/fs.ts";
 import { frontmatter } from "./lib/frontmatter.ts";
 import { runScript } from "./lib/script.ts";
 import { loadDataFile, loadGamestrings } from "./lib/heroes-data.ts";
+import { buildEffectGraph } from "./lib/effect-graph/index.ts";
+import { loadGamedataXmlFiles } from "./lib/gamedata-paths.ts";
 import {
   entryNameId,
   getAbilityName,
@@ -362,7 +364,7 @@ async function main(): Promise<void> {
   const SITE_DATA_HEROES = path.join(SITE_DATA, "heroes");
 
   const { resolveEntry, shortcodeData, abilityDescriptions, missingIcons } =
-    createEntryResolver(gs, anchorMap ?? {}, declAnchorMap ?? {});
+    createEntryResolver(gs, anchorMap ?? {}, declAnchorMap ?? {}, buildEffectGraph(await loadGamedataXmlFiles()));
 
   for (const [heroName, hero] of Object.entries(heroData)) {
     const slug = heroPageSlug(heroName, hero);

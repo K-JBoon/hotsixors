@@ -1,5 +1,5 @@
 import type { AbilityStats, AbilityStatSource } from "../types.ts";
-import { attr, block as catalogBlock, esc } from "./catalog-xml.ts";
+import { attr, block as catalogBlock } from "./catalog-xml.ts";
 import { parseConstants, resolveNumber, type Constants } from "./catalog-consts.ts";
 
 function parseMana(block: string, consts: Constants): number | null {
@@ -42,29 +42,15 @@ function parseChargeTimeUse(abilBlock: string, consts: Constants): number | null
   return m ? resolveNumber(m[1], consts) : null;
 }
 
-function parseScaling(xml: string, abilityId: string, consts: Constants): number | null {
-  const lsaRe = new RegExp(
-    `<LevelScalingArray[^>]+Ability="${esc(abilityId)}"[^>]*>([\\s\\S]*?)</LevelScalingArray>`,
-    "i"
-  );
-  const lsaMatch = lsaRe.exec(xml);
-  if (!lsaMatch) return null;
-
-  for (const modMatch of lsaMatch[1].matchAll(/<Modifications>([\s\S]*?)<\/Modifications>/gi)) {
-    const mod = modMatch[1];
-    if (/<Field[^>]+value="Amount"/i.test(mod)) {
-      const v = /<Value[^>]+value="([^"]+)"/i.exec(mod);
-      if (v) return resolveNumber(v[1], consts);
-    }
-  }
-  return null;
-}
-
 // ---
 
 const constantsCache = new Map<string, Constants>();
 
-export function parseAbilityStats(xml: string, abilityId: string, xmlPath: string): AbilityStats {
+export function parseAbilityStats(
+  xml: string,
+  abilityId: string,
+  xmlPath: string,
+): Omit<AbilityStats, "range" | "radius"> {
   const abilBlock = catalogBlock(xml, "CAbil", abilityId);
   const consts = constantsCache.get(xmlPath) ?? parseConstants(xml);
   constantsCache.set(xmlPath, consts);
@@ -90,8 +76,5 @@ export function parseAbilityStats(xml: string, abilityId: string, xmlPath: strin
   const chargeTimeUse = abilBlock ? parseChargeTimeUse(abilBlock, consts) : null;
   if (chargeTimeUse !== null) sources.chargeTimeUse = abilSrc;
 
-  const scaling = parseScaling(xml, abilityId, consts);
-  if (scaling !== null) sources.scaling = abilSrc;
-
-  return { manaCost, cooldown, castIntroTime, castFinishTime, scaling, chargeCountMax, chargeTimeUse, sources };
+  return { manaCost, cooldown, castIntroTime, castFinishTime, chargeCountMax, chargeTimeUse, sources };
 }

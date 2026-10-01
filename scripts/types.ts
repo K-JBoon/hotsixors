@@ -4,9 +4,10 @@ export type AbilityStatKey =
   | "cooldown"
   | "castIntroTime"
   | "castFinishTime"
-  | "scaling"
   | "chargeCountMax"
-  | "chargeTimeUse";
+  | "chargeTimeUse"
+  | "range"
+  | "radius";
 
 export interface AbilityStatSource {
   xmlPath: string; // Zola-relative path (e.g. "mods/.../foodata-xml"), used to build gamedata links
@@ -18,9 +19,10 @@ export interface AbilityStats {
   cooldown: number | null;          // Cooldown.TimeUse, the GCD between charge uses; null when not present
   castIntroTime: number | null;     // seconds before the ability fires
   castFinishTime: number | null;    // seconds of animation lock after firing
-  scaling: number | null;           // per-level scaling factor (e.g. 0.04 = 4%)
   chargeCountMax: number | null;    // max charges storable; >1 means a genuine multi-charge ability
   chargeTimeUse: number | null;     // seconds to recharge one charge; use this as the displayed cooldown
+  range: number | null;             // cast range, missile reach, or cone length
+  radius: number | null;            // targeting circle of the cursor effect
   sources: Partial<Record<AbilityStatKey, AbilityStatSource>>;
 }
 

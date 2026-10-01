@@ -14,6 +14,8 @@ import type {
 } from "../types.ts";
 import { GAMEDATA_DIR, HEROES_IMAGES_DIR, SITE_STATIC_IMAGES } from "./paths.ts";
 import { parseAbilityStats } from "./abilityxml.ts";
+import { abilityGeometry } from "./ability-geometry.ts";
+import type { EffectGraph } from "./effect-graph/index.ts";
 import {
   PASSIVE_ABILITY_ID,
   entryNameId,
@@ -89,7 +91,12 @@ function anchorXmlPathToAbsPath(xmlPath: string): string {
   return path.join(GAMEDATA_DIR, xmlPath.replace(/^mods\//, "").replace(/-xml$/, ".xml"));
 }
 
-export function createEntryResolver(gs: Gamestrings, anchorMap: AnchorMap, declAnchorMap: AnchorMap = {}) {
+export function createEntryResolver(
+  gs: Gamestrings,
+  anchorMap: AnchorMap,
+  declAnchorMap: AnchorMap = {},
+  graph?: EffectGraph,
+) {
   const shortcodeData: ShortcodeData = {};
   const abilityDescriptions: Record<string, string> = {};
   const missingIcons = new Set<string>();
@@ -146,7 +153,8 @@ export function createEntryResolver(gs: Gamestrings, anchorMap: AnchorMap, declA
     const fullDescHtml = renderGameStringMarkup(fullDescSource);
 
     const xmlData = type === "ability" ? await loadXmlForAbility(nameId) : null;
-    const stats = xmlData ? parseAbilityStats(xmlData.xml, nameId, xmlData.xmlPath) : null;
+    const geometry = graph ? abilityGeometry(graph, nameId) : { range: null, radius: null };
+    const stats = xmlData ? { ...parseAbilityStats(xmlData.xml, nameId, xmlData.xmlPath), ...geometry } : null;
 
     const anchor = declAnchor(nameId);
     addShortcodeEntry(nameId, {

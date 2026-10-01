@@ -190,6 +190,19 @@
 </div>
 {% endcomponent heroes.hero_stats_grid %}
 
+{% component heroes.ability_stat_label(kind, label) %}
+<dt class="ability-stat__label" title="{{ label }}">
+  <svg class="ability-stat__icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    {%- if kind == "range" -%}<circle cx="3" cy="8" r="1.5"/><path d="M6 8h7.5M10.5 5l3 3-3 3"/>
+    {%- elif kind == "radius" -%}<circle cx="8" cy="8" r="6"/><path d="M8 8h6"/><circle cx="8" cy="8" r="0.6" fill="currentColor"/>
+    {%- elif kind == "charges" -%}<path d="M4 4v8M8 4v8M12 4v8"/>
+    {%- elif kind == "cast" -%}<circle cx="8" cy="9.25" r="5.25"/><path d="M6.5 1.75h3M8 1.75V4M8 9.25 10 7.25M12 4.75l1-1"/>
+    {%- endif -%}
+  </svg>
+  <span class="visually-hidden">{{ label }}</span>
+</dt>
+{% endcomponent heroes.ability_stat_label %}
+
 {% component heroes.ability_card(ab, sc, show_stats=false) %}
 {% set st = ab.stats | default(value=false) %}
 {% set sc_entry = sc | get(key=ab.nameId, default=false) %}
@@ -218,15 +231,17 @@
   {% endif %}
   {% set multi_charge = show_stats and st and st.chargeCountMax and st.chargeCountMax > 1 %}
   {% set cast = show_stats and st and st.castIntroTime %}
-  {% set scaling = show_stats and st and st.scaling %}
+  {% set range = show_stats and st and st.range %}
+  {% set radius = show_stats and st and st.radius %}
   {% set xml = sc_entry and sc_entry.xmlPath %}
-  {% if multi_charge or cast or scaling or xml %}
+  {% if multi_charge or cast or range or radius or xml %}
   <div class="ability-card__footer">
-    {% if multi_charge or cast or scaling %}
+    {% if multi_charge or cast or range or radius %}
     <dl class="ability-card__stats">
-      {% if multi_charge %}<div class="ability-stat"><dt class="ability-stat__label">Charges</dt><dd class="ability-stat__value">{{ st.chargeCountMax }}</dd></div>{% endif %}
-      {% if cast %}<div class="ability-stat"><dt class="ability-stat__label">Cast</dt><dd class="ability-stat__value">{{ st.castIntroTime }}{% if st.castFinishTime %} + {{ st.castFinishTime }}{% endif %}s</dd></div>{% endif %}
-      {% if scaling %}<div class="ability-stat"><dt class="ability-stat__label">Scaling</dt><dd class="ability-stat__value">{{ (st.scaling * 100) | round(precision=2) }}%</dd></div>{% endif %}
+      {% if range %}<div class="ability-stat">{{<heroes.ability_stat_label kind="range" label="Range" />}}<dd class="ability-stat__value">{{ st.range }}</dd></div>{% endif %}
+      {% if radius %}<div class="ability-stat">{{<heroes.ability_stat_label kind="radius" label="Radius" />}}<dd class="ability-stat__value">{{ st.radius }}</dd></div>{% endif %}
+      {% if multi_charge %}<div class="ability-stat">{{<heroes.ability_stat_label kind="charges" label="Charges" />}}<dd class="ability-stat__value">{{ st.chargeCountMax }}</dd></div>{% endif %}
+      {% if cast %}<div class="ability-stat">{{<heroes.ability_stat_label kind="cast" label="Cast time" />}}<dd class="ability-stat__value">{{ st.castIntroTime }}{% if st.castFinishTime %} + {{ st.castFinishTime }}{% endif %}s</dd></div>{% endif %}
     </dl>
     {% endif %}
     {% if xml %}

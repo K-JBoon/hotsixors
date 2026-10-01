@@ -126,8 +126,8 @@ export function renderGameStringMarkup(text: string): string {
     }
     if (/^<c\b/i.test(tag)) {
       const color = attr(tag, "val");
-      if (color && /^[0-9a-f]{3,8}$/i.test(color)) {
-        html += `<span class="storm-color" style="color: #${color.slice(0, 6)}">`;
+      if (color && /^[0-9a-f]{1,8}$/i.test(color)) {
+        html += `<span class="storm-color" style="color: #${color.slice(0, 6).padStart(6, "0")}">`;
       } else {
         html += `<span class="storm-color">`;
       }
