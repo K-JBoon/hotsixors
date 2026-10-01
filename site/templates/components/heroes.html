@@ -133,8 +133,17 @@
 </div>
 {% endcomponent heroes.hero_index %}
 
-{% component heroes.hero_stats_grid(st) %}
+{% component heroes.hero_stats_grid(st, level=false) %}
 <div class="hero-stats__grid">
+  {% if level %}
+  <div class="stat-card stat-card--level" data-level-control>
+    <label class="stat-card__label" for="hero-level-slider">Level</label>
+    <div class="stat-card__level">
+      <output class="stat-card__level-value" data-level-display>0</output>
+      <input id="hero-level-slider" class="stat-card__slider" type="range" min="0" max="30" value="0" step="1" data-level-slider>
+    </div>
+  </div>
+  {% endif %}
   <div class="stat-card">
     <div class="stat-card__label">Health</div>
     <div class="stat-card__value"><span class="storm-scale" data-base="{{ st.life.amount }}" data-scale="{{ st.life.scale }}" data-round="up" title="+{{ (st.life.scale * 100) | round }}% per level">{{ st.life.amount | round }}</span></div>
@@ -182,55 +191,50 @@
 {% endcomponent heroes.hero_stats_grid %}
 
 {% component heroes.ability_card(ab, sc, show_stats=false) %}
-<div class="ability-card" id="ability-{{ ab.nameId }}">
-  {{<images.optimized path={'images/abilitytalents/' ~ ab.icon} class="ability-card__icon" alt="" width={48} height={48} op="fill" display_width={48} display_height={48} loading="lazy" />}}
-  <div class="ability-card__body">
-    <div class="ability-card__header">
+{% set st = ab.stats | default(value=false) %}
+{% set sc_entry = sc | get(key=ab.nameId, default=false) %}
+<div class="ability-card ability-card--hero" id="ability-{{ ab.nameId }}">
+  <div class="ability-card__header">
+    {{<images.optimized path={'images/abilitytalents/' ~ ab.icon} class="ability-card__icon" alt="" width={44} height={44} op="fill" display_width={44} display_height={44} loading="lazy" />}}
+    <div class="ability-card__title">
       <span class="ability-card__name">{{ ab.name }}</span>
-      <span class="ability-card__type badge badge--type">{{ ab.abilityType }}</span>
-      {% set sc_entry = sc | get(key=ab.nameId, default=false) %}
-      {% if sc_entry and sc_entry.xmlPath %}
-        <a class="ability-card__xml-link"
-           data-datamining
-           href="/gamedata/{{ sc_entry.xmlPath }}/{% if sc_entry.anchor %}#{{ sc_entry.anchor }}{% endif %}">XML</a>
+      {% if st and (st.manaCost or st.chargeTimeUse or st.cooldown) %}
+      <p class="ability-card__meta">
+        {% if st.manaCost %}<span class="ability-card__meta-item"><span class="ability-card__meta-label">Mana</span> {{ st.manaCost }}</span>{% endif %}
+        {% if st.chargeTimeUse %}<span class="ability-card__meta-item"><span class="ability-card__meta-label">{% if st.chargeCountMax > 1 %}Charge CD{% else %}Cooldown{% endif %}</span> {{ st.chargeTimeUse }}s</span>{% elif st.cooldown %}<span class="ability-card__meta-item"><span class="ability-card__meta-label">Cooldown</span> {{ st.cooldown }}s</span>{% endif %}
+      </p>
       {% endif %}
     </div>
-    {% if ab.stats and (ab.stats.manaCost or ab.stats.chargeTimeUse or ab.stats.cooldown) %}
-    <p class="ability-card__meta">
-      {% if ab.stats.manaCost %}<span class="ability-card__meta-item"><span class="ability-card__meta-label">Mana</span> {{ ab.stats.manaCost }}</span>{% endif %}
-      {% if ab.stats.chargeTimeUse %}<span class="ability-card__meta-item"><span class="ability-card__meta-label">{% if ab.stats.chargeCountMax > 1 %}Charge CD{% else %}Cooldown{% endif %}</span> {{ ab.stats.chargeTimeUse }}s</span>{% elif ab.stats.cooldown %}<span class="ability-card__meta-item"><span class="ability-card__meta-label">Cooldown</span> {{ ab.stats.cooldown }}s</span>{% endif %}
-    </p>
-    {% endif %}
-    {% if ab.fullDescHtml %}
-      <p class="ability-card__desc storm-game-string">{{ ab.fullDescHtml | safe }}</p>
-    {% elif ab.fullDesc %}
-      <p class="ability-card__desc">{{ ab.fullDesc }}</p>
-    {% endif %}
-    {% if show_stats and ab.stats %}
-    {% set multi_charge = ab.stats.chargeCountMax and ab.stats.chargeCountMax > 1 %}
-    {% if multi_charge or ab.stats.castIntroTime or ab.stats.scaling %}
-    <dl class="ability-card__stats">
-      {% if multi_charge %}
-      <div class="ability-stat">
-        <dt class="ability-stat__label">Charges</dt>
-        <dd class="ability-stat__value">{{ ab.stats.chargeCountMax }}</dd>
-      </div>
-      {% endif %}
-      {% if ab.stats.castIntroTime %}
-      <div class="ability-stat">
-        <dt class="ability-stat__label">Cast time</dt>
-        <dd class="ability-stat__value">{{ ab.stats.castIntroTime }} + {{ ab.stats.castFinishTime | default(value=0) }} s</dd>
-      </div>
-      {% endif %}
-      {% if ab.stats.scaling %}
-      <div class="ability-stat">
-        <dt class="ability-stat__label">Scaling</dt>
-        <dd class="ability-stat__value">{{ (ab.stats.scaling * 100) | round(precision=2) }}%</dd>
-      </div>
-      {% endif %}
-    </dl>
-    {% endif %}
+    {% if ab.abilityType | length == 1 %}
+    <kbd class="ability-card__key">{{ ab.abilityType }}</kbd>
+    {% else %}
+    <span class="ability-card__type badge badge--type">{{ ab.abilityType }}</span>
     {% endif %}
   </div>
+  {% if ab.fullDescHtml %}
+    <p class="ability-card__desc storm-game-string">{{ ab.fullDescHtml | safe }}</p>
+  {% elif ab.fullDesc %}
+    <p class="ability-card__desc">{{ ab.fullDesc }}</p>
+  {% endif %}
+  {% set multi_charge = show_stats and st and st.chargeCountMax and st.chargeCountMax > 1 %}
+  {% set cast = show_stats and st and st.castIntroTime %}
+  {% set scaling = show_stats and st and st.scaling %}
+  {% set xml = sc_entry and sc_entry.xmlPath %}
+  {% if multi_charge or cast or scaling or xml %}
+  <div class="ability-card__footer">
+    {% if multi_charge or cast or scaling %}
+    <dl class="ability-card__stats">
+      {% if multi_charge %}<div class="ability-stat"><dt class="ability-stat__label">Charges</dt><dd class="ability-stat__value">{{ st.chargeCountMax }}</dd></div>{% endif %}
+      {% if cast %}<div class="ability-stat"><dt class="ability-stat__label">Cast</dt><dd class="ability-stat__value">{{ st.castIntroTime }}{% if st.castFinishTime %} + {{ st.castFinishTime }}{% endif %}s</dd></div>{% endif %}
+      {% if scaling %}<div class="ability-stat"><dt class="ability-stat__label">Scaling</dt><dd class="ability-stat__value">{{ (st.scaling * 100) | round(precision=2) }}%</dd></div>{% endif %}
+    </dl>
+    {% endif %}
+    {% if xml %}
+    <a class="ability-card__xml-link"
+       data-datamining
+       href="/gamedata/{{ sc_entry.xmlPath }}/{% if sc_entry.anchor %}#{{ sc_entry.anchor }}{% endif %}">XML</a>
+    {% endif %}
+  </div>
+  {% endif %}
 </div>
 {% endcomponent heroes.ability_card %}

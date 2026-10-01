@@ -30,29 +30,18 @@
 
   {% if hero_data.stats or hero_data.unitStats %}
   <section class="hero-stats">
-    <div class="hero-stats__header">
-      <h2>Statistics</h2>
-      <div class="hero-level-control" data-level-control>
-        <label class="hero-level-control__label" for="hero-level-slider">
-          Level <output class="hero-level-control__value" data-level-display>0</output>
-        </label>
-        <span class="hero-level-control__bound" aria-hidden="true">0</span>
-        <input id="hero-level-slider" class="hero-level-control__slider" type="range" min="0" max="30" value="0" step="1" data-level-slider>
-        <span class="hero-level-control__bound" aria-hidden="true">30</span>
-      </div>
-    </div>
-
+    <h2 class="visually-hidden">Statistics</h2>
     {% if hero_data.unitStats %}
       {% for unit_stat in hero_data.unitStats %}
       {% set st = unit_stat.stats %}
       <div class="hero-stats__unit">
         <h3 class="hero-stats__unit-title">{{ unit_stat.unitName }}</h3>
-        {{<heroes.hero_stats_grid st={st} />}}
+        {{<heroes.hero_stats_grid st={st} level={loop.first} />}}
       </div>
       {% endfor %}
     {% elif hero_data.stats %}
     {% set st = hero_data.stats %}
-    {{<heroes.hero_stats_grid st={st} />}}
+    {{<heroes.hero_stats_grid st={st} level={true} />}}
     {% endif %}
   </section>
   {% endif %}
@@ -68,32 +57,26 @@
         {% endif %}
       {% endfor %}
     </div>
-
     <div class="ability-groups">
       {% for group in hero_data.subAbilityGroups %}
       {% set shown = [ab for ab in group.abilities if ab.category in main_cats] %}
       {% if shown | length > 0 %}
-      <div class="hero-unit-section hero-unit-section--span-{{ shown | length }}{% if group.isSecondary %} hero-unit-section--secondary{% endif %}">
-        <h3 class="hero-unit-section__label">{{ group.parentLabel }}</h3>
-        <div class="abilities-grid">
-          {% for ab in shown %}
-          {{<heroes.ability_card ab={ab} sc={sc} show_stats={true} />}}
-          {% endfor %}
-        </div>
+      <div class="ability-group ability-group--span-{{ shown | length }}">
+        <h3 class="ability-group__label">{{ group.parentLabel }}</h3>
+        {% for ab in shown %}
+        {{<heroes.ability_card ab={ab} sc={sc} show_stats={true} />}}
+        {% endfor %}
       </div>
       {% endif %}
       {% endfor %}
-
       {% for unit in hero_data.heroUnitAbilities %}
       {% set shown = [ab for ab in unit.abilities if ab.category in unit_cats] %}
       {% if shown | length > 0 %}
-      <div class="hero-unit-section hero-unit-section--span-{{ shown | length }}">
-        <h3 class="hero-unit-section__label">{{ unit.heroUnitName }} (Alternate Form)</h3>
-        <div class="abilities-grid">
-          {% for ab in shown %}
-          {{<heroes.ability_card ab={ab} sc={sc} show_stats={true} />}}
-          {% endfor %}
-        </div>
+      <div class="ability-group ability-group--span-{{ shown | length }}">
+        <h3 class="ability-group__label">{{ unit.heroUnitName }} (Alternate Form)</h3>
+        {% for ab in shown %}
+        {{<heroes.ability_card ab={ab} sc={sc} show_stats={true} />}}
+        {% endfor %}
       </div>
       {% endif %}
       {% endfor %}
@@ -116,23 +99,14 @@
       {% set tier_talents = [t for t in hero_data.talents if t.tier == tier] %}
       {% if tier_talents %}
         <div class="talent-tier">
-          <h3 class="talent-tier__label">
-            {% if tier == "level1" %}Level 1
-            {% elif tier == "level4" %}Level 4
-            {% elif tier == "level7" %}Level 7
-            {% elif tier == "level10" %}Level 10
-            {% elif tier == "level13" %}Level 13
-            {% elif tier == "level16" %}Level 16
-            {% elif tier == "level20" %}Level 20
-            {% endif %}
-          </h3>
+          <h3 class="talent-tier__label">Level <span class="talent-tier__num">{{ tier | replace(from="level", to="") }}</span></h3>
           <div class="talent-row">
             {% for tal in tier_talents | sort(attribute="sort") %}
             <div class="talent-card"
                  id="talent-{{ tal.nameId }}"
                  data-talent-id="{{ tal.nameId }}"
                  data-talent-tier="{{ tier }}">
-              {{<images.optimized path={'images/abilitytalents/' ~ tal.icon} class="talent-card__icon" alt="" width={40} height={40} op="fill" display_width={40} display_height={40} loading="lazy" />}}
+              {{<images.optimized path={'images/abilitytalents/' ~ tal.icon} class="talent-card__icon" alt="" width={36} height={36} op="fill" display_width={36} display_height={36} loading="lazy" />}}
               <div class="talent-card__body">
                 <div class="talent-card__header">
                   <span class="talent-card__name">{{ tal.name }}</span>

@@ -954,58 +954,7 @@ html:not(.datamining-enabled) [data-datamining] {
 // ─── Hero Detail ─────────────────────────────────────────────────────────────
 .hero-detail { display: flex; flex-direction: column; gap: 2rem; }
 
-.hero-level-control {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  font-family: $font-display;
-  font-size: 0.8rem;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  flex: 1;
-  max-width: 320px;
-
-  &__label {
-    color: $text-muted;
-    display: flex;
-    align-items: baseline;
-    gap: 0.4rem;
-    flex-shrink: 0;
-  }
-
-  &__value {
-    color: $accent-gold;
-    font-weight: 600;
-    font-size: 1rem;
-    min-width: 1.5em;
-    text-align: right;
-  }
-
-  &__bound {
-    color: $text-muted;
-    font-size: 0.7rem;
-    flex-shrink: 0;
-  }
-
-  &__slider {
-    flex: 1;
-    accent-color: $accent-blue;
-    min-width: 0;
-  }
-}
-
 .hero-stats {
-  &__header {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 0.4rem 1.5rem;
-    border-bottom: 1px solid $border-dim;
-    padding-bottom: 0.4rem;
-    margin-bottom: 0.75rem;
-    h2 { font-size: 1.4rem; line-height: 1.2; color: $accent-gold; margin: 0; flex-shrink: 0; }
-  }
-
   &__grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(118px, 1fr));
@@ -1056,6 +1005,22 @@ html:not(.datamining-enabled) [data-datamining] {
     color: $text-muted;
     margin-top: 0.1rem;
   }
+
+  &--level { grid-column: span 2; }
+  &--level &__label { display: block; }
+
+  &__level { display: flex; align-items: center; gap: 0.6rem; }
+
+  &__level-value {
+    min-width: 1.6em;
+    font-size: 1.2rem;
+    line-height: 1.25;
+    font-weight: 600;
+    color: $text-primary;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__slider { flex: 1; min-width: 0; accent-color: $accent-gold; }
 }
 
 .hero-banner {
@@ -1111,7 +1076,39 @@ html:not(.datamining-enabled) [data-datamining] {
   h2 { font-size: 1.4rem; color: $accent-gold; border-bottom: 1px solid $border-dim; padding-bottom: 0.5rem; margin-bottom: 1rem; }
 }
 
-.abilities-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 0.75rem; }
+$ability-card-min: 22rem;
+$ability-gap: 0.75rem;
+
+.abilities-section { container-type: inline-size; }
+
+.abilities-grid, .ability-groups {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, $ability-card-min), 1fr)); gap: $ability-gap;
+}
+
+.ability-groups { grid-auto-flow: row dense; row-gap: 1.25rem; margin-top: 1.25rem; }
+.ability-groups:not(:has(.ability-group)) { display: none; }
+
+.ability-group {
+  display: grid; grid-template-columns: subgrid; grid-auto-rows: 1fr; row-gap: 0.6rem;
+  &__label {
+    grid-column: 1 / -1;
+    display: flex; align-items: center; gap: 0.75rem; margin: 0;
+    font-family: $font-display; font-size: 0.8rem; font-weight: 600; color: $text-muted;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    &::after { content: ""; flex: 1; height: 1px; background: $border-dim; }
+  }
+}
+
+@for $n from 1 through 8 {
+  .ability-group--span-#{$n} { grid-column: span $n; grid-template-rows: auto; }
+}
+
+// A group wider than the available columns takes a full row and wraps inside it.
+@for $n from 2 through 8 {
+  @container (width < #{$n * $ability-card-min + ($n - 1) * $ability-gap}) {
+    .ability-group--span-#{$n} { grid-column: 1 / -1; }
+  }
+}
 
 .ability-card {
   display: flex; gap: 0.75rem; background: $bg-card; border: 1px solid $border-dim; border-radius: 6px; padding: 0.75rem;
@@ -1133,81 +1130,42 @@ html:not(.datamining-enabled) [data-datamining] {
     text-transform: uppercase; letter-spacing: 0.04em;
     font-size: 0.68rem; opacity: 0.85; margin-right: 0.15rem;
   }
-  &__stats {
-    margin: 0;
-    margin-top: 0.6rem;
-    padding-top: 0.5rem;
-    border-top: 1px solid $border-dim;
+}
+
+.ability-card--hero {
+  flex-direction: column; gap: 0.7rem; border-radius: 8px; padding: 0.9rem 1rem;
+
+  .ability-card__header { flex-wrap: nowrap; align-items: flex-start; gap: 0.75rem; margin: 0; }
+  .ability-card__icon { width: 44px; height: 44px; border-radius: 6px; }
+  .ability-card__title { flex: 1; min-width: 0; }
+  .ability-card__name { display: block; font-weight: 700; font-size: 1.05rem; letter-spacing: 0.03em; line-height: 1.2; }
+  .ability-card__meta { gap: 0.1rem 0.9rem; margin: 0.2rem 0 0; }
+  .ability-card__meta-item { font-size: 0.82rem; font-weight: 600; color: $text-primary; }
+  .ability-card__meta-label { font-size: 0.66rem; font-weight: 400; letter-spacing: 0.05em; color: $text-muted; opacity: 1; }
+  .ability-card__type { flex: none; font-size: 0.62rem; padding: 0.15em 0.5em; }
+  .ability-card__desc { margin: 0; line-height: 1.55; }
+
+  .ability-card__footer {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem 1rem;
+    margin-top: auto; padding-top: 0.55rem; border-top: 1px solid rgba($border-dim, 0.7);
   }
+  .ability-card__footer:not(:has(.ability-card__stats)) { border-top: 0; padding-top: 0; }
+  .ability-card__stats { display: flex; flex-wrap: wrap; gap: 0.3rem 1rem; margin: 0; }
+  .ability-card__xml-link { margin-left: auto; font-size: 0.62rem; padding: 0 0.35em; opacity: 0.6; }
+}
+
+.ability-card__key {
+  display: inline-grid; place-items: center; flex: none;
+  min-width: 1.45rem; height: 1.45rem; padding: 0 0.3rem;
+  font-family: $font-display; font-weight: 700; font-size: 0.85rem; color: $text-primary;
+  background: linear-gradient($bg-card-hover, $bg-card);
+  border: 1px solid rgba($text-muted, 0.3); border-bottom-width: 2px; border-radius: 4px;
 }
 
 .ability-stat {
-  display: grid;
-  grid-template-columns: 6.5rem 1fr;
-  column-gap: 0.5rem;
-  padding: 0.12rem 0;
-  &__label {
-    font-size: 0.78rem;
-    color: $text-muted;
-    font-weight: 600;
-  }
-  &__value {
-    font-size: 0.78rem;
-    color: $accent-blue;
-    display: flex;
-    align-items: center;
-    gap: 0.35rem;
-    flex-wrap: wrap;
-  }
-  &__src {
-    font-size: 0.65rem;
-    color: $text-muted;
-    border: 1px solid $border-dim;
-    padding: 0.05em 0.3em;
-    border-radius: 2px;
-    opacity: 0.55;
-    text-decoration: none;
-    &:hover { opacity: 1; border-color: $accent-gold; color: $accent-gold; text-decoration: none; }
-  }
-}
-
-@mixin ability-group-cols($cols) {
-  .ability-groups { grid-template-columns: repeat($cols, minmax(0, 1fr)); }
-  @for $i from 1 through 6 {
-    $span: $i;
-    @if $i > $cols { $span: $cols; }
-    .hero-unit-section--span-#{$i} {
-      grid-column: span $span;
-      .abilities-grid { grid-template-columns: repeat($span, minmax(0, 1fr)); }
-    }
-  }
-}
-
-.ability-groups {
-  display: grid;
-  grid-auto-flow: dense;
-  gap: 1.5rem 0.75rem;
-  margin-top: 1.5rem;
-}
-
-@include ability-group-cols(4);
-@media (max-width: 1200px) { @include ability-group-cols(3); }
-@media (max-width: $bp-compact) { @include ability-group-cols(1); }
-
-.hero-unit-section {
-  display: flex;
-  flex-direction: column;
-  .abilities-grid { flex: 1; }
-  &__label {
-    font-family: $font-display;
-    font-size: 1rem;
-    color: $text-muted;
-    border-bottom: 1px solid $border-dim;
-    padding-bottom: 0.3rem;
-    margin-bottom: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-  }
+  display: flex; align-items: baseline; gap: 0.3rem;
+  &__label { font-size: 0.66rem; color: $text-muted; text-transform: uppercase; letter-spacing: 0.05em; }
+  &__value { margin: 0; font-size: 0.82rem; font-weight: 600; color: $text-primary; }
 }
 
 // ─── Talents ─────────────────────────────────────────────────────────────────
@@ -1239,33 +1197,42 @@ html:not(.datamining-enabled) [data-datamining] {
   li { line-height: 1.4; margin-top: 0.2rem; }
 }
 
-.talent-tier { margin-bottom: 1.5rem; }
-
-.talent-tier__label {
-  font-family: $font-display; font-size: 1rem; color: $accent-gold;
-  border-bottom: 1px solid $border-dim; padding-bottom: 0.3rem; margin-bottom: 0.75rem;
-  text-transform: uppercase; letter-spacing: 0.08em;
+.talent-tier {
+  display: grid; grid-template-columns: 3.25rem 1fr; gap: 0.5rem;
+  & + & { margin-top: 0.5rem; }
 }
 
-.talent-row { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+.talent-tier__label {
+  display: flex; flex-direction: column; justify-content: center; align-items: center;
+  font-family: $font-display; font-size: 0.6rem; color: $text-muted; line-height: 1.1;
+  text-transform: uppercase; letter-spacing: 0.08em;
+  border-right: 2px solid $accent-gold;
+}
+
+.talent-tier__num { font-size: 1.3rem; color: $accent-gold; letter-spacing: 0; }
+
+.talent-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr)); gap: 0.5rem; }
 
 .talent-card {
-  display: flex; gap: 0.6rem; background: $bg-card; border: 1px solid $border-dim; border-radius: 6px; padding: 0.6rem;
-  flex: 1; min-width: 220px; max-width: 340px; transition: border-color 0.15s, filter 0.15s, opacity 0.15s;
+  display: flex; gap: 0.5rem; background: $bg-card; border: 1px solid $border-dim; border-radius: 5px; padding: 0.55rem 0.65rem;
+  min-width: 0; transition: border-color 0.15s, filter 0.15s, opacity 0.15s;
   &:hover { border-color: $accent-gold; }
   &:focus-visible {
     border-color: $accent-gold;
     box-shadow: 0 0 0 3px rgba($accent-gold, 0.45);
   }
-  &__icon { width: 40px; height: 40px; border-radius: 4px; flex-shrink: 0; border: 1px solid $border-dim; }
+  &__icon { width: 36px; height: 36px; border-radius: 4px; flex-shrink: 0; border: 1px solid $border-dim; }
   &__body { flex: 1; min-width: 0; }
-  &__header { display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 0.2rem; }
-  &__name { font-family: $font-display; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.04em; }
+  &__header { display: flex; align-items: flex-start; gap: 0.35rem; margin-bottom: 0.2rem; }
+  &__name { min-width: 0; font-family: $font-display; font-weight: 600; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.04em; }
   &__xml-link {
-    font-size: 0.7rem; color: $text-muted; border: 1px solid $border-dim; padding: 0.1em 0.4em; border-radius: 3px;
+    flex: none; font-size: 0.6rem; color: $text-muted; border: 1px solid $border-dim; padding: 0 0.3em; border-radius: 3px;
     &:hover { color: $accent-gold; border-color: $accent-gold; }
   }
-  &__desc { font-size: 0.8rem; color: $text-muted; line-height: 1.4; }
+  &__desc {
+    font-size: 0.8rem; color: $text-muted; line-height: 1.45;
+    br + br { display: none; }
+  }
 }
 
 .js .talent-card[data-talent-id] { cursor: pointer; }
@@ -2624,14 +2591,11 @@ html:not(.datamining-enabled) .mechanics-table {
 
 // ─── Responsive: Tablet ───────────────────────────────────────────────────────
 @media (max-width: $bp-compact) {
-  .hero-level-control { max-width: none; flex: 1 1 100%; }
-
   .hero-banner {
     &__loading { flex: 0 1 40%; width: 40%; max-width: 40%; height: 220px; }
     &__name { font-size: 2rem; }
   }
 
-  .talent-card { min-width: 180px; }
 }
 
 // ─── Responsive: Mobile ───────────────────────────────────────────────────────
@@ -2687,17 +2651,12 @@ html:not(.datamining-enabled) .mechanics-table {
     gap: 0.5rem;
   }
 
-  .hero-stats__header { gap: 0.3rem 1rem; }
-
-  // Abilities
-  .abilities-grid { grid-template-columns: 1fr; }
-
-  // Talents: full-width cards on mobile
-  .talent-card {
-    min-width: 0;
-    max-width: 100%;
-    flex: 1 1 100%;
+  .talent-tier { grid-template-columns: 1fr; gap: 0.3rem; }
+  .talent-tier__label {
+    flex-direction: row; justify-content: flex-start; gap: 0.35rem;
+    border-right: 0; border-bottom: 1px solid $border-dim; padding-bottom: 0.2rem;
   }
+  .talent-tier__num { font-size: 0.9rem; }
 
   // Battlegrounds
   .battlegrounds-list__header {
