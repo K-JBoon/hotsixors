@@ -1,7 +1,15 @@
 import { rm } from "node:fs/promises";
-import { watch } from "node:fs";
+import { readdirSync } from "node:fs";
 import * as path from "node:path";
-import { context, type BuildOptions, type BuildResult, type Metafile } from "esbuild";
+import { fileURLToPath } from "node:url";
+import {
+  context,
+  type BuildOptions,
+  type BuildResult,
+  type Metafile,
+  type PartialMessage,
+  type Plugin,
+} from "esbuild";
 import * as sass from "sass";
 import { SITE_DATA, SITE_SASS, SITE_STATIC } from "./paths.ts";
 import { writeText } from "./fs.ts";
@@ -14,24 +22,64 @@ const SOURCES = path.join(SITE_DATA, "bundle-sources.json");
 const MODULE_ENTRIES = ["hotsixors.js", "replay/replay-ui.js", "draft/draft.js"];
 const CLASSIC_ENTRIES = ["level-slider.js", "underdog-calc.js"];
 
-/** Sheets compiled from site/sass, by their name in both directories. */
+/** Sheets under site/sass, published as `<name>.css`. */
 const SASS_ENTRIES = ["main", "gamedata"];
 
-/** Stylesheets the templates load, hashed so they cache under /bundle/ too. */
-const STYLE_ENTRIES = [
-  ...SASS_ENTRIES.map((name) => `${name}.css`),
-  "replay/replay.css",
-  "draft/draft.css",
-  "lost-in-the-nexus/viewer.css",
-];
+/** Plain stylesheets the templates load, by their path under site/static. */
+const STYLE_ENTRIES = ["replay/replay.css", "draft/draft.css", "lost-in-the-nexus/viewer.css"];
 
 type Built = BuildResult & { metafile: Metafile };
 
-async function compileSass(): Promise<void> {
-  for (const name of SASS_ENTRIES) {
-    const { css } = sass.compile(path.join(SITE_SASS, `${name}.scss`), { loadPaths: [SITE_SASS] });
-    await writeText(path.join(SITE_STATIC, `${name}.css`), css);
-  }
+const sassFiles = (): string[] =>
+  readdirSync(SITE_SASS)
+    .filter((file) => file.endsWith(".scss"))
+    .map((file) => path.join(SITE_SASS, file));
+
+function sassMessage(error: unknown): PartialMessage {
+  if (!(error instanceof sass.Exception)) return { text: String(error) };
+  const { url, start, context } = error.span;
+  return {
+    text: error.sassMessage,
+    location: url && {
+      file: fileURLToPath(url),
+      line: start.line + 1,
+      column: start.column,
+      lineText: context?.split("\n")[0],
+    },
+  };
+}
+
+/** Compiles .scss in esbuild so its watcher tracks every partial the sheet loads. */
+function sassPlugin(): Plugin {
+  const lastGood = new Map<string, string>();
+  return {
+    name: "sass",
+    setup(build) {
+      build.onLoad({ filter: /\.scss$/ }, ({ path: file }) => {
+        try {
+          const { css, loadedUrls } = sass.compile(file, { loadPaths: [SITE_SASS] });
+          lastGood.set(file, css);
+          return { contents: css, loader: "css", watchFiles: loadedUrls.map((url) => fileURLToPath(url)) };
+        } catch (error) {
+          // A failed compile reports no imports, so watch every sheet until one fixes it.
+          const watched = { watchFiles: sassFiles(), watchDirs: [SITE_SASS] };
+          const stale = lastGood.get(file);
+          // A failed rebuild deletes its outputs, so keep serving the last good sheet.
+          return stale === undefined
+            ? { errors: [sassMessage(error)], ...watched }
+            : { contents: stale, loader: "css" as const, warnings: [sassMessage(error)], ...watched };
+        }
+      });
+    },
+  };
+}
+
+/** The bundles.json key: the path the source would have under site/static. */
+function manifestKey(entryPoint: string): string {
+  const file = path.resolve(entryPoint);
+  return path.dirname(file) === SITE_SASS
+    ? `${path.basename(file, ".scss")}.css`
+    : path.relative(SITE_STATIC, file);
 }
 
 async function writeManifests(results: Built[]): Promise<Array<[string, number]>> {
@@ -44,7 +92,7 @@ async function writeManifests(results: Built[]): Promise<Array<[string, number]>
       const published = path.relative(SITE_STATIC, path.resolve(file));
       sizes.push([published, meta.bytes]);
       if (meta.entryPoint) {
-        manifest[path.relative(SITE_STATIC, path.resolve(meta.entryPoint))] = published;
+        manifest[manifestKey(meta.entryPoint)] = published;
       }
     }
     for (const input of Object.keys(metafile.inputs)) {
@@ -59,17 +107,6 @@ async function writeManifests(results: Built[]): Promise<Array<[string, number]>
   return sizes.sort((a, b) => b[1] - a[1]);
 }
 
-/** Recompile the sheets whenever anything under site/sass changes. */
-function watchSass(): void {
-  let pending: NodeJS.Timeout | undefined;
-  watch(SITE_SASS, { recursive: true }, () => {
-    clearTimeout(pending);
-    pending = setTimeout(() => {
-      compileSass().catch((e: unknown) => console.error(`sass: ${(e as Error).message}`));
-    }, 50);
-  });
-}
-
 export interface BundleOptions {
   /**
    * Rebuild on every source change and drop the content hash from the output
@@ -81,7 +118,6 @@ export interface BundleOptions {
 
 export async function bundleClient({ watch: watchMode = false }: BundleOptions = {}): Promise<void> {
   await rm(OUT_DIR, { recursive: true, force: true });
-  await compileSass();
 
   const shared: BuildOptions = {
     outdir: OUT_DIR,
@@ -112,7 +148,11 @@ export async function bundleClient({ watch: watchMode = false }: BundleOptions =
     }),
     context({
       ...shared,
-      entryPoints: STYLE_ENTRIES.map((entry) => path.join(SITE_STATIC, entry)),
+      entryPoints: [
+        ...SASS_ENTRIES.map((name) => ({ in: path.join(SITE_SASS, `${name}.scss`), out: name })),
+        ...STYLE_ENTRIES.map((entry) => ({ in: path.join(SITE_STATIC, entry), out: entry.replace(/\.css$/, "") })),
+      ],
+      plugins: [sassPlugin()],
     }),
   ]);
 
@@ -120,7 +160,6 @@ export async function bundleClient({ watch: watchMode = false }: BundleOptions =
 
   if (watchMode) {
     await Promise.all(contexts.map((ctx) => ctx.watch()));
-    watchSass();
     return;
   }
 
