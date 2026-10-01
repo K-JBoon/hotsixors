@@ -170,6 +170,7 @@
   {% endif %}
 
   {% if st.weapon %}
+  {% set tm = st.weapon.timing %}
   <div class="stat-card">
     <div class="stat-card__label">Attack Damage</div>
     <div class="stat-card__value"><span class="storm-scale" data-base="{{ st.weapon.damage }}" data-scale="{{ st.weapon.damageScale }}" title="+{{ (st.weapon.damageScale * 100) | round }}% per level">{{ st.weapon.damage | round }}</span></div>
@@ -180,11 +181,13 @@
     <div class="stat-card__label">Attack Speed</div>
     <div class="stat-card__value">{{ st.weapon.attackSpeed | round(precision=2) }}/s</div>
     <div class="stat-card__scaling">Period {{ st.weapon.period | round(precision=2) }}s</div>
+    {% if tm and tm.damagePoint is number and tm.backswing is number %}<div class="stat-card__scaling" data-datamining>Windup {{ tm.damagePoint | round(precision=4) }}s, firing anim. {{ tm.backswing | round(precision=4) }}s</div>{% endif %}
   </div>
 
   <div class="stat-card">
     <div class="stat-card__label">Attack Range</div>
     <div class="stat-card__value">{{ st.weapon.range | round(precision=2) }}</div>
+    {% if tm and tm.missilePhases %}<div class="stat-card__scaling" data-datamining>Missile {% for p in tm.missilePhases %}{% if not loop.first %} → {% endif %}{{ p.speed }}{% if p.fromDistance %} (last {{ p.fromDistance | join(sep="-") }}u){% endif %}{% endfor %}</div>{% endif %}
   </div>
   {% endif %}
 </div>

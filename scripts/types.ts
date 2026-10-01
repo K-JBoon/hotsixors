@@ -105,6 +105,7 @@ export interface HeroResourceData {
 
 export interface HeroWeaponData {
   nameId: string;
+  isDisabled?: boolean;
   range: number;
   period: number;
   damage: number;
@@ -158,6 +159,19 @@ export interface HeroStatsWeapon {
   range: number;
   period: number;
   attackSpeed: number;
+  timing: HeroStatsWeaponTiming | null;
+}
+
+export interface HeroStatsWeaponTiming {
+  damagePoint: number | null;
+  backswing: number | null;
+  missilePhases: HeroStatsMissilePhase[] | null;
+}
+
+export interface HeroStatsMissilePhase {
+  speed: number;
+  /** Distance to the target where the blend into this phase starts, then ends if different. */
+  fromDistance: number[] | null;
 }
 
 export interface HeroStats {

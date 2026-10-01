@@ -9,6 +9,7 @@ import type {
   HeroStats,
   HeroUnitData,
   HeroUnitStats,
+  HeroStatsWeaponTiming,
   HeroWeaponData,
 } from "./types.ts";
 import {
@@ -22,6 +23,7 @@ import {
   readHdpInfo,
 } from "./lib/paths.ts";
 import { readJsonSafe, writeJson, writeText } from "./lib/fs.ts";
+import { buildCatalogIndex, loadWeaponCatalogFiles, readWeaponTiming } from "./lib/weapon-timing.ts";
 import { frontmatter } from "./lib/frontmatter.ts";
 import { runScript } from "./lib/script.ts";
 import { loadDataFile, loadGamestrings } from "./lib/heroes-data.ts";
@@ -112,6 +114,7 @@ function tierSlug(tier: string): string {
 }
 
 interface HeroStatsSource {
+  isMelee?: boolean;
   scalingLinkIds?: string[];
   speed?: number;
   life?: HeroLifeData;
@@ -124,7 +127,16 @@ const RESOURCE_KINDS: Array<{ field: keyof HeroStatsSource; label: string }> = [
   { field: "energy", label: "Energy" },
 ];
 
-export function buildHeroStats(hero: HeroStatsSource): HeroStats | null {
+export type WeaponTimingLookup = (weaponId: string) => HeroStatsWeaponTiming | null;
+
+// Ranged heroes list a close-range fallback weapon first.
+export function primaryWeapon(hero: HeroStatsSource): HeroWeaponData | undefined {
+  const enabled = (hero.weapons ?? []).filter((w) => !w.isDisabled);
+  if (hero.isMelee !== false) return enabled[0];
+  return enabled.reduce<HeroWeaponData | undefined>((best, w) => (!best || w.range > best.range ? w : best), undefined);
+}
+
+export function buildHeroStats(hero: HeroStatsSource, weaponTiming: WeaponTimingLookup = () => null): HeroStats | null {
   if (!hero.life) return null;
   const life = {
     amount: hero.life.amount,
@@ -148,7 +160,7 @@ export function buildHeroStats(hero: HeroStatsSource): HeroStats | null {
   }
 
   let weapon: HeroStats["weapon"] = null;
-  const w = hero.weapons?.[0];
+  const w = primaryWeapon(hero);
   if (w) {
     weapon = {
       damage: w.damage,
@@ -156,6 +168,7 @@ export function buildHeroStats(hero: HeroStatsSource): HeroStats | null {
       range: w.range,
       period: w.period,
       attackSpeed: w.period > 0 ? 1 / w.period : 0,
+      timing: weaponTiming(w.nameId),
     };
   }
 
@@ -172,12 +185,17 @@ function shouldPreferHeroUnitStats(stats: HeroStats | null, hero: HeroData): boo
   );
 }
 
-export function buildHeroUnitStats(hero: HeroData, gs: Gamestrings, stats: HeroStats | null = buildHeroStats(hero)): HeroUnitStats[] {
+export function buildHeroUnitStats(
+  hero: HeroData,
+  gs: Gamestrings,
+  stats: HeroStats | null = buildHeroStats(hero),
+  weaponTiming: WeaponTimingLookup = () => null,
+): HeroUnitStats[] {
   if (!shouldPreferHeroUnitStats(stats, hero)) return [];
 
   const units: HeroUnitStats[] = [];
   for (const [unitId, unitData] of Object.entries(hero.heroUnits ?? {}) as [string, HeroUnitData][]) {
-    const unitStats = buildHeroStats(unitData);
+    const unitStats = buildHeroStats(unitData, weaponTiming);
     if (!unitStats) continue;
     units.push({
       unitId,
@@ -363,6 +381,9 @@ async function main(): Promise<void> {
 
   const SITE_DATA_HEROES = path.join(SITE_DATA, "heroes");
 
+  const catalogIndex = buildCatalogIndex(await loadWeaponCatalogFiles());
+  const weaponTiming: WeaponTimingLookup = (id) => readWeaponTiming(catalogIndex, id);
+
   const { resolveEntry, shortcodeData, abilityDescriptions, missingIcons } =
     createEntryResolver(gs, anchorMap ?? {}, declAnchorMap ?? {}, buildEffectGraph(await loadGamedataXmlFiles()));
 
@@ -380,8 +401,8 @@ async function main(): Promise<void> {
     await writeText(path.join(SITE_CONTENT_HEROES, `${slug}.md`), heroPage(hero, heroName, slug, displayName, gs));
     console.log(`gen-heroes: wrote ${slug}.md`);
 
-    const stats = buildHeroStats(hero);
-    const unitStats = buildHeroUnitStats(hero, gs, stats);
+    const stats = buildHeroStats(hero, weaponTiming);
+    const unitStats = buildHeroUnitStats(hero, gs, stats, weaponTiming);
     await writeJson(
       path.join(SITE_DATA_HEROES, `${slug}.json`),
       { stats, unitStats, abilities, subAbilityGroups, heroUnitAbilities, talents },
