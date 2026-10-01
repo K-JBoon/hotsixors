@@ -81,7 +81,7 @@ test("structures data reports per-map kill XP and the town hall trickle bonus", 
     { label: "Most maps", summary: "None" },
     { label: "Towers of Doom", summary: "1200" },
   ]);
-  assert.match(fort.killXpNote, /\+0\.2 to the enemy team's XP trickle multiplier \(\+4\.6 XP\/s\)/);
+  assert.match(fort.killXpNote, /\+0\.2 to the attacking team's passive XP multiplier \(\+4\.6 XP\/s\)/);
 
   const keep = forts.units.find((unit) => unit.id === "TownTownHallL3");
   assert.deepEqual(keep.killXpRows, [
