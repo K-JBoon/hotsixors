@@ -96,6 +96,7 @@ $gd-hairline: rgba(120, 150, 200, 0.14);
     font-size: 0.78rem;
 
     &::placeholder { color: rgba(124, 138, 160, 0.8); }
+    &::-webkit-search-cancel-button { appearance: none; }
     &:focus {
       outline: none;
       border-color: rgba($accent-blue, 0.7);
@@ -105,9 +106,12 @@ $gd-hairline: rgba(120, 150, 200, 0.14);
 
   button {
     position: absolute;
-    right: 1.2rem;
-    top: 50%;
-    transform: translateY(-60%);
+    top: 0;
+    right: 0.85rem;
+    bottom: 0.6rem;
+    display: flex;
+    align-items: center;
+    padding: 0 0.6rem;
     background: none;
     border: 0;
     color: $gd-gutter;

@@ -21,7 +21,7 @@ function renderGameDataTreeNode(node, currentPath) {
       .map((child) => `<li>${renderGameDataTreeNode(child, currentPath)}</li>`)
       .join("");
 
-    const viewLink = `<li><a class="tree-dir__view" href="/gamedata/${nodePath}/">↗ ${name}/</a></li>`;
+    const viewLink = `<li><a class="tree-dir__view" href="/gamedata/${nodePath}/">${name}/</a></li>`;
     return `<details class="tree-dir" data-tree-node data-tree-path="${nodePath}" data-tree-search="${searchText}"${isActive ? " open" : ""}>
       <summary class="${summaryClass}">${name}</summary>
       <ul class="tree-children">${viewLink}${children}</ul>
