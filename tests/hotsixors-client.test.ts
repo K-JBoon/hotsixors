@@ -147,6 +147,42 @@ test("searchSiteIndex ranks title matches before body matches", () => {
   assert.deepEqual(results.map((entry) => entry.url), ["/heroes/alarak/", "/guides/example/"]);
 });
 
+test("searchSiteIndex ranks game data below a weaker page match", () => {
+  const results = searchSiteIndex(
+    [
+      { title: "abathurdata.xml", url: "/gamedata/abathurdata.xml/", type: "Game Data", path: "abathurdata.xml" },
+      { title: "Adrenal Overload", url: "/heroes/abathur/#talent-x", type: "Talent", hero: "Abathur" },
+    ],
+    "abathur"
+  );
+
+  assert.deepEqual(results.map((entry) => entry.type), ["Talent", "Game Data"]);
+});
+
+test("searchSiteIndex ranks word prefixes above matches across words", () => {
+  const results = searchSiteIndex(
+    [
+      { title: "Blind as a Bat", url: "/heroes/malganis/#talent-x", type: "Talent", hero: "Mal'Ganis" },
+      { title: "Adrenal Overload", url: "/heroes/abathur/#talent-y", type: "Talent", hero: "Abathur" },
+    ],
+    "aba"
+  );
+
+  assert.deepEqual(results.map((entry) => entry.title), ["Adrenal Overload", "Blind as a Bat"]);
+});
+
+test("searchSiteIndex matches on desc alone", () => {
+  const results = searchSiteIndex(
+    [
+      { title: "Symbiote", url: "/heroes/abathur/#ability-AbathurSymbiote", type: "Ability", desc: "Assist an ally" },
+      { title: "Jaina", url: "/heroes/jaina/", type: "Hero", text: "Frost mage" },
+    ],
+    "assist"
+  );
+
+  assert.deepEqual(results.map((entry) => entry.url), ["/heroes/abathur/#ability-AbathurSymbiote"]);
+});
+
 test("datamining search entry detection catches game data URLs and types", () => {
   assert.equal(isDataminingSearchEntry({ title: "Game Data", url: "/gamedata/" }), true);
   assert.equal(isDataminingSearchEntry({ title: "Abathur XML", path: "/gamedata/mods/heromods/abathur/" }), true);

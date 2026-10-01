@@ -6,6 +6,13 @@ export function frontmatterValue(source: string, key: string): string | null {
   return match ? match[1] : null;
 }
 
+/** A string key inside a single-line inline table, e.g. `portraits = {heroSelect = "x.png"}`. */
+export function frontmatterTableValue(source: string, table: string, key: string): string | null {
+  const row = source.match(new RegExp(`^${table}\\s*=\\s*\\{(.*)\\}\\s*$`, "m"));
+  const match = row?.[1].match(new RegExp(`(?:^|[{,\\s])${key}\\s*=\\s*"([^"]*)"`));
+  return match ? match[1] : null;
+}
+
 function tomlValue(value: unknown): string {
   if (Array.isArray(value)) return `[${value.map(tomlValue).join(", ")}]`;
   if (value !== null && typeof value === "object") {

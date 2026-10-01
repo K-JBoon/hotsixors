@@ -3,6 +3,11 @@ import { applyDataminingState, DATAMINING_STORAGE_KEY, getAvailableStorage, getS
 import { escapeHtml } from './js/escape.js';
 import { below } from './js/breakpoints.js';
 
+function resultMeta(entry) {
+  const type = entry.type || "Page";
+  return entry.hero && entry.type !== "Hero" ? `${type} · ${entry.hero}` : type;
+}
+
 function initGlobalSearch() {
   const root = document.querySelector("[data-site-search]");
   if (!root) return;
@@ -66,8 +71,12 @@ function initGlobalSearch() {
 
     results.innerHTML = matches.map((entry, i) => `
       <a class="site-search__result" role="option" aria-selected="false" id="site-search-option-${i}" href="${escapeHtml(entry.url)}">
-        <span class="site-search__result-title">${escapeHtml(entry.title)}</span>
-        <span class="site-search__result-meta">${escapeHtml(entry.type || "Page")}</span>
+        ${entry.icon ? `<img class="site-search__result-icon" src="${escapeHtml(entry.icon)}" alt="" width="24" height="24" loading="lazy">` : '<span class="site-search__result-icon"></span>'}
+        <span class="site-search__result-body">
+          <span class="site-search__result-title">${escapeHtml(entry.title)}</span>
+          <span class="site-search__result-meta">${escapeHtml(resultMeta(entry))}</span>
+          ${entry.desc ? `<span class="site-search__result-desc">${escapeHtml(entry.desc)}</span>` : ""}
+        </span>
       </a>
     `).join("");
     options = [...results.querySelectorAll("[role=option]")];

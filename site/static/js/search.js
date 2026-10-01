@@ -53,6 +53,7 @@ function entryHaystack(entry) {
       entry.type,
       entry.hero,
       entry.text,
+      entry.desc,
     ].filter(Boolean).join(" "));
     haystacks.set(entry, haystack);
   }
@@ -69,20 +70,40 @@ export function matchesSearchEntry(entry, query, aliases = {}) {
 
 const scoreFields = new WeakMap();
 
+// Apostrophes join, so "Mal'Ganis" stays one word.
+function searchWords(value) {
+  return String(value || "").split(/[^a-z0-9'&]+/i).map(normalizeSearchValue).filter(Boolean);
+}
+
+function nameField(value) {
+  return { full: normalizeSearchValue(value), words: searchWords(value) };
+}
+
+// "exact", "prefix" of the name or one of its words, "inner" for any other substring.
+function nameMatch({ full, words }, term) {
+  if (full === term) return "exact";
+  if (full.startsWith(term) || words.some((word) => word.startsWith(term))) return "prefix";
+  return full.includes(term) ? "inner" : null;
+}
+
 function entryScoreFields(entry) {
   let fields = scoreFields.get(entry);
   if (fields === undefined) {
     fields = {
-      title: normalizeSearchValue(entry.title || entry.name || ""),
+      title: nameField(entry.title || entry.name || ""),
       path: normalizeSearchValue(entry.path || entry.url || ""),
       type: normalizeSearchValue(entry.type || ""),
-      hero: normalizeSearchValue(entry.hero || ""),
+      hero: nameField(entry.hero || ""),
       text: normalizeSearchValue(entry.text || ""),
+      desc: normalizeSearchValue(entry.desc || ""),
     };
     scoreFields.set(entry, fields);
   }
   return fields;
 }
+
+// Keyed by normalized type; raw XML files are rarely the intended target.
+const TYPE_WEIGHT = { gamedata: 0.25 };
 
 export function searchSiteIndex(index, query, aliases = {}, limit = 12) {
   const terms = createSearchTerms(query, aliases);
@@ -91,19 +112,24 @@ export function searchSiteIndex(index, query, aliases = {}, limit = 12) {
   // Scored in place: only the entries that survive are materialized.
   const hits = [];
   for (const entry of index) {
-    const { title, path, type, hero, text } = entryScoreFields(entry);
+    const { title, path, type, hero, text, desc } = entryScoreFields(entry);
     let score = 0;
 
     for (const term of terms) {
-      if (title === term) score += 100;
-      else if (title.includes(term)) score += 70;
-      if (hero.includes(term)) score += 55;
+      const titleMatch = nameMatch(title, term);
+      if (titleMatch === "exact") score += 100;
+      else if (titleMatch === "prefix") score += 70;
+      else if (titleMatch === "inner") score += 20;
+      const heroMatch = nameMatch(hero, term);
+      if (heroMatch === "exact" || heroMatch === "prefix") score += 55;
+      else if (heroMatch === "inner") score += 10;
       if (type.includes(term)) score += 25;
       if (path.includes(term)) score += 20;
       if (text.includes(term)) score += 10;
+      if (desc.includes(term)) score += 10;
     }
 
-    if (score > 0) hits.push({ ...entry, score });
+    if (score > 0) hits.push({ ...entry, score: score * (TYPE_WEIGHT[type] ?? 1) });
   }
 
   return hits

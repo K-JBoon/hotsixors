@@ -4,13 +4,15 @@ import type { FileTreeNode } from "./types.ts";
 import { SITE_CONTENT_HEROES, SITE_DATA, SITE_DATA_BATTLEGROUNDS, SITE_DATA_HEROES, SITE_STATIC, slugify } from "./lib/paths.ts";
 import { readJsonSafe, writeJson } from "./lib/fs.ts";
 import { runScript } from "./lib/script.ts";
-import { frontmatterValue } from "./lib/frontmatter.ts";
+import { frontmatterTableValue, frontmatterValue } from "./lib/frontmatter.ts";
 
 interface SearchEntry {
   title: string;
   url: string;
   type: "Hero" | "Ability" | "Talent" | "Battleground" | "Guide" | "Game Data" | "Reference";
   text?: string;
+  desc?: string;
+  icon?: string;
   path?: string;
   hero?: string;
 }
@@ -33,6 +35,7 @@ interface CrossReferencesIndex {
 interface HeroAbility {
   nameId: string;
   name: string;
+  icon?: string;
   abilityType?: string;
   shortDesc?: string;
   category: string;
@@ -69,6 +72,10 @@ interface UnitGroups {
 // anchor to link to. Alternate-form units drop "activable".
 const ABILITY_CATEGORIES = new Set(["basic", "heroic", "trait", "activable"]);
 const HERO_UNIT_ABILITY_CATEGORIES = new Set(["basic", "heroic", "trait"]);
+
+function imageUrl(dir: string, file: string | null | undefined): string | undefined {
+  return file ? `/images/${dir}/${file}` : undefined;
+}
 
 function tierLabel(tier: string): string {
   return tier.replace(/^level/, "Level ");
@@ -148,8 +155,9 @@ async function heroPageEntries(entries: SearchEntry[]): Promise<void> {
       url: `/heroes/${slug}/`,
       type: "Hero",
       hero: title,
+      desc: frontmatterValue(content, "description") || undefined,
+      icon: imageUrl("heroportraits", frontmatterTableValue(content, "portraits", "heroSelect")),
       text: [
-        frontmatterValue(content, "description") ?? "",
         frontmatterValue(content, "role") ?? "",
         frontmatterValue(content, "franchise") ?? "",
       ].join(" "),
@@ -165,16 +173,20 @@ async function heroPageEntries(entries: SearchEntry[]): Promise<void> {
         .filter((ability) => HERO_UNIT_ABILITY_CATEGORIES.has(ability.category)),
     ];
 
+    // Variant cards (second casts, talent-granted copies) often repeat name and text.
     const seen = new Set<string>();
     for (const ability of abilities) {
-      if (seen.has(ability.nameId)) continue;
-      seen.add(ability.nameId);
+      const key = `${ability.name}\0${ability.shortDesc ?? ""}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
       entries.push({
         title: ability.name,
         url: `/heroes/${slug}/#ability-${ability.nameId}`,
         type: "Ability",
         hero: title,
-        text: [ability.abilityType ?? "", ability.shortDesc ?? ""].join(" ").trim(),
+        desc: ability.shortDesc || undefined,
+        icon: imageUrl("abilitytalents", ability.icon),
+        text: ability.abilityType ?? "",
       });
     }
 
@@ -184,7 +196,9 @@ async function heroPageEntries(entries: SearchEntry[]): Promise<void> {
         url: `/heroes/${slug}/#talent-${talent.nameId}`,
         type: "Talent",
         hero: title,
-        text: [tierLabel(talent.tier), talent.abilityType ?? "", talent.shortDesc ?? ""].join(" ").trim(),
+        desc: talent.shortDesc || undefined,
+        icon: imageUrl("abilitytalents", talent.icon),
+        text: [tierLabel(talent.tier), talent.abilityType ?? ""].join(" ").trim(),
       });
     }
   }
@@ -209,9 +223,9 @@ async function battlegroundEntries(entries: SearchEntry[]): Promise<void> {
       title: bg.name,
       url: `/battlegrounds/${bg.slug}/`,
       type: "Battleground",
+      desc: bg.description || undefined,
       text: [
         bg.franchise,
-        bg.description,
         ...bg.objectives.map((objective) => `${objective.title} ${objective.description}`),
         ...bg.summary,
         ...bg.mechanics.map((mechanic) => `${mechanic.title} ${mechanic.body}`),
@@ -321,7 +335,8 @@ async function main(): Promise<void> {
         title: mechanic.name,
         url: `/status-effects/#${slugify(mechanic.name)}`,
         type: "Reference",
-        text: [mechanic.category, mechanic.description, mechanic.summary, mechanic.primaryBehavior, mechanic.sourceIds.join(" ")].join(" "),
+        desc: mechanic.summary || undefined,
+        text: [mechanic.category, mechanic.description, mechanic.primaryBehavior, mechanic.sourceIds.join(" ")].join(" "),
       });
     }
   }

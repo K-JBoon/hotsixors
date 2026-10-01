@@ -422,8 +422,8 @@ html:not(.datamining-enabled) [data-datamining] {
 
 .site-search__result {
   display: flex;
-  flex-direction: column;
-  gap: 0.1rem;
+  align-items: flex-start;
+  gap: 0.6rem;
   padding: 0.65rem 0.75rem;
   color: $text-primary;
   border-bottom: 1px solid rgba($border-dim, 0.65);
@@ -437,6 +437,29 @@ html:not(.datamining-enabled) [data-datamining] {
     box-shadow: inset 3px 0 0 $accent-gold;
     text-decoration: none;
   }
+}
+
+.site-search__result-icon {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  margin-top: 0.1rem;
+  border-radius: 3px;
+}
+
+.site-search__result-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+.site-search__result-desc {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: $text-muted;
+  font-size: 0.78rem;
 }
 
 .site-search__result-title {
