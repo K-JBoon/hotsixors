@@ -170,24 +170,23 @@
   {% endif %}
 
   {% if st.weapon %}
-  {% set tm = st.weapon.timing %}
-  <div class="stat-card">
-    <div class="stat-card__label">Attack Damage</div>
-    <div class="stat-card__value"><span class="storm-scale" data-base="{{ st.weapon.damage }}" data-scale="{{ st.weapon.damageScale }}" title="+{{ (st.weapon.damageScale * 100) | round }}% per level">{{ st.weapon.damage | round }}</span></div>
-    {% if st.weapon.damageScale > 0 %}<div class="stat-card__scaling">+{{ (st.weapon.damageScale * 100) | round }}% per level</div>{% endif %}
-  </div>
-
-  <div class="stat-card">
-    <div class="stat-card__label">Attack Speed</div>
-    <div class="stat-card__value">{{ st.weapon.attackSpeed | round(precision=2) }}/s</div>
-    <div class="stat-card__scaling">Period {{ st.weapon.period | round(precision=2) }}s</div>
-    {% if tm and tm.damagePoint is number and tm.backswing is number %}<div class="stat-card__scaling" data-datamining>Windup {{ tm.damagePoint | round(precision=4) }}s, firing anim. {{ tm.backswing | round(precision=4) }}s</div>{% endif %}
-  </div>
-
-  <div class="stat-card">
-    <div class="stat-card__label">Attack Range</div>
-    <div class="stat-card__value">{{ st.weapon.range | round(precision=2) }}</div>
-    {% if tm and tm.missilePhases %}<div class="stat-card__scaling" data-datamining>Missile {% for p in tm.missilePhases %}{% if not loop.first %} → {% endif %}{{ p.speed }}{% if p.fromDistance %} (last {{ p.fromDistance | join(sep="-") }}u){% endif %}{% endfor %}</div>{% endif %}
+  {% set w = st.weapon %}
+  {% set tm = w.timing | default(value=false) %}
+  {% set windup = tm and tm.damagePoint is number %}
+  {% set missile = tm and tm.missilePhases %}
+  <div class="stat-card stat-card--attack">
+    <div class="stat-card__label">Basic Attack</div>
+    <dl class="stat-chips">
+      <div class="ability-stat">{{<heroes.ability_stat_label kind="damage" label="Damage" />}}<dd class="ability-stat__value"><span class="storm-scale" data-base="{{ w.damage }}" data-scale="{{ w.damageScale }}" title="+{{ (w.damageScale * 100) | round }}% per level">{{ w.damage | round }}</span></dd></div>
+      <div class="ability-stat">{{<heroes.ability_stat_label kind="attack-speed" label="Attack speed" />}}<dd class="ability-stat__value" title="Period {{ w.period | round(precision=2) }}s">{{ w.attackSpeed | round(precision=2) }}/s</dd></div>
+      <div class="ability-stat">{{<heroes.ability_stat_label kind="range" label="Range" />}}<dd class="ability-stat__value">{{ w.range | round(precision=2) }}</dd></div>
+      {% if missile %}<div class="ability-stat">{{<heroes.ability_stat_label kind="missile" label="Missile speed" />}}<dd class="ability-stat__value" title="{% for p in tm.missilePhases %}{% if not loop.first %} → {% endif %}{{ p.speed }}{% if p.fromDistance %} (last {{ p.fromDistance | join(sep="-") }}u){% endif %}{% endfor %}">{{ tm.missilePhases | first | get(key="speed") }}</dd></div>{% endif %}
+    </dl>
+    {% if w.damageScale > 0 or windup %}<div class="stat-card__scaling">
+      {%- if w.damageScale > 0 %}+{{ (w.damageScale * 100) | round }}% per level{% endif %}
+      {%- if w.damageScale > 0 and windup %} · {% endif %}
+      {%- if windup %}{{ tm.damagePoint }}s windup{% if tm.backswing %}, {{ tm.backswing }}s backswing{% endif %}{% endif -%}
+    </div>{% endif %}
   </div>
   {% endif %}
 </div>
@@ -199,6 +198,9 @@
     {%- if kind == "range" -%}<circle cx="3" cy="8" r="1.5"/><path d="M6 8h7.5M10.5 5l3 3-3 3"/>
     {%- elif kind == "radius" -%}<circle cx="8" cy="8" r="6"/><path d="M8 8h6"/><circle cx="8" cy="8" r="0.6" fill="currentColor"/>
     {%- elif kind == "charges" -%}<path d="M4 4v8M8 4v8M12 4v8"/>
+    {%- elif kind == "damage" -%}<path d="M13.5 2.5 6.5 9.5M13.5 2.5h-2.5M13.5 2.5V5M4.5 8.5l3 3M6 10l-3.5 3.5"/>
+    {%- elif kind == "attack-speed" -%}<path d="M3 4l4 4-4 4M9 4l4 4-4 4"/>
+    {%- elif kind == "missile" -%}<circle cx="11.5" cy="8" r="2.5"/><path d="M2 8h5M3.5 5h3.5M3.5 11h3.5"/>
     {%- elif kind == "cast" -%}<circle cx="8" cy="9.25" r="5.25"/><path d="M6.5 1.75h3M8 1.75V4M8 9.25 10 7.25M12 4.75l1-1"/>
     {%- endif -%}
   </svg>
@@ -240,7 +242,7 @@
   {% if multi_charge or cast or range or radius or xml %}
   <div class="ability-card__footer">
     {% if multi_charge or cast or range or radius %}
-    <dl class="ability-card__stats">
+    <dl class="stat-chips">
       {% if range %}<div class="ability-stat">{{<heroes.ability_stat_label kind="range" label="Range" />}}<dd class="ability-stat__value">{{ st.range }}</dd></div>{% endif %}
       {% if radius %}<div class="ability-stat">{{<heroes.ability_stat_label kind="radius" label="Radius" />}}<dd class="ability-stat__value">{{ st.radius }}</dd></div>{% endif %}
       {% if multi_charge %}<div class="ability-stat">{{<heroes.ability_stat_label kind="charges" label="Charges" />}}<dd class="ability-stat__value">{{ st.chargeCountMax }}</dd></div>{% endif %}

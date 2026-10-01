@@ -22,14 +22,14 @@
     flatEntries.push({ el, base: base - spec.perLevel, perLevel: spec.perLevel, decimals: spec.decimals });
   }
   if (targets.length === 0 && flatEntries.length === 0) return;
-  const STAT_CARD_SELECTOR = ".stat-card__value";
+  const COMPACT_VALUE_SELECTOR = ".stat-card__value, .ability-stat__value";
   const entries = targets.map(function (el) {
     const base = parseFloat(el.dataset.base);
     const scale = parseFloat(el.dataset.scale);
     const isPercent = el.dataset.percent === "true";
     const perTick = "perTick" in el.dataset;
     const roundUp = el.dataset.round === "up";
-    const inStatCard = el.closest(STAT_CARD_SELECTOR) !== null;
+    const compact = el.closest(COMPACT_VALUE_SELECTOR) !== null;
     let decimals;
     if (el.dataset.decimals != null) {
       decimals = parseInt(el.dataset.decimals, 10);
@@ -38,7 +38,7 @@
     } else {
       decimals = 2;
     }
-    return { el, base, scale, isPercent, perTick, roundUp, decimals, inStatCard };
+    return { el, base, scale, isPercent, perTick, roundUp, decimals, compact };
   });
 
   // Engine math is 20.12 fixed point. Each level-up truncates, and regen accrues per game tick.
@@ -76,7 +76,7 @@
     if (display) display.textContent = String(level);
     for (const e of entries) {
       const formatted = format(scaledValue(e, level), e.decimals, e.isPercent, e.roundUp);
-      if (level === 0 && e.scale > 0 && !e.inStatCard) {
+      if (level === 0 && e.scale > 0 && !e.compact) {
         const pct = Math.round(e.scale * 100);
         e.el.innerHTML = escape(formatted) + ' <span class="storm-scaling">(+' + pct + "% per level)</span>";
       } else {

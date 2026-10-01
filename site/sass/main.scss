@@ -956,8 +956,8 @@ html:not(.datamining-enabled) [data-datamining] {
 
 .hero-stats {
   &__grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(118px, 1fr));
+    display: flex;
+    flex-wrap: wrap;
     gap: 0.5rem;
   }
 
@@ -974,6 +974,7 @@ html:not(.datamining-enabled) [data-datamining] {
 }
 
 .stat-card {
+  flex: 0 1 112px;
   background: $bg-card;
   border: 1px solid $border-dim;
   border-radius: 6px;
@@ -1006,7 +1007,13 @@ html:not(.datamining-enabled) [data-datamining] {
     margin-top: 0.1rem;
   }
 
-  &--level { grid-column: span 2; }
+  &--level { flex-basis: calc(224px + 0.5rem); }
+  &--attack { flex: 1 1 auto; }
+  &--attack .stat-chips { gap: 0.3rem 1.1rem; }
+  &--attack .ability-stat { gap: 0.35rem; }
+  &--attack .ability-stat__icon { width: 1.1rem; height: 1.1rem; }
+  &--attack .ability-stat__value { font-size: 1.2rem; line-height: 1.25; color: $accent-gold; font-variant-numeric: tabular-nums; }
+  &--attack .storm-scale { color: inherit; border-bottom-color: rgba($accent-gold, 0.5); }
   &--level &__label { display: block; }
 
   &__level { display: flex; align-items: center; gap: 0.6rem; }
@@ -1149,8 +1156,7 @@ $ability-gap: 0.75rem;
     display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem 1rem;
     margin-top: auto; padding-top: 0.55rem; border-top: 1px solid rgba($border-dim, 0.7);
   }
-  .ability-card__footer:not(:has(.ability-card__stats)) { border-top: 0; padding-top: 0; }
-  .ability-card__stats { display: flex; flex-wrap: wrap; gap: 0.3rem 1rem; margin: 0; }
+  .ability-card__footer:not(:has(.stat-chips)) { border-top: 0; padding-top: 0; }
   .ability-card__xml-link { margin-left: auto; font-size: 0.62rem; padding: 0 0.35em; opacity: 0.6; }
 }
 
@@ -1158,9 +1164,11 @@ $ability-gap: 0.75rem;
   display: inline-grid; place-items: center; flex: none;
   min-width: 1.45rem; height: 1.45rem; padding: 0 0.3rem;
   font-family: $font-display; font-weight: 700; font-size: 0.85rem; color: $text-primary;
-  background: linear-gradient($bg-card-hover, $bg-card);
+  background: $bg-card-hover;
   border: 1px solid rgba($text-muted, 0.3); border-bottom-width: 2px; border-radius: 4px;
 }
+
+.stat-chips { display: flex; flex-wrap: wrap; gap: 0.3rem 1rem; margin: 0; }
 
 .ability-stat {
   display: flex; align-items: baseline; gap: 0.3rem;
