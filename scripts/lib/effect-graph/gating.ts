@@ -140,6 +140,18 @@ function isTriviallyPassableValidator(
   return false;
 }
 
+function checksOwnState(graph: EffectGraph, validatorId: string, seen = new Set<string>()): boolean {
+  if (seen.has(validatorId)) return false;
+  seen.add(validatorId);
+  const node = graph.nodes.get(validatorId);
+  if (!node) return false;
+  if (node.tag === "CValidatorUnitCompareBehaviorCount" || node.tag === "CValidatorUnitCompareTokenCount") {
+    const which = findFirst(node.elements, "WhichUnit")?.attrs.Value;
+    return which === "Caster" || which === "Source";
+  }
+  return (node.refs["CombineArray"] ?? []).some((id) => checksOwnState(graph, id, seen));
+}
+
 export function validatorTalentIds(
   graph: EffectGraph,
   anchorToEntry: AnchorIndex,
@@ -175,11 +187,12 @@ export function validatorTalentIds(
   if (node.tag === "CValidatorCombine") {
     const isAnd = valuesOfDirectChildren(node.elements, "Type")[0]?.toLowerCase() === "and";
     if (!isAnd && strictOr && combineChildren.some((id) => isTriviallyPassableValidator(graph, id))) return [];
-    const out = new Set<string>();
-    for (const childId of combineChildren) {
-      for (const tid of validatorTalentIds(graph, anchorToEntry, childId, seen, strictOr)) out.add(tid);
+    const perChild = combineChildren.map((id) => validatorTalentIds(graph, anchorToEntry, id, seen, strictOr));
+    // An Or with a talent-free branch is ungated, unless that branch checks caster state a talent may grant.
+    if (!isAnd && strictOr && combineChildren.some((id, i) => perChild[i].length === 0 && !checksOwnState(graph, id))) {
+      return [];
     }
-    return [...out];
+    return [...new Set(perChild.flat())];
   }
 
   const out = new Set<string>();
