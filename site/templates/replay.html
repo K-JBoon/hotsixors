@@ -3,6 +3,7 @@
 {% block title %}Heroes of the Storm Replay Viewer | {{ config.title }}{% endblock title %}
 
 {% block head %}
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Heroes of the Storm Replay Viewer","url":{{ page.permalink | json_encode() | safe }},"description":{{ page.description | json_encode() | safe }},"applicationCategory":"GameApplication","operatingSystem":"Any","browserRequirements":"Requires JavaScript","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}</script>
   {% set bundles = load_data(path="data/bundles.json") %}
   <link rel="stylesheet" href="{{ get_url(path=bundles['replay/replay.css']) }}">
 {% endblock head %}
@@ -26,6 +27,9 @@
       <div class="replay-drop__status" data-drop-status hidden></div>
     </div>
   </div>
+  <section class="replay-about">
+    {{ page.content | safe }}
+  </section>
   <!-- Outside #replay-root: the viewer replaces that element's contents wholesale. -->
   <div class="replay-drop-overlay" data-drop-overlay aria-hidden="true">
     <div class="replay-drop-overlay__inner"><strong>Drop to add replays</strong></div>

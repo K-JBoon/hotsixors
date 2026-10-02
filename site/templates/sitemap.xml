@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
+{%- set lastmods = load_data(path="data/lastmod.json") %}
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     {%- for sitemap_entry in entries %}
     {%- if not sitemap_entry.extra.noindex %}
+    {%- set url_path = sitemap_entry.permalink | replace(from=config.base_url, to="") %}
+    {%- set lastmod = lastmods | get(key=url_path, default=sitemap_entry.updated | default(value="")) %}
     <url>
         <loc>{{ sitemap_entry.permalink | escape_xml | safe }}</loc>
-        {%- if sitemap_entry.updated %}
-        <lastmod>{{ sitemap_entry.updated }}</lastmod>
+        {%- if lastmod %}
+        <lastmod>{{ lastmod }}</lastmod>
         {%- endif %}
     </url>
     {%- endif %}

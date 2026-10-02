@@ -16,6 +16,33 @@
   white-space: nowrap;
   border: 0;
 }
+.replay-about {
+  max-width: 800px;
+  margin: 0 auto 3rem;
+  color: #a6b3c2;
+  line-height: 1.7;
+}
+.replay-about h2 {
+  font-size: 1.3rem;
+  color: #e4b800;
+  margin: 2rem 0 0.75rem;
+}
+.replay-about p,
+.replay-about ul {
+  margin: 0 0 1rem;
+}
+.replay-about strong {
+  color: #e0e6f0;
+}
+.replay-about a {
+  color: #4a9eff;
+}
+.replay-about code {
+  overflow-wrap: anywhere;
+}
+.replay-page:has(#replay-root[data-state='loaded']) .replay-about {
+  display: none;
+}
 /* Keep inline SVG icons aligned with text so feed rows and controls stay tidy. */
 .rp-icon {
   display: inline-block;
@@ -37,7 +64,7 @@
   align-items: center;
   justify-content: center;
   gap: 0.35rem;
-  min-height: 80vh;
+  min-height: max(80vh, 100vh - 11rem);
   border: 2px dashed rgba(140, 160, 220, 0.4);
   border-radius: 16px;
   padding: 2rem;

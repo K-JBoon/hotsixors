@@ -47,6 +47,9 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Fetch history for sitemap dates
+        run: git fetch --unshallow --filter=blob:none origin
+
       - uses: actions/setup-node@v4
         with:
           node-version: '22'

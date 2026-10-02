@@ -43,6 +43,7 @@ export const TASKS: Task[] = [
   { name: "gen-gamedata-entries", stage: "parsed", needs: ["gen-gamedata", "gen-heroes"] },
   { name: "gen-cross-references", stage: "parsed", needs: ["gen-heroes", "gen-mechanics"] },
   { name: "gen-draft-data", stage: "parsed", needs: ["gen-heroes", "gen-battlegrounds"] },
+  { name: "gen-lastmod", stage: "parsed", needs: ["gen-gamedata", "gen-heroes", "gen-battlegrounds"] },
   { name: "gen-search", stage: "parsed", needs: ["gen-gamedata", "gen-mechanics", "gen-minions", "gen-structures", "gen-heroes", "gen-cross-references", "gen-battlegrounds"] },
 ];
 
