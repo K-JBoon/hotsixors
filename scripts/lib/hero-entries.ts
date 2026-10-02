@@ -4,6 +4,7 @@ import { copyFile, mkdir, readFile, stat } from "node:fs/promises";
 import * as path from "node:path";
 
 import type {
+  AbilityArea,
   AbilityStats,
   AnchorMap,
   Gamestrings,
@@ -14,7 +15,8 @@ import type {
 } from "../types.ts";
 import { GAMEDATA_DIR, HEROES_IMAGES_DIR, SITE_STATIC_IMAGES } from "./paths.ts";
 import { parseAbilityStats } from "./abilityxml.ts";
-import { abilityGeometry } from "./ability-geometry.ts";
+import { abilityGeometry, type GatedArea } from "./ability-geometry.ts";
+import { scriptRange } from "./script-ranges.ts";
 import type { EffectGraph } from "./effect-graph/index.ts";
 import {
   PASSIVE_ABILITY_ID,
@@ -44,6 +46,7 @@ export interface ResolvedAbility {
   fullDescHtml: string;
   category: string;
   stats: AbilityStats | null;
+  areas: AbilityArea[];
 }
 
 export interface ResolvedTalent extends ResolvedAbility {
@@ -100,6 +103,7 @@ export function createEntryResolver(
   const shortcodeData: ShortcodeData = {};
   const abilityDescriptions: Record<string, string> = {};
   const missingIcons = new Set<string>();
+  const foundAreas = new Map<string, GatedArea[]>();
   const xmlFileCache = new Map<string, string>();
 
   function declAnchor(nameId: string) {
@@ -153,8 +157,11 @@ export function createEntryResolver(
     const fullDescHtml = renderGameStringMarkup(fullDescSource);
 
     const xmlData = type === "ability" ? await loadXmlForAbility(nameId) : null;
-    const geometry = graph ? abilityGeometry(graph, nameId) : { range: null, radius: null };
-    const stats = xmlData ? { ...parseAbilityStats(xmlData.xml, nameId, xmlData.xmlPath), ...geometry } : null;
+    const { areas, range, ...geometry } = graph ? abilityGeometry(graph, nameId) : { range: null, radius: null, width: null, areas: [] };
+    if (areas.length > 0) foundAreas.set(nameId, areas);
+    const stats = xmlData
+      ? { ...parseAbilityStats(xmlData.xml, nameId, xmlData.xmlPath), ...geometry, range: scriptRange(nameId) ?? range }
+      : null;
 
     const anchor = declAnchor(nameId);
     addShortcodeEntry(nameId, {
@@ -187,8 +194,9 @@ export function createEntryResolver(
       fullDescHtml,
       category,
       stats,
+      areas: [],
     };
   };
 
-  return { resolveEntry, shortcodeData, abilityDescriptions, missingIcons };
+  return { resolveEntry, shortcodeData, abilityDescriptions, missingIcons, foundAreas };
 }

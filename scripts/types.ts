@@ -7,11 +7,21 @@ export type AbilityStatKey =
   | "chargeCountMax"
   | "chargeTimeUse"
   | "range"
-  | "radius";
+  | "radius"
+  | "width";
 
 export interface AbilityStatSource {
   xmlPath: string; // Zola-relative path (e.g. "mods/.../foodata-xml"), used to build gamedata links
   anchor: string;  // element id within that file
+}
+
+export interface AbilityArea {
+  label: string;
+  radius: number | null;
+  radiusMax?: number;               // set when steps of one area grow, e.g. stacking talents
+  width: number | null;
+  length: number | null;
+  source: string;                   // effect id of the area search
 }
 
 export interface AbilityStats {
@@ -22,7 +32,8 @@ export interface AbilityStats {
   chargeCountMax: number | null;    // max charges storable; >1 means a genuine multi-charge ability
   chargeTimeUse: number | null;     // seconds to recharge one charge; use this as the displayed cooldown
   range: number | null;             // cast range, missile reach, or cone length
-  radius: number | null;            // targeting circle of the cursor effect
+  radius: number | null;            // targeting circle, or the first area the cast hits
+  width: number | null;             // rectangle width of the targeting guide or hitbox
   sources: Partial<Record<AbilityStatKey, AbilityStatSource>>;
 }
 

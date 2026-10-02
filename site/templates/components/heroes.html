@@ -197,6 +197,7 @@
   <svg class="ability-stat__icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
     {%- if kind == "range" -%}<circle cx="3" cy="8" r="1.5"/><path d="M6 8h7.5M10.5 5l3 3-3 3"/>
     {%- elif kind == "radius" -%}<circle cx="8" cy="8" r="6"/><path d="M8 8h6"/><circle cx="8" cy="8" r="0.6" fill="currentColor"/>
+    {%- elif kind == "width" -%}<path d="M2.5 3v10M13.5 3v10M5 8h6M7 6 5 8l2 2M9 6l2 2-2 2"/>
     {%- elif kind == "charges" -%}<path d="M4 4v8M8 4v8M12 4v8"/>
     {%- elif kind == "damage" -%}<path d="M13.5 2.5 6.5 9.5M13.5 2.5h-2.5M13.5 2.5V5M4.5 8.5l3 3M6 10l-3.5 3.5"/>
     {%- elif kind == "attack-speed" -%}<path d="M3 4l4 4-4 4M9 4l4 4-4 4"/>
@@ -207,6 +208,12 @@
   <span class="visually-hidden">{{ label }}</span>
 </dt>
 {% endcomponent heroes.ability_stat_label %}
+
+{% component heroes.ability_areas(areas, class) %}
+<ul class="ability-areas {{ class }}">
+  {% for area in areas %}<li><span class="ability-areas__label">{{ area.label }}</span> {% if area.radius %}{{ area.radius }}{% if area.radiusMax %} to {{ area.radiusMax }}{% endif %} radius{% else %}{{ area.width }}{% if area.length %} × {{ area.length }}{% endif %} box{% endif %}</li>{% endfor %}
+</ul>
+{% endcomponent heroes.ability_areas %}
 
 {% component heroes.ability_card(ab, sc, show_stats=false) %}
 {% set st = ab.stats | default(value=false) %}
@@ -238,13 +245,16 @@
   {% set cast = show_stats and st and st.castIntroTime %}
   {% set range = show_stats and st and st.range %}
   {% set radius = show_stats and st and st.radius %}
+  {% set width = show_stats and st and st.width %}
+  {% set areas = show_stats and ab.areas | default(value=[]) %}
   {% set xml = sc_entry and sc_entry.xmlPath %}
-  {% if multi_charge or cast or range or radius or xml %}
+  {% if multi_charge or cast or range or radius or width or xml %}
   <div class="ability-card__footer">
-    {% if multi_charge or cast or range or radius %}
+    {% if multi_charge or cast or range or radius or width %}
     <dl class="stat-chips">
       {% if range %}<div class="ability-stat">{{<heroes.ability_stat_label kind="range" label="Range" />}}<dd class="ability-stat__value">{{ st.range }}</dd></div>{% endif %}
       {% if radius %}<div class="ability-stat">{{<heroes.ability_stat_label kind="radius" label="Radius" />}}<dd class="ability-stat__value">{{ st.radius }}</dd></div>{% endif %}
+      {% if width %}<div class="ability-stat">{{<heroes.ability_stat_label kind="width" label="Width" />}}<dd class="ability-stat__value">{{ st.width }}</dd></div>{% endif %}
       {% if multi_charge %}<div class="ability-stat">{{<heroes.ability_stat_label kind="charges" label="Charges" />}}<dd class="ability-stat__value">{{ st.chargeCountMax }}</dd></div>{% endif %}
       {% if cast %}<div class="ability-stat">{{<heroes.ability_stat_label kind="cast" label="Cast time" />}}<dd class="ability-stat__value">{{ st.castIntroTime }}{% if st.castFinishTime %} + {{ st.castFinishTime }}{% endif %}s</dd></div>{% endif %}
     </dl>
@@ -256,5 +266,6 @@
     {% endif %}
   </div>
   {% endif %}
+  {% if areas %}{{<heroes.ability_areas areas={ab.areas} class="ability-card__areas" />}}{% endif %}
 </div>
 {% endcomponent heroes.ability_card %}

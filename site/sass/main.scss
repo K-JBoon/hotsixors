@@ -1193,6 +1193,13 @@ $ability-gap: 0.75rem;
 
 .stat-chips { display: flex; flex-wrap: wrap; gap: 0.3rem 1rem; margin: 0; }
 
+.ability-areas {
+  display: flex; flex-wrap: wrap; gap: 0.15rem 0.85rem;
+  margin: 0; padding: 0; list-style: none; font-size: 0.78rem; color: $text-muted;
+  &__label { color: $text-primary; }
+}
+.talent-card__areas { margin-top: 0.35rem; }
+
 .ability-stat {
   display: flex; align-items: baseline; gap: 0.3rem;
   &__label { display: flex; align-self: center; color: $text-muted; }

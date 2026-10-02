@@ -122,6 +122,7 @@
                 {% elif tal.fullDesc %}
                   <p class="talent-card__desc">{{ tal.fullDesc }}</p>
                 {% endif %}
+                {% if tal.areas %}{{<heroes.ability_areas areas={tal.areas} class="talent-card__areas" />}}{% endif %}
               </div>
             </div>
             {% endfor %}

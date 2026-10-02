@@ -28,6 +28,8 @@ import { frontmatter } from "./lib/frontmatter.ts";
 import { runScript } from "./lib/script.ts";
 import { loadDataFile, loadGamestrings } from "./lib/heroes-data.ts";
 import { buildEffectGraph } from "./lib/effect-graph/index.ts";
+import { buildReverseRefs } from "./lib/effect-graph/walk.ts";
+import { assignAreas } from "./lib/area-owners.ts";
 import { loadGamedataXmlFiles } from "./lib/gamedata-paths.ts";
 import {
   entryNameId,
@@ -384,8 +386,10 @@ async function main(): Promise<void> {
   const catalogIndex = buildCatalogIndex(await loadWeaponCatalogFiles());
   const weaponTiming: WeaponTimingLookup = (id) => readWeaponTiming(catalogIndex, id);
 
-  const { resolveEntry, shortcodeData, abilityDescriptions, missingIcons } =
-    createEntryResolver(gs, anchorMap ?? {}, declAnchorMap ?? {}, buildEffectGraph(await loadGamedataXmlFiles()));
+  const graph = buildEffectGraph(await loadGamedataXmlFiles());
+  const reverseRefs = buildReverseRefs(graph);
+  const { resolveEntry, shortcodeData, abilityDescriptions, missingIcons, foundAreas } =
+    createEntryResolver(gs, anchorMap ?? {}, declAnchorMap ?? {}, graph);
 
   for (const [heroName, hero] of Object.entries(heroData)) {
     const slug = heroPageSlug(heroName, hero);
@@ -397,6 +401,14 @@ async function main(): Promise<void> {
     const talents = await resolveTalents(hero, ctx, resolveEntry);
     const subAbilityGroups = await resolveSubAbilityGroups(hero, gs, ctx, resolveEntry);
     const heroUnitAbilities = await resolveHeroUnits(hero, gs, ctx, resolveEntry);
+
+    const abilityEntries = [
+      ...abilities,
+      ...subAbilityGroups.flatMap((g) => g.abilities),
+      ...heroUnitAbilities.flatMap((u) => u.abilities),
+    ];
+    const areas = assignAreas(graph, reverseRefs, { slug, name: displayName, abilities: abilityEntries, talents }, foundAreas);
+    for (const entry of [...abilityEntries, ...talents]) entry.areas = areas.get(entry.nameId) ?? [];
 
     await writeText(path.join(SITE_CONTENT_HEROES, `${slug}.md`), heroPage(hero, heroName, slug, displayName, gs));
     console.log(`gen-heroes: wrote ${slug}.md`);

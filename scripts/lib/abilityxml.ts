@@ -50,7 +50,7 @@ export function parseAbilityStats(
   xml: string,
   abilityId: string,
   xmlPath: string,
-): Omit<AbilityStats, "range" | "radius"> {
+): Omit<AbilityStats, "range" | "radius" | "width"> {
   const abilBlock = catalogBlock(xml, "CAbil", abilityId);
   const consts = constantsCache.get(xmlPath) ?? parseConstants(xml);
   constantsCache.set(xmlPath, consts);
