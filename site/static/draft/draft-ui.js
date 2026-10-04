@@ -1,5 +1,6 @@
 
-import { teamOnClock, teamForRole, currentPhase, heroIsUsed, chogallIsPickable } from "./draft-state.js";
+import { teamOnClock, teamForRole, currentPhase, heroIsUsed, heroIsLocked, chogallIsPickable } from "./draft-state.js";
+import { openMaps, otherTeam, seriesLockedHeroes, togglePresetHero } from "./draft-series.js";
 import { matchesSearchEntry, normalizeSearchValue } from "../js/search.js";
 
 function el(tag, attrs = {}, children = []) {
@@ -24,6 +25,44 @@ export function normalizeLobbyCode(raw) {
 }
 
 function heroById(draftData, id) { return draftData.heroes.find(h => h.id === id); }
+
+function teamLabel(team) { return team === "blue" ? "Blue" : "Red"; }
+
+function captainName(captains, team) { return captains[team]?.name ?? `${teamLabel(team)} captain`; }
+
+function heroThumb(draftData, id, cls = "draft-thumb") {
+  const h = heroById(draftData, id);
+  return h ? el("img", { class: cls, src: `/images/heroportraits/${h.portrait}`, alt: h.name, title: h.name }) : null;
+}
+
+function mapName(draftData, slug) {
+  return draftData.battlegrounds.find(b => b.slug === slug)?.name ?? slug;
+}
+
+function seriesHistory(draftData, games) {
+  if (!games.length) return null;
+  return el("ol", { class: "draft-series" }, games.map((g, i) =>
+    el("li", { class: "draft-series__game" }, [
+      el("div", { class: "draft-series__map" }, `Game ${i + 1}: ${mapName(draftData, g.map)}`),
+      ...["blue", "red"].map(team =>
+        el("div", { class: `draft-series__picks draft-series__picks--${team}` },
+          g.picks[team].map(id => heroThumb(draftData, id)))),
+    ])));
+}
+
+function presetPicker(draftData, preset, onToggle) {
+  return el("div", { class: "draft-preset" },
+    ROLE_ROWS.map(row => el("div", { class: "draft-preset__row" },
+      draftData.heroes.filter(h => row.roles.includes(h.role)).map(h => {
+        const locked = preset.includes(h.id);
+        return el("button", {
+          class: "draft-preset__hero" + (locked ? " draft-preset__hero--locked" : ""),
+          title: h.name,
+          "aria-pressed": String(locked),
+          onClick: () => onToggle(h.id),
+        }, el("img", { src: `/images/heroportraits/${h.portrait}`, alt: h.name }));
+      }))));
+}
 
 function boardStyleForBattleground(bg) {
   if (!bg?.background) return null;
@@ -137,16 +176,37 @@ export function renderLobby(root, {
       el("option", { value: "captain", selected: hostConfig.mapPickMode === "captain" }, "Second-pick captain picks"),
       el("option", { value: "random",  selected: hostConfig.mapPickMode === "random" }, "Random"),
     ]);
+    const fearlessSel = el("select", {
+      onChange: (e) => onConfigChange({ ...hostConfig, fearless: e.target.value === "on" }),
+    }, [
+      el("option", { value: "off", selected: !hostConfig.fearless }, "Off"),
+      el("option", { value: "on",  selected: hostConfig.fearless }, "On"),
+    ]);
     configNode = el("div", { class: "draft-config" }, [
       el("label", {}, ["Timer mode", timerSel]),
       el("label", {}, ["First pick",  fpSel]),
       el("label", {}, ["Map selection", mapModeSel]),
+      el("label", {}, ["Fearless draft", fearlessSel]),
     ]);
   } else {
     configNode = el("div", { class: "draft-config" }, [
       el("div", {}, `Timer mode: ${hostConfig.timerMode}`),
       el("div", {}, `First pick: ${hostConfig.firstPick}`),
       el("div", {}, `Map selection: ${hostConfig.mapPickMode === "captain" ? "second-pick captain" : "random"}`),
+      el("div", {}, `Fearless draft: ${hostConfig.fearless ? "on" : "off"}`),
+    ]);
+  }
+
+  let fearlessNode = null;
+  if (hostConfig.fearless) {
+    const preset = hostConfig.presetLocked;
+    fearlessNode = el("div", { class: "draft-fearless" }, [
+      el("div", { class: "draft-fearless__heading" }, `Unavailable from game 1 (${preset.length})`),
+      isHost
+        ? presetPicker(draftData, preset, (hero) => onConfigChange({ ...hostConfig, presetLocked: togglePresetHero(preset, hero) }))
+        : preset.length
+          ? el("div", { class: "draft-fearless__locked" }, preset.map(id => heroThumb(draftData, id)))
+          : el("div", { class: "draft-await" }, "None"),
     ]);
   }
 
@@ -207,6 +267,7 @@ export function renderLobby(root, {
     header,
     seats,
     configNode,
+    fearlessNode,
     mapNode,
     el("div", { class: "draft-start" }, [startNode]),
   ]));
@@ -285,6 +346,7 @@ export function renderDraft(root, { state, draftData, role, highlight, searchQue
     : "";
 
   const bg = draftData.battlegrounds.find(b => b.slug === state.map);
+  const mapLine = gameMapLine(state, bg);
 
   const leftName  = state.captains[leftTeam]?.name  ?? "—";
   const rightName = state.captains[rightTeam]?.name ?? "—";
@@ -295,7 +357,7 @@ export function renderDraft(root, { state, draftData, role, highlight, searchQue
     el("div", { class: "draft-header__center" }, [
       el("div", { class: timerCls }, timerText),
       el("div", { class: "draft-header__phase" + (iAmOnClock ? " draft-header__phase--mine" : "") }, phaseLine),
-      el("div", { class: "draft-header__map" }, (bg?.name ?? state.map ?? "").toUpperCase()),
+      el("div", { class: "draft-header__map" }, mapLine),
     ]),
     el("div", { class: `draft-header__bans draft-header__bans--right draft-header__bans--${rightTeam}` }, [banStrip(state, draftData, rightTeam)]),
     el("div", { class: `draft-header__team draft-header__team--right draft-header__team--${rightTeam}` + (onClock === rightTeam ? " draft-header__team--onclock" : "") }, rightName),
@@ -312,12 +374,13 @@ export function renderDraft(root, { state, draftData, role, highlight, searchQue
       el("div", { class: "draft-roleRow__heroes" },
         heroes.map(h => {
           const used = heroIsUsed(state, h.id);
+          const locked = heroIsLocked(state, h.id);
           const isChogallHero = h.id === "Chogall" || h.id === "Gall";
           const chogallBlocked = isChogallHero && phase?.action === "pick" && !chogallIsPickable(state);
           const isHighlight = iAmOnClock && highlight === h.id;
           const isDim = sq && !heroMatches(h);
           return el("button", {
-            class: "draft-hero" + (used ? " draft-hero--used" : "") + (isHighlight ? " draft-hero--highlight" : "") + (isDim ? " draft-hero--dim" : ""),
+            class: "draft-hero" + (used ? " draft-hero--used" : "") + (locked ? " draft-hero--locked" : "") + (isHighlight ? " draft-hero--highlight" : "") + (isDim ? " draft-hero--dim" : ""),
             "data-hero-id": h.id,
             disabled: used || !iAmOnClock || chogallBlocked,
             tabindex: isDim ? "-1" : null,
@@ -328,7 +391,7 @@ export function renderDraft(root, { state, draftData, role, highlight, searchQue
               e.preventDefault();
               onLockIn({ hero: h.id });
             },
-            title: h.name,
+            title: locked ? `${h.name} (unavailable in this series)` : h.name,
           }, [
             el("img", { src: `/images/heroportraits/${h.portrait}`, alt: h.name }),
           ]);
@@ -423,7 +486,86 @@ export function renderDraft(root, { state, draftData, role, highlight, searchQue
   }
 }
 
-export function renderResult(root, { state, draftData, shareUrl }) {
+export function renderMapPick(root, { draftData, captains, hostConfig, series, role, onPickMap }) {
+  root.innerHTML = "";
+  root.dataset.state = "mappick";
+  const game = series.length + 1;
+  const firstPick = hostConfig.firstPick;
+  const mapPicker = otherTeam(firstPick);
+  const myTeam = teamForRole(role);
+  const leftTeam = myTeam ?? "blue";
+  const rightTeam = otherTeam(leftTeam);
+  const noBans = { bans: { blue: [], red: [] } };
+  const locked = seriesLockedHeroes(hostConfig.presetLocked, series);
+
+  const header = el("div", { class: "draft-header" }, [
+    el("div", { class: `draft-header__team draft-header__team--left draft-header__team--${leftTeam}` + (mapPicker === leftTeam ? " draft-header__team--onclock" : "") }, captainName(captains, leftTeam)),
+    el("div", { class: `draft-header__bans draft-header__bans--left draft-header__bans--${leftTeam}` }, [banStrip(noBans, draftData, leftTeam)]),
+    el("div", { class: "draft-header__center" }, [
+      el("div", { class: "draft-header__map" }, `GAME ${game} · MAP PICK`),
+    ]),
+    el("div", { class: `draft-header__bans draft-header__bans--right draft-header__bans--${rightTeam}` }, [banStrip(noBans, draftData, rightTeam)]),
+    el("div", { class: `draft-header__team draft-header__team--right draft-header__team--${rightTeam}` + (mapPicker === rightTeam ? " draft-header__team--onclock" : "") }, captainName(captains, rightTeam)),
+  ]);
+
+  const picker = myTeam === mapPicker
+    ? el("div", { class: "draft-map draft-map--pick" }, [
+        el("div", {}, "Pick the battleground:"),
+        el("div", { class: "draft-map__grid" },
+          openMaps(draftData.battlegrounds, series).map(b =>
+            el("button", { class: "draft-map__btn", onClick: () => onPickMap({ map: b.slug }) }, b.name))),
+      ])
+    : el("div", { class: "draft-await" }, `${captainName(captains, mapPicker)} is picking the map…`);
+
+  root.appendChild(el("section", { class: "draft-board draft-board--result" }, [
+    header,
+    el("div", { class: "draft-stage" }, [
+      el("div"),
+      el("div", { class: "draft-result__panel draft-mappick" }, [
+        el("div", { class: "draft-result__heading" }, `Game ${game}`),
+        el("div", {}, `${captainName(captains, firstPick)} has first pick.`),
+        picker,
+        el("div", { class: "draft-fearless__heading" }, `Unavailable heroes (${locked.length})`),
+        el("div", { class: "draft-fearless__locked" }, locked.map(id => heroThumb(draftData, id))),
+        seriesHistory(draftData, series),
+      ]),
+      el("div"),
+    ]),
+  ]));
+}
+
+function gameMapLine(state, bg) {
+  const map = (bg?.name ?? state.map ?? "").toUpperCase();
+  return state.game ? `GAME ${state.game} · ${map}` : map;
+}
+
+function resultActions({ shareUrl, live }) {
+  if (live) {
+    if (!live.isHost) return el("div", { class: "draft-await" }, "Waiting for the host to start the next game…");
+    return el("div", { class: "draft-result__series" }, [
+      el("div", {}, "Who takes first pick? The other captain picks the map."),
+      el("div", { class: "draft-actions draft-result__actions" }, ["blue", "red"].map(team =>
+        el("button", { class: "draft-btn draft-btn--primary", onClick: () => live.onNextGame(team) },
+          captainName(live.captains, team)))),
+      el("div", { class: "draft-actions draft-result__actions" }, [
+        el("button", { class: "draft-btn", onClick: () => live.onEndSeries() }, "End series"),
+      ]),
+    ]);
+  }
+  return shareUrl
+    ? el("div", { class: "draft-actions draft-result__actions" }, [
+        el("button", {
+          class: "draft-btn draft-btn--primary",
+          onClick: () => navigator.clipboard?.writeText(shareUrl),
+        }, "Copy result link"),
+        el("a", { class: "draft-btn", href: location.pathname }, "New draft"),
+      ])
+    : el("div", { class: "draft-actions draft-result__actions" }, [
+        el("a", { class: "draft-btn draft-btn--primary", href: location.pathname }, "Start your own draft"),
+      ]);
+}
+
+export function renderResult(root, { state, draftData, shareUrl, series = [], live = null }) {
   root.innerHTML = "";
   root.dataset.state = "result";
   const leftTeam = "blue";
@@ -437,25 +579,16 @@ export function renderResult(root, { state, draftData, shareUrl }) {
     el("div", { class: `draft-header__team draft-header__team--left draft-header__team--${leftTeam}` }, leftName),
     el("div", { class: `draft-header__bans draft-header__bans--left draft-header__bans--${leftTeam}` }, [banStrip(state, draftData, leftTeam)]),
     el("div", { class: "draft-header__center" }, [
-      el("div", { class: "draft-header__map" }, (bg?.name ?? state.map ?? "").toUpperCase()),
+      el("div", { class: "draft-header__map" }, gameMapLine(state, bg)),
     ]),
     el("div", { class: `draft-header__bans draft-header__bans--right draft-header__bans--${rightTeam}` }, [banStrip(state, draftData, rightTeam)]),
     el("div", { class: `draft-header__team draft-header__team--right draft-header__team--${rightTeam}` }, rightName),
   ]);
 
   const panel = el("div", { class: "draft-result__panel" }, [
-    el("div", { class: "draft-result__heading" }, "Draft Complete"),
-    shareUrl
-      ? el("div", { class: "draft-actions draft-result__actions" }, [
-          el("button", {
-            class: "draft-btn draft-btn--primary",
-            onClick: () => navigator.clipboard?.writeText(shareUrl),
-          }, "Copy result link"),
-          el("a", { class: "draft-btn", href: location.pathname }, "New draft"),
-        ])
-      : el("div", { class: "draft-actions draft-result__actions" }, [
-          el("a", { class: "draft-btn draft-btn--primary", href: location.pathname }, "Start your own draft"),
-        ]),
+    el("div", { class: "draft-result__heading" }, state.game ? `Game ${state.game} Complete` : "Draft Complete"),
+    seriesHistory(draftData, series),
+    resultActions({ shareUrl, live }),
   ]);
 
   root.appendChild(el("section", { class: "draft-board draft-board--result", style: boardStyleForBattleground(bg) }, [

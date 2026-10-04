@@ -1,10 +1,11 @@
-import { renderLanding, renderLobby, renderDraft, renderResult, normalizeLobbyCode } from "./draft-ui.js";
+import { renderLanding, renderLobby, renderDraft, renderResult, renderMapPick, normalizeLobbyCode } from "./draft-ui.js";
 import { createStorage } from "./draft-storage.js";
 import { createInitialState, applyEvent, teamOnClock, teamForRole, currentPhase, isDraftComplete } from "./draft-state.js";
 import { updateSelectGridSearchQuery } from "../js/search.js";
 import { createTimer } from "./draft-timer.js";
 import { createNet, electHost } from "./draft-net.js";
 import { encodeSnapshot, decodeSnapshot } from "./draft-snapshot.js";
+import { summarizeGame, seriesLockedHeroes, openMaps } from "./draft-series.js";
 
 const root = document.getElementById("draft-root");
 const storage = createStorage();
@@ -24,11 +25,19 @@ let draftSearchQuery = "";
 let draftSearchShouldFocus = false;
 let draftHeroShouldFocus = null;
 let seqCounter = 0;
-let lobby = null;            // { code, hostPeerId, captains, hostConfig }
+let lobby = null;            // { code, hostPeerId, captains, hostConfig, series }
+let finalized = false;
 let soloCheckTimeout = null; // pending timer to detect solo arrival
 
 const LOBBY_CODE_ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
-const DEFAULT_HOST_CONFIG = { timerMode: "timed", firstPick: "random", mapPickMode: "captain", map: null };
+const DEFAULT_HOST_CONFIG = {
+  timerMode: "timed",
+  firstPick: "random",
+  mapPickMode: "captain",
+  map: null,
+  fearless: false,
+  presetLocked: [],
+};
 
 function genLobbyCode() {
   let s = "";
@@ -58,7 +67,7 @@ async function bootstrap() {
   if (resultParam) {
     try {
       const decoded = decodeSnapshot(resultParam);
-      renderResult(root, { state: decoded, draftData, shareUrl: location.href });
+      renderResult(root, { state: decoded, draftData, shareUrl: location.href, series: decoded.series ?? [] });
     } catch (e) {
       console.error("invalid result snapshot", e);
       root.textContent = "Invalid result link.";
@@ -101,6 +110,7 @@ async function enterLobby(name, code, { role: joinRole, host }) {
       ? { blue: { peerId: mySelfPeerId, name, captainId: mySelfCaptainId }, red: null }
       : { blue: null, red: null },
     hostConfig: { ...DEFAULT_HOST_CONFIG },
+    series: [],
   };
   storage.rememberLobby({ lobbyCode: code, peerId: mySelfPeerId, role, captainId: mySelfCaptainId });
   renderCurrentView();
@@ -163,11 +173,7 @@ function handleCommand(msg, fromPeerId) {
       seatPeer(fromPeerId, msg.name, msg.captainId);
       break;
     case "lobby-pick-map":
-      if (state) return;
-      if (!lobby.hostConfig.map) {
-        lobby.hostConfig = { ...lobby.hostConfig, map: msg.map };
-        broadcastLobby();
-      }
+      setMap(msg.map);
       break;
     case "ban":
     case "pick":
@@ -214,11 +220,47 @@ function seatPeer(peerId, name, captainId) {
   broadcastLobby();
 }
 
+function mapIsOpen(map) {
+  return openMaps(draftData.battlegrounds, lobby.series).some(b => b.slug === map);
+}
+
+function setMap(map) {
+  if (state || lobby.hostConfig.map || !mapIsOpen(map)) return;
+  lobby.hostConfig = { ...lobby.hostConfig, map };
+  if (betweenGames()) startDraft();
+  else broadcastLobby();
+}
+
+function pickMap({ map }) {
+  if (isHost) setMap(map);
+  else net.sendCommand({ kind: "lobby-pick-map", map });
+}
+
+function lobbyMessage() {
+  return { hostPeerId: mySelfPeerId, captains: lobby.captains, hostConfig: lobby.hostConfig, series: lobby.series };
+}
+
+function applyLobbyMessage(msg) {
+  lobby.hostPeerId = msg.hostPeerId ?? lobby.hostPeerId;
+  lobby.captains = msg.captains;
+  lobby.hostConfig = msg.hostConfig;
+  lobby.series = msg.series ?? lobby.series;
+  if (msg.captains.blue?.peerId === mySelfPeerId) role = "captain-blue";
+  else if (msg.captains.red?.peerId === mySelfPeerId) role = "captain-red";
+}
+
+function resetDraftInput() {
+  highlight = null;
+  draftSearchQuery = "";
+  draftSearchShouldFocus = false;
+  draftHeroShouldFocus = null;
+}
+
 function broadcastLobby() {
   if (lobby.captains.blue && lobby.captains.red && lobby.hostConfig.firstPick === "random") {
     lobby.hostConfig = { ...lobby.hostConfig, firstPick: Math.random() < 0.5 ? "blue" : "red" };
   }
-  broadcastEvent({ kind: "lobby-update", hostPeerId: mySelfPeerId, captains: lobby.captains, hostConfig: lobby.hostConfig });
+  broadcastEvent({ kind: "lobby-update", ...lobbyMessage() });
   renderCurrentView();
 }
 
@@ -229,13 +271,18 @@ function handleEvent(msg, _fromPeerId) {
       if (msg.peerId === mySelfPeerId) role = msg.role;
       break;
     case "lobby-update":
-      if (lobby) {
-        lobby.hostPeerId = msg.hostPeerId ?? lobby.hostPeerId;
-        lobby.captains = msg.captains;
-        lobby.hostConfig = msg.hostConfig;
-        if (msg.captains.blue?.peerId === mySelfPeerId) role = "captain-blue";
-        else if (msg.captains.red?.peerId === mySelfPeerId) role = "captain-red";
-      }
+      if (lobby) applyLobbyMessage(msg);
+      break;
+    case "next-game":
+      if (!lobby) return;
+      applyLobbyMessage(msg);
+      state = null;
+      resetDraftInput();
+      storage.clearSnapshot(lobby.code);
+      armTimerForState();
+      break;
+    case "series-end":
+      finalize();
       break;
     case "draft-start":
       state = msg.state;
@@ -251,13 +298,9 @@ function handleEvent(msg, _fromPeerId) {
         } else {
           return;
         }
-        highlight = null;
-        draftSearchQuery = "";
-        draftSearchShouldFocus = false;
-        draftHeroShouldFocus = null;
+        resetDraftInput();
         persistSnapshot();
         armTimerForState();
-        if (isDraftComplete(state)) finalize();
       } catch (e) {
         console.warn("could not apply event:", e.message);
       }
@@ -281,11 +324,8 @@ function handlePeers(event) {
       soloCheckTimeout = null;
     }
     if (isHost) {
-      if (state) {
-        net.sendEvent({ seq: nextSeq(), hostPeerId: mySelfPeerId, kind: "snapshot", state }, event.peerId);
-      } else if (lobby) {
-        net.sendEvent({ seq: nextSeq(), hostPeerId: mySelfPeerId, kind: "lobby-update", captains: lobby.captains, hostConfig: lobby.hostConfig }, event.peerId);
-      }
+      if (lobby) net.sendEvent({ seq: nextSeq(), kind: "lobby-update", ...lobbyMessage() }, event.peerId);
+      if (state) net.sendEvent({ seq: nextSeq(), hostPeerId: mySelfPeerId, kind: "snapshot", state }, event.peerId);
     } else {
       net.sendCommand({ kind: "hello", captainId: mySelfCaptainId, name: myName });
     }
@@ -330,16 +370,20 @@ function handleElection({ leavingPeerId, lastSeenSeq, selfPeerId }) {
 function startDraft() {
   if (!isHost || !lobby) return;
   if (!lobby.captains.blue || !lobby.captains.red) return;
-  if (!lobby.hostConfig.map) return;
+  const { map, fearless, presetLocked, timerMode } = lobby.hostConfig;
+  if (!map) return;
   let fp = lobby.hostConfig.firstPick;
   if (fp === "random") fp = Math.random() < 0.5 ? "blue" : "red";
+  if (fp !== "blue" && fp !== "red") return;
   state = createInitialState({
     lobbyCode: lobby.code,
     hostPeerId: mySelfPeerId,
     captains: lobby.captains,
     firstPick: fp,
-    timerMode: lobby.hostConfig.timerMode,
-    map: lobby.hostConfig.map,
+    timerMode,
+    map,
+    locked: fearless ? seriesLockedHeroes(presetLocked, lobby.series) : [],
+    game: fearless ? lobby.series.length + 1 : null,
     now: Date.now(),
   });
   broadcastEvent({ kind: "draft-start", state });
@@ -354,8 +398,36 @@ function advanceState(event) {
   persistSnapshot();
   broadcastEvent({ kind: "commit", event, state });
   armTimerForState();
-  if (isDraftComplete(state)) finalize();
+  renderCurrentView();
+}
+
+function startNextGame(firstPick) {
+  if (!isHost || !state || !isDraftComplete(state)) return;
+  lobby.series = [...lobby.series, summarizeGame(state)];
+  const pool = openMaps(draftData.battlegrounds, lobby.series);
+  const rolled = lobby.hostConfig.mapPickMode === "random" ? pool[Math.floor(Math.random() * pool.length)] : null;
+  lobby.hostConfig = { ...lobby.hostConfig, firstPick, map: null };
+  state = null;
+  resetDraftInput();
+  storage.clearSnapshot(lobby.code);
+  broadcastEvent({ kind: "next-game", ...lobbyMessage() });
+  armTimerForState();
+  if (rolled) setMap(rolled.slug);
   else renderCurrentView();
+}
+
+function endSeries() {
+  if (!isHost || !state || !isDraftComplete(state)) return;
+  broadcastEvent({ kind: "series-end" });
+  finalize();
+}
+
+function inSeries() {
+  return !!lobby?.hostConfig.fearless;
+}
+
+function betweenGames() {
+  return !state && inSeries() && lobby.series.length > 0;
 }
 
 function armTimerForState() {
@@ -392,13 +464,16 @@ function updateTimerView() {
 }
 
 function finalize() {
-  if (root.dataset.state === "result") return;
+  if (finalized || !state) return;
+  finalized = true;
+  const series = inSeries() ? lobby.series : [];
   const shareState = {
     ...state,
     captains: {
       blue: state.captains.blue ? { name: state.captains.blue.name } : null,
       red:  state.captains.red  ? { name: state.captains.red.name }  : null,
     },
+    ...(series.length ? { series } : {}),
   };
   const encoded = encodeSnapshot(shareState);
   const share = `${location.origin}${location.pathname}?result=${encoded}`;
@@ -407,7 +482,7 @@ function finalize() {
   if (timer) timer.setDeadline(null);
   try { net?.leave(); } catch {}
   net = null;
-  renderResult(root, { state, draftData, shareUrl: share });
+  renderResult(root, { state, draftData, shareUrl: share, series });
 }
 
 function leaveLobby() {
@@ -418,9 +493,21 @@ function leaveLobby() {
 }
 
 function renderCurrentView() {
-  if (!draftData) return;
+  if (!draftData || finalized) return;
   if (state && isDraftComplete(state)) {
-    finalize();
+    if (!inSeries()) {
+      finalize();
+      return;
+    }
+    renderResult(root, {
+      state, draftData, series: lobby.series,
+      live: {
+        isHost,
+        captains: state.captains,
+        onNextGame: startNextGame,
+        onEndSeries: endSeries,
+      },
+    });
     return;
   }
   if (state) {
@@ -464,6 +551,16 @@ function renderCurrentView() {
     });
     return;
   }
+  if (betweenGames()) {
+    renderMapPick(root, {
+      draftData, role,
+      captains: lobby.captains,
+      hostConfig: lobby.hostConfig,
+      series: lobby.series,
+      onPickMap: pickMap,
+    });
+    return;
+  }
   if (lobby) {
     renderLobby(root, {
       lobbyCode: lobby.code,
@@ -476,14 +573,7 @@ function renderCurrentView() {
         lobby.hostConfig = c;
         broadcastLobby();
       },
-      onPickMap: ({ map }) => {
-        if (isHost) {
-          lobby.hostConfig = { ...lobby.hostConfig, map };
-          broadcastLobby();
-        } else {
-          net.sendCommand({ kind: "lobby-pick-map", map });
-        }
-      },
+      onPickMap: pickMap,
       onStartDraft: () => startDraft(),
       onLeave: () => leaveLobby(),
     });

@@ -18,7 +18,7 @@ export const PHASE_TABLE = Object.freeze([
   { action: "pick", team: "EN", timer: 30 },
 ]);
 
-export function createInitialState({ lobbyCode, hostPeerId, captains, firstPick, timerMode, map, now }) {
+export function createInitialState({ lobbyCode, hostPeerId, captains, firstPick, timerMode, map, locked = [], game = null, now }) {
   if (firstPick !== "blue" && firstPick !== "red") throw new Error("firstPick must be 'blue' or 'red'");
   if (!map) throw new Error("map is required before draft start");
   const deadline = timerMode === "timed" ? now + PHASE_TABLE[0].timer * 1000 : null;
@@ -29,6 +29,8 @@ export function createInitialState({ lobbyCode, hostPeerId, captains, firstPick,
     firstPick,
     timerMode,
     map,
+    game,
+    locked: [...locked],
     bans:  { blue: [], red: [] },
     picks: { blue: [], red: [] },
     step: 0,
@@ -55,8 +57,13 @@ export function teamForRole(role) {
   return role === "captain-blue" ? "blue" : role === "captain-red" ? "red" : null;
 }
 
+export function heroIsLocked(state, hero) {
+  return !!state.locked?.includes(hero);
+}
+
 export function heroIsUsed(state, hero) {
-  return state.bans.blue.includes(hero) ||
+  return heroIsLocked(state, hero) ||
+         state.bans.blue.includes(hero) ||
          state.bans.red.includes(hero) ||
          state.picks.blue.includes(hero) ||
          state.picks.red.includes(hero);

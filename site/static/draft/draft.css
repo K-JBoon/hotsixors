@@ -36,20 +36,44 @@
 .draft-map__btn { padding: 0.5rem; cursor: pointer; background: rgba(255,255,255,0.08); color: inherit; border: 1px solid #555; border-radius: 4px; }
 .draft-map__btn:hover { background: rgba(255,255,255,0.15); }
 .draft-start { display: flex; justify-content: center; padding: 1rem; }
+.draft-fearless { display: grid; gap: 0.75rem; margin: 1rem 0; padding: 1rem; background: rgba(255,255,255,0.03); border-radius: 6px; }
+.draft-fearless__heading { font-size: 0.9rem; font-weight: 600; }
+.draft-fearless__locked { display: flex; flex-wrap: wrap; gap: 4px; }
+.draft-preset { display: grid; gap: 4px; }
+.draft-preset__row { display: flex; flex-wrap: wrap; gap: 4px; }
+.draft-preset__hero { width: 44px; height: 44px; padding: 0; cursor: pointer; background: none; border: 1px solid #444; border-radius: 4px; overflow: hidden; }
+.draft-preset__hero img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.draft-preset__hero--locked { border-color: #bf1a1a; }
+.draft-preset__hero--locked img { filter: grayscale(1) brightness(0.4); }
+.draft-thumb { width: 36px; height: 36px; object-fit: cover; border-radius: 3px; display: block; }
+.draft-series { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; }
+.draft-series__game { display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: 0.75rem; text-align: left; }
+.draft-series__map { font-size: 0.85rem; opacity: 0.85; }
+.draft-series__picks { display: flex; gap: 3px; padding: 2px; border-radius: 4px; }
+.draft-series__picks--blue { background: rgba(26,107,191,0.35); }
+.draft-series__picks--red  { background: rgba(191,26,26,0.35); }
+.draft-mappick { justify-content: flex-start; overflow-y: auto; padding-block: 1rem; }
+.draft-result__series { display: grid; gap: 0.75rem; justify-items: center; }
 .draft-await { opacity: 0.7; font-style: italic; }
 body:has(#draft-root[data-state="drafting"]),
-body:has(#draft-root[data-state="result"]) { height: 100dvh; overflow: hidden; }
+body:has(#draft-root[data-state="result"]),
+body:has(#draft-root[data-state="mappick"]) { height: 100dvh; overflow: hidden; }
 body:has(#draft-root[data-state="drafting"]) .site-footer,
-body:has(#draft-root[data-state="result"]) .site-footer { display: none; }
+body:has(#draft-root[data-state="result"]) .site-footer,
+body:has(#draft-root[data-state="mappick"]) .site-footer { display: none; }
 .draft-main-area:has(#draft-root[data-state="drafting"]),
-.draft-main-area:has(#draft-root[data-state="result"]) { padding: 0; min-height: 0; }
+.draft-main-area:has(#draft-root[data-state="result"]),
+.draft-main-area:has(#draft-root[data-state="mappick"]) { padding: 0; min-height: 0; }
 .draft-page:has(#draft-root[data-state="drafting"]),
-.draft-page:has(#draft-root[data-state="result"]) { max-width: none; padding: 0; height: 100%; }
+.draft-page:has(#draft-root[data-state="result"]),
+.draft-page:has(#draft-root[data-state="mappick"]) { max-width: none; padding: 0; height: 100%; }
 .draft-page:has(#draft-root[data-state="drafting"]) > h1,
-.draft-page:has(#draft-root[data-state="result"]) > h1 { display: none; }
+.draft-page:has(#draft-root[data-state="result"]) > h1,
+.draft-page:has(#draft-root[data-state="mappick"]) > h1 { display: none; }
 
 #draft-root[data-state="drafting"],
-#draft-root[data-state="result"] { height: 100%; }
+#draft-root[data-state="result"],
+#draft-root[data-state="mappick"] { height: 100%; }
 
 #draft-root[data-state="drafting"] { color: #d8e3f2; }
 
@@ -345,6 +369,7 @@ body:has(#draft-root[data-state="result"]) .site-footer { display: none; }
 .draft-hero:hover:not(:disabled) img { box-shadow: 0 0 0 2px rgba(255,215,0,0.5) inset; }
 .draft-hero--used { cursor: not-allowed; }
 .draft-hero--used img { filter: grayscale(1) brightness(0.4); }
+.draft-hero--locked img { filter: grayscale(1) brightness(0.25) sepia(0.6) hue-rotate(-30deg); }
 .draft-hero--dim { opacity: 0.18; }
 .draft-hero--highlight {
   border-color: #ffd166;
@@ -412,7 +437,8 @@ body:has(#draft-root[data-state="result"]) .site-footer { display: none; }
   box-shadow: 0 0 14px rgba(255,108,108,0.5);
 }
 .draft-lockin--ban.draft-lockin--ready:hover { background: linear-gradient(180deg, #c83535, #9c2424); }
-#draft-root[data-state="result"] { color: #d8e3f2; }
+#draft-root[data-state="result"],
+#draft-root[data-state="mappick"] { color: #d8e3f2; }
 
 .draft-result__panel {
   display: flex;
