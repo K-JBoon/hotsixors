@@ -83,6 +83,27 @@ const XML = `<Catalog>
     <AreaArray Effect="BarrageDamage"><Radius value="6" /></AreaArray>
     <MaxCount value="2" />
   </CEffectEnumArea>
+
+  <CValidatorUnitCompareBehaviorCount id="CasterNotRooted" parent="CasterNotParent"><Categories index="DebuffRoot" value="1" /></CValidatorUnitCompareBehaviorCount>
+  <CValidatorUnitCompareBehaviorCount id="CasterNotFeared" parent="CasterNotParent"><Categories index="Fear" value="1" /></CValidatorUnitCompareBehaviorCount>
+  <CValidatorUnitFilters id="CasterNotDazed"><WhichUnit Value="Caster" /><Filters value="-;Dazed" /></CValidatorUnitFilters>
+  <CAbilEffectInstant id="Dash"><Effect value="DashSet" /></CAbilEffectInstant>
+  <CEffectSet id="DashSet"><EffectArray value="DashApply" /><EffectArray value="DashGuardApply" /><EffectArray value="PuddleSearch" /></CEffectSet>
+  <CEffectApplyBehavior id="DashApply"><WhichUnit Value="Caster" /><Behavior value="DashBuff" /></CEffectApplyBehavior>
+  <CEffectApplyBehavior id="DashGuardApply"><WhichUnit Value="Caster" /><Behavior value="DashGuard" /></CEffectApplyBehavior>
+  <CBehaviorBuff id="DashBuff">
+    <RemoveValidatorArray value="CasterNotRooted" />
+    <RemoveValidatorArray value="CasterNotDazed" />
+    <Modification><MoveSpeedMaximum value="10" /></Modification>
+  </CBehaviorBuff>
+  <CBehaviorBuff id="DashGuard">
+    <RemoveValidatorArray value="CasterNotFeared" />
+    <Modification><MoveSpeedMaximum value="10" /></Modification>
+  </CBehaviorBuff>
+  <CEffectEnumArea id="PuddleSearch">
+    <SearchFilters value="-;Enemy" />
+    <AreaArray Effect="BarrageHit"><Radius value="3" /></AreaArray>
+  </CEffectEnumArea>
 </Catalog>`;
 
 function run(body: string) {
@@ -145,6 +166,16 @@ test("remove and disable validators read as end and pause conditions", () => {
   const out = labels();
   assert.ok(out.includes("Ends on death, stun or silence, except during Time Stop."));
   assert.ok(out.includes("Pauses during Stasis."));
+});
+
+test("end conditions merge over the caster buffs; an unnamed excluded filter reads as never on", () => {
+  const out = run(`process.stdout.write(JSON.stringify(abilityNotes(graph, "Dash", nameOf)));`) as { label: string; source: string }[];
+  assert.ok(out.some((n) => n.label === "Ends on root or fear." && n.source === "DashBuff"));
+});
+
+test("a lockout past a search for the caster's own units gets no note", () => {
+  const out = run(`process.stdout.write(JSON.stringify(abilityNotes(graph, "Dash", nameOf)));`) as { label: string }[];
+  assert.ok(!out.some((n) => n.label.startsWith("Hits each target")));
 });
 
 test("a talent-gated note goes to the talent card", () => {

@@ -191,7 +191,9 @@ function appliesItself(graph: EffectGraph, id: string, behavior: string) {
 
 // The lockout behavior sits on the target, so it limits each target, not the whole ability.
 // An inert behavior whose absence gates only its own apply locks nothing out, e.g. a sound cooldown.
-function lockoutNote(graph: EffectGraph, node: GraphNode) {
+// Past a search for the caster's own units, the hits belong to those units, e.g. ignited Oil Spills.
+function lockoutNote(graph: EffectGraph, node: GraphNode, path: string[]) {
+  if ([...path, node.id].some((id) => graph.nodes.get(id)?.tag === "CEffectEnumArea" && !findsEnemies(graph, id))) return null;
   const absent = (node.refs.ValidatorArray ?? []).filter((v) => !onCaster(graph, v)).flatMap((v) => absentBehavior(graph, v) ?? []);
   if (absent.length === 0) return null;
   const chain = reached(graph, [node.id]).filter(({ node: n }) => n.tag !== "CEffectApplyBehavior" || !onCaster(graph, n.id));
@@ -269,11 +271,13 @@ function formulaOf(graph: EffectGraph, id: string, seen = new Set<string>()): Fo
     return state ? compared(graph, id, state) : null;
   }
   if (node.tag === "CValidatorUnitFilters") {
-    const [required, excluded] = (inheritedValue(graph, id, "Filters") ?? "").split(";").map((s) => s.split(",").filter((f) => f && f !== "-"));
-    const flags = [...(required ?? []), ...(excluded ?? [])];
-    if (flags.length === 0 || flags.some((f) => !FILTER_STATES[f])) return null;
-    const need = (required ?? []).map((f) => FILTER_STATES[f]);
-    const deny = (excluded ?? []).map((f) => FILTER_STATES[f]);
+    const [required = [], excluded = []] = (inheritedValue(graph, id, "Filters") ?? "")
+      .split(";")
+      .map((s) => s.split(",").filter((f) => f && f !== "-"));
+    if (required.length + excluded.length === 0 || required.some((f) => !FILTER_STATES[f])) return null;
+    const need = required.map((f) => FILTER_STATES[f]);
+    // An unnamed excluded flag, e.g. Dazed, reads as never on.
+    const deny = excluded.flatMap((f) => FILTER_STATES[f] ?? []);
     return { test: (on) => need.every((s) => on.has(s)) && deny.every((s) => !on.has(s)), states: [...need, ...deny] };
   }
   return null;
@@ -307,19 +311,25 @@ function inert(graph: EffectGraph, id: string) {
   });
 }
 
-function endNotes(graph: EffectGraph, node: GraphNode) {
-  if (inert(graph, node.id)) return [];
-  const sentence = (verb: string, validators: string[], skip?: string) => {
-    const found = failingStates(graph, validators);
+// One sentence over all buffs: the ability ends when any of them ends. Buffs with an unnamed validator are left out.
+// The source is the first buff that ends on its own, so a buff shared by sibling abilities does not claim the note.
+function endNotes(graph: EffectGraph, nodes: GraphNode[]) {
+  const live = nodes.filter((n) => !inert(graph, n.id));
+  const sentence = (verb: string, tag: string, skip?: string) => {
+    const named = live
+      .map((node) => ({ node, validators: allValues(graph, node.id, tag) }))
+      .filter(({ validators }) => validators.every((v) => formulaOf(graph, v) !== null));
+    const found = failingStates(graph, named.flatMap((n) => n.validators));
     const failing = found?.failing.filter((s) => s !== skip) ?? [];
     if (!found || failing.length === 0) return null;
     const except = found.except.length > 0 ? `, except during ${joined(found.except)}` : "";
-    return `${verb} ${joined(failing)}${except}.`;
+    const source = named.find(({ validators }) => failingStates(graph, validators))?.node ?? named[0].node;
+    return { label: `${verb} ${joined(failing)}${except}.`, source };
   };
   // A dead unit's buffs stop anyway, so "pauses during death" says nothing.
   return [
-    sentence("Ends on", allValues(graph, node.id, "RemoveValidatorArray")),
-    sentence("Pauses during", allValues(graph, node.id, "DisableValidatorArray"), "death"),
+    sentence("Ends on", "RemoveValidatorArray"),
+    sentence("Pauses during", "DisableValidatorArray", "death"),
   ];
 }
 
@@ -330,18 +340,18 @@ export function abilityNotes(graph: EffectGraph, abilId: string, nameOf: NameOf)
   const note = (label: string | null, node: GraphNode, gates: string[]) =>
     label ? [{ label, source: node.id, gates, hitGates: ownGates(graph, node) }] : [];
   const buffs = leastGated.filter((v) => isCasterBuff(graph, v));
-  // One disabled-abilities note per gate set, merged over the buffs, e.g. a form with several buffs.
-  const disabled = [...new Set(buffs.map((v) => v.gates.join()))].flatMap((key) => {
-    const group = buffs.filter((v) => v.gates.join() === key);
-    const ids = group.flatMap((v) => disabledIds(graph, graph.nodes.get(v.id)!));
-    return note(disabledNote(graph, ids, nameOf), graph.nodes.get(group[0].id)!, group[0].gates);
-  });
+  // Buff notes merge per gate set, e.g. a form or a dash with several buffs.
+  const groups = [...new Set(buffs.map((v) => v.gates.join()))].map((key) => buffs.filter((v) => v.gates.join() === key));
   const notes = [
-    ...disabled,
+    ...groups.flatMap((group) => {
+      const nodes = group.map((v) => graph.nodes.get(v.id)!);
+      const disabled = disabledNote(graph, nodes.flatMap((n) => disabledIds(graph, n)), nameOf);
+      const ends = endNotes(graph, nodes).flatMap((end) => (end ? note(end.label, end.source, group[0].gates) : []));
+      return [...note(disabled, nodes[0], group[0].gates), ...ends];
+    }),
     ...leastGated.flatMap((visit) => {
       const node = graph.nodes.get(visit.id)!;
-      const ends = buffs.includes(visit) ? endNotes(graph, node) : [];
-      return [priorityNote(graph, node), lockoutNote(graph, node), ...ends].flatMap((label) => note(label, node, visit.gates));
+      return [priorityNote(graph, node), lockoutNote(graph, node, visit.path)].flatMap((label) => note(label, node, visit.gates));
     }),
   ];
   return notes.filter((n, i) => notes.findIndex((m) => m.label === n.label && m.gates.join() === n.gates.join()) === i);
