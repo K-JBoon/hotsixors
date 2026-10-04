@@ -54,7 +54,7 @@ const REF_FIELDS_SET = new Set(REF_FIELDS);
 export const BACKREF_TAG_RE = /^(?:Which[A-Z]\w*|Target|ImpactLocation|LaunchLocation)$/;
 
 function isGameplayCatalogTag(tag: string): boolean {
-  return /^(?:CEffect|CAbil|CBehavior|CTalent|CValidator|CWeapon|CUnit)/.test(tag);
+  return /^(?:CEffect|CAbil|CBehavior|CTalent|CValidator|CWeapon|CUnit|CTargetSort)/.test(tag);
 }
 
 function gameplayTagRank(tag: string): number {

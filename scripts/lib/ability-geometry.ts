@@ -19,10 +19,11 @@ export interface AbilityGeometry {
   areas: GatedArea[];
 }
 
-interface Visit {
+export interface Visit {
   id: string;
   summon: boolean;
   gates: string[];
+  path: string[];
 }
 
 interface Shape {
@@ -64,7 +65,7 @@ const WALK_FIELDS = new Set([
   "Behavior",
 ]);
 
-const CC_ROOTS: Record<string, string> = {
+export const CC_ROOTS: Record<string, string> = {
   StormStun: "stun",
   StormSlowParent: "slow",
   StormRoot: "root",
@@ -84,7 +85,7 @@ const BUFF_ROOTS = new Set([
   "StormCloak",
 ]);
 
-function inheritedValue(graph: EffectGraph, id: string, tag: string) {
+export function inheritedValue(graph: EffectGraph, id: string, tag: string) {
   for (const ancestor of parentChain(graph, id)) {
     const el = graph.nodes.get(ancestor)?.elements.find((e) => e.tag === tag);
     if (el?.attrs.value) return el.attrs.value;
@@ -92,7 +93,7 @@ function inheritedValue(graph: EffectGraph, id: string, tag: string) {
   return null;
 }
 
-function number(graph: EffectGraph, value: string | null | undefined) {
+export function number(graph: EffectGraph, value: string | null | undefined) {
   return value ? resolvedNumber(graph, value) : null;
 }
 
@@ -100,7 +101,7 @@ function rounded(n: number | null) {
   return n === null ? null : Math.round(n * 100) / 100;
 }
 
-function positive(n: number | null) {
+export function positive(n: number | null) {
   return n !== null && n > 0 ? n : null;
 }
 
@@ -123,7 +124,7 @@ const PASSES_AT_ZERO: Record<string, (value: number) => boolean> = {
 };
 
 // A talent pick or a granted behavior/token, as opposed to target state or a "does not have" check.
-function isCondition(graph: EffectGraph, validatorId: string, seen = new Set<string>()): boolean {
+export function isCondition(graph: EffectGraph, validatorId: string, seen = new Set<string>()): boolean {
   const node = graph.nodes.get(validatorId);
   if (!node || seen.has(validatorId)) return false;
   seen.add(validatorId);
@@ -147,14 +148,14 @@ function talentGate(graph: EffectGraph, gate: string) {
   return gate.startsWith(CHANCE_GATE) || graph.nodes.get(gate)?.tag === "CValidatorPlayerTalent";
 }
 
-function ownGates(graph: EffectGraph, node: GraphNode) {
+export function ownGates(graph: EffectGraph, node: GraphNode) {
   const validators = node.elements
     .filter((e) => e.tag === "ValidatorArray")
     .flatMap((e) => (e.attrs.value && isCondition(graph, e.attrs.value) ? [e.attrs.value] : []));
   return isDormantEffectWithoutEnabler(graph, node, new Map()) ? [...validators, CHANCE_GATE + node.id] : validators;
 }
 
-function caseGates(graph: EffectGraph, node: GraphNode) {
+export function caseGates(graph: EffectGraph, node: GraphNode) {
   const out = new Map<string, string>();
   if (node.tag !== "CEffectSwitch") return out;
   for (const c of node.elements.filter((e) => e.tag === "CaseArray")) {
@@ -164,7 +165,7 @@ function caseGates(graph: EffectGraph, node: GraphNode) {
 }
 
 // DestroyPersistent's Effect names the persistent to stop, not one to run.
-function walkRefs(node: GraphNode) {
+export function walkRefs(node: GraphNode) {
   if (node.tag === "CEffectDestroyPersistent") return [];
   return Object.entries(node.refs).filter(([field]) => WALK_FIELDS.has(field));
 }
@@ -188,9 +189,10 @@ function children(graph: EffectGraph, visit: Visit): Visit[] {
       id,
       summon: visit.summon || field === "SpawnEffect",
       gates: cases.has(id) ? [...visit.gates, cases.get(id)!] : visit.gates,
+      path: [...visit.path, visit.id],
     })),
   );
-  const spawned = spawnedRoots(graph, node).map((id) => ({ id, summon: true, gates: visit.gates }));
+  const spawned = spawnedRoots(graph, node).map((id) => ({ id, summon: true, gates: visit.gates, path: [...visit.path, visit.id] }));
   return [...refs, ...spawned];
 }
 
@@ -218,13 +220,13 @@ function revisit(seen: Map<string, number>, visit: Visit) {
 }
 
 // Breadth-first, so the cast's own effects win over deeper sub-effects. A less-gated path revisits a node.
-function walk(graph: EffectGraph, abilId: string, cursorId: string | null): Visit[] {
+export function walk(graph: EffectGraph, abilId: string, cursorId: string | null): Visit[] {
   const seen = new Map<string, number>([[abilId, 0]]);
   const visits: Visit[] = [];
   const parent = graph.nodes.get(abilId)?.elements.find((e) => e.tag === "ParentAbil")?.attrs.value;
   const abils = [...new Set([abilId, ...childAbils(graph, abilId), ...(parent ? childAbils(graph, parent) : [])])];
   const roots = [...abils.flatMap((id) => graph.nodes.get(id)?.refs.Effect ?? []), ...(cursorId ? [cursorId] : [])];
-  let layer: Visit[] = roots.map((id) => ({ id, summon: false, gates: [] }));
+  let layer: Visit[] = roots.map((id) => ({ id, summon: false, gates: [], path: [] }));
   for (let depth = 0; depth < MAX_WALK_DEPTH && layer.length > 0; depth++) {
     const fresh = layer
       .filter((v) => graph.nodes.has(v.id))
@@ -318,7 +320,7 @@ function arcOf(graph: EffectGraph, area: Element) {
   return number(graph, area.attrs.Arc ?? findFirst(area.children, "Arc")?.attrs.value);
 }
 
-function rootOf(graph: EffectGraph, id: string) {
+export function rootOf(graph: EffectGraph, id: string) {
   return parentChain(graph, id).at(-1) ?? id;
 }
 

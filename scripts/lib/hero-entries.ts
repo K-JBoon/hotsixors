@@ -5,6 +5,7 @@ import * as path from "node:path";
 
 import type {
   AbilityArea,
+  AbilityNote,
   AbilityStats,
   AnchorMap,
   Gamestrings,
@@ -16,6 +17,8 @@ import type {
 import { GAMEDATA_DIR, HEROES_IMAGES_DIR, SITE_STATIC_IMAGES } from "./paths.ts";
 import { parseAbilityStats } from "./abilityxml.ts";
 import { abilityGeometry, type GatedArea } from "./ability-geometry.ts";
+import { abilityTicks, type GatedTick } from "./ability-ticks.ts";
+import { abilityNotes, type GatedNote } from "./ability-notes.ts";
 import { scriptRange } from "./script-ranges.ts";
 import type { EffectGraph } from "./effect-graph/index.ts";
 import {
@@ -23,6 +26,7 @@ import {
   entryNameId,
   getAbilityFullDesc,
   getAbilityName,
+  nameByAbilId,
   getAbilityShortDesc,
   renderGameStringMarkup,
   stripMarkup,
@@ -47,6 +51,7 @@ export interface ResolvedAbility {
   category: string;
   stats: AbilityStats | null;
   areas: AbilityArea[];
+  notes: AbilityNote[];
 }
 
 export interface ResolvedTalent extends ResolvedAbility {
@@ -104,6 +109,8 @@ export function createEntryResolver(
   const abilityDescriptions: Record<string, string> = {};
   const missingIcons = new Set<string>();
   const foundAreas = new Map<string, GatedArea[]>();
+  const foundTicks = new Map<string, GatedTick[]>();
+  const foundNotes = new Map<string, GatedNote[]>();
   const xmlFileCache = new Map<string, string>();
 
   function declAnchor(nameId: string) {
@@ -159,6 +166,10 @@ export function createEntryResolver(
     const xmlData = type === "ability" ? await loadXmlForAbility(nameId) : null;
     const { areas, range, ...geometry } = graph ? abilityGeometry(graph, nameId) : { range: null, radius: null, width: null, areas: [] };
     if (areas.length > 0) foundAreas.set(nameId, areas);
+    const ticks = graph ? abilityTicks(graph, nameId) : [];
+    if (ticks.length > 0) foundTicks.set(nameId, ticks);
+    const notes = graph ? abilityNotes(graph, nameId, (id) => nameByAbilId(gs, id)) : [];
+    if (notes.length > 0) foundNotes.set(nameId, notes);
     const stats = xmlData
       ? { ...parseAbilityStats(xmlData.xml, nameId, xmlData.xmlPath), ...geometry, range: scriptRange(nameId) ?? range }
       : null;
@@ -195,8 +206,9 @@ export function createEntryResolver(
       category,
       stats,
       areas: [],
+      notes: [],
     };
   };
 
-  return { resolveEntry, shortcodeData, abilityDescriptions, missingIcons, foundAreas };
+  return { resolveEntry, shortcodeData, abilityDescriptions, missingIcons, foundAreas, foundTicks, foundNotes };
 }

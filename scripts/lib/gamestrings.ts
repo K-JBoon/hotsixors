@@ -14,7 +14,7 @@ function textSection(gs: Gamestrings, linkId: string): GamestringsAbilityText {
 
 const abilIdNames = new WeakMap<Gamestrings, Record<string, string>>();
 
-function nameByAbilId(gs: Gamestrings, abilId: string): string | undefined {
+export function nameByAbilId(gs: Gamestrings, abilId: string): string | undefined {
   let index = abilIdNames.get(gs);
   if (!index) {
     index = {};

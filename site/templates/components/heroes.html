@@ -209,11 +209,16 @@
 </dt>
 {% endcomponent heroes.ability_stat_label %}
 
-{% component heroes.ability_areas(areas, class) %}
-<ul class="ability-areas {{ class }}">
-  {% for area in areas %}<li><span class="ability-areas__label">{{ area.label }}</span> {% if area.radius %}{{ area.radius }}{% if area.radiusMax %} to {{ area.radiusMax }}{% endif %} radius{% else %}{{ area.width }}{% if area.length %} × {{ area.length }}{% endif %} box{% endif %}</li>{% endfor %}
-</ul>
-{% endcomponent heroes.ability_areas %}
+
+{% component heroes.ability_notes(areas, notes, class) %}
+<details class="ability-notes {{ class }}">
+  <summary>Details</summary>
+  <ul>
+    {%- for area in areas %}<li>{{ area.label }}: {% if area.radius %}{{ area.radius }}{% if area.radiusMax %} to {{ area.radiusMax }}{% endif %} radius{% else %}{{ area.width }}{% if area.length %} × {{ area.length }}{% endif %} box{% endif %}</li>{% endfor %}
+    {%- for note in notes %}<li>{{ note.label }}</li>{% endfor -%}
+  </ul>
+</details>
+{% endcomponent heroes.ability_notes %}
 
 {% component heroes.ability_card(ab, sc, show_stats=false) %}
 {% set st = ab.stats | default(value=false) %}
@@ -247,6 +252,7 @@
   {% set radius = show_stats and st and st.radius %}
   {% set width = show_stats and st and st.width %}
   {% set areas = show_stats and ab.areas | default(value=[]) %}
+  {% set notes = show_stats and ab.notes | default(value=[]) %}
   {% set xml = sc_entry and sc_entry.xmlPath %}
   {% if multi_charge or cast or range or radius or width or xml %}
   <div class="ability-card__footer">
@@ -266,6 +272,6 @@
     {% endif %}
   </div>
   {% endif %}
-  {% if areas %}{{<heroes.ability_areas areas={ab.areas} class="ability-card__areas" />}}{% endif %}
+  {% if areas or notes %}{{<heroes.ability_notes areas={ab.areas} notes={ab.notes} class="ability-card__notes" />}}{% endif %}
 </div>
 {% endcomponent heroes.ability_card %}

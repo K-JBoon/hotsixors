@@ -29,7 +29,8 @@ import { runScript } from "./lib/script.ts";
 import { loadDataFile, loadGamestrings } from "./lib/heroes-data.ts";
 import { buildEffectGraph } from "./lib/effect-graph/index.ts";
 import { buildReverseRefs } from "./lib/effect-graph/walk.ts";
-import { assignAreas } from "./lib/area-owners.ts";
+import { assignAreas, assignNotes, assignTicks } from "./lib/area-owners.ts";
+import { tickNote } from "./lib/ability-ticks.ts";
 import { loadGamedataXmlFiles } from "./lib/gamedata-paths.ts";
 import {
   entryNameId,
@@ -388,7 +389,7 @@ async function main(): Promise<void> {
 
   const graph = buildEffectGraph(await loadGamedataXmlFiles());
   const reverseRefs = buildReverseRefs(graph);
-  const { resolveEntry, shortcodeData, abilityDescriptions, missingIcons, foundAreas } =
+  const { resolveEntry, shortcodeData, abilityDescriptions, missingIcons, foundAreas, foundTicks, foundNotes } =
     createEntryResolver(gs, anchorMap ?? {}, declAnchorMap ?? {}, graph);
 
   for (const [heroName, hero] of Object.entries(heroData)) {
@@ -407,8 +408,14 @@ async function main(): Promise<void> {
       ...subAbilityGroups.flatMap((g) => g.abilities),
       ...heroUnitAbilities.flatMap((u) => u.abilities),
     ];
-    const areas = assignAreas(graph, reverseRefs, { slug, name: displayName, abilities: abilityEntries, talents }, foundAreas);
-    for (const entry of [...abilityEntries, ...talents]) entry.areas = areas.get(entry.nameId) ?? [];
+    const heroEntries = { slug, name: displayName, abilities: abilityEntries, talents };
+    const areas = assignAreas(graph, reverseRefs, heroEntries, foundAreas);
+    const ticks = assignTicks(graph, reverseRefs, heroEntries, foundTicks);
+    const notes = assignNotes(graph, reverseRefs, heroEntries, foundNotes);
+    for (const entry of [...abilityEntries, ...talents]) {
+      entry.areas = areas.get(entry.nameId) ?? [];
+      entry.notes = [...(ticks.get(entry.nameId) ?? []).map(tickNote), ...(notes.get(entry.nameId) ?? [])];
+    }
 
     await writeText(path.join(SITE_CONTENT_HEROES, `${slug}.md`), heroPage(hero, heroName, slug, displayName, gs));
     console.log(`gen-heroes: wrote ${slug}.md`);

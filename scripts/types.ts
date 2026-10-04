@@ -24,6 +24,22 @@ export interface AbilityArea {
   source: string;                   // effect id of the area search
 }
 
+export interface AbilityTick {
+  label: string;                    // what one hit does, e.g. "damage", "0.5s stun"
+  amount: number | null;            // base damage or heal per hit, before level scaling
+  amountMax?: number;               // set when hits grow or shrink
+  period: number;
+  rate: number;                     // hits per second
+  firstAt: number;                  // seconds until the first hit
+  count: number | null;             // hits over the effective duration, the t=0 hit included
+  source: string;                   // periodic behavior or persistent id
+}
+
+export interface AbilityNote {
+  label: string;                    // one mechanic fact, e.g. "Hits each target at most once per 0.3125s."
+  source: string;                   // node id the fact comes from
+}
+
 export interface AbilityStats {
   manaCost: number | null;
   cooldown: number | null;          // Cooldown.TimeUse, the GCD between charge uses; null when not present

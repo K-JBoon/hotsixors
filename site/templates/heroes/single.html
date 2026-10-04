@@ -122,7 +122,7 @@
                 {% elif tal.fullDesc %}
                   <p class="talent-card__desc">{{ tal.fullDesc }}</p>
                 {% endif %}
-                {% if tal.areas %}{{<heroes.ability_areas areas={tal.areas} class="talent-card__areas" />}}{% endif %}
+                {% if tal.areas or tal.notes %}{{<heroes.ability_notes areas={tal.areas} notes={tal.notes} class="talent-card__notes" />}}{% endif %}
               </div>
             </div>
             {% endfor %}
