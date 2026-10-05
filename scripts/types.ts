@@ -207,6 +207,7 @@ export interface HeroStats {
   resource: HeroStatsResource | null;
   weapon: HeroStatsWeapon | null;
   speed: number;
+  radius: number;
 }
 
 export interface HeroUnitStats {

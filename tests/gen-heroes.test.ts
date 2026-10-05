@@ -133,7 +133,8 @@ test("talent-granted sub-ability parents resolve against the talent gamestrings"
   );
 });
 
-function resolveHeroUnitStats(hero) {
+// `catalog` is a JS expression for a CatalogLookup; undefined uses the empty default.
+function resolveHeroUnitStats(hero, catalog = "undefined") {
   const script = `
     import { buildHeroStats, buildHeroUnitStats } from "./scripts/gen-heroes.ts";
     const gs = {
@@ -148,8 +149,9 @@ function resolveHeroUnitStats(hero) {
       },
     };
     const hero = ${JSON.stringify(hero)};
-    const stats = buildHeroStats(hero);
-    console.log(JSON.stringify({ stats, unitStats: buildHeroUnitStats(hero, gs, stats) }));
+    const catalog = ${catalog};
+    const stats = buildHeroStats(hero, catalog);
+    console.log(JSON.stringify({ stats, unitStats: buildHeroUnitStats(hero, gs, stats, catalog) }));
   `;
   return JSON.parse(execFileSync(
     process.execPath,
@@ -208,6 +210,81 @@ test("normal heroes keep primary stats even when they have a hero unit", () => {
   });
 
   assert.deepEqual(unitStats, []);
+});
+
+test("D.Va shows mech and pilot stats side by side", () => {
+  const { unitStats } = resolveHeroUnitStats({
+    unitId: "HeroDVaMech",
+    hyperlinkId: "DVa",
+    radius: 1.1875,
+    life: { amount: 2150, scale: 0.04, regenRate: 4.4804, regenScale: 0.04 },
+    speed: 4.8398,
+    weapons: [{ nameId: "DVaMechWeapon", range: 3.75, period: 0.25, damage: 22, damageScale: 0.04 }],
+    heroUnits: {
+      HeroDVaPilot: {
+        abilities: {},
+        radius: 0.625,
+        life: { amount: 1109, scale: 0.04, regenRate: 2.5664, regenScale: 0.04 },
+        speed: 4.8398,
+        weapons: [{ nameId: "DVaPilotWeapon", range: 5.5, period: 0.25, damage: 55, damageScale: 0.04 }],
+      },
+    },
+  });
+
+  assert.deepEqual(unitStats.map((unit) => [unit.unitName, unit.stats.life.amount, unit.stats.radius]), [
+    ["Mech Form", 2150, 1.1875],
+    ["Pilot Form", 1109, 0.625],
+  ]);
+});
+
+test("Greymane's Worgen form applies the Worgen buff and its damage modifier", () => {
+  const { unitStats } = resolveHeroUnitStats({
+    unitId: "HeroGreymane",
+    hyperlinkId: "Greymane",
+    isMelee: false,
+    radius: 0.6875,
+    life: { amount: 2210, scale: 0.04, regenRate: 4.6, regenScale: 0.04 },
+    speed: 4.8398,
+    weapons: [
+      { nameId: "HeroGreymaneMeleeWeapon", range: 1.5, period: 1, damage: 148, damageScale: 0.04 },
+      { nameId: "HeroGreymaneRangedWeapon", range: 5.5, period: 1, damage: 148, damageScale: 0.04 },
+      { nameId: "HeroGreymaneWorgenWeapon", range: 1.25, period: 1, damage: 148, damageScale: 0.04, isDisabled: true },
+    ],
+  }, `{
+    weaponTiming: () => null,
+    weaponDamageMultiplier: (id) => (id === "HeroGreymaneWorgenWeapon" ? 1.4 : 1),
+    buff: (id) => id === "GreymaneWorgenForm"
+      ? { lifeMax: 0, weaponEnable: ["HeroGreymaneWorgenWeapon"], weaponDisable: ["HeroGreymaneRangedWeapon", "HeroGreymaneMeleeWeapon"] }
+      : null,
+  }`);
+
+  assert.deepEqual(unitStats.map((unit) => [unit.unitName, Math.round(unit.stats.weapon.damage * 10) / 10, unit.stats.weapon.range]), [
+    ["Human Form", 148, 5.5],
+    ["Worgen Form", 207.2, 1.25],
+  ]);
+});
+
+test("Alexstrasza's Dragon Form adds the Dragonqueen health buff", () => {
+  const life = { amount: 1780, scale: 0.04, regenRate: 3.7, regenScale: 0.04 };
+  const weapon = { range: 5.5, period: 1, damage: 73, damageScale: 0.04 };
+  const { unitStats } = resolveHeroUnitStats({
+    unitId: "HeroAlexstrasza",
+    hyperlinkId: "Alexstrasza",
+    life,
+    weapons: [{ nameId: "AlexstraszaAttackWeapon", ...weapon }],
+    heroUnits: {
+      HeroAlexstraszaDragon: { abilities: {}, life, weapons: [{ nameId: "AlexstraszaDragonConeWeapon", ...weapon }] },
+    },
+  }, `{
+    weaponTiming: () => null,
+    weaponDamageMultiplier: () => 1,
+    buff: (id) => (id === "AlexstraszaDragonqueenHealthIncrease" ? { lifeMax: 500, weaponEnable: [], weaponDisable: [] } : null),
+  }`);
+
+  assert.deepEqual(unitStats.map((unit) => [unit.unitName, unit.stats.life.amount]), [
+    ["Normal Form", 1780],
+    ["Dragon Form", 2280],
+  ]);
 });
 
 function resolveHeroUnitAbilityCardVisibility(ids) {

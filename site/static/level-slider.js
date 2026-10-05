@@ -22,7 +22,7 @@
     flatEntries.push({ el, base: base - spec.perLevel, perLevel: spec.perLevel, decimals: spec.decimals });
   }
   if (targets.length === 0 && flatEntries.length === 0) return;
-  const COMPACT_VALUE_SELECTOR = ".stat-card__value, .ability-stat__value";
+  const COMPACT_VALUE_SELECTOR = ".stat-card__value, .ability-stat__value, .summon-panel";
   const entries = targets.map(function (el) {
     const base = parseFloat(el.dataset.base);
     const scale = parseFloat(el.dataset.scale);

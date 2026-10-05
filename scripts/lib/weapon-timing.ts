@@ -1,4 +1,4 @@
-// Weapon attack timing and missile speed, read from the raw XML catalogs.
+// Weapon timing, missile speed, damage modifiers and form buffs, read from the raw XML catalogs.
 
 import { readFile } from "node:fs/promises";
 import * as path from "node:path";
@@ -19,9 +19,9 @@ export interface CatalogIndex {
   consts: Constants;
 }
 
-type Family = "CWeapon" | "CEffect" | "CMover" | "CUnit";
+type Family = "CWeapon" | "CEffect" | "CMover" | "CUnit" | "CBehavior";
 
-const FAMILY_RE = /^C(Weapon|Effect|Mover|Unit)/;
+const FAMILY_RE = /^C(Weapon|Effect|Mover|Unit|Behavior)/;
 
 // Effect fields that run on launch, before any missile impact.
 const LAUNCH_VALUE_FIELDS = new Set(["EffectArray", "CaseDefault", "InitialEffect", "PeriodicEffectArray"]);
@@ -123,6 +123,20 @@ function fieldNode(index: CatalogIndex, family: Family, id: string, field: strin
   return null;
 }
 
+// Array entries under `path`, merged by index from least to most specific declaration.
+function arrayEntries(index: CatalogIndex, family: Family, id: string, path: string[]): Record<string, string>[] {
+  const merged = new Map<string, Record<string, string>>();
+  let appended = 0;
+  for (const decl of [...chain(index, family, id)].reverse()) {
+    const hits = path.reduce<CatalogNode[]>((nodes, tag) => nodes.flatMap((n) => n.children.filter((c) => c.tag === tag)), [decl]);
+    for (const hit of hits) {
+      const key = hit.attrs.index ?? `#${appended++}`;
+      merged.set(key, { ...merged.get(key), ...hit.attrs });
+    }
+  }
+  return [...merged.values()].filter((attrs) => attrs.removed !== "1");
+}
+
 function numberField(index: CatalogIndex, family: Family, id: string, field: string): number | null {
   return resolveNumber(fieldNode(index, family, id, field)?.attrs.value ?? null, index.consts);
 }
@@ -221,5 +235,31 @@ export function readWeaponTiming(index: CatalogIndex, weaponId: string): HeroSta
     damagePoint: num("DamagePoint"),
     backswing: num("Backswing"),
     missilePhases: launchId ? missilePhases(index, launchId) : null,
+  };
+}
+
+// Modifiers without a validator always apply, e.g. Greymane's Worgen weapon deals 40% more.
+export function readWeaponDamageMultiplier(index: CatalogIndex, weaponId: string): number {
+  const effectId = fieldNode(index, "CWeapon", weaponId, "DisplayEffect")?.attrs.value;
+  if (!effectId) return 1;
+  return arrayEntries(index, "CEffect", effectId, ["MultiplicativeModifierArray"])
+    .filter((m) => !m.Validator)
+    .reduce((total, m) => total + (resolveNumber(m.Modifier ?? null, index.consts) ?? 0), 1);
+}
+
+export interface BuffModification {
+  lifeMax: number;
+  weaponEnable: string[];
+  weaponDisable: string[];
+}
+
+export function readBuffModification(index: CatalogIndex, behaviorId: string): BuffModification | null {
+  if (!index.entries.has(`CBehavior:${behaviorId}`)) return null;
+  const entries = (field: string) => arrayEntries(index, "CBehavior", behaviorId, ["Modification", field]);
+  const life = entries("VitalMaxArray").find((v) => v.index === "Life");
+  return {
+    lifeMax: resolveNumber(life?.value ?? null, index.consts) ?? 0,
+    weaponEnable: entries("WeaponEnableArray").map((v) => v.value),
+    weaponDisable: entries("WeaponDisableArray").map((v) => v.value),
   };
 }

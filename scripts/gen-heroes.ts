@@ -23,12 +23,21 @@ import {
   readHdpInfo,
 } from "./lib/paths.ts";
 import { readJsonSafe, writeJson, writeText } from "./lib/fs.ts";
-import { buildCatalogIndex, loadWeaponCatalogFiles, readWeaponTiming } from "./lib/weapon-timing.ts";
+import {
+  buildCatalogIndex,
+  loadWeaponCatalogFiles,
+  readBuffModification,
+  readWeaponDamageMultiplier,
+  readWeaponTiming,
+  type BuffModification,
+} from "./lib/weapon-timing.ts";
 import { frontmatter } from "./lib/frontmatter.ts";
 import { runScript } from "./lib/script.ts";
 import { loadDataFile, loadGamestrings } from "./lib/heroes-data.ts";
 import { buildEffectGraph } from "./lib/effect-graph/index.ts";
 import { buildReverseRefs } from "./lib/effect-graph/walk.ts";
+import { createDeadGates, createReachability } from "./lib/ability-reachability.ts";
+import { heroSummons, type Summon, type SummonEntry } from "./lib/hero-summons.ts";
 import { assignAreas, assignNotes, assignTicks } from "./lib/area-owners.ts";
 import { tickNote } from "./lib/ability-ticks.ts";
 import { loadGamedataXmlFiles } from "./lib/gamedata-paths.ts";
@@ -49,6 +58,7 @@ import {
   type ResolvedAbility,
   type ResolvedTalent,
   type SubAbilityGroup,
+  type SummonResolved,
 } from "./lib/hero-entries.ts";
 
 // Friendly labels for sub-ability group parent IDs.
@@ -69,7 +79,41 @@ const HERO_UNIT_LABEL_OVERRIDES: Record<string, string> = {
   "HeroAlexstraszaDragon": "Dragon Form",
 };
 
+// Heroes with stats blocks beside the main unit: one per hero unit, plus one per buff form of the main unit.
+// `unitBuffs` maps a hero unit to the buff that is always on it in that form.
+const HERO_FORMS: Record<string, { main: string; unitBuffs?: Record<string, string>; buffForms?: Record<string, string> }> = {
+  "DVa": { main: "Mech Form" },
+  "Alexstrasza": { main: "Normal Form", unitBuffs: { HeroAlexstraszaDragon: "AlexstraszaDragonqueenHealthIncrease" } },
+  "Rexxar": { main: "Rexxar" },
+  "Greymane": { main: "Human Form", buffForms: { "Worgen Form": "GreymaneWorgenForm" } },
+};
+
 const HERO_UNIT_ABILITY_CARD_SKIP_IDS = new Set(["LostVikings"]);
+
+// Friendly labels for summoned unit IDs.
+const SUMMON_LABEL_OVERRIDES: Record<string, string> = {
+  "GallEyeOfKilroggPlacedUnit": "Eye of Kilrogg",
+  "GazloweXplodiumChargeArkReaktorRockItTurret": "Rock-It! Turret",
+  "NecromancerRaiseSkeleton": "Skeletal Warrior",
+  "NecromancerRaiseSkeletonBonePrisonTalentJailor": "Skeletal Warrior",
+  "RexxarUnleashTheBoarsUnit": "Boar",
+  "VarianBannerOfDalaran": "Banner of Dalaran",
+  "WitchDoctorCorpseSpider": "Corpse Spider",
+  "WitchDoctorZombieWallDeadRushTalentUnit": "Dead Rush Zombie",
+  "XalatathVoidConvergencePortalUnit": "Void Portal",
+  "XalatathVoidConvergenceRiftInvasionPortalUnit": "Void Portal",
+};
+
+// Summons the game flags Untargetable, so the stored life is a placeholder.
+const SUMMON_INVULNERABLE_IDS = new Set(["RexxarUnleashTheBoarsUnit"]);
+
+// Summoned stand-ins for the hero itself.
+const SUMMON_EXCLUDE_IDS = new Set(["LeoricWraithWalkUnit"]);
+
+// Summons the Galaxy script spawns, keyed by herodata key.
+const SCRIPT_SUMMONS: Record<string, Summon[]> = {
+  Raynor: [{ unitId: "RaynorRaynorsBanshee", sourceId: "RaynorRaynorsRaidersDummy" }],
+};
 
 // Maps hyperlinkId values that need special formatting.
 const DISPLAY_NAME_OVERRIDES: Record<string, string> = {
@@ -120,6 +164,7 @@ interface HeroStatsSource {
   isMelee?: boolean;
   scalingLinkIds?: string[];
   speed?: number;
+  radius?: number;
   life?: HeroLifeData;
   energy?: HeroResourceData;
   weapons?: HeroWeaponData[];
@@ -130,7 +175,13 @@ const RESOURCE_KINDS: Array<{ field: keyof HeroStatsSource; label: string }> = [
   { field: "energy", label: "Energy" },
 ];
 
-export type WeaponTimingLookup = (weaponId: string) => HeroStatsWeaponTiming | null;
+export interface CatalogLookup {
+  weaponTiming: (weaponId: string) => HeroStatsWeaponTiming | null;
+  weaponDamageMultiplier: (weaponId: string) => number;
+  buff: (behaviorId: string) => BuffModification | null;
+}
+
+const NO_CATALOG: CatalogLookup = { weaponTiming: () => null, weaponDamageMultiplier: () => 1, buff: () => null };
 
 // Ranged heroes list a close-range fallback weapon first.
 export function primaryWeapon(hero: HeroStatsSource): HeroWeaponData | undefined {
@@ -139,7 +190,7 @@ export function primaryWeapon(hero: HeroStatsSource): HeroWeaponData | undefined
   return enabled.reduce<HeroWeaponData | undefined>((best, w) => (!best || w.range > best.range ? w : best), undefined);
 }
 
-export function buildHeroStats(hero: HeroStatsSource, weaponTiming: WeaponTimingLookup = () => null): HeroStats | null {
+export function buildHeroStats(hero: HeroStatsSource, catalog: CatalogLookup = NO_CATALOG): HeroStats | null {
   if (!hero.life) return null;
   const life = {
     amount: hero.life.amount,
@@ -166,16 +217,16 @@ export function buildHeroStats(hero: HeroStatsSource, weaponTiming: WeaponTiming
   const w = primaryWeapon(hero);
   if (w) {
     weapon = {
-      damage: w.damage,
+      damage: w.damage * catalog.weaponDamageMultiplier(w.nameId),
       damageScale: w.damageScale ?? 0,
       range: w.range,
       period: w.period,
       attackSpeed: w.period > 0 ? 1 / w.period : 0,
-      timing: weaponTiming(w.nameId),
+      timing: catalog.weaponTiming(w.nameId),
     };
   }
 
-  return { life, resource, weapon, speed: hero.speed ?? 0 };
+  return { life, resource, weapon, speed: hero.speed ?? 0, radius: hero.radius ?? 0 };
 }
 
 function shouldPreferHeroUnitStats(stats: HeroStats | null, hero: HeroData): boolean {
@@ -188,25 +239,52 @@ function shouldPreferHeroUnitStats(stats: HeroStats | null, hero: HeroData): boo
   );
 }
 
+function withBuff(unit: HeroStatsSource, buff: BuffModification | null): HeroStatsSource {
+  if (!buff) return unit;
+  const toggle = (w: HeroWeaponData): HeroWeaponData =>
+    buff.weaponEnable.includes(w.nameId) ? { ...w, isDisabled: false }
+    : buff.weaponDisable.includes(w.nameId) ? { ...w, isDisabled: true }
+    : w;
+  return {
+    ...unit,
+    life: unit.life && { ...unit.life, amount: unit.life.amount + buff.lifeMax },
+    weapons: unit.weapons?.map(toggle),
+  };
+}
+
+function heroUnitStatsList(
+  hero: HeroData,
+  gs: Gamestrings,
+  catalog: CatalogLookup,
+  unitBuffs: Record<string, string> = {},
+): HeroUnitStats[] {
+  return (Object.entries(hero.heroUnits ?? {}) as [string, HeroUnitData][]).flatMap(([unitId, unitData]) => {
+    const buffId = unitBuffs[unitId];
+    const stats = buildHeroStats(withBuff(unitData, buffId ? catalog.buff(buffId) : null), catalog);
+    return stats ? [{ unitId, unitName: HERO_UNIT_LABEL_OVERRIDES[unitId] ?? getUnitName(gs, unitId), stats }] : [];
+  });
+}
+
+function buffFormStats(hero: HeroData, label: string, behaviorId: string, catalog: CatalogLookup): HeroUnitStats[] {
+  const buff = catalog.buff(behaviorId);
+  const stats = buff && buildHeroStats(withBuff(hero, buff), catalog);
+  return stats ? [{ unitId: hero.unitId, unitName: label, stats }] : [];
+}
+
 export function buildHeroUnitStats(
   hero: HeroData,
   gs: Gamestrings,
   stats: HeroStats | null = buildHeroStats(hero),
-  weaponTiming: WeaponTimingLookup = () => null,
+  catalog: CatalogLookup = NO_CATALOG,
 ): HeroUnitStats[] {
-  if (!shouldPreferHeroUnitStats(stats, hero)) return [];
-
-  const units: HeroUnitStats[] = [];
-  for (const [unitId, unitData] of Object.entries(hero.heroUnits ?? {}) as [string, HeroUnitData][]) {
-    const unitStats = buildHeroStats(unitData, weaponTiming);
-    if (!unitStats) continue;
-    units.push({
-      unitId,
-      unitName: HERO_UNIT_LABEL_OVERRIDES[unitId] ?? getUnitName(gs, unitId),
-      stats: unitStats,
-    });
-  }
-  return units;
+  if (shouldPreferHeroUnitStats(stats, hero)) return heroUnitStatsList(hero, gs, catalog);
+  const forms = HERO_FORMS[hero.hyperlinkId];
+  if (!stats || !forms) return [];
+  return [
+    { unitId: hero.unitId, unitName: forms.main, stats },
+    ...heroUnitStatsList(hero, gs, catalog, forms.unitBuffs),
+    ...Object.entries(forms.buffForms ?? {}).flatMap(([label, behaviorId]) => buffFormStats(hero, label, behaviorId, catalog)),
+  ];
 }
 
 export function shouldRenderHeroUnitAbilityCards(hero: Pick<HeroData, "hyperlinkId">): boolean {
@@ -260,7 +338,8 @@ async function resolveSubAbilityGroups(
   hero: HeroData,
   gs: Gamestrings,
   ctx: HeroContext,
-  resolve: ResolveEntry
+  resolve: ResolveEntry,
+  isUnreachable: (abilityId: string, buttonId: string) => boolean,
 ): Promise<SubAbilityGroup[]> {
   const out: SubAbilityGroup[] = [];
   for (const [parentKey, categories] of Object.entries(hero.subAbilities ?? {})) {
@@ -272,7 +351,7 @@ async function resolveSubAbilityGroups(
     const abilities: ResolvedAbility[] = [];
     for (const [category, entries] of Object.entries(categories)) {
       for (const ab of entries) {
-        if (SUB_ABILITY_EXCLUDE_IDS.has(entryNameId(ab))) continue;
+        if (SUB_ABILITY_EXCLUDE_IDS.has(entryNameId(ab)) || isUnreachable(ab.abilityId, ab.buttonId)) continue;
         abilities.push(await resolve(ab, categorySlug(category), ctx, "ability"));
       }
     }
@@ -306,6 +385,79 @@ async function resolveHeroUnits(
         abilities,
       });
     }
+  }
+  return out;
+}
+
+type SummonUnitData = HeroUnitData & { attributes?: string[] };
+
+// Abilities first, so a talent that reworks an ability does not claim its base summon.
+function summonEntries(hero: HeroData): SummonEntry[] {
+  const abilities = [
+    ...Object.values(hero.abilities ?? {}).flat(),
+    ...Object.values(hero.subAbilities ?? {}).flatMap((categories) => Object.values(categories).flat()),
+    ...Object.values(hero.heroUnits ?? {}).flatMap((unit) => Object.values(unit.abilities ?? {}).flat()),
+  ];
+  const talents = Object.values(hero.talents ?? {}).flat();
+  return [...abilities, ...talents].map((entry) => ({
+    id: entryNameId(entry),
+    abilityId: entry.abilityId,
+    buttonId: entry.buttonId,
+  }));
+}
+
+// 1 life with no damaging weapon marks an invulnerable effect carrier. Weapons that hit through effects read 0 damage.
+export function summonStats(unit: SummonUnitData, catalog: CatalogLookup = NO_CATALOG): HeroStats | null {
+  if (!(unit.attributes ?? []).includes("Summoned")) return null;
+  const weapons = (unit.weapons ?? []).filter((w) => !w.isDisabled && w.damage > 0);
+  if ((unit.life?.amount ?? 0) <= 1 && !weapons.length) return null;
+  return buildHeroStats({ ...unit, isMelee: false, weapons }, catalog);
+}
+
+const PLACEHOLDER_PORTRAIT = "storm_ui_ingame_hero_icon_placeholder.png";
+
+// Image path under images/: the target info portrait, else the summoning ability's icon.
+async function summonPortrait(unit: SummonUnitData, source: ResolvedAbility | undefined): Promise<string> {
+  const file = unit.portraits?.targetInfo;
+  const copied = file && file !== PLACEHOLDER_PORTRAIT && await copyImageIfExists(
+    path.join(HEROES_IMAGES_DIR, "unitportraits", file),
+    path.join(SITE_STATIC_IMAGES, "unitportraits", file),
+  );
+  if (copied) return `unitportraits/${file}`;
+  return source?.icon ? `abilitytalents/${source.icon}` : "";
+}
+
+async function resolveSummons(
+  summons: Summon[],
+  units: Record<string, SummonUnitData>,
+  sources: Map<string, ResolvedAbility>,
+  gs: Gamestrings,
+  ctx: HeroContext,
+  resolve: ResolveEntry,
+  catalog: CatalogLookup,
+): Promise<SummonResolved[]> {
+  const out: SummonResolved[] = [];
+  for (const { unitId, sourceId } of summons) {
+    const unit = units[unitId];
+    const stats = unit && !SUMMON_EXCLUDE_IDS.has(unitId) ? summonStats(unit, catalog) : null;
+    if (!stats) continue;
+    const abilities: ResolvedAbility[] = [];
+    for (const [category, entries] of Object.entries(unit.abilities ?? {})) {
+      for (const ab of entries) {
+        if (ab.abilityType === "Hidden" || !gs.ability.fullText[ab.linkId]) continue;
+        abilities.push(await resolve(ab, categorySlug(category), ctx, "ability"));
+      }
+    }
+    const source = sources.get(sourceId);
+    out.push({
+      unitId,
+      unitName: SUMMON_LABEL_OVERRIDES[unitId] ?? getUnitName(gs, unitId),
+      sourceName: source?.name ?? splitCamelCase(sourceId),
+      portrait: await summonPortrait(unit, source),
+      invulnerable: SUMMON_INVULNERABLE_IDS.has(unitId),
+      stats: { ...stats, sight: unit.sight ?? 0 },
+      abilities,
+    });
   }
   return out;
 }
@@ -375,6 +527,7 @@ async function main(): Promise<void> {
   console.log(`gen-heroes: using version ${gameVersion(await readHdpInfo())}`);
   const heroData = (await loadDataFile<Record<string, HeroData>>("herodata")).items;
   const gs = (await loadGamestrings<Gamestrings>()).items;
+  const unitData = (await loadDataFile<Record<string, SummonUnitData>>("unitdata")).items;
 
   const anchorMap = await readJsonSafe<AnchorMap>(path.join(SITE_DATA, "anchor-map.json"));
   const declAnchorMap = await readJsonSafe<AnchorMap>(path.join(SITE_DATA, "decl-anchor-map.json"));
@@ -385,10 +538,19 @@ async function main(): Promise<void> {
   const SITE_DATA_HEROES = path.join(SITE_DATA, "heroes");
 
   const catalogIndex = buildCatalogIndex(await loadWeaponCatalogFiles());
-  const weaponTiming: WeaponTimingLookup = (id) => readWeaponTiming(catalogIndex, id);
+  const catalog: CatalogLookup = {
+    weaponTiming: (id) => readWeaponTiming(catalogIndex, id),
+    weaponDamageMultiplier: (id) => readWeaponDamageMultiplier(catalogIndex, id),
+    buff: (id) => readBuffModification(catalogIndex, id),
+  };
 
   const graph = buildEffectGraph(await loadGamedataXmlFiles());
   const reverseRefs = buildReverseRefs(graph);
+  const offeredTalents = new Set(
+    Object.values(heroData).flatMap((hero) => Object.values(hero.talents ?? {}).flat().map((t) => t.talentId)),
+  );
+  const isUnreachable = createReachability(graph, reverseRefs, offeredTalents);
+  const { isDeadCondition } = createDeadGates(graph, reverseRefs, offeredTalents);
   const { resolveEntry, shortcodeData, abilityDescriptions, missingIcons, foundAreas, foundTicks, foundNotes } =
     createEntryResolver(gs, anchorMap ?? {}, declAnchorMap ?? {}, graph);
 
@@ -400,14 +562,29 @@ async function main(): Promise<void> {
     await copyPortraits(hero);
     const abilities = await resolveAbilities(hero, ctx, resolveEntry);
     const talents = await resolveTalents(hero, ctx, resolveEntry);
-    const subAbilityGroups = await resolveSubAbilityGroups(hero, gs, ctx, resolveEntry);
+    const subAbilityGroups = await resolveSubAbilityGroups(hero, gs, ctx, resolveEntry, isUnreachable);
     const heroUnitAbilities = await resolveHeroUnits(hero, gs, ctx, resolveEntry);
 
-    const abilityEntries = [
+    const kitEntries = [
       ...abilities,
       ...subAbilityGroups.flatMap((g) => g.abilities),
       ...heroUnitAbilities.flatMap((u) => u.abilities),
     ];
+    const sources = new Map<string, ResolvedAbility>([...kitEntries, ...talents].map((e) => [e.nameId, e]));
+    const summons = await resolveSummons(
+      [
+        ...heroSummons(graph, summonEntries(hero), offeredTalents, isDeadCondition),
+        ...(SCRIPT_SUMMONS[heroName] ?? []),
+      ],
+      unitData,
+      sources,
+      gs,
+      ctx,
+      resolveEntry,
+      catalog,
+    );
+
+    const abilityEntries = [...kitEntries, ...summons.flatMap((s) => s.abilities)];
     const heroEntries = { slug, name: displayName, abilities: abilityEntries, talents };
     const areas = assignAreas(graph, reverseRefs, heroEntries, foundAreas);
     const ticks = assignTicks(graph, reverseRefs, heroEntries, foundTicks);
@@ -420,11 +597,11 @@ async function main(): Promise<void> {
     await writeText(path.join(SITE_CONTENT_HEROES, `${slug}.md`), heroPage(hero, heroName, slug, displayName, gs));
     console.log(`gen-heroes: wrote ${slug}.md`);
 
-    const stats = buildHeroStats(hero, weaponTiming);
-    const unitStats = buildHeroUnitStats(hero, gs, stats, weaponTiming);
+    const stats = buildHeroStats(hero, catalog);
+    const unitStats = buildHeroUnitStats(hero, gs, stats, catalog);
     await writeJson(
       path.join(SITE_DATA_HEROES, `${slug}.json`),
-      { stats, unitStats, abilities, subAbilityGroups, heroUnitAbilities, talents },
+      { stats, unitStats, abilities, subAbilityGroups, heroUnitAbilities, summons, talents },
       2,
     );
     console.log(`gen-heroes: wrote data/heroes/${slug}.json`);

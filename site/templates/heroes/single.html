@@ -57,6 +57,9 @@
         {% endif %}
       {% endfor %}
     </div>
+    {% if hero_data.subAbilityGroups or hero_data.heroUnitAbilities %}
+    <details class="hero-summons hero-extra-abilities">
+      <summary><h2>Additional Abilities</h2></summary>
     <div class="ability-groups">
       {% for group in hero_data.subAbilityGroups %}
       {% set shown = [ab for ab in group.abilities if ab.category in main_cats] %}
@@ -81,7 +84,20 @@
       {% endif %}
       {% endfor %}
     </div>
+    </details>
+    {% endif %}
   </section>
+
+  {% if hero_data.summons %}
+  <details class="hero-summons">
+    <summary><h2>Summons</h2></summary>
+    <div class="hero-summons__grid">
+      {% for summon in hero_data.summons %}
+      {{<heroes.summon_panel summon={summon} sc={sc} />}}
+      {% endfor %}
+    </div>
+  </details>
+  {% endif %}
 
   <section class="talents-section" data-talent-hero="{{ hero.hero_name }}">
     <h2>Talents</h2>

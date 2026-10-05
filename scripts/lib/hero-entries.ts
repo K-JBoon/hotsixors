@@ -10,6 +10,7 @@ import type {
   AnchorMap,
   Gamestrings,
   HeroAbility,
+  HeroStats,
   HeroTalent,
   ShortcodeData,
   ShortcodeEntry,
@@ -72,6 +73,16 @@ export interface SubAbilityGroup {
 export interface HeroUnitResolved {
   heroUnitId: string;
   heroUnitName: string;
+  abilities: ResolvedAbility[];
+}
+
+export interface SummonResolved {
+  unitId: string;
+  unitName: string;
+  sourceName: string;
+  portrait: string;
+  invulnerable: boolean;
+  stats: HeroStats & { sight: number };
   abilities: ResolvedAbility[];
 }
 
