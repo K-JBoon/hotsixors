@@ -142,3 +142,53 @@ test("a tick that needs two talents of one tier is dropped", () => {
   assert.deepEqual(out.RendTalent, ["damage 10"]);
   assert.equal(out.CenterTalent, undefined);
 });
+
+const SHARED = `<Catalog>
+  <CEffectDamage id="StormDamage" />
+  <CAbilEffectTarget id="Slash"><Effect value="SlashSet" /></CAbilEffectTarget>
+  <CEffectSet id="SlashSet"><EffectArray value="RageDotApply" /></CEffectSet>
+  <CEffectApplyBehavior id="RageDotApply"><Behavior value="RageDot" /></CEffectApplyBehavior>
+  <CBehaviorBuff id="RageDot"><Duration value="4" /><Period value="1" /><PeriodicEffect value="RageDamage" /></CBehaviorBuff>
+  <CEffectDamage id="RageDamage" parent="StormDamage"><Amount value="7" /></CEffectDamage>
+  <CAbilEffectInstant id="Rage" />
+  <CAbilEffectTarget id="Reap"><Effect value="ReapApply" /></CAbilEffectTarget>
+  <CEffectApplyBehavior id="ReapApply"><Behavior value="MarkDot" /></CEffectApplyBehavior>
+  <CBehaviorBuff id="MarkDot"><Duration value="4" /><Period value="1" /><PeriodicEffect value="MarkDamage" /></CBehaviorBuff>
+  <CEffectDamage id="MarkDamage" parent="StormDamage"><Amount value="5" /></CEffectDamage>
+  <CAbilEffectTarget id="Wraith"><Effect value="WraithSet" /></CAbilEffectTarget>
+  <CEffectSet id="WraithSet"><EffectArray value="WraithApply" /></CEffectSet>
+  <CEffectApplyBehavior id="WraithApply"><ValidatorArray value="TargetHasMark" /><Behavior value="MarkDot" /></CEffectApplyBehavior>
+  <CValidatorUnitCompareBehaviorCount id="TargetHasMark"><Compare value="GE" /><Value value="1" /><Behavior value="MarkDot" /></CValidatorUnitCompareBehaviorCount>
+</Catalog>`;
+
+function placedShared() {
+  const script = `
+    import { buildEffectGraph } from "./scripts/lib/effect-graph/index.ts";
+    import { buildReverseRefs } from "./scripts/lib/effect-graph/walk.ts";
+    import { abilityTicks } from "./scripts/lib/ability-ticks.ts";
+    import { assignTicks } from "./scripts/lib/area-owners.ts";
+    const graph = buildEffectGraph([{ path: "x.xml", content: ${JSON.stringify(SHARED)} }]);
+    const ids = ["Slash", "Rage", "Reap", "Wraith"];
+    const hero = { slug: "x", name: "X", abilities: ids.map((nameId) => ({ nameId, name: nameId, icon: "", stats: null })), talents: [] };
+    const out = assignTicks(graph, buildReverseRefs(graph), hero, new Map(ids.map((id) => [id, abilityTicks(graph, id)])));
+    process.stdout.write(JSON.stringify(Object.fromEntries([...out].map(([k, v]) => [k, v.map((t) => \`\${t.label} \${t.amount}\`)]))));
+  `;
+  const out = execFileSync(
+    process.execPath,
+    ["--import", "tsx", "--input-type=module", "-e", script],
+    { cwd: new URL("..", import.meta.url), encoding: "utf-8" },
+  );
+  return JSON.parse(out) as Record<string, string[]>;
+}
+
+test("a tick named after another ability that does not reach it moves there", () => {
+  const out = placedShared();
+  assert.deepEqual(out.Rage, ["damage 7"]);
+  assert.equal(out.Slash, undefined);
+});
+
+test("a state-prefixed copy of a tick another card shows plainly is dropped", () => {
+  const out = placedShared();
+  assert.deepEqual(out.Reap, ["damage 5"]);
+  assert.equal(out.Wraith, undefined);
+});

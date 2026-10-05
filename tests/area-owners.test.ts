@@ -70,3 +70,47 @@ test("state-gated variants stay on the ability with the state as prefix, talent 
 test("talent variants that keep the ability's size are dropped", () => {
   assert.equal(placed().placed.HeavyStrikeTalent, undefined);
 });
+
+const GEM = `<Catalog>
+  <CEffectCreateHealer id="StormHealingParent" />
+  <CAbilEffectTarget id="Cube"><Effect value="CubeSet" /></CAbilEffectTarget>
+  <CEffectSet id="CubeSet"><EffectArray value="CubeGemSet" /><EffectArray value="CubeImpactSet" /></CEffectSet>
+  <CEffectSet id="CubeGemSet"><ValidatorArray value="CasterHasGem" /><EffectArray value="CubeGemSourceApply" /></CEffectSet>
+  <CEffectApplyBehavior id="CubeGemSourceApply"><WhichUnit Value="Source" /><Behavior value="GemSourceBuff" /></CEffectApplyBehavior>
+  <CBehaviorBuff id="GemSourceBuff" />
+  <CEffectSet id="CubeImpactSet"><ValidatorArray value="SourceHasGem" /><EffectArray value="PotionSearch" /></CEffectSet>
+  <CEffectEnumArea id="PotionSearch"><AreaArray Effect="PotionHeal"><Radius value="1" /></AreaArray></CEffectEnumArea>
+  <CEffectCreateHealer id="PotionHeal" parent="StormHealingParent" />
+  <CValidatorUnitHasBehavior id="CasterHasGem"><WhichUnit Value="Caster" /><Behavior value="GemCasterBuff" /></CValidatorUnitHasBehavior>
+  <CValidatorUnitHasBehavior id="SourceHasGem"><WhichUnit Value="Source" /><Behavior value="GemSourceBuff" /></CValidatorUnitHasBehavior>
+  <CAbilEffectInstant id="Gem"><Effect value="GemApply" /></CAbilEffectInstant>
+  <CTalent id="Gem"><Abil value="Gem" /><Active value="1" /></CTalent>
+  <CEffectApplyBehavior id="GemApply"><WhichUnit Value="Caster" /><Behavior value="GemCasterBuff" /></CEffectApplyBehavior>
+  <CBehaviorBuff id="GemCasterBuff" />
+</Catalog>`;
+
+test("an area gated on a buff a talent's active ability grants moves to that talent", () => {
+  const script = `
+    import { buildEffectGraph } from "./scripts/lib/effect-graph/index.ts";
+    import { buildReverseRefs } from "./scripts/lib/effect-graph/walk.ts";
+    import { abilityGeometry } from "./scripts/lib/ability-geometry.ts";
+    import { assignAreas } from "./scripts/lib/area-owners.ts";
+    const graph = buildEffectGraph([{ path: "x.xml", content: ${JSON.stringify(GEM)} }]);
+    const { areas, ...stats } = abilityGeometry(graph, "Cube");
+    const hero = {
+      slug: "x",
+      name: "X",
+      abilities: [{ nameId: "Cube", name: "Cube", icon: "", stats }],
+      talents: [{ nameId: "Gem", name: "Gem", icon: "", stats: null }],
+    };
+    const out = assignAreas(graph, buildReverseRefs(graph), hero, new Map([["Cube", areas]]));
+    process.stdout.write(JSON.stringify(Object.fromEntries([...out].map(([k, v]) => [k, v.map((a) => [a.label, a.radius])]))));
+  `;
+  const out = JSON.parse(
+    execFileSync(process.execPath, ["--import", "tsx", "--input-type=module", "-e", script], {
+      cwd: new URL("..", import.meta.url),
+      encoding: "utf-8",
+    }),
+  );
+  assert.deepEqual(out, { Gem: [["Heal area", 1]] });
+});

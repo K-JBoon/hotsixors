@@ -1,11 +1,11 @@
 // Places each ability area, tick and note on the card it belongs to: the ability, a trait state it depends on, or a talent.
 
 import type { AbilityArea, AbilityNote, AbilityTick } from "../types.ts";
-import type { AbilTalentEntry, AnchorIndex, EffectGraph, ReverseRef } from "./effect-graph/types.ts";
+import type { AbilTalentEntry, AnchorIndex, EffectGraph, GraphNode, ReverseRef } from "./effect-graph/types.ts";
 import { chanceEnabledEffectIds, talentIdsFromValidators, validatorTalentIds } from "./effect-graph/gating.ts";
-import { resolveEffectOwners } from "./effect-graph/owners.ts";
+import { hasIdBoundary, resolveEffectOwners } from "./effect-graph/owners.ts";
 import { effectsApplyingBehavior, parentChain, rootAbilityAnchorIds } from "./effect-graph/walk.ts";
-import { CHANCE_GATE, sameArea, type GatedArea } from "./ability-geometry.ts";
+import { CHANCE_GATE, isCondition, sameArea, type GatedArea } from "./ability-geometry.ts";
 import type { GatedTick } from "./ability-ticks.ts";
 import type { GatedNote } from "./ability-notes.ts";
 
@@ -45,8 +45,21 @@ function chanceTalents(graph: EffectGraph, index: AnchorIndex, effectId: string)
   });
 }
 
-// Talents an effect needs: the first talent check on every path up to an ability. Empty when a path has none.
-function upstreamTalents(graph: EffectGraph, reverseRefs: Map<string, ReverseRef[]>, index: AnchorIndex, effectId: string) {
+// Talents an effect needs: the first talent check or talent active on every path up to an ability, or a state check
+// a talent grants, e.g. a buff a talent's active ability puts on the hero. Empty when a path has none.
+function upstreamTalents(
+  graph: EffectGraph,
+  reverseRefs: Map<string, ReverseRef[]>,
+  index: AnchorIndex,
+  ownerId: string,
+  effectId: string,
+  checked: Set<string>,
+) {
+  const stateTalents = (node: GraphNode) =>
+    (node.refs.ValidatorArray ?? [])
+      .filter((v) => !checked.has(v) && checked.add(v) && isCondition(graph, v))
+      .flatMap((v) => gateOwners(graph, reverseRefs, index, ownerId, v, checked))
+      .flatMap((c) => (c.kind === "talent" ? [c.nameId] : []));
   const found = new Set<string>();
   const seen = new Set<string>();
   const queue = [effectId];
@@ -55,7 +68,8 @@ function upstreamTalents(graph: EffectGraph, reverseRefs: Map<string, ReverseRef
     if (seen.has(id)) continue;
     seen.add(id);
     const node = graph.nodes.get(id);
-    const talents = node ? talentIdsFromValidators(graph, index, node) : [];
+    const own = index[id]?.kind === "talent" ? [id] : node ? talentIdsFromValidators(graph, index, node) : [];
+    const talents = own.length > 0 || !node ? own : stateTalents(node);
     if (talents.length > 0) {
       talents.forEach((t) => found.add(t));
       continue;
@@ -67,7 +81,14 @@ function upstreamTalents(graph: EffectGraph, reverseRefs: Map<string, ReverseRef
 }
 
 // A marker the owner itself applies names no other ability; the talents above its apply effects then gate it.
-function gateOwners(graph: EffectGraph, reverseRefs: Map<string, ReverseRef[]>, index: AnchorIndex, ownerId: string, validatorId: string) {
+function gateOwners(
+  graph: EffectGraph,
+  reverseRefs: Map<string, ReverseRef[]>,
+  index: AnchorIndex,
+  ownerId: string,
+  validatorId: string,
+  checked = new Set([validatorId]),
+): AbilTalentEntry[] {
   if (validatorId.startsWith(CHANCE_GATE)) return chanceTalents(graph, index, validatorId.slice(CHANCE_GATE.length));
   const talents = validatorTalentIds(graph, index, validatorId).flatMap((id) => index[id] ?? []);
   if (talents.length > 0) return talents;
@@ -80,7 +101,7 @@ function gateOwners(graph: EffectGraph, reverseRefs: Map<string, ReverseRef[]>, 
   if (appliers.length > 0 && applierTalents.every((t) => t.length > 0)) return named(applierTalents.flat());
   const anchors = named(appliers.flatMap((e) => [...rootAbilityAnchorIds(reverseRefs, index, e)]));
   if (anchors.some((a) => a.nameId !== ownerId)) return anchors;
-  const upstream = appliers.map((e) => upstreamTalents(graph, reverseRefs, index, e));
+  const upstream = appliers.map((e) => upstreamTalents(graph, reverseRefs, index, ownerId, e, checked));
   return appliers.length > 0 && upstream.every((t) => t.length > 0) ? named(upstream.flat()) : anchors;
 }
 
@@ -163,6 +184,7 @@ function gatedTargets(
   gateIds: string[],
   source: string,
   hitGates: string[] = [],
+  place?: Place,
 ): Target[] {
   if (gateIds.some((g) => unpickable(graph, index, g))) return [];
   const gates = gateIds.map((g) => ({
@@ -191,10 +213,39 @@ function gatedTargets(
   if (gateIds.length === 0) {
     const owners: AbilTalentEntry[] = resolveEffectOwners(graph, reverseRefs, index, new Map(), source);
     if (owners.length > 0 && !owners.some((o) => o.nameId === owner.nameId)) {
-      return namedOwners(owners, source).map((o) => target(o.nameId));
+      // Of several owners, those whose own walk finds the record hold it.
+      const finders = owners.filter((o) => place?.finds(o.nameId));
+      return namedOwners(finders.length > 0 ? finders : owners, source).map((o) => target(o.nameId));
     }
+    if (place?.elsewhere) return [target(place.elsewhere.nameId)];
   }
   return [target(owner.nameId, false, true)];
+}
+
+// The ability whose id starts the record id, the longest one.
+function namedAbility(hero: Hero, source: string) {
+  return hero.abilities.filter((e) => hasIdBoundary(source, e.nameId)).sort((a, b) => b.nameId.length - a.nameId.length)[0];
+}
+
+// A shared mechanic named after another ability that does not reach it itself, e.g. a bleed every ability applies.
+// An owner or talent the record names more closely keeps it.
+function namedElsewhere(hero: Hero, found: Map<string, { source: string }[]>, owner: AreaEntry, source: string) {
+  const named = namedAbility(hero, source);
+  if (!named || commonPrefix([owner.nameId, source]).length >= named.nameId.length) return undefined;
+  if (hero.talents.some((t) => t.nameId !== named.nameId && names(source, t.nameId))) return undefined;
+  return (found.get(named.nameId) ?? []).some((x) => x.source === source) ? undefined : named;
+}
+
+interface Place {
+  elsewhere: AreaEntry | undefined;
+  finds: (nameId: string) => boolean;
+}
+
+function placeOf(hero: Hero, found: Map<string, { source: string }[]>, owner: AreaEntry, source: string): Place {
+  return {
+    elsewhere: namedElsewhere(hero, found, owner, source),
+    finds: (nameId) => (found.get(nameId) ?? []).some((x) => x.source === source),
+  };
 }
 
 function prefixed<T extends { label: string }>(item: T, prefix: string | undefined): T {
@@ -207,11 +258,16 @@ function placeArea(
   index: AnchorIndex,
   owner: AreaEntry,
   area: GatedArea,
+  place: Place,
 ): Placement[] {
   const base = strip(area);
   const repeatsStat = [owner.stats?.radius, owner.stats?.width].some((n) => n != null && (n === base.radius || n === base.width));
-  return gatedTargets(graph, reverseRefs, index, owner, area.gates, area.source)
+  // Moved to the ability it is named after, a circle of that ability's radius adds nothing.
+  const { elsewhere } = place;
+  const repeatsHome = elsewhere?.stats?.radius != null && elsewhere.stats.radius === base.radius;
+  return gatedTargets(graph, reverseRefs, index, owner, area.gates, area.source, [], place)
     .filter((t) => !t.plain || !(base.label === "Buff area" || repeatsStat))
+    .filter((t) => t.nameId !== elsewhere?.nameId || !repeatsHome)
     .map((t) => ({ nameId: t.nameId, area: prefixed(base, t.prefix), owner: owner.nameId, variant: t.variant }));
 }
 
@@ -224,7 +280,9 @@ export function assignAreas(
 ): Map<string, AbilityArea[]> {
   const index = anchorIndex(hero);
   const placements = hero.abilities.flatMap((owner) =>
-    (found.get(owner.nameId) ?? []).flatMap((area) => placeArea(graph, reverseRefs, index, owner, area)),
+    (found.get(owner.nameId) ?? []).flatMap((area) =>
+      placeArea(graph, reverseRefs, index, owner, area, placeOf(hero, found, owner, area.source)),
+    ),
   );
   // A talent variant that keeps a size its ability already shows does not change the area.
   const ownerSizes = (owner: string) => {
@@ -276,13 +334,27 @@ export function assignTicks(
   // A gate with no talent or state to name would leave a bare variant next to the base tick.
   const placements = hero.abilities.flatMap((owner) =>
     (found.get(owner.nameId) ?? []).flatMap(({ gates, hitGates, refreshed, ...tick }) =>
-      gatedTargets(graph, reverseRefs, index, owner, gates, tick.source, hitGates)
+      gatedTargets(graph, reverseRefs, index, owner, gates, tick.source, hitGates, placeOf(hero, found, owner, tick.source))
         .filter((t) => !(t.plain && gates.length > 0) && possible(t))
-        .map((t) => ({ nameId: t.nameId, tick: prefixed(tick, t.prefix), also: t.also, own: !refreshed || t.nameId === owner.nameId, variant: t.variant, owner: owner.nameId })),
+        .map((t) => ({
+          nameId: t.nameId,
+          tick: prefixed(tick, t.prefix),
+          raw: tick,
+          prefix: t.prefix,
+          also: t.also,
+          own: !refreshed || t.nameId === owner.nameId,
+          variant: t.variant,
+          owner: owner.nameId,
+        })),
     ),
   );
+  // A state-prefixed copy of a tick another card shows plainly repeats it, e.g. a trait's mark that abilities reapply.
+  const repeated = (p: (typeof placements)[number]) =>
+    p.prefix !== undefined &&
+    !p.variant &&
+    placements.some((q) => q.prefix === undefined && q.tick.source === p.tick.source && sameTick(q.raw, p.raw));
   const changing = placements.filter(
-    (p) => !p.variant || !placements.some((q) => q.nameId === p.owner && !q.variant && sameTick(q.tick, p.tick)),
+    (p) => !repeated(p) && (!p.variant || !placements.some((q) => q.nameId === p.owner && !q.variant && sameTick(q.tick, p.tick))),
   );
   type Placed = { tick: AbilityTick; also: string | undefined; own: boolean };
   const out = new Map<string, Placed[]>();
@@ -315,7 +387,7 @@ export function assignNotes(
   const possible = pickable(hero);
   const placements = hero.abilities.flatMap((owner) =>
     (found.get(owner.nameId) ?? []).flatMap(({ gates, hitGates, ...note }) =>
-      gatedTargets(graph, reverseRefs, index, owner, gates, note.source, hitGates)
+      gatedTargets(graph, reverseRefs, index, owner, gates, note.source, hitGates, placeOf(hero, found, owner, note.source))
         .filter((t) => !(t.plain && gates.length > 0) && possible(t))
         .map((t) => ({
           nameId: t.nameId,

@@ -146,3 +146,48 @@ test("persistent projected forward from the caster sets range after the targetin
   `, "Wall");
   assert.equal(g.range, 22);
 });
+
+test("a smaller circle a set fires with a larger one of the same kind is its center", () => {
+  const g = geometry(`
+    <CAbilEffectTarget id="Flare"><Effect value="FlareSet" /><CursorEffect value="FlareOuter" /></CAbilEffectTarget>
+    <CEffectSet id="FlareSet"><EffectArray value="FlareInner" /><EffectArray value="FlareOuter" /></CEffectSet>
+    <CEffectEnumArea id="FlareInner"><AreaArray Effect="FlareDamage"><Radius value="1" /></AreaArray></CEffectEnumArea>
+    <CEffectEnumArea id="FlareOuter"><AreaArray Effect="FlareDamage"><Radius value="2.5" /></AreaArray></CEffectEnumArea>
+    <CEffectDamage id="FlareDamage" parent="StormDamage" />
+    <CEffectDamage id="StormDamage" />
+  `, "Flare");
+  assert.equal(g.radius, 2.5);
+  assert.deepEqual(g.areas.map((a) => [a.label, a.radius]), [["Center damage area", 1]]);
+});
+
+test("with its own cursor, an area named after another ability does not set the radius", () => {
+  const g = geometry(`
+    <CAbilEffectTarget id="Stream"><Effect value="StreamSet" /><CursorEffect value="StreamSearch" /></CAbilEffectTarget>
+    <CEffectSet id="StreamSet"><EffectArray value="StreamSearch" /><EffectArray value="SpillIgniteSearch" /></CEffectSet>
+    <CEffectEnumArea id="StreamSearch">
+      <AreaArray Effect="StreamDamage"><RectangleWidth value="0.85" /><RectangleHeight value="1.75" /></AreaArray>
+    </CEffectEnumArea>
+    <CEffectEnumArea id="SpillIgniteSearch"><AreaArray Effect="StreamDamage"><Radius value="1.5" /></AreaArray></CEffectEnumArea>
+    <CEffectDamage id="StreamDamage" parent="StormDamage" />
+    <CEffectDamage id="StormDamage" />
+    <CAbilEffectTarget id="Spill" />
+  `, "Stream");
+  assert.equal(g.width, 0.85);
+  assert.equal(g.radius, null);
+});
+
+test("a state check on the cast's own effect is what it targets, not a gate; a talent check there stays", () => {
+  const g = geometry(`
+    <CAbilEffectTarget id="Strike"><Effect value="StrikeSet" /></CAbilEffectTarget>
+    <CEffectSet id="StrikeSet">
+      <ValidatorArray value="TargetMarked" /><ValidatorArray value="HasStrikeTalent" />
+      <EffectArray value="StrikeSearch" />
+    </CEffectSet>
+    <CEffectEnumArea id="StrikeSearch"><AreaArray Effect="StrikeDamage"><Radius value="4" /></AreaArray></CEffectEnumArea>
+    <CEffectDamage id="StrikeDamage" parent="StormDamage" />
+    <CEffectDamage id="StormDamage" />
+    <CValidatorUnitCompareBehaviorCount id="TargetMarked"><Compare value="GT" /><Behavior value="Marked" /></CValidatorUnitCompareBehaviorCount>
+    <CValidatorPlayerTalent id="HasStrikeTalent"><Find value="1" /><Value value="StrikeTalent" /></CValidatorPlayerTalent>
+  `, "Strike");
+  assert.deepEqual(g.areas.map((a) => [a.radius, a.gates]), [[4, ["HasStrikeTalent"]]]);
+});

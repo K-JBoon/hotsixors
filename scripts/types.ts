@@ -32,6 +32,7 @@ export interface AbilityTick {
   rate: number;                     // hits per second
   firstAt: number;                  // seconds until the first hit
   count: number | null;             // hits over the effective duration, the t=0 hit included
+  lasts?: number;                   // status length when each hit renews it before it ends
   source: string;                   // periodic behavior or persistent id
 }
 

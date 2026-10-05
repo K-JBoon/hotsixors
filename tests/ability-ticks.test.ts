@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
 import test from "node:test";
+import { tickNote } from "../scripts/lib/ability-ticks.ts";
 
 const ROOTS = `
   <CEffectDamage id="StormDamage" />
@@ -34,6 +35,7 @@ function ticks(xml: string, abilId: string) {
     rate: number;
     firstAt: number;
     count: number | null;
+    lasts?: number;
     gates: string[];
   }[];
 }
@@ -523,4 +525,60 @@ test("a switch case that picks by target type names the target kind", () => {
     <CEffectDamage id="BarbsDamage" parent="StormSpell"><Amount value="21" /></CEffectDamage>
   `;
   assert.deepEqual(ticks(xml, "Barbs").map(brief).sort(), ["21 damage (structures) @1 x2 from 1", "21 damage @1 x3 from 1"]);
+});
+
+test("an ability that shares an effect's id is not run, and a case for bosses is not the normal hit", () => {
+  const xml = `
+    <CAbilEffectInstant id="Strike"><Effect value="StrikeStart" /></CAbilEffectInstant>
+    <CEffectSet id="StrikeStart"><EffectArray value="StrikeGuardApply" /><EffectArray value="StrikePersistent" /></CEffectSet>
+    <CEffectApplyBehavior id="StrikeGuardApply"><WhichUnit Value="Caster" /><Behavior value="StrikeGuard" /></CEffectApplyBehavior>
+    <CBehaviorBuff id="StrikeGuard" parent="StormStun"><Duration value="2" /></CBehaviorBuff>
+    <CEffectCreatePersistent id="StrikePersistent">
+      <PeriodCount value="3" /><PeriodicEffectArray value="StrikeHit" /><PeriodicPeriodArray value="0.25" />
+    </CEffectCreatePersistent>
+    <CEffectSet id="StrikeHit"><EffectArray value="Strike" /><EffectArray value="StrikeSwitch" /></CEffectSet>
+    <CEffectApplyBehavior id="Strike"><WhichUnit Value="Caster" /><Behavior value="StrikeActive" /></CEffectApplyBehavior>
+    <CBehaviorBuff id="StrikeActive" />
+    <CEffectSwitch id="StrikeSwitch"><CaseArray Validator="IsBoss" Effect="StrikeFlat" /><CaseDefault value="StrikeDamage" /></CEffectSwitch>
+    <CValidatorUnitType id="IsBoss"><Value value="Boss" /></CValidatorUnitType>
+    <CEffectDamage id="StrikeFlat" parent="StormSpell"><Amount value="256" /></CEffectDamage>
+    <CEffectDamage id="StrikeDamage" parent="StormSpell"><Amount value="70" /></CEffectDamage>
+  `;
+  assert.deepEqual(ticks(xml, "Strike").map(brief), ["70 damage @0.25 x3 from 0.25"]);
+});
+
+test("a status an area renews before it ends holds while in the area", () => {
+  const xml = `
+    <CAbilEffectInstant id="Puddle"><Effect value="PuddlePersistent" /></CAbilEffectInstant>
+    <CEffectCreatePersistent id="PuddlePersistent">
+      <PeriodCount value="4" /><PeriodicEffectArray value="PuddleSearch" /><PeriodicPeriodArray value="0.125" />
+    </CEffectCreatePersistent>
+    <CEffectEnumArea id="PuddleSearch"><AreaArray Effect="PuddleSlowApply"><Radius value="1.5" /></AreaArray></CEffectEnumArea>
+    <CEffectApplyBehavior id="PuddleSlowApply"><Behavior value="PuddleSlow" /></CEffectApplyBehavior>
+    <CBehaviorBuff id="PuddleSlow" parent="StormSlowParent"><Duration value="0.1875" /></CBehaviorBuff>
+  `;
+  const [tick] = ticks(xml, "Puddle");
+  assert.equal(tick.lasts, 0.1875);
+  assert.equal(tickNote({ ...tick, source: "PuddlePersistent" }).label, "Slow holds while in the area, lingers 0.1875s after leaving");
+});
+
+test("a status with no length of its own lasts as long as the timed marker it needs", () => {
+  const xml = `
+    <CAbilEffectInstant id="Calm"><Effect value="CalmPersistent" /></CAbilEffectInstant>
+    <CEffectCreatePersistent id="CalmPersistent">
+      <PeriodCount value="4" /><PeriodicEffectArray value="CalmSearch" /><PeriodicPeriodArray value="0.5" />
+    </CEffectCreatePersistent>
+    <CEffectEnumArea id="CalmSearch"><AreaArray Effect="CalmSet"><Radius value="6.5" /></AreaArray></CEffectEnumArea>
+    <CEffectSet id="CalmSet"><EffectArray value="CalmMarkerApply" /><EffectArray value="CalmArmorApply" /></CEffectSet>
+    <CEffectApplyBehavior id="CalmMarkerApply"><Behavior value="CalmMarker" /></CEffectApplyBehavior>
+    <CBehaviorBuff id="CalmMarker"><Duration value="0.5" /></CBehaviorBuff>
+    <CEffectApplyBehavior id="CalmArmorApply"><Behavior value="CalmArmor" /></CEffectApplyBehavior>
+    <CBehaviorBuff id="CalmArmor" parent="StormArmor">
+      <RemoveValidatorArray value="HasCalmMarker" />
+      <ArmorModification><AllArmorBonus value="10" /></ArmorModification>
+    </CBehaviorBuff>
+    <CValidatorUnitCompareBehaviorCount id="HasCalmMarker"><Value value="1" /><Behavior value="CalmMarker" /></CValidatorUnitCompareBehaviorCount>
+  `;
+  const [tick] = ticks(xml, "Calm");
+  assert.equal(tickNote({ ...tick, source: "CalmPersistent" }).label, "+10 armor holds while in the area, lingers 0.5s after leaving");
 });

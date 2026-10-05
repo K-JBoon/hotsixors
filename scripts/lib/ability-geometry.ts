@@ -130,6 +130,7 @@ export function isCondition(graph: EffectGraph, validatorId: string, seen = new 
   seen.add(validatorId);
   const value = (tag: string) => inheritedValue(graph, validatorId, tag);
   if (node.tag === "CValidatorPlayerTalent") return value("Find") === "1";
+  if (node.tag === "CValidatorUnitHasBehavior") return value("Behavior") !== null && value("Negate") !== "1";
   if (node.tag === "CValidatorUnitCompareBehaviorCount" || node.tag === "CValidatorUnitCompareTokenCount") {
     if (!value(node.tag === "CValidatorUnitCompareBehaviorCount" ? "Behavior" : "TokenId")) return false;
     const passes = PASSES_AT_ZERO[(value("Compare") ?? "eq").toLowerCase()];
@@ -219,18 +220,42 @@ function revisit(seen: Map<string, number>, visit: Visit) {
   return true;
 }
 
+// The ability and the steps it shares a walk with.
+function walkAbils(graph: EffectGraph, abilId: string) {
+  const parent = graph.nodes.get(abilId)?.elements.find((e) => e.tag === "ParentAbil")?.attrs.value;
+  return [...new Set([abilId, ...childAbils(graph, abilId), ...(parent ? childAbils(graph, parent) : [])])];
+}
+
+const abilIdCache = new WeakMap<EffectGraph, Set<string>>();
+
+// The longest ability id that starts a record id at a word boundary, e.g. FirebatOilSpill for FirebatOilSpillHealSearch.
+function namedAbility(graph: EffectGraph, id: string) {
+  let ids = abilIdCache.get(graph);
+  if (!ids) {
+    ids = new Set([...graph.nodes.values()].filter((n) => n.tag.startsWith("CAbil")).map((n) => n.id));
+    abilIdCache.set(graph, ids);
+  }
+  const cuts = [...id.matchAll(/(?=[A-Z0-9_])/g)].map((m) => m.index).filter((i) => i > 0);
+  return [id.length, ...cuts.reverse()].map((i) => id.slice(0, i)).find((prefix) => ids.has(prefix)) ?? null;
+}
+
 // Breadth-first, so the cast's own effects win over deeper sub-effects. A less-gated path revisits a node.
 export function walk(graph: EffectGraph, abilId: string, cursorId: string | null): Visit[] {
   const seen = new Map<string, number>([[abilId, 0]]);
   const visits: Visit[] = [];
-  const parent = graph.nodes.get(abilId)?.elements.find((e) => e.tag === "ParentAbil")?.attrs.value;
-  const abils = [...new Set([abilId, ...childAbils(graph, abilId), ...(parent ? childAbils(graph, parent) : [])])];
+  const abils = walkAbils(graph, abilId);
   const roots = [...abils.flatMap((id) => graph.nodes.get(id)?.refs.Effect ?? []), ...(cursorId ? [cursorId] : [])];
+  const casts = new Set(graph.nodes.get(abilId)?.refs.Effect ?? []);
+  // A state check on the cast's own effect is what the ability targets, e.g. an enemy with Reaper's Mark, not a variant.
+  const gatesOf = (v: Visit) => {
+    const gates = ownGates(graph, graph.nodes.get(v.id)!);
+    return v.path.length === 0 && casts.has(v.id) ? gates.filter((g) => talentGate(graph, g)) : gates;
+  };
   let layer: Visit[] = roots.map((id) => ({ id, summon: false, gates: [], path: [] }));
   for (let depth = 0; depth < MAX_WALK_DEPTH && layer.length > 0; depth++) {
     const fresh = layer
       .filter((v) => graph.nodes.has(v.id))
-      .map((v) => ({ ...v, gates: [...v.gates, ...ownGates(graph, graph.nodes.get(v.id)!)] }))
+      .map((v) => ({ ...v, gates: [...v.gates, ...gatesOf(v)] }))
       .filter((v) => revisit(seen, v));
     visits.push(...fresh);
     layer = fresh.flatMap((v) => children(graph, v));
@@ -409,7 +434,7 @@ function capitalized(text: string) {
   return text[0].toUpperCase() + text.slice(1);
 }
 
-function areaLabel(area: FoundArea) {
+function areaLabel(area: Pick<Shape, "outcomes" | "relayed" | "search">) {
   const { outcomes, relayed } = area;
   if (area.search) {
     if (outcomes.has("trigger")) return null;
@@ -445,8 +470,14 @@ export function abilityGeometry(graph: EffectGraph, abilId: string): AbilityGeom
   const found: FoundArea[] = leastGated
     .flatMap((v) => shapesOf(graph, v.id).map((s) => ({ ...s, ...v, gates: [...v.gates, ...s.outcomeGates] })))
     .filter(inBounds);
+  const abils = walkAbils(graph, abilId);
+  // With its own cursor, an area named after another ability is that ability's, e.g. an Oil Spill that Flame Stream ignites.
+  const foreign = (a: FoundArea) => {
+    const named = cursor ? namedAbility(graph, a.id) : null;
+    return named !== null && !abils.includes(named) && !abilId.startsWith(named);
+  };
   const own = found.filter(
-    (a) => !a.summon && a.reach === null && !a.search && a.gates.length === 0 && ![null, "Buff area"].includes(areaLabel(a)),
+    (a) => !a.summon && !foreign(a) && a.reach === null && !a.search && a.gates.length === 0 && ![null, "Buff area"].includes(areaLabel(a)),
   );
   const circle = cursor?.radius ?? (cursor?.reach != null ? null : own.find((a) => a.radius !== null)?.radius ?? null);
   const width = cursor?.width ?? own.find((a) => a.width !== null)?.width ?? null;
@@ -455,11 +486,20 @@ export function abilityGeometry(graph: EffectGraph, abilId: string): AbilityGeom
   const projection = firstOf(nodes, (n) => projectionReach(graph, n));
   const primary = (a: FoundArea) =>
     a.gates.length === 0 && ((a.radius !== null && a.radius === circle) || (a.width !== null && a.width === width));
+  // A smaller circle the same set fires with a larger one of the same kind is its center, e.g. Arcane Flare's bonus damage.
+  const center = (a: FoundArea, label: string) => {
+    const set = graph.nodes.get(a.path.at(-1) ?? "");
+    if (a.radius === null || set?.tag !== "CEffectSet") return false;
+    const siblings = (set.refs.EffectArray ?? []).flatMap((id) => shapesOf(graph, id));
+    return siblings.some((b) => b.radius !== null && b.radius > a.radius! && areaLabel(b) === label);
+  };
   const areas = found
     .filter((a) => a.reach === null && !primary(a))
     .flatMap((a) => {
       const label = areaLabel(a);
-      return label ? [{ label, radius: a.radius, width: a.width, length: a.length, source: a.id, gates: a.gates }] : [];
+      if (!label) return [];
+      const shown = center(a, label) ? `Center ${label[0].toLowerCase()}${label.slice(1)}` : label;
+      return [{ label: shown, radius: a.radius, width: a.width, length: a.length, source: a.id, gates: a.gates }];
     })
     .filter((a, i, all) => all.findIndex((b) => sameArea(a, b) && a.gates.join() === b.gates.join()) === i);
   return {

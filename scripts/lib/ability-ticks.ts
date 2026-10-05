@@ -51,6 +51,8 @@ interface Bound {
 interface Payload {
   label: string;
   amount: number | null;
+  // Length of the status one hit puts on its target; null for amounts, shields and stacks, which add up.
+  lasts: number | null;
   gates: string[];
   // Behaviors the path needs absent.
   absent: string[];
@@ -209,7 +211,7 @@ function behaviorLabel(graph: EffectGraph, id: string, duration: number | null) 
 // Amounts below 1 are dummy hits that only trigger procs.
 function amounted(amount: number | null, label: string) {
   if (amount !== null && amount > 0 && amount < 1) return null;
-  return { label, amount: amount ? trimmed(amount) : null };
+  return { label, amount: amount ? trimmed(amount) : null, lasts: null };
 }
 
 function vitalFraction(graph: EffectGraph, id: string, tag: string) {
@@ -222,14 +224,20 @@ function damageKind(graph: EffectGraph, id: string) {
   return "damage";
 }
 
-function payloadOf(graph: EffectGraph, node: GraphNode): { label: string; amount: number | null } | null {
+function payloadOf(graph: EffectGraph, node: GraphNode): Pick<Payload, "label" | "amount" | "lasts"> | null {
   const root = rootOf(graph, node.id);
   const value = (tag: string) => number(graph, inheritedValue(graph, node.id, tag));
   if (node.tag === "CEffectDamage" && root === "StormDamage") return amounted(value("Amount"), damageKind(graph, node.id));
   if (node.tag === "CEffectCreateHealer" && root === "StormHealingParent") return amounted(value("RechargeVitalRate"), "heal");
   const behavior = node.tag === "CEffectApplyBehavior" ? node.refs.Behavior?.[0] : undefined;
-  const label = behavior ? behaviorLabel(graph, behavior, appliedDuration(graph, behavior, node.id)) : null;
-  return label ? { label, amount: null } : null;
+  if (!behavior) return null;
+  const duration = appliedDuration(graph, behavior, node.id);
+  const label = behaviorLabel(graph, behavior, duration);
+  const adds =
+    parentChain(graph, behavior).includes("StormShield") || (number(graph, inheritedValue(graph, behavior, "MaxStackCount")) ?? 1) > 1;
+  const length = duration ?? tetheredLength(graph, behavior);
+  const lasts = adds || length === null || onCaster(graph, node.id) ? null : trimmed(length);
+  return label ? { label, amount: null, lasts } : null;
 }
 
 function same(a: { label: string; amount: number | null }, b: { label: string; amount: number | null }) {
@@ -246,7 +254,32 @@ function repeats(graph: EffectGraph, id: string) {
   return source !== null && (source.ownHits === null || source.ownHits > new Set(source.effects).size);
 }
 
+// Passes only for listed unit types or vehicles, e.g. bosses.
+function checksMapUnit(graph: EffectGraph, id: string, seen = new Set<string>()): boolean {
+  const node = graph.nodes.get(id);
+  if (!node || seen.has(id)) return false;
+  seen.add(id);
+  if (node.tag === "CValidatorUnitType") return true;
+  if (node.tag === "CValidatorUnitCompareBehaviorCount") return (node.refs.Behavior ?? []).some((b) => b.startsWith("GenericVehicleBehavior"));
+  if (node.tag !== "CValidatorCombine" || inheritedValue(graph, id, "Negate") === "1") return false;
+  const parts = node.refs.CombineArray ?? [];
+  return parts.length > 0 && parts.every((p) => checksMapUnit(graph, p, seen));
+}
+
+// Switch cases for bosses and vehicles stand in for the normal hit, e.g. flat damage in place of max health damage.
+function mapUnitCases(graph: EffectGraph, node: GraphNode) {
+  if (node.tag !== "CEffectSwitch") return new Set<string>();
+  const fallback = node.refs.CaseDefault ?? [];
+  return new Set(
+    node.elements
+      .filter((e) => e.tag === "CaseArray" && e.attrs.Effect && e.attrs.Validator && checksMapUnit(graph, e.attrs.Validator))
+      .map((e) => e.attrs.Effect)
+      .filter((id) => !fallback.includes(id)),
+  );
+}
+
 // Stops at applied behaviors and nested tickers; those tick on their own.
+// Only effects run their refs; an ability or behavior that shares an effect's id brings refs the effect does not run.
 export function reached(graph: EffectGraph, roots: string[]) {
   const out: { node: GraphNode; gates: string[]; checks: string[] }[] = [];
   const seen = new Set<string>();
@@ -260,13 +293,14 @@ export function reached(graph: EffectGraph, roots: string[]) {
       });
     out.push(...fresh);
     layer = fresh
-      .filter(({ node }) => node.tag !== "CEffectApplyBehavior" && !repeats(graph, node.id))
+      .filter(({ node }) => node.tag.startsWith("CEffect") && node.tag !== "CEffectApplyBehavior" && !repeats(graph, node.id))
       .flatMap(({ node, gates, checks }) => {
         const cases = caseGates(graph, node);
+        const special = mapUnitCases(graph, node);
         return walkRefs(node)
           .filter(([field]) => field !== "Behavior")
           .flatMap(([, ids]) =>
-            ids.map((id) => ({
+            ids.filter((id) => !special.has(id)).map((id) => ({
               id,
               gates: cases.has(id) ? [...gates, cases.get(id)!] : gates,
               checks: cases.has(id) ? [...checks, cases.get(id)!] : checks,
@@ -406,6 +440,14 @@ export function inheritedValueAttr(graph: EffectGraph, id: string, tag: string) 
 function endsWith(graph: EffectGraph, behaviorId: string, sourceId: string) {
   const ends = ["FinalEffect", "ExpireEffect"].flatMap((tag) => inheritedValue(graph, behaviorId, tag) ?? []);
   return ends.length > 0 && stops(graph, sourceId, ends);
+}
+
+// A behavior with no length of its own that ends with a timed one it needs, e.g. armor tied to a short area marker.
+function tetheredLength(graph: EffectGraph, behaviorId: string) {
+  const lengths = allValues(graph, behaviorId, "RemoveValidatorArray")
+    .flatMap((v) => requiredBehaviors(graph, v))
+    .flatMap((b) => appliedDuration(graph, b, undefined) ?? []);
+  return lengths.length > 0 ? Math.min(...lengths) : null;
 }
 
 // Behaviors a validator needs present, e.g. a channel that keeps a persistent alive.
@@ -590,6 +632,7 @@ function spaced(times: number[], lock: number | undefined) {
 interface Hits {
   label: string;
   amount: number | null;
+  lasts: number | null;
   amountMax?: number;
   gates: string[];
   times: number[];
@@ -610,6 +653,7 @@ function tickOf(source: Source, visit: Visit, hits: Hits, known: boolean, refres
     ...(hits.amountMax === undefined ? {} : { amountMax: hits.amountMax }),
     period,
     rate: trimmed(1 / period),
+    ...(hits.lasts !== null && hits.lasts >= period - EPSILON ? { lasts: hits.lasts } : {}),
     firstAt: times[0],
     count: known ? times.length : null,
     source: source.id,
@@ -651,6 +695,8 @@ export function abilityTicks(graph: EffectGraph, abilId: string): GatedTick[] {
     const chain = reached(graph, source.effects);
     // Behind a capped search, a lockout on the target caps each target, not the shots; the notes state the cap.
     const searched = chain.some(({ node }) => node.tag === "CEffectEnumArea" && capped(graph, node));
+    // An uncapped search keeps a status on everything in range, e.g. a slowing puddle.
+    const zone = chain.some(({ node }) => node.tag === "CEffectEnumArea" && !capped(graph, node));
     const initial = payloadsOf(graph, source.initial);
     const byEffect = new Map([...new Set(source.effects)].map((e) => [e, payloadsOf(graph, [e])]));
     const payloads = [...byEffect.values()].flat();
@@ -667,7 +713,8 @@ export function abilityTicks(graph: EffectGraph, abilId: string): GatedTick[] {
         const periodic = firing.map((h) => h.at);
         const atStart = initial.some((p) => same(p, payload));
         const times = spaced(atStart && periodic[0] !== 0 ? [0, ...periodic] : periodic, lock);
-        const base = { label: payload.label, amount: payload.amount, gates: payload.gates, node: payload.node };
+        const lasts = zone ? payload.lasts : null;
+        const base = { label: payload.label, amount: payload.amount, lasts, gates: payload.gates, node: payload.node };
         const window = modifierWindow(graph, payload.node, byId, [...visit.gates, ...payload.gates], source.id);
         if (!window) return [{ ...base, times }];
         return [
@@ -689,8 +736,13 @@ export function abilityTicks(graph: EffectGraph, abilId: string): GatedTick[] {
   return kept.filter((t, i) => kept.findIndex((u) => u.source === t.source && sameGated(u, t)) === i);
 }
 
-export function tickNote({ label, rate, count, firstAt, source }: AbilityTick): AbilityNote {
+// A status an area renews before it ends holds throughout; only how long it lingers matters.
+export function tickNote({ label, rate, count, firstAt, source, lasts }: AbilityTick): AbilityNote {
+  const capitalized = (text: string) => `${text[0].toUpperCase()}${text.slice(1)}`;
+  if (lasts !== undefined) {
+    return { label: `${capitalized(label.replace(`${lasts}s `, ""))} holds while in the area, lingers ${lasts}s after leaving`, source };
+  }
   const total = count ? ` (×${count})` : "";
   const first = firstAt > 0 ? `, first at ${firstAt}s` : "";
-  return { label: `${label[0].toUpperCase()}${label.slice(1)} tickrate: ${rate.toFixed(1)} per second${total}${first}`, source };
+  return { label: `${capitalized(label)} tickrate: ${rate.toFixed(1)} per second${total}${first}`, source };
 }

@@ -87,6 +87,7 @@ const XML = `<Catalog>
   <CValidatorUnitCompareBehaviorCount id="CasterNotRooted" parent="CasterNotParent"><Categories index="DebuffRoot" value="1" /></CValidatorUnitCompareBehaviorCount>
   <CValidatorUnitCompareBehaviorCount id="CasterNotFeared" parent="CasterNotParent"><Categories index="Fear" value="1" /></CValidatorUnitCompareBehaviorCount>
   <CValidatorUnitFilters id="CasterNotDazed"><WhichUnit Value="Caster" /><Filters value="-;Dazed" /></CValidatorUnitFilters>
+  <CValidatorUnitFilters id="CasterNotHallucination"><WhichUnit Value="Caster" /><Filters value="-;Hallucination" /></CValidatorUnitFilters>
   <CAbilEffectInstant id="Dash"><Effect value="DashSet" /></CAbilEffectInstant>
   <CEffectSet id="DashSet"><EffectArray value="DashApply" /><EffectArray value="DashGuardApply" /><EffectArray value="PuddleSearch" /></CEffectSet>
   <CEffectApplyBehavior id="DashApply"><WhichUnit Value="Caster" /><Behavior value="DashBuff" /></CEffectApplyBehavior>
@@ -94,6 +95,7 @@ const XML = `<Catalog>
   <CBehaviorBuff id="DashBuff">
     <RemoveValidatorArray value="CasterNotRooted" />
     <RemoveValidatorArray value="CasterNotDazed" />
+    <RemoveValidatorArray value="CasterNotHallucination" />
     <Modification><MoveSpeedMaximum value="10" /></Modification>
   </CBehaviorBuff>
   <CBehaviorBuff id="DashGuard">
@@ -104,6 +106,30 @@ const XML = `<Catalog>
     <SearchFilters value="-;Enemy" />
     <AreaArray Effect="BarrageHit"><Radius value="3" /></AreaArray>
   </CEffectEnumArea>
+
+  <CAbilEffectTarget id="Shot"><Effect value="ShotMissile" /></CAbilEffectTarget>
+  <CEffectLaunchMissile id="ShotMissile"><PeriodicValidator value="CasterNotDead" /><SearchEffect value="ShotSearch" /></CEffectLaunchMissile>
+  <CEffectEnumArea id="ShotSearch">
+    <TargetSorts><SortArray value="TSDistance" /></TargetSorts>
+    <AreaArray MaxCount="1" Effect="BarrageDamage"><Radius value="1" /></AreaArray>
+  </CEffectEnumArea>
+  <CAbilEffectInstant id="Seek"><Effect value="SeekSearch" /></CAbilEffectInstant>
+  <CEffectEnumArea id="SeekSearch">
+    <TargetSorts><SortArray value="TSDistance" /></TargetSorts>
+    <AreaArray MaxCount="1" Effect="BarrageDamage"><Radius value="12" /></AreaArray>
+  </CEffectEnumArea>
+  <CValidatorCombine id="CasterNotDazedOrRooted">
+    <Type value="And" /><CombineArray value="CasterNotDazed" /><CombineArray value="CasterNotRooted" />
+  </CValidatorCombine>
+  <CAbilEffectTarget id="Roll"><Effect value="RollMissile" /></CAbilEffectTarget>
+  <CEffectLaunchMissile id="RollMissile"><PeriodicValidator value="CasterNotDazedOrRooted" /><LaunchEffect value="RollGuardApply" /></CEffectLaunchMissile>
+  <CEffectApplyBehavior id="RollGuardApply"><WhichUnit Value="Caster" /><Behavior value="DashGuard" /></CEffectApplyBehavior>
+
+  <CBehaviorBuff id="StormStasisRemoved" />
+  <CAbilEffectTarget id="Clone"><Effect value="CloneSet" /></CAbilEffectTarget>
+  <CEffectSet id="CloneSet"><EffectArray value="CloneHideApply" /><EffectArray value="DashApply" /></CEffectSet>
+  <CEffectApplyBehavior id="CloneHideApply"><WhichUnit Value="Source" /><Behavior value="CloneHide" /></CEffectApplyBehavior>
+  <CBehaviorBuff id="CloneHide" parent="StormStasisRemoved" />
 </Catalog>`;
 
 function run(body: string) {
@@ -170,7 +196,26 @@ test("remove and disable validators read as end and pause conditions", () => {
 
 test("end conditions merge over the caster buffs; an unnamed excluded filter reads as never on", () => {
   const out = run(`process.stdout.write(JSON.stringify(abilityNotes(graph, "Dash", nameOf)));`) as { label: string; source: string }[];
-  assert.ok(out.some((n) => n.label === "Ends on root or fear." && n.source === "DashBuff"));
+  assert.ok(out.some((n) => n.label === "Ends on daze, root or fear." && n.source === "DashBuff"));
+});
+
+function labelsOf(abilId: string) {
+  return (run(`process.stdout.write(JSON.stringify(abilityNotes(graph, ${JSON.stringify(abilId)}, nameOf)));`) as { label: string }[]).map(
+    (n) => n.label,
+  );
+}
+
+test("a skillshot that hits the closest unit gets no priority note, nor a death end for its missile", () => {
+  assert.deepEqual(labelsOf("Shot"), []);
+  assert.deepEqual(labelsOf("Seek"), ["Hits 1 target, preferring the closest."]);
+});
+
+test("a missile that carries the hero ends the ability with the buffs it applies", () => {
+  assert.deepEqual(labelsOf("Roll"), ["Ends on daze, root or fear."]);
+});
+
+test("a hero that leaves the map gets no notes from its own buffs", () => {
+  assert.deepEqual(labelsOf("Clone"), []);
 });
 
 test("a lockout past a search for the caster's own units gets no note", () => {

@@ -2,6 +2,7 @@
 
 import type { AbilityNote } from "../types.ts";
 import type { EffectGraph, Element, GraphNode } from "./effect-graph/types.ts";
+import { findFirst } from "./effect-graph/traverse.ts";
 import { parentChain } from "./effect-graph/walk.ts";
 import { inheritedValue, number, ownGates, positive, walk, walkRefs, type Visit } from "./ability-geometry.ts";
 import { COMPARES, absentBehavior, inheritedValueAttr, lockout, onCaster, reached } from "./ability-ticks.ts";
@@ -60,7 +61,7 @@ const CATEGORY_STATES: Record<string, string> = {
   PushOrPull: "displacement",
 };
 
-const FILTER_STATES: Record<string, string> = { Dead: "death" };
+const FILTER_STATES: Record<string, string> = { Dead: "death", Dazed: "daze" };
 
 const STATE_ORDER = [...Object.values(FILTER_STATES), ...Object.values(CATEGORY_STATES)];
 
@@ -152,6 +153,9 @@ function sendsSummons(graph: EffectGraph, node: GraphNode) {
   return tags.has("CEffectCreateUnit") && tags.has("CEffectIssueOrder");
 }
 
+// Larger searches pick a target rather than detect a touch.
+const MAX_HITBOX = 2;
+
 function priorityNote(graph: EffectGraph, node: GraphNode) {
   if (node.tag !== "CEffectEnumArea" || !findsEnemies(graph, node.id) || sendsSummons(graph, node)) return null;
   const areaMax = node.elements.find((e) => e.tag === "AreaArray" && e.attrs.MaxCount)?.attrs.MaxCount;
@@ -160,6 +164,9 @@ function priorityNote(graph: EffectGraph, node: GraphNode) {
   if (max === null || phrases.length === 0) return null;
   const targets = max === 1 ? "target" : "targets";
   const verb = (node.refs.Effect ?? []).some((id) => graph.nodes.get(id)?.tag === "CEffectIssueOrder") ? "Attacks" : "Hits";
+  // A skillshot's hitbox hits the first unit it touches; saying so adds nothing. A wide search for the closest unit is a choice.
+  const radii = node.elements.filter((e) => e.tag === "AreaArray").map((a) => number(graph, findFirst(a.children, "Radius")?.attrs.value) ?? 0);
+  if (verb === "Hits" && max === 1 && phrases.join() === "the closest" && radii.every((r) => r <= MAX_HITBOX)) return null;
   if (phrases[0] === "random") return `${verb} ${max} random ${targets}.`;
   return `${verb} ${max} ${targets}, preferring ${phrases.filter((p) => p !== "random").join(", then ")}.`;
 }
@@ -201,6 +208,24 @@ function lockoutNote(graph: EffectGraph, node: GraphNode, path: string[]) {
   const guards = absent.some((b) => (absenceGates(graph).get(b) ?? []).some((id) => !appliesItself(graph, id, b)));
   const lock = locksOnly && !guards ? undefined : lockout(graph, chain, absent);
   return lock && lock >= MIN_LOCKOUT ? `Hits each target at most once per ${trimmed(lock)}s.` : null;
+}
+
+// A missile that moves the hero, e.g. a dash, stops when the hero is rooted; its periodic validator ends the travel.
+function carriesCaster(graph: EffectGraph, visit: Visit) {
+  const validator = graph.nodes.get(visit.id)!.tag.startsWith("CEffectLaunchMissile")
+    ? inheritedValue(graph, visit.id, "PeriodicValidator")
+    : null;
+  return validator !== null && (failingStates(graph, [validator])?.failing.includes("root") ?? false);
+}
+
+// The hero leaves the map and controls another unit, e.g. Ultimate Evolution's clone; its own buffs say nothing about that unit.
+function removesCaster(graph: EffectGraph, visit: Visit) {
+  const applier = visit.path.at(-1);
+  return (
+    parentChain(graph, visit.id).includes("StormStasisRemoved") &&
+    applier !== undefined &&
+    ["Caster", "Source"].includes(inheritedValueAttr(graph, applier, "WhichUnit") ?? "")
+  );
 }
 
 function isCasterBuff(graph: EffectGraph, visit: Visit) {
@@ -276,7 +301,7 @@ function formulaOf(graph: EffectGraph, id: string, seen = new Set<string>()): Fo
       .map((s) => s.split(",").filter((f) => f && f !== "-"));
     if (required.length + excluded.length === 0 || required.some((f) => !FILTER_STATES[f])) return null;
     const need = required.map((f) => FILTER_STATES[f]);
-    // An unnamed excluded flag, e.g. Dazed, reads as never on.
+    // An unnamed excluded flag, e.g. Hallucination, reads as never on.
     const deny = excluded.flatMap((f) => FILTER_STATES[f] ?? []);
     return { test: (on) => need.every((s) => on.has(s)) && deny.every((s) => !on.has(s)), states: [...need, ...deny] };
   }
@@ -311,13 +336,22 @@ function inert(graph: EffectGraph, id: string) {
   });
 }
 
-// One sentence over all buffs: the ability ends when any of them ends. Buffs with an unnamed validator are left out.
-// The source is the first buff that ends on its own, so a buff shared by sibling abilities does not claim the note.
+function endValidators(graph: EffectGraph, node: GraphNode) {
+  if (!node.tag.startsWith("CBehavior")) return [inheritedValue(graph, node.id, "PeriodicValidator") ?? []].flat();
+  return allValues(graph, node.id, "RemoveValidatorArray");
+}
+
+function pauseValidators(graph: EffectGraph, node: GraphNode) {
+  return node.tag.startsWith("CBehavior") ? allValues(graph, node.id, "DisableValidatorArray") : [];
+}
+
+// One sentence over all buffs and dash missiles: the ability ends when any of them ends. Ones with an unnamed validator
+// are left out. The source is the first that ends on its own, so a buff shared by sibling abilities does not claim the note.
 function endNotes(graph: EffectGraph, nodes: GraphNode[]) {
   const live = nodes.filter((n) => !inert(graph, n.id));
-  const sentence = (verb: string, tag: string, skip?: string) => {
+  const sentence = (verb: string, validatorsOf: (node: GraphNode) => string[], skip?: string) => {
     const named = live
-      .map((node) => ({ node, validators: allValues(graph, node.id, tag) }))
+      .map((node) => ({ node, validators: validatorsOf(node) }))
       .filter(({ validators }) => validators.every((v) => formulaOf(graph, v) !== null));
     const found = failingStates(graph, named.flatMap((n) => n.validators));
     const failing = found?.failing.filter((s) => s !== skip) ?? [];
@@ -328,8 +362,8 @@ function endNotes(graph: EffectGraph, nodes: GraphNode[]) {
   };
   // A dead unit's buffs stop anyway, so "pauses during death" says nothing.
   return [
-    sentence("Ends on", "RemoveValidatorArray"),
-    sentence("Pauses during", "DisableValidatorArray", "death"),
+    sentence("Ends on", (node) => endValidators(graph, node)),
+    sentence("Pauses during", (node) => pauseValidators(graph, node), "death"),
   ];
 }
 
@@ -339,9 +373,12 @@ export function abilityNotes(graph: EffectGraph, abilId: string, nameOf: NameOf)
   const leastGated = visits.filter((v) => !visits.some((w) => w.id === v.id && w.gates.length < v.gates.length));
   const note = (label: string | null, node: GraphNode, gates: string[]) =>
     label ? [{ label, source: node.id, gates, hitGates: ownGates(graph, node) }] : [];
-  const buffs = leastGated.filter((v) => isCasterBuff(graph, v));
+  const buffs = [...leastGated.filter((v) => isCasterBuff(graph, v)), ...leastGated.filter((v) => carriesCaster(graph, v))];
+  const removed = new Set(leastGated.filter((v) => removesCaster(graph, v)).map((v) => v.gates.join()));
   // Buff notes merge per gate set, e.g. a form or a dash with several buffs.
-  const groups = [...new Set(buffs.map((v) => v.gates.join()))].map((key) => buffs.filter((v) => v.gates.join() === key));
+  const groups = [...new Set(buffs.map((v) => v.gates.join()))]
+    .filter((key) => !removed.has(key))
+    .map((key) => buffs.filter((v) => v.gates.join() === key));
   const notes = [
     ...groups.flatMap((group) => {
       const nodes = group.map((v) => graph.nodes.get(v.id)!);
