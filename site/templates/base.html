@@ -150,6 +150,7 @@
       </a>
     </p>
     <p>&copy; {{ now() | date(format="%Y") }} HotSixors</p>
+    {% if build_info %}<p>Patch {{ build_info.game_version }}</p>{% endif %}
     <p>&copy; 2014 Blizzard Entertainment, Inc. All rights reserved. Heroes of the Storm is a trademark of Blizzard Entertainment, Inc.</p>
   </footer>
   {% set bundles = load_data(path="data/bundles.json") %}
