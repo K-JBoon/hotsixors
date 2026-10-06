@@ -6,6 +6,7 @@
 {%- if label == "" -%}{%- set label = entry | get(key="abilityType", default="") -%}{%- endif -%}
 {%- set desc = entry | get(key="shortDesc", default="") -%}
 {%- set mana = entry | get(key="manaCost", default=0) -%}
+{%- if entry.costText -%}{%- set mana = entry.costText -%}{%- endif -%}
 {%- set cd = entry | get(key="cooldown", default=0) -%}
 <div class="ability-card ability-card--guide" id="ability-{{ id }}">
   {%- if entry.icon -%}
@@ -17,7 +18,7 @@
       {% if label %}<span class="ability-card__type badge badge--type">{{ label }}</span>{% endif %}
       {% if entry.xmlPath %}<a class="ability-card__xml-link" href="/gamedata/{{ entry.xmlPath }}/{% if entry.anchor %}#{{ entry.anchor }}{% endif %}" data-datamining>XML</a>{% endif %}
     </div>
-    {% if mana or cd %}<p class="ability-card__meta">{% if mana %}<span class="ability-card__meta-item"><span class="ability-card__meta-label">Mana</span> {{ mana }}</span>{% endif %}{% if cd %}<span class="ability-card__meta-item"><span class="ability-card__meta-label">Cooldown</span> {{ cd }}s</span>{% endif %}</p>{% endif %}
+    {% if mana or cd %}<p class="ability-card__meta">{% if mana %}<span class="ability-card__meta-item"><span class="ability-card__meta-label">{{ entry | get(key="costKind", default="Mana") }}</span> {{ mana }}</span>{% endif %}{% if cd %}<span class="ability-card__meta-item"><span class="ability-card__meta-label">Cooldown</span> {{ cd }}s</span>{% endif %}</p>{% endif %}
     {% if desc %}<p class="ability-card__desc">{{ desc }}</p>{% endif %}
   </div>
 </div>

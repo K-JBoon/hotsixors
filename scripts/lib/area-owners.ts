@@ -267,6 +267,8 @@ function placeArea(
   const repeatsHome = elsewhere?.stats?.radius != null && elsewhere.stats.radius === base.radius;
   return gatedTargets(graph, reverseRefs, index, owner, area.gates, area.source, [], place)
     .filter((t) => !t.plain || !(base.label === "Buff area" || repeatsStat))
+    // A state that keeps the size the card already shows does not change the area.
+    .filter((t) => !t.prefix || t.variant || !repeatsStat)
     .filter((t) => t.nameId !== elsewhere?.nameId || !repeatsHome)
     .map((t) => ({ nameId: t.nameId, area: prefixed(base, t.prefix), owner: owner.nameId, variant: t.variant }));
 }

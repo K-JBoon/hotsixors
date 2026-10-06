@@ -1104,9 +1104,15 @@ $unit-panel-label-min: 22rem;
   padding: 0 0.4rem; border-radius: 3px;
   font-size: 0.78rem; font-weight: 600; font-variant-numeric: tabular-nums; color: #f2fff0;
   &--life { background: #3a7d22; border: 1px solid #6dbb3f; }
+  &--shield { background: #4a525b; border: 1px solid #e8eef4; }
   &--invulnerable { background: $bg-panel; border: 1px solid $border-dim; color: $text-muted; }
-  &--resource { background: #2a5d9f; border: 1px solid $accent-blue; }
-  &__kind { font-weight: 400; opacity: 0.8; }
+  &--resource { background: #244f88; border: 1px solid $accent-blue; }
+  &--yellow { background: #6e520c; border-color: #e3b93c; }
+  &--orange { background: #7a3b0c; border-color: #f0892c; }
+  &--pink { background: #8f2a66; border-color: #f06bb5; }
+  &--red { background: #8a1f1f; border-color: #e04848; }
+  &--magenta { background: #851f85; border-color: #f143f1; }
+  &__kind { font-weight: 400; }
   &__regen--decay { color: #ffb3a8; }
   .storm-scale { color: inherit; border-bottom-color: rgba(255, 255, 255, 0.5); }
 }

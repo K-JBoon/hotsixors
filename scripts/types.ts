@@ -43,6 +43,8 @@ export interface AbilityNote {
 
 export interface AbilityStats {
   manaCost: number | null;
+  costKind?: string;
+  costText?: string;                // tooltip cost, e.g. "6 per second"
   cooldown: number | null;          // Cooldown.TimeUse, the GCD between charge uses; null when not present
   castIntroTime: number | null;     // seconds before the ability fires
   castFinishTime: number | null;    // seconds of animation lock after firing
@@ -115,7 +117,10 @@ export interface HeroUnitData {
   sight?: number;
   radius?: number;
   life?: HeroLifeData;
+  shield?: HeroShieldData;
   energy?: HeroResourceData;
+  energyType?: string;
+  energyTone?: string;
   weapons?: HeroWeaponData[];
   portraits?: HeroPortraits;
 }
@@ -125,6 +130,10 @@ export interface HeroLifeData {
   scale?: number;
   regenRate: number;
   regenScale?: number;
+}
+
+export interface HeroShieldData extends HeroLifeData {
+  regenDelay?: number;
 }
 
 export interface HeroResourceData {
@@ -165,12 +174,17 @@ export interface HeroData {
   sight?: number;
   radius?: number;
   life?: HeroLifeData;
+  shield?: HeroShieldData;
   energy?: HeroResourceData;
+  energyType?: string;
+  energyTone?: string;
   weapons?: HeroWeaponData[];
 }
 
 export interface HeroStatsResource {
   kind: string; // "Mana" | "Energy" | "Fury" | "Brew" | etc.
+  tone: string | null;
+  flatPerLevel: boolean;
   amount: number;
   regenRate: number | null;
 }
@@ -180,6 +194,10 @@ export interface HeroStatsLife {
   scale: number;
   regenRate: number;
   regenScale: number;
+}
+
+export interface HeroStatsShield extends HeroStatsLife {
+  regenDelay: number;
 }
 
 export interface HeroStatsWeapon {
@@ -205,6 +223,7 @@ export interface HeroStatsMissilePhase {
 
 export interface HeroStats {
   life: HeroStatsLife;
+  shield: HeroStatsShield | null;
   resource: HeroStatsResource | null;
   weapon: HeroStatsWeapon | null;
   speed: number;
@@ -238,8 +257,9 @@ export interface Gamestrings {
     description?: Record<string, string>;
     expandedRole?: Record<string, string>;
     roles?: Record<string, string[]>;
+    energyType?: Record<string, string>;
   };
-  unit: { name: Record<string, string> };
+  unit: { name: Record<string, string>; energyType?: Record<string, string> };
   skin: { infoText: Record<string, string> };
 }
 
@@ -266,6 +286,8 @@ export interface ShortcodeEntry {
   abilityType: string;
   shortDesc: string;
   manaCost: number | null;
+  costKind: string;
+  costText: string;
   cooldown: number | null;          // displayed cooldown: chargeTimeUse if present, else cooldown
   xmlPath: string;
   anchor: string;

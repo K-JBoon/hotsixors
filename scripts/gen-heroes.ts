@@ -1,11 +1,13 @@
 import { readFile, readdir, stat } from "node:fs/promises";
 import * as path from "node:path";
 import type {
+  AbilityStats,
   AnchorMap,
   Gamestrings,
   HeroData,
   HeroLifeData,
   HeroResourceData,
+  HeroShieldData,
   HeroStats,
   HeroUnitData,
   HeroUnitStats,
@@ -33,9 +35,11 @@ import {
   type BuffModification,
 } from "./lib/weapon-timing.ts";
 import { frontmatter } from "./lib/frontmatter.ts";
+import { findHeroSelectExtras, withHeroSelectExtras } from "./lib/hero-select-extras.ts";
+import { gatedBy } from "./lib/ability-phases.ts";
 import { runScript } from "./lib/script.ts";
 import { loadDataFile, loadGamestrings } from "./lib/heroes-data.ts";
-import { buildEffectGraph } from "./lib/effect-graph/index.ts";
+import { buildEffectGraph, type EffectGraph } from "./lib/effect-graph/index.ts";
 import { buildReverseRefs } from "./lib/effect-graph/walk.ts";
 import { createDeadGates, createReachability } from "./lib/ability-reachability.ts";
 import { heroSummons, type Summon, type SummonEntry } from "./lib/hero-summons.ts";
@@ -183,14 +187,36 @@ interface HeroStatsSource {
   speed?: number;
   radius?: number;
   life?: HeroLifeData;
+  shield?: HeroShieldData;
   energy?: HeroResourceData;
+  energyType?: string;
+  energyTone?: string;
   weapons?: HeroWeaponData[];
 }
 
-// Detects which resource pool the hero uses.
-const RESOURCE_KINDS: Array<{ field: keyof HeroStatsSource; label: string }> = [
-  { field: "energy", label: "Energy" },
-];
+// In-game resource bar colors. Heroes not listed use the mana blue.
+const RESOURCE_TONES: Record<string, string> = {
+  Auriel: "yellow",
+  Barbarian: "orange",
+  Chen: "yellow",
+  Deathwing: "orange",
+  DVa: "pink",
+  Hogger: "red",
+  Junkrat: "orange",
+  Medic: "yellow",
+  Tinker: "orange",
+  Valeera: "yellow",
+  Zarya: "magenta",
+};
+
+export function withResourceType(gs: Gamestrings, heroName: string, hero: HeroData): HeroData {
+  const energyType = gs.hero.energyType?.[heroName];
+  const energyTone = RESOURCE_TONES[heroName];
+  const heroUnits = hero.heroUnits && Object.fromEntries(
+    Object.entries(hero.heroUnits).map(([id, unit]) => [id, { ...unit, energyType: gs.unit.energyType?.[id] ?? energyType, energyTone }]),
+  );
+  return { ...hero, energyType, energyTone, heroUnits };
+}
 
 export interface CatalogLookup {
   weaponTiming: (weaponId: string) => HeroStatsWeaponTiming | null;
@@ -215,19 +241,26 @@ export function buildHeroStats(hero: HeroStatsSource, catalog: CatalogLookup = N
     regenRate: hero.life.regenRate,
     regenScale: hero.life.regenScale ?? 0,
   };
+  const shield = hero.shield ? {
+    amount: hero.shield.amount,
+    scale: hero.shield.scale ?? 0,
+    regenRate: hero.shield.regenRate,
+    regenScale: hero.shield.regenScale ?? 0,
+    regenDelay: hero.shield.regenDelay ?? 0,
+  } : null;
 
   let resource: HeroStats["resource"] = null;
-  for (const { field, label } of RESOURCE_KINDS) {
-    const r = hero[field] as HeroResourceData | undefined;
-    if (r && typeof r.amount === "number") {
-      // Casters are signalled by a scaling link containing "Mana".
-      let kind = label;
-      if (field === "energy") {
-        kind = (hero.scalingLinkIds ?? []).some((id) => id.includes("Mana")) ? "Mana" : "Energy";
-      }
-      resource = { kind, amount: r.amount, regenRate: r.regenRate ?? null };
-      break;
-    }
+  const r = hero.energy;
+  if (r && typeof r.amount === "number") {
+    // Mana that grows per level comes with a scaling link containing "Mana".
+    const flatPerLevel = (hero.scalingLinkIds ?? []).some((id) => id.includes("Mana"));
+    resource = {
+      kind: hero.energyType ?? (flatPerLevel ? "Mana" : "Energy"),
+      tone: hero.energyTone ?? null,
+      flatPerLevel,
+      amount: r.amount,
+      regenRate: r.regenRate ?? null,
+    };
   }
 
   let weapon: HeroStats["weapon"] = null;
@@ -243,7 +276,7 @@ export function buildHeroStats(hero: HeroStatsSource, catalog: CatalogLookup = N
     };
   }
 
-  return { life, resource, weapon, speed: hero.speed ?? 0, radius: hero.radius ?? 0 };
+  return { life, shield, resource, weapon, speed: hero.speed ?? 0, radius: hero.radius ?? 0 };
 }
 
 function shouldPreferHeroUnitStats(stats: HeroStats | null, hero: HeroData): boolean {
@@ -387,8 +420,10 @@ async function resolveSubAbilityGroups(
   ctx: HeroContext,
   resolve: ResolveEntry,
   isUnreachable: (abilityId: string, buttonId: string) => boolean,
-): Promise<SubAbilityGroup[]> {
-  const out: SubAbilityGroup[] = [];
+  graph: EffectGraph,
+): Promise<{ groups: SubAbilityGroup[]; phases: AbilityPhase[] }> {
+  const groups: SubAbilityGroup[] = [];
+  const phases: AbilityPhase[] = [];
   for (const [parentKey, categories] of Object.entries(hero.subAbilities ?? {})) {
     const { parentNameId, parentButtonId, parentAbilityType } = parseSubAbilityParentKey(parentKey);
     // Dismount is the only thing under Mount, and it says nothing.
@@ -399,14 +434,57 @@ async function resolveSubAbilityGroups(
     for (const [category, entries] of Object.entries(categories)) {
       for (const ab of entries) {
         if (SUB_ABILITY_EXCLUDE_IDS.has(entryNameId(ab)) || isUnreachable(ab.abilityId, ab.buttonId)) continue;
-        abilities.push(await resolve(ab, categorySlug(category), ctx, "ability"));
+        const gate = gatedBy(graph, parentKey.split("|")[0], ab.abilityId);
+        if (gate === "disabled") continue;
+        const resolved = await resolve(ab, categorySlug(category), ctx, "ability", { costless: gate === "free" });
+        if (gate === "phase" && ab.buttonId === parentButtonId) phases.push({ parentNameId, ability: resolved });
+        else abilities.push(resolved);
       }
     }
     if (!abilities.length) continue;
     const isSecondary = abilities.every((ab) => isSecondaryAbility(ab.nameId, parentNameId));
-    out.push({ parentNameId, parentButtonId, parentAbilityType, parentLabel, abilities, isSecondary });
+    groups.push({ parentNameId, parentButtonId, parentAbilityType, parentLabel, abilities, isSecondary });
   }
-  return out;
+  return { groups, phases };
+}
+
+interface AbilityPhase {
+  parentNameId: string;
+  ability: ResolvedAbility;
+}
+
+function uniqueByJson<T>(items: T[]): T[] {
+  return [...new Map(items.map((item) => [JSON.stringify(item), item])).values()];
+}
+
+function fillStats(parent: AbilityStats, phase: AbilityStats): AbilityStats {
+  const filled = Object.entries(parent).map(([key, value]) => [key, value ?? phase[key as keyof AbilityStats]]);
+  return { ...Object.fromEntries(filled), sources: { ...phase.sources, ...parent.sources } } as AbilityStats;
+}
+
+// A same-button follow-up cast (channel release) folds into its parent card.
+// Stats fold before area placement, so placement sees the sizes the card shows.
+function withPhaseStats(parent: ResolvedAbility, phase: ResolvedAbility): ResolvedAbility {
+  const stats = parent.stats && phase.stats ? fillStats(parent.stats, phase.stats) : parent.stats ?? phase.stats;
+  return { ...parent, stats };
+}
+
+function withPhaseDetails(parent: ResolvedAbility, phase: ResolvedAbility): ResolvedAbility {
+  return {
+    ...parent,
+    areas: uniqueByJson([...parent.areas, ...phase.areas]),
+    notes: uniqueByJson([...parent.notes, ...phase.notes]),
+  };
+}
+
+function mergePhases(
+  abilities: ResolvedAbility[],
+  phases: AbilityPhase[],
+  merge: (parent: ResolvedAbility, phase: ResolvedAbility) => ResolvedAbility,
+): ResolvedAbility[] {
+  return abilities.map((ab) =>
+    phases.filter((p) => p.parentNameId === ab.nameId).reduce((acc, p) => merge(acc, p.ability), ab)
+  );
 }
 
 // Every hero unit's abilities are resolved so they land in shortcode-data (the
@@ -572,8 +650,8 @@ async function addGamedataAliases(aliases: Record<string, string[]>): Promise<vo
 
 async function main(): Promise<void> {
   console.log(`gen-heroes: using version ${gameVersion(await readHdpInfo())}`);
-  const heroData = (await loadDataFile<Record<string, HeroData>>("herodata")).items;
-  const gs = (await loadGamestrings<Gamestrings>()).items;
+  const parsedHeroData = (await loadDataFile<Record<string, HeroData>>("herodata")).items;
+  const parsedGs = (await loadGamestrings<Gamestrings>()).items;
   const unitData = (await loadDataFile<Record<string, SummonUnitData>>("unitdata")).items;
 
   const anchorMap = await readJsonSafe<AnchorMap>(path.join(SITE_DATA, "anchor-map.json"));
@@ -584,7 +662,10 @@ async function main(): Promise<void> {
 
   const SITE_DATA_HEROES = path.join(SITE_DATA, "heroes");
 
-  const catalogIndex = buildCatalogIndex(await loadWeaponCatalogFiles());
+  const catalogFiles = await loadWeaponCatalogFiles();
+  const catalogIndex = buildCatalogIndex(catalogFiles);
+  const extras = await findHeroSelectExtras(catalogFiles, parsedHeroData, parsedGs, catalogIndex);
+  const { heroData, gs } = withHeroSelectExtras(parsedHeroData, parsedGs, extras);
   const catalog: CatalogLookup = {
     weaponTiming: (id) => readWeaponTiming(catalogIndex, id),
     weaponDamageMultiplier: (id) => readWeaponDamageMultiplier(catalogIndex, id),
@@ -601,20 +682,23 @@ async function main(): Promise<void> {
   const { resolveEntry, shortcodeData, abilityDescriptions, missingIcons, foundAreas, foundTicks, foundNotes } =
     createEntryResolver(gs, anchorMap ?? {}, declAnchorMap ?? {}, graph);
 
-  for (const [heroName, hero] of Object.entries(heroData)) {
+  for (const [heroName, rawHero] of Object.entries(heroData)) {
+    const hero = withResourceType(gs, heroName, rawHero);
     const slug = heroPageSlug(heroName, hero);
     const displayName = heroPageDisplayName(gs, heroName, hero.hyperlinkId);
-    const ctx: HeroContext = { slug, displayName };
+    const ctx: HeroContext = { slug, displayName, resourceKind: hero.energyType ?? "Mana" };
 
     await copyPortraits(hero);
-    const abilities = await resolveAbilities(hero, ctx, resolveEntry);
+    const resolvedAbilities = await resolveAbilities(hero, ctx, resolveEntry);
     const talents = await resolveTalents(hero, ctx, resolveEntry);
-    const subAbilityGroups = await resolveSubAbilityGroups(hero, gs, ctx, resolveEntry, isUnreachable);
+    const { groups: subAbilityGroups, phases } = await resolveSubAbilityGroups(hero, gs, ctx, resolveEntry, isUnreachable, graph);
+    const abilities = mergePhases(resolvedAbilities, phases, withPhaseStats);
     const heroUnitAbilities = await resolveHeroUnits(hero, gs, ctx, resolveEntry);
 
     const kitEntries = [
       ...abilities,
       ...subAbilityGroups.flatMap((g) => g.abilities),
+      ...phases.map((p) => p.ability),
       ...heroUnitAbilities.flatMap((u) => u.abilities),
     ];
     const sources = new Map<string, ResolvedAbility>([...kitEntries, ...talents].map((e) => [e.nameId, e]));
@@ -648,7 +732,7 @@ async function main(): Promise<void> {
     const unitStats = await keepExistingPortraits(buildHeroUnitStats(hero, gs, stats, catalog));
     await writeJson(
       path.join(SITE_DATA_HEROES, `${slug}.json`),
-      { stats, portrait: heroPortrait(hero), unitStats, abilities, subAbilityGroups, heroUnitAbilities, summons, talents },
+      { stats, portrait: heroPortrait(hero), unitStats, abilities: mergePhases(abilities, phases, withPhaseDetails), subAbilityGroups, heroUnitAbilities, summons, talents },
       2,
     );
     console.log(`gen-heroes: wrote data/heroes/${slug}.json`);

@@ -43,6 +43,11 @@ export function getAbilityFullDesc(gs: Gamestrings, linkId: string): string {
   return textSection(gs, linkId).fullText[linkId] ?? "";
 }
 
+export function getAbilityCostText(gs: Gamestrings, linkId: string): string {
+  const text = textSection(gs, linkId).energyText?.[linkId];
+  return text ? stripMarkup(text).replace(/^[^:]+:\s*/, "").trim() : "";
+}
+
 export function splitCamelCase(id: string): string {
   return id.replace(/([a-z])([A-Z])/g, "$1 $2");
 }

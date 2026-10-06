@@ -141,6 +141,12 @@ function numberField(index: CatalogIndex, family: Family, id: string, field: str
   return resolveNumber(fieldNode(index, family, id, field)?.attrs.value ?? null, index.consts);
 }
 
+/** Numeric field by gamestring catalog name ("Behavior", "Effect", ...). */
+export function readCatalogNumber(index: CatalogIndex, catalog: string, id: string, field: string): number | null {
+  const family = familyOf(`C${catalog}`);
+  return family ? numberField(index, family, id, field) : null;
+}
+
 function effectTag(index: CatalogIndex, id: string): string | null {
   return index.entries.get(`CEffect:${id}`)?.[0]?.tag ?? null;
 }

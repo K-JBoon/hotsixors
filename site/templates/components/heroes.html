@@ -156,8 +156,8 @@
       </div>
       {% endif %}
       {% if st.resource %}
-      <div class="unit-bar unit-bar--resource" title="{{ st.resource.kind }}">
-        <span>{{ st.resource.amount | round }}</span>
+      <div class="unit-bar unit-bar--resource{% if st.resource.tone %} unit-bar--{{ st.resource.tone }}{% endif %}" title="{{ st.resource.kind }}">
+        <span>{{ st.resource.amount | round | int }}</span>
       </div>
       {% endif %}
     </div>
@@ -198,18 +198,24 @@
 {% set tm = w and w.timing | default(value=false) %}
 {% set windup = tm and tm.damagePoint is number %}
 {% set missile = tm and tm.missilePhases %}
-{% set flat = st.resource and st.resource.kind == "Mana" %}
+{% set flat = st.resource and st.resource.flatPerLevel %}
 <article class="unit-strip">
   {% if portrait %}{{<images.optimized path={'images/' ~ portrait} class="unit-strip__portrait" alt="" width={128} height={128} op="fit" display_width={64} display_height={64} loading="lazy" />}}{% endif %}
   <div class="unit-strip__vitals">
     <h3 class="unit-strip__name{% if solo %} visually-hidden{% endif %}">{{ name }}</h3>
+    {% if st.shield %}
+    <div class="unit-bar unit-bar--shield" title="Shields{% if st.shield.scale > 0 %}, +{{ (st.shield.scale * 100) | round }}% per level{% endif %}{% if st.shield.regenDelay %}, regenerate after {{ st.shield.regenDelay }}s without damage{% endif %}">
+      <span><span class="unit-bar__kind">Shields</span> <span class="storm-scale" data-base="{{ st.shield.amount }}" data-scale="{{ st.shield.scale }}" data-round="up">{{ st.shield.amount | round | int }}</span></span>
+      {% if st.shield.regenRate %}<span class="unit-bar__regen"><span class="storm-scale" data-base="{{ st.shield.regenRate }}" data-scale="{{ st.shield.regenScale }}" data-decimals="0">{{ st.shield.regenRate | round | int }}</span>/s</span>{% endif %}
+    </div>
+    {% endif %}
     <div class="unit-bar unit-bar--life" title="Health{% if st.life.scale > 0 %}, +{{ (st.life.scale * 100) | round }}% per level{% endif %}">
       <span class="storm-scale" data-base="{{ st.life.amount }}" data-scale="{{ st.life.scale }}" data-round="up">{{ st.life.amount | round }}</span>
       {% if st.life.regenRate %}<span class="unit-bar__regen{% if st.life.regenRate < 0 %} unit-bar__regen--decay{% endif %}"><span class="storm-scale" data-base="{{ st.life.regenRate }}" data-scale="{{ st.life.regenScale }}" data-decimals="2" data-per-tick>{{ st.life.regenRate | round(precision=2) }}</span>/s</span>{% endif %}
     </div>
     {% if st.resource %}
-    <div class="unit-bar unit-bar--resource" title="{{ st.resource.kind }}">
-      <span><span class="unit-bar__kind">{{ st.resource.kind }}</span> <span{% if flat %} data-flat-per-level="Mana"{% endif %}>{{ st.resource.amount | round }}</span></span>
+    <div class="unit-bar unit-bar--resource{% if st.resource.tone %} unit-bar--{{ st.resource.tone }}{% endif %}" title="{{ st.resource.kind }}">
+      <span><span class="unit-bar__kind">{{ st.resource.kind }}</span> <span{% if flat %} data-flat-per-level="Mana"{% endif %}>{{ st.resource.amount | round | int }}</span></span>
       {% if st.resource.regenRate %}<span class="unit-bar__regen"><span{% if flat %} data-flat-per-level="Mana Regen"{% endif %}>{{ st.resource.regenRate | round(precision=2) }}</span>/s</span>{% endif %}
     </div>
     {% endif %}
@@ -266,9 +272,10 @@
     {{<images.optimized path={'images/abilitytalents/' ~ ab.icon} class="ability-card__icon" alt="" width={44} height={44} op="fill" display_width={44} display_height={44} loading="lazy" />}}
     <div class="ability-card__title">
       <span class="ability-card__name">{{ ab.name }}</span>
-      {% if st and (st.manaCost or st.chargeTimeUse or st.cooldown) %}
+      {% set cost = false %}{% if st %}{% set cost = st.manaCost %}{% if st.costText %}{% set cost = st.costText %}{% endif %}{% endif %}
+      {% if st and (cost or st.chargeTimeUse or st.cooldown) %}
       <p class="ability-card__meta">
-        {% if st.manaCost %}<span class="ability-card__meta-item"><span class="ability-card__meta-label">Mana</span> {{ st.manaCost }}</span>{% endif %}
+        {% if cost %}<span class="ability-card__meta-item"><span class="ability-card__meta-label">{{ st.costKind | default(value="Mana") }}</span> {{ cost }}</span>{% endif %}
         {% if st.chargeTimeUse %}<span class="ability-card__meta-item"><span class="ability-card__meta-label">{% if st.chargeCountMax > 1 %}Charge CD{% else %}Cooldown{% endif %}</span> {{ st.chargeTimeUse }}s</span>{% elif st.cooldown %}<span class="ability-card__meta-item"><span class="ability-card__meta-label">Cooldown</span> {{ st.cooldown }}s</span>{% endif %}
       </p>
       {% endif %}

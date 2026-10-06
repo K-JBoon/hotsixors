@@ -25,6 +25,7 @@ import type { EffectGraph } from "./effect-graph/index.ts";
 import {
   PASSIVE_ABILITY_ID,
   entryNameId,
+  getAbilityCostText,
   getAbilityFullDesc,
   getAbilityName,
   nameByAbilId,
@@ -36,6 +37,7 @@ import {
 export interface HeroContext {
   slug: string;
   displayName: string;
+  resourceKind: string;
 }
 
 export interface ResolvedAbility {
@@ -90,7 +92,8 @@ export type ResolveEntry = (
   entry: HeroAbility | HeroTalent,
   category: string,
   ctx: HeroContext,
-  type: "ability" | "talent"
+  type: "ability" | "talent",
+  opts?: { costless?: boolean },
 ) => Promise<ResolvedAbility>;
 
 // Reports whether the image was available.
@@ -158,7 +161,7 @@ export function createEntryResolver(
   }
 
   // Talents have no XML stats.
-  const resolveEntry: ResolveEntry = async (entry, category, ctx, type) => {
+  const resolveEntry: ResolveEntry = async (entry, category, ctx, type, opts) => {
     const nameId = entryNameId(entry);
 
     const hasIcon = await copyImageIfExists(
@@ -181,8 +184,10 @@ export function createEntryResolver(
     if (ticks.length > 0) foundTicks.set(nameId, ticks);
     const notes = graph ? abilityNotes(graph, nameId, (id) => nameByAbilId(gs, id)) : [];
     if (notes.length > 0) foundNotes.set(nameId, notes);
-    const stats = xmlData
-      ? { ...parseAbilityStats(xmlData.xml, nameId, xmlData.xmlPath), ...geometry, range: scriptRange(nameId) ?? range }
+    const xmlStats = xmlData ? parseAbilityStats(xmlData.xml, nameId, xmlData.xmlPath) : null;
+    const costText = opts?.costless || xmlStats?.manaCost != null ? "" : getAbilityCostText(gs, entry.linkId);
+    const stats = xmlStats
+      ? { ...xmlStats, ...geometry, range: scriptRange(nameId) ?? range, costKind: ctx.resourceKind, costText }
       : null;
 
     const anchor = declAnchor(nameId);
@@ -195,6 +200,8 @@ export function createEntryResolver(
       abilityType: entry.abilityType ?? "",
       shortDesc,
       manaCost: stats ? stats.manaCost : null,
+      costKind: ctx.resourceKind,
+      costText,
       cooldown: stats ? (stats.chargeTimeUse ?? stats.cooldown) : null,
       xmlPath: anchor ? anchor.xmlPath : "",
       anchor: anchor ? nameId : "",
