@@ -1,4 +1,4 @@
-import { readFile, readdir } from "node:fs/promises";
+import { readFile, readdir, stat } from "node:fs/promises";
 import * as path from "node:path";
 import type {
   AnchorMap,
@@ -14,6 +14,7 @@ import type {
 } from "./types.ts";
 import {
   HEROES_IMAGES_DIR,
+  CASC_PORTRAITS_DIR,
   GAMEDATA_DIR,
   SITE_CONTENT_HEROES,
   SITE_STATIC_IMAGES,
@@ -81,11 +82,27 @@ const HERO_UNIT_LABEL_OVERRIDES: Record<string, string> = {
 
 // Heroes with stats blocks beside the main unit: one per hero unit, plus one per buff form of the main unit.
 // `unitBuffs` maps a hero unit to the buff that is always on it in that form.
-const HERO_FORMS: Record<string, { main: string; unitBuffs?: Record<string, string>; buffForms?: Record<string, string> }> = {
+// `icons` maps a form label to the ability icon shown when the form has no portrait of its own.
+interface HeroForms {
+  main: string;
+  unitBuffs?: Record<string, string>;
+  buffForms?: Record<string, string>;
+  icons?: Record<string, string>;
+}
+
+const HERO_FORMS: Record<string, HeroForms> = {
   "DVa": { main: "Mech Form" },
-  "Alexstrasza": { main: "Normal Form", unitBuffs: { HeroAlexstraszaDragon: "AlexstraszaDragonqueenHealthIncrease" } },
+  "Alexstrasza": {
+    main: "Normal Form",
+    unitBuffs: { HeroAlexstraszaDragon: "AlexstraszaDragonqueenHealthIncrease" },
+    icons: { "Dragon Form": "storm_ui_icon_alexstrasza_dragon_queen.png" },
+  },
   "Rexxar": { main: "Rexxar" },
-  "Greymane": { main: "Human Form", buffForms: { "Worgen Form": "GreymaneWorgenForm" } },
+  "Greymane": {
+    main: "Human Form",
+    buffForms: { "Worgen Form": "GreymaneWorgenForm" },
+    icons: { "Worgen Form": "storm_ui_icon_greymane_curseoftheworgen.png" },
+  },
 };
 
 const HERO_UNIT_ABILITY_CARD_SKIP_IDS = new Set(["LostVikings"]);
@@ -252,23 +269,47 @@ function withBuff(unit: HeroStatsSource, buff: BuffModification | null): HeroSta
   };
 }
 
+// Image paths under images/.
+export function heroPortrait(hero: Pick<HeroData, "portraits">): string {
+  const file = hero.portraits?.target ?? hero.portraits?.targetInfo;
+  return file ? `heroportraits/${file}` : "";
+}
+
+const formIcon = (icons: Record<string, string>, label: string): string =>
+  icons[label] ? `abilitytalents/${icons[label]}` : "";
+
+// Hero unit art is a party frame, or target info panel art extracted from CASC into CASC_PORTRAITS_DIR.
+// A unit that reuses the hero's own portrait file has no art of its own.
+function unitPortraitFile(hero: HeroData, unitData: HeroUnitData): string {
+  const file = unitData.portraits?.targetInfo ?? "";
+  if (!file || file === hero.portraits?.targetInfo) return "";
+  return /partyframe|targetinfopanel_unit_hero_/.test(file) ? file : "";
+}
+
+function heroUnitPortrait(hero: HeroData, unitData: HeroUnitData, label: string, icons: Record<string, string>): string {
+  const file = unitPortraitFile(hero, unitData);
+  return file ? `heroportraits/${file}` : formIcon(icons, label) || heroPortrait(hero);
+}
+
 function heroUnitStatsList(
   hero: HeroData,
   gs: Gamestrings,
   catalog: CatalogLookup,
-  unitBuffs: Record<string, string> = {},
+  forms: Pick<HeroForms, "unitBuffs" | "icons"> = {},
 ): HeroUnitStats[] {
   return (Object.entries(hero.heroUnits ?? {}) as [string, HeroUnitData][]).flatMap(([unitId, unitData]) => {
-    const buffId = unitBuffs[unitId];
+    const buffId = forms.unitBuffs?.[unitId];
     const stats = buildHeroStats(withBuff(unitData, buffId ? catalog.buff(buffId) : null), catalog);
-    return stats ? [{ unitId, unitName: HERO_UNIT_LABEL_OVERRIDES[unitId] ?? getUnitName(gs, unitId), stats }] : [];
+    const unitName = HERO_UNIT_LABEL_OVERRIDES[unitId] ?? getUnitName(gs, unitId);
+    const portrait = heroUnitPortrait(hero, unitData, unitName, forms.icons ?? {});
+    return stats ? [{ unitId, unitName, portrait, stats }] : [];
   });
 }
 
-function buffFormStats(hero: HeroData, label: string, behaviorId: string, catalog: CatalogLookup): HeroUnitStats[] {
+function buffFormStats(hero: HeroData, label: string, behaviorId: string, catalog: CatalogLookup, icons: Record<string, string>): HeroUnitStats[] {
   const buff = catalog.buff(behaviorId);
   const stats = buff && buildHeroStats(withBuff(hero, buff), catalog);
-  return stats ? [{ unitId: hero.unitId, unitName: label, stats }] : [];
+  return stats ? [{ unitId: hero.unitId, unitName: label, portrait: formIcon(icons, label) || heroPortrait(hero), stats }] : [];
 }
 
 export function buildHeroUnitStats(
@@ -281,9 +322,9 @@ export function buildHeroUnitStats(
   const forms = HERO_FORMS[hero.hyperlinkId];
   if (!stats || !forms) return [];
   return [
-    { unitId: hero.unitId, unitName: forms.main, stats },
-    ...heroUnitStatsList(hero, gs, catalog, forms.unitBuffs),
-    ...Object.entries(forms.buffForms ?? {}).flatMap(([label, behaviorId]) => buffFormStats(hero, label, behaviorId, catalog)),
+    { unitId: hero.unitId, unitName: forms.main, portrait: heroPortrait(hero), stats },
+    ...heroUnitStatsList(hero, gs, catalog, forms),
+    ...Object.entries(forms.buffForms ?? {}).flatMap(([label, behaviorId]) => buffFormStats(hero, label, behaviorId, catalog, forms.icons ?? {})),
   ];
 }
 
@@ -293,15 +334,21 @@ export function shouldRenderHeroUnitAbilityCards(hero: Pick<HeroData, "hyperlink
 
 // Portraits are keyed by variation and may hold one filename or a list.
 async function copyPortraits(hero: HeroData): Promise<void> {
-  for (const val of Object.values(hero.portraits ?? {})) {
-    const filenames: string[] = Array.isArray(val) ? val : typeof val === "string" ? [val] : [];
-    for (const f of filenames) {
-      await copyImageIfExists(
-        path.join(HEROES_IMAGES_DIR, "heroportraits", f),
-        path.join(SITE_STATIC_IMAGES, "heroportraits", f)
-      );
-    }
+  const unitFiles = Object.values(hero.heroUnits ?? {}).map((u) => u.portraits?.targetInfo ?? "");
+  const files = [...Object.values(hero.portraits ?? {}).flat(), ...unitFiles].filter((f): f is string => typeof f === "string" && f !== "");
+  for (const f of new Set(files)) {
+    const dest = path.join(SITE_STATIC_IMAGES, "heroportraits", f);
+    await copyImageIfExists(path.join(HEROES_IMAGES_DIR, "heroportraits", f), dest)
+      || await copyImageIfExists(path.join(CASC_PORTRAITS_DIR, f), dest);
   }
+}
+
+// Runs after copyPortraits; drops portraits whose file is missing.
+async function keepExistingPortraits(unitStats: HeroUnitStats[]): Promise<HeroUnitStats[]> {
+  return Promise.all(unitStats.map(async (unit) => {
+    const exists = unit.portrait && await stat(path.join(SITE_STATIC_IMAGES, unit.portrait)).then(() => true, () => false);
+    return exists ? unit : { ...unit, portrait: "" };
+  }));
 }
 
 async function resolveAbilities(hero: HeroData, ctx: HeroContext, resolve: ResolveEntry): Promise<ResolvedAbility[]> {
@@ -598,10 +645,10 @@ async function main(): Promise<void> {
     console.log(`gen-heroes: wrote ${slug}.md`);
 
     const stats = buildHeroStats(hero, catalog);
-    const unitStats = buildHeroUnitStats(hero, gs, stats, catalog);
+    const unitStats = await keepExistingPortraits(buildHeroUnitStats(hero, gs, stats, catalog));
     await writeJson(
       path.join(SITE_DATA_HEROES, `${slug}.json`),
-      { stats, unitStats, abilities, subAbilityGroups, heroUnitAbilities, summons, talents },
+      { stats, portrait: heroPortrait(hero), unitStats, abilities, subAbilityGroups, heroUnitAbilities, summons, talents },
       2,
     );
     console.log(`gen-heroes: wrote data/heroes/${slug}.json`);

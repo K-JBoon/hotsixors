@@ -11,41 +11,43 @@
 
 <div class="hero-detail" data-level-scope>
 
-  <div class="hero-banner role-{{ hero.role | lower }}">
-    {% if hero.portraits.loading %}
-      {{<images.optimized path={'images/heroportraits/' ~ hero.portraits.loading} class="hero-banner__loading" alt="" width={340} height={124} op="fit" display_width={340} display_height={124} loading="eager" />}}
-    {% endif %}
-    <div class="hero-banner__info">
-      <h1 class="hero-banner__name">{{ hero.hero_name }}</h1>
-      <div class="hero-banner__meta">
-        {% if hero.in_game_role %}<span class="badge badge--role">{{ hero.in_game_role }}</span>{% endif %}
-        {% if hero.franchise %}<span class="badge badge--franchise">{{ hero.franchise }}</span>{% endif %}
-        <a class="hero-wiki-link" href="https://heroesofthestorm.fandom.com/wiki/{{ hero.hero_name | replace(from=" ", to="_") }}" target="_blank" rel="noopener noreferrer"><svg class="hero-wiki-link__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6"/><path d="M10 14 21 3"/></svg>Wiki</a>
-        <a class="hero-wiki-link" href="https://nexus-patch-notes.github.io/heroes/{{ hero.hero_name | slugify | replace(from="-", to="") }}.html" target="_blank" rel="noopener noreferrer"><svg class="hero-wiki-link__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6"/><path d="M10 14 21 3"/></svg>Nexus Patch Notes</a>
+  <section class="hero-head">
+    <div class="hero-head__body">
+      <div class="hero-banner hero-banner--bio role-{{ hero.role | lower }}">
+        <div class="hero-banner__info">
+          <h1 class="hero-banner__name">{{ hero.hero_name }}</h1>
+          <div class="hero-banner__meta">
+            {% if hero.in_game_role %}<span class="badge badge--role">{{ hero.in_game_role }}</span>{% endif %}
+            {% if hero.franchise %}<span class="badge badge--franchise">{{ hero.franchise }}</span>{% endif %}
+            <a class="hero-wiki-link" href="https://heroesofthestorm.fandom.com/wiki/{{ hero.hero_name | replace(from=" ", to="_") }}" target="_blank" rel="noopener noreferrer"><svg class="hero-wiki-link__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6"/><path d="M10 14 21 3"/></svg>Wiki</a>
+            <a class="hero-wiki-link" href="https://nexus-patch-notes.github.io/heroes/{{ hero.hero_name | slugify | replace(from="-", to="") }}.html" target="_blank" rel="noopener noreferrer"><svg class="hero-wiki-link__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6"/><path d="M10 14 21 3"/></svg>Nexus Patch Notes</a>
+          </div>
+          {% if page.description %}
+            <p class="hero-banner__desc">{{ page.description }}</p>
+          {% endif %}
+        </div>
       </div>
-      {% if page.description %}
-        <p class="hero-banner__desc">{{ page.description }}</p>
+      {% if hero_data.stats or hero_data.unitStats %}
+      <div class="hero-head__units">
+        <h2 class="visually-hidden">Statistics</h2>
+        {% if hero_data.unitStats %}
+        {% for unit in hero_data.unitStats %}
+        {{<heroes.unit_strip name={unit.unitName} portrait={unit.portrait} st={unit.stats} solo={hero_data.unitStats | length == 1} />}}
+        {% endfor %}
+        {% else %}
+        {{<heroes.unit_strip name={hero.hero_name} portrait={hero_data.portrait} st={hero_data.stats} solo={true} />}}
+        {% endif %}
+      </div>
       {% endif %}
     </div>
-  </div>
-
-  {% if hero_data.stats or hero_data.unitStats %}
-  <section class="hero-stats">
-    <h2 class="visually-hidden">Statistics</h2>
-    {% if hero_data.unitStats %}
-      {% for unit_stat in hero_data.unitStats %}
-      {% set st = unit_stat.stats %}
-      <div class="hero-stats__unit">
-        <h3 class="hero-stats__unit-title">{{ unit_stat.unitName }}</h3>
-        {{<heroes.hero_stats_grid st={st} level={loop.first} />}}
-      </div>
-      {% endfor %}
-    {% elif hero_data.stats %}
-    {% set st = hero_data.stats %}
-    {{<heroes.hero_stats_grid st={st} level={true} />}}
+    {% if hero_data.stats or hero_data.unitStats %}
+    <div class="hero-level" data-level-control>
+      <label class="hero-level__label" for="hero-level-slider">Level</label>
+      <output class="hero-level__value" data-level-display>0</output>
+      <input id="hero-level-slider" class="hero-level__slider" type="range" min="0" max="30" value="0" step="1" data-level-slider>
+    </div>
     {% endif %}
   </section>
-  {% endif %}
 
   <section class="abilities-section">
     <h2>Abilities</h2>
@@ -94,7 +96,7 @@
     <summary><h2>Summons</h2></summary>
     <div class="hero-summons__grid">
       {% for summon in hero_data.summons %}
-      {{<heroes.summon_panel summon={summon} sc={sc} />}}
+      {{<heroes.unit_panel name={summon.unitName} portrait={summon.portrait} st={summon.stats} sc={sc} source={summon.sourceName} invulnerable={summon.invulnerable} abilities={summon.abilities} />}}
       {% endfor %}
     </div>
   </details>

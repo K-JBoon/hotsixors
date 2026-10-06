@@ -97,6 +97,7 @@ export interface HeroPortraits {
   draftScreen?: string;
   minimap?: string;
   targetInfo?: string;
+  partyFrames?: string[];
 }
 
 export interface HeroRatings {
@@ -213,6 +214,8 @@ export interface HeroStats {
 export interface HeroUnitStats {
   unitId: string;
   unitName: string;
+  // Image path under images/; empty when no art exists.
+  portrait: string;
   stats: HeroStats;
 }
 

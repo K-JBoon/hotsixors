@@ -287,6 +287,42 @@ test("Alexstrasza's Dragon Form adds the Dragonqueen health buff", () => {
   ]);
 });
 
+test("hero forms use their own portrait, else the form ability icon", () => {
+  const life = { amount: 1780, scale: 0.04, regenRate: 3.7, regenScale: 0.04 };
+  const weapons = [{ nameId: "W", range: 5.5, period: 1, damage: 73, damageScale: 0.04 }];
+  const portraits = { targetInfo: "storm_ui_ingame_partyframe_alexstrasza.png" };
+  const { unitStats } = resolveHeroUnitStats({
+    unitId: "HeroAlexstrasza",
+    hyperlinkId: "Alexstrasza",
+    portraits: { ...portraits, target: "ui_targetportrait_hero_alexstrasza.png" },
+    life,
+    weapons,
+    heroUnits: { HeroAlexstraszaDragon: { abilities: {}, life, weapons, portraits } },
+  });
+  const { unitStats: dva } = resolveHeroUnitStats({
+    unitId: "HeroDVaMech",
+    hyperlinkId: "DVa",
+    portraits: { targetInfo: "storm_ui_ingame_partyframe_dva_mech.png" },
+    life,
+    weapons,
+    heroUnits: { HeroDVaPilot: { abilities: {}, life, weapons, portraits: { targetInfo: "storm_ui_ingame_partyframe_dva.png" } } },
+  });
+
+  const { unitStats: vikings } = resolveHeroUnitStats({
+    life: { amount: 1, scale: 0, regenRate: 0, regenScale: 0 },
+    portraits: { targetInfo: "" },
+    heroUnits: { HeroErik: { abilities: {}, life, weapons, portraits: { targetInfo: "storm_ui_ingame_targetinfopanel_unit_hero_eric.png" } } },
+  });
+
+  assert.deepEqual([...unitStats, ...dva, ...vikings].map((unit) => [unit.unitName, unit.portrait]), [
+    ["Normal Form", "heroportraits/ui_targetportrait_hero_alexstrasza.png"],
+    ["Dragon Form", "abilitytalents/storm_ui_icon_alexstrasza_dragon_queen.png"],
+    ["Mech Form", "heroportraits/storm_ui_ingame_partyframe_dva_mech.png"],
+    ["Pilot Form", "heroportraits/storm_ui_ingame_partyframe_dva.png"],
+    ["Erik", "heroportraits/storm_ui_ingame_targetinfopanel_unit_hero_eric.png"],
+  ]);
+});
+
 function resolveHeroUnitAbilityCardVisibility(ids) {
   const script = `
     import { shouldRenderHeroUnitAbilityCards } from "./scripts/gen-heroes.ts";

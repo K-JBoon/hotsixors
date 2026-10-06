@@ -11,10 +11,8 @@
   // Mana pools scale flat, not by a rate in the hero data. Their base is the level 1 value.
   const FLAT_PER_LEVEL = { "Mana": { perLevel: 10, decimals: 0 }, "Mana Regen": { perLevel: 0.09765625, decimals: 2 } };
   const flatEntries = [];
-  for (const card of scope.querySelectorAll(".stat-card")) {
-    const label = card.querySelector(".stat-card__label");
-    const el = card.querySelector(".stat-card__value");
-    const spec = label && el ? FLAT_PER_LEVEL[label.textContent.trim()] : null;
+  for (const el of scope.querySelectorAll("[data-flat-per-level]")) {
+    const spec = FLAT_PER_LEVEL[el.dataset.flatPerLevel];
     if (!spec) continue;
     const base = parseFloat(el.textContent);
     // Gul'dan and Probius have no mana regen and do not gain any per level.
@@ -22,7 +20,7 @@
     flatEntries.push({ el, base: base - spec.perLevel, perLevel: spec.perLevel, decimals: spec.decimals });
   }
   if (targets.length === 0 && flatEntries.length === 0) return;
-  const COMPACT_VALUE_SELECTOR = ".stat-card__value, .ability-stat__value, .summon-panel";
+  const COMPACT_VALUE_SELECTOR = ".ability-stat__value, .unit-panel, .unit-strip";
   const entries = targets.map(function (el) {
     const base = parseFloat(el.dataset.base);
     const scale = parseFloat(el.dataset.scale);

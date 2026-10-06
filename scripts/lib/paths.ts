@@ -18,6 +18,7 @@ export const DEPOTCACHE_DIR = path.join(GAMEDATA_DIR, "core.stormmod/base.stormd
 
 export const HEROPROTOCOL_VERSIONS = path.join(REPO_ROOT, "submodules/heroprotocol/heroprotocol/versions");
 export const ABILLINK_STORE = path.join(REPO_ROOT, "data/replay-abillinks");
+export const CASC_PORTRAITS_DIR = path.join(REPO_ROOT, "data/casc-portraits");
 export const SITE_CONTENT = path.join(REPO_ROOT, "site/content");
 export const SITE_CONTENT_HEROES = path.join(REPO_ROOT, "site/content/heroes");
 export const SITE_CONTENT_BATTLEGROUNDS = path.join(REPO_ROOT, "site/content/battlegrounds");

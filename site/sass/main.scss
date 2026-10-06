@@ -977,103 +977,68 @@ html:not(.datamining-enabled) [data-datamining] {
 // ─── Hero Detail ─────────────────────────────────────────────────────────────
 .hero-detail { display: flex; flex-direction: column; gap: 2rem; }
 
-.hero-stats {
-  &__grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
+.hero-head {
+  background: $bg-card; border: 1px solid $border-dim; border-radius: 8px; overflow: hidden;
+  &__body {
+    display: grid;
+    @media (min-width: 1100px) { grid-template-columns: minmax(16rem, 20rem) minmax(0, 1fr); }
   }
-
-  &__unit + &__unit {
-    margin-top: 1rem;
+  &__units {
+    display: flex; flex-direction: column; gap: 0.75rem; padding: 0.75rem;
+    border-top: 1px solid $border-dim;
+    @media (min-width: 1100px) { border-top: 0; border-left: 1px solid $border-dim; }
+    > .unit-strip + .unit-strip { border-top: 1px solid $border-dim; padding-top: 0.75rem; }
   }
-
-  &__unit-title {
-    color: $text-muted;
-    font-size: 1rem;
-    letter-spacing: 0.06em;
-    margin: 0 0 0.5rem;
-  }
+  .hero-level { max-width: none; padding: 0.5rem 1.25rem; border-top: 1px solid $border-dim; background: $bg-panel; }
+  .hero-level__slider { flex: 0 1 22rem; }
 }
 
-.stat-card {
-  flex: 0 1 112px;
-  background: $bg-card;
-  border: 1px solid $border-dim;
-  border-radius: 6px;
-  padding: 0.45rem 0.6rem;
-
+.hero-level {
+  display: flex; align-items: center; gap: 0.6rem;
+  max-width: 24rem;
   &__label {
-    font-family: $font-display;
-    font-size: 0.68rem;
-    line-height: 1.3;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: $text-muted;
-    margin-bottom: 0.2rem;
+    font-family: $font-display; font-size: 0.68rem; text-transform: uppercase;
+    letter-spacing: 0.06em; color: $text-muted;
   }
-
   &__value {
-    font-size: 1.2rem;
-    line-height: 1.25;
-    font-weight: 600;
-    color: $accent-gold;
-    font-variant-numeric: tabular-nums;
-
-    .storm-scale { color: $accent-gold; border-bottom-color: rgba($accent-gold, 0.5); }
+    min-width: 1.6em; font-size: 1.1rem; font-weight: 600;
+    color: $text-primary; font-variant-numeric: tabular-nums;
   }
-
-  &__scaling {
-    font-size: 0.68rem;
-    line-height: 1.3;
-    color: $text-muted;
-    margin-top: 0.1rem;
-  }
-
-  &--level { flex-basis: calc(224px + 0.5rem); }
-  &--attack { flex: 1 1 auto; }
-  &--attack .stat-chips { gap: 0.3rem 1.1rem; }
-  &--attack .ability-stat { gap: 0.35rem; }
-  &--attack .ability-stat__icon { width: 1.1rem; height: 1.1rem; }
-  &--attack .ability-stat__value { font-size: 1.2rem; line-height: 1.25; color: $accent-gold; font-variant-numeric: tabular-nums; }
-  &--attack .storm-scale { color: inherit; border-bottom-color: rgba($accent-gold, 0.5); }
-  &--level &__label { display: block; }
-
-  &__level { display: flex; align-items: center; gap: 0.6rem; }
-
-  &__level-value {
-    min-width: 1.6em;
-    font-size: 1.2rem;
-    line-height: 1.25;
-    font-weight: 600;
-    color: $text-primary;
-    font-variant-numeric: tabular-nums;
-  }
-
   &__slider { flex: 1; min-width: 0; accent-color: $accent-gold; }
 }
 
 .hero-banner {
   display: flex;
   align-items: center;
-  gap: 2rem;
+  gap: 1.5rem;
   background: $bg-card;
   border: 1px solid $border-dim;
   border-radius: 8px;
+  box-shadow: none;
   overflow: hidden;
   &__loading {
     flex: 0 1 33%;
     width: 33%;
     max-width: 33%;
-    height: 260px;
+    height: 160px;
     object-fit: cover;
     object-position: right center;
     border-radius: 4px;
   }
-  &__info { flex: 1; padding: 0.25rem 0; }
-  &__name { font-size: 2.5rem; line-height: 1.05; color: $accent-gold; }
-  &__meta { display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; margin: 0.5rem 0 0.6rem; }
-  &__desc { color: $text-muted; max-width: 62ch; line-height: 1.6; }
+  &__info { flex: 1; padding: 0.25rem 1.25rem 0.25rem 0; }
+  &__name { font-size: 2rem; line-height: 1.05; color: $accent-gold; }
+  &__meta { display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; margin: 0.4rem 0 0.4rem; }
+  &__desc { color: $text-muted; max-width: 62ch; line-height: 1.5; font-size: 0.92rem; }
+}
+
+.hero-banner--bio {
+  align-items: flex-start;
+  background: none; border: 0; border-radius: 0;
+  padding: 0.9rem 1.25rem;
+  .hero-banner__info { padding: 0; }
+  .hero-banner__name { font-size: 1.6rem; }
+  .hero-banner__meta { margin: 0.35rem 0 0.5rem; }
+  .hero-banner__desc { margin: 0; font-size: 0.88rem; }
 }
 
 .hero-banner__links {
@@ -1124,26 +1089,56 @@ html:not(.datamining-enabled) [data-datamining] {
   }
 }
 
-.summon-panel {
+$unit-panel-label-min: 22rem;
+
+@mixin visible-stat-labels {
+  .ability-stat__label { gap: 0.3rem; }
+  .ability-stat__label .visually-hidden {
+    position: static; width: auto; height: auto; overflow: visible; clip: auto;
+    font-size: 0.72rem;
+  }
+}
+
+.unit-bar {
+  display: flex; justify-content: space-between; gap: 0.5rem;
+  padding: 0 0.4rem; border-radius: 3px;
+  font-size: 0.78rem; font-weight: 600; font-variant-numeric: tabular-nums; color: #f2fff0;
+  &--life { background: #3a7d22; border: 1px solid #6dbb3f; }
+  &--invulnerable { background: $bg-panel; border: 1px solid $border-dim; color: $text-muted; }
+  &--resource { background: #2a5d9f; border: 1px solid $accent-blue; }
+  &__kind { font-weight: 400; opacity: 0.8; }
+  &__regen--decay { color: #ffb3a8; }
+  .storm-scale { color: inherit; border-bottom-color: rgba(255, 255, 255, 0.5); }
+}
+
+.unit-strip {
+  display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0.4rem 0.75rem; align-items: start;
+  container-type: inline-size;
+  &__portrait { grid-row: span 2; width: 5.25rem; height: 5.25rem; object-fit: cover; border: 1px solid $border-dim; border-radius: 4px; }
+  &__vitals { display: flex; flex-direction: column; gap: 0.25rem; min-width: 0; }
+  &__name { margin: 0; font-family: $font-display; font-size: 1rem; line-height: 1.1; color: $text-primary; text-box: trim-start cap alphabetic; }
+  &__stats { display: flex; flex-wrap: wrap; gap: 0.3rem 1.25rem; margin: 0; }
+  .unit-bar { padding: 0.05rem 0.5rem; font-size: 0.85rem; }
+  @container (width >= #{$unit-panel-label-min}) {
+    .unit-strip__stats { @include visible-stat-labels; }
+  }
+}
+
+.unit-panel {
   display: flex; flex-direction: column; gap: 0.5rem;
   padding: 0.5rem; background: $bg-card; border: 1px solid $border-dim; border-radius: 6px;
+  container-type: inline-size;
 
   &__head { display: flex; gap: 0.6rem; }
   &__portrait { flex: none; width: 64px; height: 56px; object-fit: cover; border: 1px solid $border-dim; border-radius: 4px; }
   &__vitals { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.2rem; }
   &__name { margin: 0; font-family: $font-display; font-size: 1rem; line-height: 1.1; color: $text-primary; }
   &__source { margin: 0; font-size: 0.72rem; color: $text-muted; }
-  &__bar {
-    display: flex; justify-content: space-between; gap: 0.5rem;
-    padding: 0 0.4rem; border-radius: 3px;
-    font-size: 0.78rem; font-weight: 600; font-variant-numeric: tabular-nums; color: #f2fff0;
-    &--life { background: #3a7d22; border: 1px solid #6dbb3f; }
-    &--invulnerable { background: $bg-panel; border: 1px solid $border-dim; color: $text-muted; }
-    &--resource { background: #2a5d9f; border: 1px solid $accent-blue; }
-    .storm-scale { color: inherit; border-bottom-color: rgba(255, 255, 255, 0.5); }
-  }
-  &__regen--decay { color: #ffb3a8; }
   &__stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.3rem 0.75rem; margin: 0; }
+  @container (width >= #{$unit-panel-label-min}) {
+    &__stats { grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr)); }
+    &__stats { @include visible-stat-labels; }
+  }
   &__abilities { display: flex; flex-wrap: wrap; gap: 0.3rem 0.75rem; margin: auto 0 0; padding: 0; list-style: none; font-size: 0.78rem; }
   &__ability {
     display: flex; align-items: center; gap: 0.3rem;
@@ -2682,8 +2677,8 @@ html:not(.datamining-enabled) .mechanics-table {
 // ─── Responsive: Tablet ───────────────────────────────────────────────────────
 @media (max-width: $bp-compact) {
   .hero-banner {
-    &__loading { flex: 0 1 40%; width: 40%; max-width: 40%; height: 220px; }
-    &__name { font-size: 2rem; }
+    &__loading { flex: 0 1 40%; width: 40%; max-width: 40%; height: 140px; }
+    &__name { font-size: 1.75rem; }
   }
 
 }
@@ -2709,7 +2704,7 @@ html:not(.datamining-enabled) .mechanics-table {
       flex: none;
       width: 100%;
       max-width: 100%;
-      height: 150px;
+      height: 120px;
       border-radius: 0;
       object-position: right center;
     }
