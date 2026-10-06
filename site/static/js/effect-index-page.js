@@ -1,4 +1,4 @@
-import { effectIndexSearchFromState, effectIndexStateFromSearch, effectSlugFromHash } from "./effect-index.js";
+import { NUMERIC_SORT_KEYS, compareEffectRows, effectIndexSearchFromState, effectIndexStateFromSearch, effectSlugFromHash } from "./effect-index.js";
 
 function initEffectIndex() {
   const search = document.querySelector("[data-effect-search]");
@@ -107,6 +107,25 @@ function initEffectIndex() {
   });
   window.addEventListener("hashchange", applyHashFilterIfValid);
   applyStateFromUrl();
+  for (const table of document.querySelectorAll("[data-effect-table]")) initSortableTable(table);
+}
+
+function initSortableTable(table) {
+  const tbody = table.tBodies[0];
+  const headers = [...table.querySelectorAll("th")];
+  table.querySelector("thead").addEventListener("click", (event) => {
+    const button = event.target.closest("[data-sort]");
+    if (!button) return;
+    const key = button.dataset.sort;
+    const th = button.closest("th");
+    const current = th.getAttribute("aria-sort");
+    const first = NUMERIC_SORT_KEYS.includes(key) ? "descending" : "ascending";
+    const direction = current === first ? (first === "ascending" ? "descending" : "ascending") : first;
+    for (const header of headers) header.removeAttribute("aria-sort");
+    th.setAttribute("aria-sort", direction);
+    const rows = [...tbody.rows].sort((a, b) => compareEffectRows(a.dataset, b.dataset, key, direction));
+    tbody.append(...rows);
+  });
 }
 
 export { initEffectIndex };

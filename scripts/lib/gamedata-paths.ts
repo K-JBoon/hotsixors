@@ -22,6 +22,8 @@ const INCLUDED_GAMEDATA_FILES = new Set([
   "mods/heroesdata.stormmod/base.stormdata/gamedata/validatordata.xml",
   "mods/heroesdata.stormmod/base.stormdata/gamedata/targetsortdata.xml",
   "mods/core.stormmod/base.stormdata/gamedata/targetsortdata.xml",
+  "mods/core.stormmod/base.stormdata/gamedata/accumulatordata.xml",
+  "mods/heroesdata.stormmod/base.stormdata/gamedata/accumulatordata.xml",
 ]);
 // Engine defaults, load manifests and shared catalogs published for reference.
 // The effect graph doesn't read them.
@@ -35,7 +37,6 @@ const REFERENCE_GAMEDATA_FILES = new Set([
   "mods/heroesdata.stormmod/base.stormdata/gamedata.xml",
   "mods/heroesdata.stormmod/base.stormdata/includes.xml",
   "mods/heroesdata.stormmod/base.stormdata/triggerlibs/librarylist.xml",
-  "mods/heroesdata.stormmod/base.stormdata/gamedata/accumulatordata.xml",
   "mods/heroesdata.stormmod/base.stormdata/gamedata/buttondata.xml",
   "mods/heroesdata.stormmod/base.stormdata/gamedata/gamedata.xml",
   "mods/heroesdata.stormmod/base.stormdata/gamedata/herodata.xml",

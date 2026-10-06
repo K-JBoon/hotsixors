@@ -571,13 +571,24 @@ const MECHANICS: MechanicDefinition[] = [
     slug: "cloaked",
     category: "Stealth and Vision",
     description: "Hidden from enemies. They can still see a shimmer, unless it is Deep Stealth. Attacking, casting or taking damage breaks most Stealth.",
-    summary: "Sets the Cloak state (plus SuppressFidgeting). StormPersistentCloak adds Permanent, EnabledWhileDead and a NoCloakRevealerCombine disable validator. StormUnrevealableCloak also sets Undetectable and SuppressCollision, and sends incoming damage through HeroGenericUnrevealableDummy.",
+    summary: "Sets the Cloak state (plus SuppressFidgeting). StormPersistentCloak adds Permanent, EnabledWhileDead and a NoCloakRevealerCombine disable validator.",
     primaryBehavior: "StormCloak",
-    sourceIds: ["StormCloak", "StormPersistentCloak", "StormUnrevealableCloak"],
+    sourceIds: ["StormCloak", "StormPersistentCloak"],
     sources: [
       { label: "StormCloak behavior", kind: "XML", path: BEHAVIOR_DATA, anchor: "StormCloak" },
       { label: "Persistent cloak variant", kind: "XML", path: BEHAVIOR_DATA, anchor: "StormPersistentCloak" },
-      { label: "Unrevealable cloak variant", kind: "XML", path: BEHAVIOR_DATA, anchor: "StormUnrevealableCloak" },
+    ],
+  },
+  {
+    name: "Unrevealable Stealth",
+    slug: "unrevealable",
+    category: "Stealth and Vision",
+    description: "Stealth that damage and reveal effects cannot break. Often a short window at the start of normal Stealth.",
+    summary: "StormUnrevealableCloak extends StormCloak. It sets Undetectable and SuppressCollision, disables AttackReveal and GenericCloakRevealer, and sends incoming damage through HeroGenericUnrevealableDummy.",
+    primaryBehavior: "StormUnrevealableCloak",
+    sourceIds: ["StormUnrevealableCloak"],
+    sources: [
+      { label: "StormUnrevealableCloak behavior", kind: "XML", path: BEHAVIOR_DATA, anchor: "StormUnrevealableCloak" },
     ],
   },
 ];

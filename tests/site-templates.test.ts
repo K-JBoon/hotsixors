@@ -154,6 +154,10 @@ test("effect index template consumes cross-reference data and exposes filter hoo
   assert.match(template, /data-effect-mechanic/);
   assert.match(template, /data-effect-category/);
   assert.match(template, /data-effect-chip/);
+  assert.match(template, /data-effect-table/);
+  assert.match(template, /\{% for inst in entry\.instances %\}/);
+  assert.match(template, /data-sort="amount"/);
+  assert.match(template, /data-sort="duration"/);
 });
 
 test("mechanic generation uses intent-based effect categories", () => {

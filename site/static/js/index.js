@@ -1,5 +1,5 @@
 export { createSearchTerms, matchesSearchEntry, searchSiteIndex, selectGridSearchState, orderSelectGridSearchEntries, updateSelectGridSearchQuery } from './search.js';
-export { effectIndexSearchFromState, effectIndexStateFromSearch, effectSlugFromHash } from './effect-index.js';
+export { compareEffectRows, effectIndexSearchFromState, effectIndexStateFromSearch, effectSlugFromHash } from './effect-index.js';
 export { parseTalentBuildHash, serializeTalentBuildCode, serializeTalentBuildHash, talentStateFromHotSBuildCode, talentTierHasChoice, toggleOptionalTalent, toggleRecommendedTalent } from './talent-builds.js';
 export { getAvailableStorage, getStoredBoolean, isDataminingSearchEntry, setStoredBoolean } from './storage.js';
 export { escapeHtml } from './escape.js';

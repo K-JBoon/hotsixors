@@ -21,6 +21,7 @@ export function excludedBehaviorDescendantsForMechanic(mechanic: MechanicLike): 
 
 export function excludedAppliedBehaviorDescendantsForMechanic(mechanic: MechanicLike): string[] {
   if (mechanic.slug === "invulnerable") return ["StormStasis"];
+  if (mechanic.slug === "cloaked") return ["StormUnrevealableCloak"];
   // Taunt interruption stuns are excluded from CC tracking.
   if (mechanic.slug === "stunned") {
     return ["VarianTauntInterruptionStun", "GarroshWarlordsChallengeInterruptionStun"];

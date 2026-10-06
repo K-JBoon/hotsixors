@@ -22,6 +22,7 @@ import {
   orderSelectGridSearchEntries,
   selectGridSearchState,
   updateSelectGridSearchQuery,
+  compareEffectRows,
   effectIndexSearchFromState,
   effectIndexStateFromSearch,
   effectSlugFromHash,
@@ -284,6 +285,20 @@ test("effect index query string omits default filters", () => {
   );
   assert.equal(effectIndexSearchFromState({ effects: validSlugs, query: "" }, validSlugs), "");
   assert.equal(effectIndexSearchFromState({ effects: [], query: "" }, validSlugs), "?effects=");
+});
+
+test("effect index table rows sort by column, blanks last", () => {
+  const rows = [
+    { hero: "Chen", name: "Keg Smash", kind: "ability W", amount: "10", duration: "1.25" },
+    { hero: "Ana", name: "Dart", kind: "talent", amount: "50", duration: "4" },
+    { hero: "Chen", name: "Keg Smash", kind: "ability W", amount: "40", duration: "1.75" },
+    { hero: "Zul", name: "Grasp", kind: "ability E", amount: "", duration: "" },
+  ];
+  const order = (key, dir) => [...rows].sort((a, b) => compareEffectRows(a, b, key, dir)).map((r) => `${r.hero}:${r.amount}`);
+  assert.deepEqual(order("amount", "descending"), ["Ana:50", "Chen:40", "Chen:10", "Zul:"]);
+  assert.deepEqual(order("amount", "ascending"), ["Chen:10", "Chen:40", "Ana:50", "Zul:"]);
+  assert.deepEqual(order("duration", "descending"), ["Ana:50", "Chen:40", "Chen:10", "Zul:"]);
+  assert.deepEqual(order("hero", "descending"), ["Zul:", "Chen:10", "Chen:40", "Ana:50"]);
 });
 
 test("talent build hash parses and serializes HotS talent codes with optional choices", () => {

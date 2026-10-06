@@ -41,8 +41,7 @@ export function accumulatorAttrPolarity(graph: EffectGraph, accumulatorId: strin
     if (!scale?.attrs.value) continue;
     const n = resolvedNumber(graph, scale.attrs.value);
     if (n === null) continue;
-    if (n > 0) return "increase";
-    if (n < 0) return "decrease";
+    return n > 0 ? "increase" : n < 0 ? "decrease" : null;
   }
   return null;
 }

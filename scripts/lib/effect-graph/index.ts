@@ -4,6 +4,7 @@ export type {
   EffectGraph,
   MechanicLike,
   AbilTalentEntry,
+  EffectValue,
   MechanicApplications,
   MechanicRef,
 } from "./types.ts";

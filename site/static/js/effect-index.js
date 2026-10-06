@@ -44,3 +44,18 @@ export function effectIndexSearchFromState(state, validSlugs = []) {
   const serialized = params.toString();
   return serialized ? `?${serialized}` : "";
 }
+
+export const NUMERIC_SORT_KEYS = ["amount", "duration"];
+
+// Rows are { hero, name, kind, amount, duration } with numbers as strings; blanks sort last either way.
+export function compareEffectRows(a, b, key, direction = "ascending") {
+  const sign = direction === "descending" ? -1 : 1;
+  const tieBreak = () => a.hero.localeCompare(b.hero) || a.name.localeCompare(b.name);
+  if (NUMERIC_SORT_KEYS.includes(key)) {
+    const x = a[key] === "" ? null : Number(a[key]);
+    const y = b[key] === "" ? null : Number(b[key]);
+    if (x === null || y === null) return x === y ? tieBreak() : x === null ? 1 : -1;
+    return sign * (x - y) || tieBreak();
+  }
+  return sign * String(a[key]).localeCompare(String(b[key])) || tieBreak();
+}

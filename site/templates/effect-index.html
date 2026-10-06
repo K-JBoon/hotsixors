@@ -61,15 +61,40 @@
           {% if mechanic.entries | length == 0 %}
             <p class="effect-index-empty">No hero applies this directly.</p>
           {% else %}
-          <ul class="effect-index-list">
+          <div class="effect-table-wrap">
+          <table class="effect-table" data-effect-table>
+            <thead>
+              <tr>
+                <th scope="col" aria-sort="ascending"><button type="button" data-sort="hero">Hero</button></th>
+                <th scope="col"><button type="button" data-sort="name">Ability or talent</button></th>
+                <th scope="col"><button type="button" data-sort="kind">Kind</button></th>
+                {% if mechanic.amountUnit %}<th scope="col" class="effect-table__num"><button type="button" data-sort="amount">Amount</button></th>{% endif %}
+                {% if mechanic.hasDuration %}<th scope="col" class="effect-table__num"><button type="button" data-sort="duration">Duration</button></th>{% endif %}
+              </tr>
+            </thead>
+            <tbody>
             {% for entry in mechanic.entries %}
-            <li class="effect-index-entry" data-effect-name="{{ entry.heroName }} {{ entry.name }}">
-              {{<images.optimized path={'images/abilitytalents/' ~ entry.icon} class="effect-index-icon" alt="" width={28} height={28} op="fill" display_width={28} display_height={28} loading="lazy" />}}
-              <a href="{{ get_url(path='heroes/' ~ entry.heroSlug) }}#{{ entry.kind }}-{{ entry.nameId }}"><span class="effect-index-hero">{{ entry.heroName }}</span> — {{ entry.name }}</a>
-              <span class="effect-index-kind">{{ entry.kind }}{% if entry.abilityType %} · {{ entry.abilityType }}{% endif %}</span>
-            </li>
+            {% for inst in entry.instances %}
+            <tr class="effect-index-entry" data-effect-name="{{ entry.heroName }} {{ entry.name }}"
+                data-hero="{{ entry.heroName }}" data-name="{{ entry.name }}" data-kind="{{ entry.kind }} {{ entry.abilityType | default(value='') }}"
+                data-amount="{% if inst.maxAmount is defined %}{{ inst.maxAmount }}{% elif inst.amount is defined %}{{ inst.amount }}{% endif %}" data-duration="{% if inst.duration is defined %}{{ inst.duration }}{% endif %}">
+              <td class="effect-table__hero">{{ entry.heroName }}</td>
+              <td class="effect-table__name">
+                {{<images.optimized path={'images/abilitytalents/' ~ entry.icon} class="effect-index-icon" alt="" width={28} height={28} op="fill" display_width={28} display_height={28} loading="lazy" />}}
+                <span>
+                  <a href="{{ get_url(path='heroes/' ~ entry.heroSlug) }}#{{ entry.kind }}-{{ entry.nameId }}">{{ entry.name }}</a>
+                  {% if inst.modifies %}<span class="effect-table__modifies">changes {{ inst.modifies }}</span>{% endif %}
+                </span>
+              </td>
+              <td class="effect-table__kind">{{ entry.kind }}{% if entry.abilityType %} · {{ entry.abilityType }}{% endif %}{% if entry.talentTier %} · {{ entry.talentTier | replace(from="level", to="Level ") }}{% endif %}</td>
+              {% if mechanic.amountUnit %}<td class="effect-table__num">{% if inst.amount is defined %}{{ inst.amount }}{% if inst.maxAmount is defined %}–{{ inst.maxAmount }}{% endif %}{% if inst.scales %}+{% endif %}{% if inst.unit == "armor" %} armor{% else %}{{ inst.unit }}{% endif %}{% else %}<span class="effect-table__none">–</span>{% endif %}</td>{% endif %}
+              {% if mechanic.hasDuration %}<td class="effect-table__num">{% if inst.duration is defined %}{{ inst.duration }}s{% else %}<span class="effect-table__none">–</span>{% endif %}</td>{% endif %}
+            </tr>
             {% endfor %}
-          </ul>
+            {% endfor %}
+            </tbody>
+          </table>
+          </div>
           {% endif %}
         </section>
       {% endfor %}

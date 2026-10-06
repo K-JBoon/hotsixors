@@ -14,6 +14,7 @@ import {
   rootOwners,
   targetBehaviorOf,
 } from "./walk.ts";
+import { findAll } from "./traverse.ts";
 import {
   abilityIdsFromValidators,
   gatingTalentIds,
@@ -175,6 +176,14 @@ function computeEntryForNamedId(anchorToEntry: AnchorIndex, id: string): AbilTal
   return longestMatch(aliasTable(anchorToEntry).all, id)?.entry ?? null;
 }
 
+// A talent that modifies a behavior does not own it: the behavior exists without the talent.
+function talentModifiesBehavior(graph: EffectGraph, talentId: string, behaviorId: string | null): boolean {
+  const node = behaviorId ? graph.nodes.get(talentId) : undefined;
+  if (!node) return false;
+  return findAll(node.elements, "AbilityModificationArray")
+    .some((arr) => findAll(arr.children, "Entry").some((e) => e.attrs.value === behaviorId));
+}
+
 function directSourceEntry(
   graph: EffectGraph,
   anchorToEntry: AnchorIndex,
@@ -184,7 +193,10 @@ function directSourceEntry(
   const talentAnchorId = [
     talentAnchorForId(anchorToEntry, behaviorId),
     talentAnchorForId(anchorToEntry, effectId),
-  ].filter((id): id is string => Boolean(id)).sort((a, b) => b.length - a.length)[0];
+  ]
+    .filter((id): id is string => Boolean(id))
+    .filter((id) => !talentModifiesBehavior(graph, id, behaviorId))
+    .sort((a, b) => b.length - a.length)[0];
   const talentEntry = talentAnchorId ? anchorToEntry[talentAnchorId] : undefined;
   if (talentEntry) return { anchorId: talentAnchorId, entry: talentEntry };
   if (hasNonTraitAlias(anchorToEntry, behaviorId) || hasNonTraitAlias(anchorToEntry, effectId)) return null;

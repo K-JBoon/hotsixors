@@ -58,7 +58,34 @@ export interface AbilTalentEntry {
   name: string;
   icon: string;
   abilityType?: string;
-  talentTier?: number;
+  talentTier?: string;
+  values?: EffectValue[];
+}
+
+export interface EffectValue {
+  stat: "duration" | "amount";
+  value: number;
+  unit: "s" | "%" | "armor";
+  source: string;
+  // Apply effect whose UseDuration replaces the behavior's Duration.
+  via?: string;
+  // Static number is a base; an accumulator scales it in game.
+  scales?: true;
+  // Stacks one caster can apply; the amount adds per stack.
+  stacks?: number;
+  // Accumulators that scale this amount in game.
+  accumulators?: string[];
+  // Amount with every accumulator at its cap.
+  max?: number;
+  // Ability nameId whose value this talent changes.
+  modifies?: string;
+}
+
+export interface MatchSource {
+  behavior?: string;
+  effect?: string;
+  modifier?: number;
+  accumulator?: string;
 }
 
 export type MechanicRef = Pick<MechanicLike, "slug" | "name">;

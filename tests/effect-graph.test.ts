@@ -83,6 +83,102 @@ test("findMechanicApplications attributes an apply-effect to its named owner onl
   assert.deepEqual(result[0].entries.map((e) => e.nameId), ["DiabloOverpower"]);
 });
 
+const VALUE_XML = {
+  path: "mods/heromods/chen.stormmod/base.stormdata/gamedata/chendata.xml",
+  content: `
+    <Catalog>
+      <CAbilEffectTarget id="ChenKegSmash"><Effect value="ChenKegSmashSet" /></CAbilEffectTarget>
+      <CEffectSet id="ChenKegSmashSet">
+        <EffectArray value="ChenKegSmashSlowApply" />
+        <EffectArray value="ChenKegSmashStunApply" />
+        <EffectArray value="ChenKegSmashScaledSlowApply" />
+      </CEffectSet>
+      <CEffectApplyBehavior id="ChenKegSmashSlowApply"><Behavior value="ChenKegSmashSlow" /></CEffectApplyBehavior>
+      <CBehaviorBuff id="ChenKegSmashSlow" parent="StormSlowParent">
+        <Duration value="1.25" />
+        <Modification><UnifiedMoveSpeedFactor value="-0.4" /></Modification>
+      </CBehaviorBuff>
+      <CEffectApplyBehavior id="ChenKegSmashStunApply">
+        <Behavior value="ChenKegSmashStun" />
+        <Flags index="UseDuration" value="1" />
+        <Duration value="0.75" />
+      </CEffectApplyBehavior>
+      <CBehaviorBuff id="ChenKegSmashStun" parent="StormStun"><Duration value="2" /></CBehaviorBuff>
+      <CEffectApplyBehavior id="ChenKegSmashScaledSlowApply"><Behavior value="ChenKegSmashScaledSlow" /></CEffectApplyBehavior>
+      <CBehaviorBuff id="ChenKegSmashScaledSlow" parent="StormSlowParent">
+        <Duration value="-1" />
+        <Modification>
+          <UnifiedMoveSpeedFactor value="-0.1"><AccumulatorArray value="ChenAcc" /></UnifiedMoveSpeedFactor>
+        </Modification>
+      </CBehaviorBuff>
+    </Catalog>`,
+};
+
+test("findMechanicApplications reads durations and amounts from matched behaviors", () => {
+  const result = runGraph([STORM_XML, VALUE_XML], `
+    const g = G.buildEffectGraph(files);
+    const anchorToEntry = {
+      ChenKegSmash: { kind: "ability", nameId: "ChenKegSmash", heroSlug: "chen", heroName: "Chen", name: "Keg Smash", icon: "x.png" },
+    };
+    const mechanics = [
+      { slug: "slowed", name: "Slowed", category: "Crowd Control", primaryBehavior: "StormSlowParent", sourceIds: [] },
+      { slug: "stunned", name: "Stunned", category: "Crowd Control", primaryBehavior: "StormStun", sourceIds: [] },
+    ];
+    return G.findMechanicApplications(g, anchorToEntry, mechanics).map((m) => m.entries[0].values);
+  `);
+  const [slowed, stunned] = result;
+  assert.deepEqual(slowed, [
+    { stat: "amount", value: 10, unit: "%", source: "ChenKegSmashScaledSlow", scales: true, accumulators: ["ChenAcc"] },
+    { stat: "amount", value: 40, unit: "%", source: "ChenKegSmashSlow" },
+    { stat: "duration", value: 1.25, unit: "s", source: "ChenKegSmashSlow" },
+  ]);
+  assert.deepEqual(stunned, [{ stat: "duration", value: 0.75, unit: "s", source: "ChenKegSmashStun", via: "ChenKegSmashStunApply" }]);
+});
+
+test("findMechanicApplications credits flat talent modifications to the talent", () => {
+  const talentXml = {
+    path: "talent.xml",
+    content: `<Catalog>
+      <CTalent id="ChenTouchOfHoney">
+        <AbilityModificationArray>
+          <Modifications>
+            <Type value="FlatModification" /><Catalog value="Behavior" /><Entry value="ChenKegSmashSlow" />
+            <Field value="Modification.UnifiedMoveSpeedFactor" /><Value value="-0.200000" />
+          </Modifications>
+          <Modifications>
+            <Type value="FlatModification" /><Catalog value="Behavior" /><Entry value="ChenKegSmashSlow" />
+            <Field value="Duration" /><Value value="0.500000" />
+          </Modifications>
+          <Modifications>
+            <Type value="FlatModification" /><Catalog value="Behavior" /><Entry value="ChenKegSmashStun" />
+            <Field value="Duration" /><Value value="1" />
+          </Modifications>
+        </AbilityModificationArray>
+      </CTalent>
+    </Catalog>`,
+  };
+  const result = runGraph([STORM_XML, VALUE_XML, talentXml], `
+    const g = G.buildEffectGraph(files);
+    const anchorToEntry = {
+      ChenKegSmash: { kind: "ability", nameId: "ChenKegSmash", heroSlug: "chen", heroName: "Chen", name: "Keg Smash", icon: "x.png" },
+      ChenTouchOfHoney: { kind: "talent", nameId: "ChenTouchOfHoney", heroSlug: "chen", heroName: "Chen", name: "A Touch of Honey", icon: "y.png" },
+    };
+    const mechanics = [
+      { slug: "slowed", name: "Slowed", category: "Crowd Control", primaryBehavior: "StormSlowParent", sourceIds: [] },
+      { slug: "stunned", name: "Stunned", category: "Crowd Control", primaryBehavior: "StormStun", sourceIds: [] },
+    ];
+    return G.findMechanicApplications(g, anchorToEntry, mechanics)
+      .map((m) => m.entries.find((e) => e.nameId === "ChenTouchOfHoney")?.values ?? null);
+  `);
+  const [slowed, stunned] = result;
+  assert.deepEqual(slowed, [
+    { stat: "amount", value: 60, unit: "%", source: "ChenKegSmashSlow", modifies: "ChenKegSmash" },
+    { stat: "duration", value: 1.75, unit: "s", source: "ChenKegSmashSlow", modifies: "ChenKegSmash" },
+  ]);
+  // UseDuration on the apply effect overrides the behavior field the talent edits.
+  assert.equal(stunned, null);
+});
+
 test("findMechanicApplications keeps hero-specific Storm-prefixed apply effects", () => {
   const files = [{
     path: "x.xml",
@@ -2018,4 +2114,105 @@ test("findMechanicApplications credits primed basic-attack effects to the primin
     return G.findMechanicApplications(g, anchorToEntry, mechanics);
   `);
   assert.deepEqual(result[0].entries.map((e) => e.nameId), ["HeroPrime"]);
+});
+
+test("findMechanicApplications credits a behavior to its ability when a same-named talent only modifies it", () => {
+  const files = [{
+    path: "x.xml",
+    content: `<Catalog>
+      <CBehaviorBuff id="StormBlind" />
+      <CAbilEffectTarget id="HeroShot"><Effect value="HeroShotSet" /></CAbilEffectTarget>
+      <CEffectSet id="HeroShotSet"><EffectArray value="HeroBlindApply" /></CEffectSet>
+      <CEffectApplyBehavior id="HeroBlindApply"><Behavior value="HeroShotBlind" /></CEffectApplyBehavior>
+      <CBehaviorBuff id="HeroShotBlind" parent="StormBlind"><Duration value="2" /></CBehaviorBuff>
+      <CTalent id="HeroShotBlind">
+        <Face value="HeroBlind" />
+        <Abil value="HeroShot" />
+        <AbilityModificationArray>
+          <Modifications>
+            <Type value="FlatModification" />
+            <Catalog value="Behavior" />
+            <Entry value="HeroShotBlind" />
+            <Field value="Duration" />
+            <Value value="2.5" />
+          </Modifications>
+        </AbilityModificationArray>
+      </CTalent>
+    </Catalog>`,
+  }];
+  const result = runGraph(files, `
+    const g = G.buildEffectGraph(files);
+    const anchorToEntry = {
+      HeroShot: { kind: "ability", nameId: "HeroShot", buttonId: "HeroShot", heroSlug: "hero", heroName: "Hero", name: "Shot", icon: "i.png", abilityType: "W" },
+      HeroShotBlind: { kind: "talent", nameId: "HeroShotBlind", buttonId: "HeroBlind", heroSlug: "hero", heroName: "Hero", name: "Blind", icon: "i.png" },
+    };
+    const mechanics = [{ slug: "blinded", name: "Blinded", category: "Crowd Control", primaryBehavior: "StormBlind", sourceIds: [] }];
+    return G.findMechanicApplications(g, anchorToEntry, mechanics);
+  `);
+  const values = Object.fromEntries(result[0].entries.map((e) => [e.nameId, e.values.map((v) => [v.value, v.modifies ?? null])]));
+  assert.deepEqual(values, { HeroShot: [[2, null]], HeroShotBlind: [[4.5, "HeroShot"]] });
+});
+
+test("findMechanicApplications folds a talent's edit of its own buff into the base value", () => {
+  const files = [{
+    path: "x.xml",
+    content: `<Catalog>
+      <CBehaviorBuff id="StormArmor" />
+      <CAbilEffectInstant id="HeroSwarm"><Effect value="HeroSwarmSet" /></CAbilEffectInstant>
+      <CEffectSet id="HeroSwarmSet"><EffectArray value="HeroArmorApply" /></CEffectSet>
+      <CEffectApplyBehavior id="HeroArmorApply">
+        <Behavior value="HeroSwarmArmor" />
+        <ValidatorArray value="HeroHasEnduring" />
+      </CEffectApplyBehavior>
+      <CBehaviorBuff id="HeroSwarmArmor" parent="StormArmor"><Duration value="3.5" /></CBehaviorBuff>
+      <CValidatorPlayerTalent id="HeroHasEnduring"><Find value="1" /><Value value="HeroEnduring" /></CValidatorPlayerTalent>
+      <CTalent id="HeroEnduring">
+        <Abil value="HeroSwarm" />
+        <AbilityModificationArray>
+          <Modifications>
+            <Type value="FlatModification" />
+            <Catalog value="Behavior" />
+            <Entry value="HeroSwarmArmor" />
+            <Field value="Duration" />
+            <Value value="0.5" />
+          </Modifications>
+        </AbilityModificationArray>
+      </CTalent>
+    </Catalog>`,
+  }];
+  const result = runGraph(files, `
+    const g = G.buildEffectGraph(files);
+    const anchorToEntry = {
+      HeroSwarm: { kind: "ability", nameId: "HeroSwarm", buttonId: "HeroSwarm", heroSlug: "hero", heroName: "Hero", name: "Swarm", icon: "i.png", abilityType: "Q" },
+      HeroEnduring: { kind: "talent", nameId: "HeroEnduring", buttonId: "HeroEnduring", heroSlug: "hero", heroName: "Hero", name: "Enduring", icon: "i.png" },
+    };
+    const mechanics = [{ slug: "armored", name: "Armored", category: "Buff", primaryBehavior: "StormArmor", sourceIds: [] }];
+    return G.findMechanicApplications(g, anchorToEntry, mechanics);
+  `);
+  const values = Object.fromEntries(result[0].entries.map((e) => [e.nameId, e.values.map((v) => [v.value, v.modifies ?? null])]));
+  assert.deepEqual(values, { HeroEnduring: [[4, null]] });
+});
+
+test("findMechanicApplications credits a unit-innate behavior to the trait of the same id", () => {
+  const files = [{
+    path: "x.xml",
+    content: `<Catalog>
+      <CBehaviorBuff id="StormCloak" />
+      <CBehaviorBuff id="HeroPermanentCloak" parent="StormCloak" />
+      <CBehaviorBuff id="HeroOtherBuff" parent="StormCloak" />
+      <CUnit id="HeroUnit">
+        <BehaviorArray Link="HeroPermanentCloak" />
+        <BehaviorArray Link="HeroOtherBuff" />
+      </CUnit>
+    </Catalog>`,
+  }];
+  const result = runGraph(files, `
+    const g = G.buildEffectGraph(files);
+    const anchorToEntry = {
+      HeroPermanentCloak: { kind: "ability", nameId: "HeroPermanentCloak", buttonId: "HeroPermanentCloak", heroSlug: "hero", heroName: "Hero", name: "Permanent Cloak", icon: "i.png", abilityType: "Trait" },
+    };
+    const mechanics = [{ slug: "cloaked", name: "Stealthed", category: "Stealth", primaryBehavior: "StormCloak", sourceIds: ["StormCloak"] }];
+    return G.findMechanicApplications(g, anchorToEntry, mechanics);
+  `);
+  assert.deepEqual(result[0].entries.map((e) => e.nameId), ["HeroPermanentCloak"]);
 });

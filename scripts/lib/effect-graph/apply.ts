@@ -11,8 +11,10 @@ import type {
   MechanicLike,
   MechanicApplications,
   AnchorIndex,
+  MatchSource,
   Polarity,
 } from "./types.ts";
+import { sourceValues, talentModifiedValues, uniqueValues } from "./values.ts";
 import { findAll, findFirst } from "./traverse.ts";
 import { buildReverseRefs, effectsApplyingBehavior, containingEffectRefs, behaviorRefsBehaviorWithoutExcludedDescendants, targetBehaviorOf, rootAbilityAnchorIds } from "./walk.ts";
 import {
@@ -106,26 +108,56 @@ function talentOwnersForBehavior(
   sourceBehaviorIds: string[],
   excludedBehaviorDescendants: string[],
   mechanic: MechanicLike,
-): AbilTalentEntry[] {
-  return talentNodes
-    .filter(({ node }) => {
-      const behaviorBucketRefs = (node.refs["Abil"] ?? []).filter(
-        (id) => !anchorToEntry[id] && graph.nodes.get(id)?.tag.startsWith("CBehavior"),
-      );
-      const talentBehaviorRefs = [...(node.refs["BehaviorArray"] ?? []), ...behaviorBucketRefs];
-      return talentBehaviorRefs.some(
+): Credit[] {
+  return talentNodes.flatMap(({ node, entry }) => {
+    const behaviorBucketRefs = (node.refs["Abil"] ?? []).filter(
+      (id) => !anchorToEntry[id] && graph.nodes.get(id)?.tag.startsWith("CBehavior"),
+    );
+    const talentBehaviorRefs = [...(node.refs["BehaviorArray"] ?? []), ...behaviorBucketRefs];
+    return talentBehaviorRefs
+      .filter(
         (id) =>
           sourceBehaviorIds.some((sourceId) =>
             behaviorRefsBehaviorWithoutExcludedDescendants(graph, id, sourceId, excludedBehaviorDescendants)
           )
           && behaviorMatchesMechanicKind(graph, id, mechanic),
-      );
-    })
-    .map(({ entry }) => entry);
+      )
+      .map((behavior) => ({ entry, source: { behavior } }));
+  });
 }
 
-const addEntry = (entries: Map<string, AbilTalentEntry>, entry: AbilTalentEntry | undefined): void => {
-  if (entry && !entries.has(entry.nameId)) entries.set(entry.nameId, entry);
+// Unit-innate behaviors (CUnit BehaviorArray) named after a trait, e.g. NovaPermanentCloak.
+function innateTraitApplications(
+  graph: EffectGraph,
+  reverseRefs: Map<string, ReverseRef[]>,
+  anchorToEntry: AnchorIndex,
+  sourceBehaviorIds: string[],
+  excludedBehaviorDescendants: string[],
+  mechanic: MechanicLike,
+): Credit[] {
+  return Object.entries(anchorToEntry)
+    .filter(([behavior, entry]) =>
+      entry.abilityType === "Trait"
+      && graph.nodes.get(behavior)?.tag.startsWith("CBehavior")
+      && (reverseRefs.get(behavior) ?? []).some(({ node, field }) => field === "BehaviorArray" && node.tag === "CUnit")
+      && sourceBehaviorIds.some((sourceId) =>
+        behaviorRefsBehaviorWithoutExcludedDescendants(graph, behavior, sourceId, excludedBehaviorDescendants))
+      && behaviorMatchesMechanicKind(graph, behavior, mechanic))
+    .map(([behavior, entry]) => ({ entry, source: { behavior } }));
+}
+
+interface Credit {
+  entry: AbilTalentEntry;
+  source?: MatchSource;
+}
+
+type Found = Map<string, { entry: AbilTalentEntry; sources: MatchSource[] }>;
+
+const addEntry = (found: Found, entry: AbilTalentEntry | undefined | null, source?: MatchSource): void => {
+  if (!entry) return;
+  const cur = found.get(entry.nameId) ?? { entry, sources: [] };
+  if (source) cur.sources.push(source);
+  found.set(entry.nameId, cur);
 };
 
 // Lifesteal effects (CEffectDamage with LeechFraction>0) are gated at the effect level,
@@ -136,8 +168,8 @@ function lifestealDirectEffectEntries(
   graph: EffectGraph,
   anchorToEntry: AnchorIndex,
   directEffectIds: Set<string>,
-): AbilTalentEntry[] {
-  const out: AbilTalentEntry[] = [];
+): Credit[] {
+  const out: Credit[] = [];
   for (const eid of directEffectIds) {
     const effectNode = graph.nodes.get(eid);
     // LeechValidator gates the lifesteal fraction specifically; ValidatorArray gates the
@@ -152,14 +184,14 @@ function lifestealDirectEffectEntries(
     if (leechTalentIds.length > 0) {
       for (const tid of leechTalentIds) {
         const e = anchorToEntry[tid];
-        if (e) out.push(e);
+        if (e) out.push({ entry: e, source: { effect: eid } });
       }
       continue;
     }
     if (/HeroWeaponDamage(?:Hero)?$/i.test(eid) && !/(?:FocusFire|Remorseless|Cleaver|Ricochet)/i.test(eid)) {
       for (const entry of Object.values(anchorToEntry)) {
         if (entry.kind === "ability" && entry.abilityType === "Trait" && hasIdBoundary(eid, entry.nameId.replace(/Reload$/i, ""))) {
-          out.push(entry);
+          out.push({ entry, source: { effect: eid } });
         }
       }
     }
@@ -194,10 +226,10 @@ function damageMmaApplications(
   bucketEnablers: Map<string, string[]>,
   mechanic: MechanicLike,
   ignoreSpawnSetupRefs: boolean,
-): AbilTalentEntry[] {
+): Credit[] {
   if (mechanic.statModifier !== "damage" || mechanic.statPolarity !== "increase") return [];
 
-  const out: AbilTalentEntry[] = [];
+  const out: Credit[] = [];
 
   // Count MMA signatures to separate hero-wide traits from single-ability bonuses.
   const traitMmaSigCount = new Map<string, number>();
@@ -271,14 +303,14 @@ function damageMmaApplications(
           if (roots && roots.size === 1) continue;
           for (const talentId of talentIds) {
             const e = anchorToEntry[talentId];
-            if (e) out.push(e);
+            if (e) out.push({ entry: e, source: { effect: node.id, modifier: modifier ?? 0, ...(accumulatorId && { accumulator: accumulatorId }) } });
           }
           continue;
         }
       }
       if (isHeroWideTraitMma(mma.attrs) && accumulatorId) {
         const owner = entryForNamedId(anchorToEntry, accumulatorId);
-        if (owner) out.push(owner);
+        if (owner) out.push({ entry: owner, source: { effect: node.id, modifier: modifier ?? 0, ...(accumulatorId && { accumulator: accumulatorId }) } });
       }
     }
   }
@@ -315,7 +347,7 @@ function damageMmaApplications(
       if (roots.size === 1) continue;
       for (const talentId of talentIds) {
         const e = anchorToEntry[talentId];
-        if (e) out.push(e);
+        if (e) out.push({ entry: e, source: { effect: caseEffectId, modifier: caseAmount / defaultAmount - 1 } });
       }
     }
   }
@@ -328,14 +360,18 @@ function damageMmaApplications(
 // to a reader. Keep one per (hero, display name): prefer an ability over a talent, then
 // the shortest id (the base, not a "…GlyphOf…" variant).
 function collapseEntries(
-  byNameId: Map<string, AbilTalentEntry>,
+  graph: EffectGraph,
+  mechanic: MechanicLike,
+  found: Found,
   excludedEntryIds: Set<string>,
 ): AbilTalentEntry[] {
   const byHeroName = new Map<string, AbilTalentEntry>();
-  for (const entry of byNameId.values()) {
+  const sources = new Map<string, MatchSource[]>();
+  for (const { entry, sources: own } of found.values()) {
     if (excludedEntryIds.has(entry.nameId)) continue;
     if (isCancelEntry(entry)) continue;
-    const k = `${entry.heroSlug} ${entry.name}`;
+    const k = `${entry.heroSlug}\u0000${entry.name}`;
+    sources.set(k, [...(sources.get(k) ?? []), ...own]);
     const cur = byHeroName.get(k);
     const better =
       !cur
@@ -343,7 +379,39 @@ function collapseEntries(
       || (entry.kind === cur.kind && entry.nameId.length < cur.nameId.length);
     if (better) byHeroName.set(k, entry);
   }
-  return [...byHeroName.values()].sort(
+  const withValues = [...byHeroName.entries()].map(([k, entry]) => {
+    const values = uniqueValues((sources.get(k) ?? []).flatMap((source) => sourceValues(graph, mechanic, source)));
+    return values.length > 0 ? { ...entry, values } : entry;
+  });
+  return withValues.sort(
+    (a, b) =>
+      a.heroName.localeCompare(b.heroName)
+      || (a.kind === b.kind ? 0 : a.kind === "ability" ? -1 : 1)
+      || a.name.localeCompare(b.name),
+  );
+}
+
+function withTalentModifications(
+  graph: EffectGraph,
+  mechanic: MechanicLike,
+  entries: AbilTalentEntry[],
+  talentNodes: TalentSidecars["talentNodes"],
+  excludedEntryIds: Set<string>,
+): AbilTalentEntry[] {
+  const byNameId = new Map(entries.map((e) => [e.nameId, e]));
+  for (const { entry, node } of talentNodes) {
+    if (excludedEntryIds.has(entry.nameId)) continue;
+    const modified = talentModifiedValues(graph, mechanic, node, entries);
+    if (modified.length === 0) continue;
+    const cur = byNameId.get(entry.nameId) ?? entry;
+    // A talent editing its own buff replaces the base value: the unmodified one never applies.
+    const own = modified.filter((v) => v.modifies === entry.nameId).map(({ modifies: _, ...v }) => v);
+    const replaced = new Set(own.map((v) => v.source));
+    const kept = (cur.values ?? []).filter((v) => v.modifies || !replaced.has(v.source));
+    const others = modified.filter((v) => v.modifies !== entry.nameId);
+    byNameId.set(entry.nameId, { ...cur, values: uniqueValues([...kept, ...own, ...others]) });
+  }
+  return [...byNameId.values()].sort(
     (a, b) =>
       a.heroName.localeCompare(b.heroName)
       || (a.kind === b.kind ? 0 : a.kind === "ability" ? -1 : 1)
@@ -365,7 +433,7 @@ export function findMechanicApplications(
   const { chanceEnablers, bucketEnablers, talentNodes } = buildTalentSidecars(graph, anchorToEntry);
 
   return mechanics.map((mech) => {
-    const byNameId = new Map<string, AbilTalentEntry>();
+    const byNameId: Found = new Map();
     const healingBehaviorIds = mech.slug === "healing-increase" ? positiveHealingBuffIds(graph) : [];
     const lifestealBehaviorIds = mech.statModifier === "lifesteal" ? positiveLifestealBehaviorIds(graph, mech.statDamageKind) : [];
     const statBehaviorIds = positiveStatBehaviorIds(graph, mech);
@@ -396,50 +464,54 @@ export function findMechanicApplications(
         if (!nodePassesMechanicFilter(graph, effectId, mech)) continue;
         effectIds.add(effectId);
       }
-      for (const entry of talentOwnersForBehavior(graph, anchorToEntry, talentNodes, behaviorIds, excludedBehaviorDescendants, mech)) {
-        addEntry(byNameId, entry);
+      for (const { entry, source } of talentOwnersForBehavior(graph, anchorToEntry, talentNodes, behaviorIds, excludedBehaviorDescendants, mech)) {
+        addEntry(byNameId, entry, source);
       }
+    }
+    for (const { entry, source } of innateTraitApplications(graph, reverseRefs, anchorToEntry, behaviorIds, excludedBehaviorDescendants, mech)) {
+      addEntry(byNameId, entry, source);
     }
     if (mech.statModifier === "lifesteal") {
       for (const behaviorId of lifestealBehaviorIds) {
-        addEntry(byNameId, entryForNamedId(anchorToEntry, behaviorId) ?? undefined);
+        addEntry(byNameId, entryForNamedId(anchorToEntry, behaviorId), { behavior: behaviorId });
       }
-      for (const entry of lifestealDirectEffectEntries(graph, anchorToEntry, directEffectIds)) {
-        addEntry(byNameId, entry);
+      for (const { entry, source } of lifestealDirectEffectEntries(graph, anchorToEntry, directEffectIds)) {
+        addEntry(byNameId, entry, source);
       }
     }
     for (const eid of effectIds) {
       if (isSharedStormApplyEffect(graph, eid)) continue;
       const owners = resolveEffectOwners(graph, reverseRefs, anchorToEntry, chanceEnablers, eid, { ignoreSpawnSetupRefs, bucketEnablers });
-      for (const entry of owners) addEntry(byNameId, entry);
+      const targetBehaviorId = targetBehaviorOf(graph, eid);
+      const source = { effect: eid, ...(targetBehaviorId && { behavior: targetBehaviorId }) };
+      for (const entry of owners) addEntry(byNameId, entry, source);
       if (owners.length === 0 && containingEffectRefs(reverseRefs, eid).length > 0) {
         const effectNode = graph.nodes.get(eid);
-        const targetBehaviorId = targetBehaviorOf(graph, eid);
         const fallbackTalentIds = [
           ...new Set([
             ...(effectNode ? gatingTalentIds(graph, anchorToEntry, effectNode, chanceEnablers) : []),
             ...(targetBehaviorId ? talentIdsFromBehaviorValidators(graph, anchorToEntry, targetBehaviorId) : []),
           ]),
         ];
-        for (const talentId of fallbackTalentIds) addEntry(byNameId, anchorToEntry[talentId]);
+        for (const talentId of fallbackTalentIds) addEntry(byNameId, anchorToEntry[talentId], source);
       }
     }
     if (mech.slug === "healing-increase") {
       for (const behaviorId of healingBehaviorIds) {
         for (const { anchor, entry } of talentNodes) {
-          if (behaviorNameMatchesTalent(behaviorId, anchor)) addEntry(byNameId, entry);
+          if (behaviorNameMatchesTalent(behaviorId, anchor)) addEntry(byNameId, entry, { behavior: behaviorId });
         }
       }
     }
-    for (const entry of damageMmaApplications(graph, reverseRefs, anchorToEntry, chanceEnablers, bucketEnablers, mech, ignoreSpawnSetupRefs)) {
-      addEntry(byNameId, entry);
+    for (const { entry, source } of damageMmaApplications(graph, reverseRefs, anchorToEntry, chanceEnablers, bucketEnablers, mech, ignoreSpawnSetupRefs)) {
+      addEntry(byNameId, entry, source);
     }
 
     return {
       slug: mech.slug,
       name: mech.name,
       category: mech.category,
-      entries: collapseEntries(byNameId, excludedEntryIds),
+      entries: withTalentModifications(graph, mech, collapseEntries(graph, mech, byNameId, excludedEntryIds), talentNodes, excludedEntryIds),
     };
   });
 }
