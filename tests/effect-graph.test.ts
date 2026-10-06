@@ -2216,3 +2216,31 @@ test("findMechanicApplications credits a unit-innate behavior to the trait of th
   `);
   assert.deepEqual(result[0].entries.map((e) => e.nameId), ["HeroPermanentCloak"]);
 });
+
+test("findMechanicApplications ignores damage upgrades on unreferenced switches", () => {
+  const files = [{
+    path: "x.xml",
+    content: `<Catalog>
+      <CEffectDamage id="StormSpellDot" />
+      <CAbilEffectTarget id="HeroQ"><Effect value="HeroQDamage" /></CAbilEffectTarget>
+      <CEffectDamage id="HeroQDamage" parent="StormSpellDot"><Amount value="33" /></CEffectDamage>
+      <CEffectDamage id="HeroQMasteryDamage" parent="StormSpellDot"><Amount value="81" /></CEffectDamage>
+      <CEffectSwitch id="HeroQDamageSwitch">
+        <CaseArray Validator="HeroHasTalent" Effect="HeroQMasteryDamage" />
+        <CaseDefault value="HeroQDamage" />
+      </CEffectSwitch>
+      <CValidatorPlayerTalent id="HeroHasTalent"><Find value="1" /><Value value="HeroTalent" /></CValidatorPlayerTalent>
+      <CTalent id="HeroTalent" />
+    </Catalog>`,
+  }];
+  const result = runGraph(files, `
+    const g = G.buildEffectGraph(files);
+    const anchorToEntry = {
+      HeroQ: { kind: "ability", nameId: "HeroQ", buttonId: "HeroQ", heroSlug: "hero", heroName: "Hero", name: "Q", icon: "i.png", abilityType: "Q" },
+      HeroTalent: { kind: "talent", nameId: "HeroTalent", buttonId: "HeroTalent", heroSlug: "hero", heroName: "Hero", name: "Talent", icon: "i.png" },
+    };
+    const mechanics = [{ slug: "damage-increase", name: "Damage Increase", category: "Buff", primaryBehavior: "", sourceIds: [], statModifier: "damage", statPolarity: "increase", statDamageKind: "general" }];
+    return G.findMechanicApplications(g, anchorToEntry, mechanics);
+  `);
+  assert.deepEqual(result[0].entries.map((e) => e.nameId), []);
+});

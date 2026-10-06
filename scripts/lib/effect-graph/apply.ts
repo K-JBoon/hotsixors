@@ -322,6 +322,8 @@ function damageMmaApplications(
   // OctoGrabPokeMasteryDamage (137) via TargetHasOctoGrabMasteryCarry.
   for (const [, node] of graph.nodes) {
     if (node.tag !== "CEffectSwitch") continue;
+    // Unreferenced switches are dead data (e.g. only named in ExcludeEffectArray lists).
+    if ((reverseRefs.get(node.id) ?? []).length === 0) continue;
     const defaultEl = findFirst(node.elements, "CaseDefault");
     const defaultEffectId = defaultEl?.attrs.value;
     if (!defaultEffectId) continue;
