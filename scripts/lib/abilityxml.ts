@@ -1,5 +1,5 @@
 import type { AbilityStats, AbilityStatSource } from "../types.ts";
-import { attr, block as catalogBlock } from "./catalog-xml.ts";
+import { attr, block as catalogBlock, esc } from "./catalog-xml.ts";
 import { parseConstants, resolveNumber, type Constants } from "./catalog-consts.ts";
 
 function parseMana(block: string, consts: Constants): number | null {
@@ -8,9 +8,29 @@ function parseMana(block: string, consts: Constants): number | null {
   return resolveNumber(attr(el[0], "value"), consts);
 }
 
-function parseCooldown(block: string, consts: Constants): number | null {
-  const m = /<Cooldown[^>]+TimeUse="([^"]+)"/i.exec(block);
+function parseCooldown(block: string, costTag: string, consts: Constants): number | null {
+  const cost = new RegExp(`<${costTag}\\b[^>]*>([\\s\\S]*?)</${costTag}>`, "i").exec(block);
+  const m = cost && /<Cooldown[^>]+TimeUse="([^"]+)"/i.exec(cost[1]);
   return m ? resolveNumber(m[1], consts) : null;
+}
+
+// Off faces come from the ability's CmdButtonArray or from unit card layouts.
+export function isToggleOffButton(xml: string, abilityId: string, buttonId: string): boolean {
+  const abilBlock = catalogBlock(xml, "CAbil", abilityId);
+  if (!abilBlock) return false;
+  const cmd = /<CmdButtonArray[^>]+index="Off"[^>]*>/i.exec(abilBlock);
+  if (cmd && attr(cmd[0], "DefaultButtonFace") === buttonId) return true;
+  const layout = new RegExp(`<Buttons\\b[^>]+AbilCmd="${esc(abilityId)},Off"[^>]*>`, "gi");
+  return [...xml.matchAll(layout)].some((m) => attr(m[0], "Face") === buttonId);
+}
+
+// Toggles pay Cost on activation (the cancel lockout) and OffCost/ExpireCost on deactivation.
+function cardCooldown(abilBlock: string, isOff: boolean, consts: Constants): number | null {
+  const onCost = parseCooldown(abilBlock, "Cost", consts);
+  if (isOff) return onCost;
+  const all = [onCost, parseCooldown(abilBlock, "OffCost", consts), parseCooldown(abilBlock, "ExpireCost", consts)]
+    .filter((v): v is number => v !== null);
+  return all.length > 0 ? Math.max(...all) : null;
 }
 
 function parseCastIntroTime(block: string, consts: Constants): number | null {
@@ -49,6 +69,7 @@ const constantsCache = new Map<string, Constants>();
 export function parseAbilityStats(
   xml: string,
   abilityId: string,
+  buttonId: string,
   xmlPath: string,
 ): Omit<AbilityStats, "range" | "radius" | "width"> {
   const abilBlock = catalogBlock(xml, "CAbil", abilityId);
@@ -61,7 +82,9 @@ export function parseAbilityStats(
   const manaCost = abilBlock ? parseMana(abilBlock, consts) : null;
   if (manaCost !== null) sources.manaCost = abilSrc;
 
-  const cooldown = abilBlock ? parseCooldown(abilBlock, consts) : null;
+  const cooldown = abilBlock
+    ? cardCooldown(abilBlock, isToggleOffButton(xml, abilityId, buttonId), consts)
+    : null;
   if (cooldown !== null) sources.cooldown = abilSrc;
 
   const castIntroTime = abilBlock ? parseCastIntroTime(abilBlock, consts) : null;

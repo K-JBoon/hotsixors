@@ -16,7 +16,7 @@ import type {
   ShortcodeEntry,
 } from "../types.ts";
 import { GAMEDATA_DIR, HEROES_IMAGES_DIR, SITE_STATIC_IMAGES } from "./paths.ts";
-import { parseAbilityStats } from "./abilityxml.ts";
+import { isToggleOffButton, parseAbilityStats } from "./abilityxml.ts";
 import { abilityGeometry, type GatedArea } from "./ability-geometry.ts";
 import { abilityTicks, type GatedTick } from "./ability-ticks.ts";
 import { abilityNotes, type GatedNote } from "./ability-notes.ts";
@@ -184,14 +184,15 @@ export function createEntryResolver(
     if (ticks.length > 0) foundTicks.set(nameId, ticks);
     const notes = graph ? abilityNotes(graph, nameId, (id) => nameByAbilId(gs, id)) : [];
     if (notes.length > 0) foundNotes.set(nameId, notes);
-    const xmlStats = xmlData ? parseAbilityStats(xmlData.xml, nameId, xmlData.xmlPath) : null;
+    const xmlStats = xmlData ? parseAbilityStats(xmlData.xml, nameId, entry.buttonId, xmlData.xmlPath) : null;
     const costText = opts?.costless || xmlStats?.manaCost != null ? "" : getAbilityCostText(gs, entry.linkId);
     const stats = xmlStats
       ? { ...xmlStats, ...geometry, range: scriptRange(nameId) ?? range, costKind: ctx.resourceKind, costText }
       : null;
 
     const anchor = declAnchor(nameId);
-    addShortcodeEntry(nameId, {
+    const isOffCard = xmlData ? isToggleOffButton(xmlData.xml, nameId, entry.buttonId) : false;
+    if (!isOffCard || !shortcodeData[nameId]) addShortcodeEntry(nameId, {
       name,
       buttonId: entry.buttonId,
       icon,
