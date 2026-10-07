@@ -192,6 +192,7 @@ export interface HeroStatsResource {
 export interface HeroStatsLife {
   amount: number;
   scale: number;
+  scalePct: number;
   regenRate: number;
   regenScale: number;
 }
@@ -203,6 +204,7 @@ export interface HeroStatsShield extends HeroStatsLife {
 export interface HeroStatsWeapon {
   damage: number;
   damageScale: number;
+  damageScalePct: number;
   range: number;
   period: number;
   attackSpeed: number;

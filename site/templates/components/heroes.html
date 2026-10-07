@@ -150,8 +150,8 @@
       {% if invulnerable %}
       <div class="unit-bar unit-bar--invulnerable">Invulnerable</div>
       {% else %}
-      <div class="unit-bar unit-bar--life" title="Health{% if st.life.scale > 0 %}, +{{ (st.life.scale * 100) | round }}% per level{% endif %}">
-        <span class="storm-scale" data-base="{{ st.life.amount }}" data-scale="{{ st.life.scale }}" data-round="up">{{ st.life.amount | round }}</span>
+      <div class="unit-bar unit-bar--life" title="Health{% if st.life.scale > 0 %}, +{{ st.life.scalePct }}% per level{% endif %}">
+        <span class="storm-scale" data-base="{{ st.life.amount }}" data-scale="{{ st.life.scale }}" data-round="up" data-show-scaling>{{ st.life.amount | round }}</span>
         {% if st.life.regenRate %}<span class="unit-bar__regen{% if st.life.regenRate < 0 %} unit-bar__regen--decay{% endif %}"><span class="storm-scale" data-base="{{ st.life.regenRate }}" data-scale="{{ st.life.regenScale }}" data-decimals="2" data-per-tick>{{ st.life.regenRate | round(precision=2) }}</span>/s</span>{% endif %}
       </div>
       {% endif %}
@@ -164,7 +164,7 @@
   </div>
   <dl class="unit-panel__stats">
     {% if w %}
-    <div class="ability-stat">{{<heroes.ability_stat_label kind="damage" label="Damage" />}}<dd class="ability-stat__value"><span class="storm-scale" data-base="{{ w.damage }}" data-scale="{{ w.damageScale }}" title="+{{ (w.damageScale * 100) | round }}% per level">{{ w.damage | round }}</span></dd></div>
+    <div class="ability-stat">{{<heroes.ability_stat_label kind="damage" label="Damage" />}}<dd class="ability-stat__value"><span class="storm-scale" data-base="{{ w.damage }}" data-scale="{{ w.damageScale }}" title="+{{ w.damageScalePct }}% per level">{{ w.damage | round }}</span></dd></div>
     <div class="ability-stat">{{<heroes.ability_stat_label kind="attack-speed" label="Attack speed" />}}<dd class="ability-stat__value" title="Period {{ w.period | round(precision=2) }}s{% if windup %}, {{ tm.damagePoint }}s windup{% if tm.backswing %}, {{ tm.backswing }}s backswing{% endif %}{% endif %}">{{ w.attackSpeed | round(precision=2) }}/s</dd></div>
     <div class="ability-stat">{{<heroes.ability_stat_label kind="range" label="Range" />}}<dd class="ability-stat__value">{{ w.range | round(precision=2) }}</dd></div>
     {% if missile %}<div class="ability-stat">{{<heroes.ability_stat_label kind="missile" label="Missile speed" />}}<dd class="ability-stat__value" title="{% for p in tm.missilePhases %}{% if not loop.first %} → {% endif %}{{ p.speed }}{% if p.fromDistance %} (last {{ p.fromDistance | join(sep="-") }}u){% endif %}{% endfor %}">{{ tm.missilePhases | first | get(key="speed") }}</dd></div>{% endif %}
@@ -204,13 +204,13 @@
   <div class="unit-strip__vitals">
     <h3 class="unit-strip__name{% if solo %} visually-hidden{% endif %}">{{ name }}</h3>
     {% if st.shield %}
-    <div class="unit-bar unit-bar--shield" title="Shields{% if st.shield.scale > 0 %}, +{{ (st.shield.scale * 100) | round }}% per level{% endif %}{% if st.shield.regenDelay %}, regenerate after {{ st.shield.regenDelay }}s without damage{% endif %}">
+    <div class="unit-bar unit-bar--shield" title="Shields{% if st.shield.scale > 0 %}, +{{ st.shield.scalePct }}% per level{% endif %}{% if st.shield.regenDelay %}, regenerate after {{ st.shield.regenDelay }}s without damage{% endif %}">
       <span><span class="unit-bar__kind">Shields</span> <span class="storm-scale" data-base="{{ st.shield.amount }}" data-scale="{{ st.shield.scale }}" data-round="up">{{ st.shield.amount | round | int }}</span></span>
       {% if st.shield.regenRate %}<span class="unit-bar__regen"><span class="storm-scale" data-base="{{ st.shield.regenRate }}" data-scale="{{ st.shield.regenScale }}" data-decimals="0">{{ st.shield.regenRate | round | int }}</span>/s</span>{% endif %}
     </div>
     {% endif %}
-    <div class="unit-bar unit-bar--life" title="Health{% if st.life.scale > 0 %}, +{{ (st.life.scale * 100) | round }}% per level{% endif %}">
-      <span class="storm-scale" data-base="{{ st.life.amount }}" data-scale="{{ st.life.scale }}" data-round="up">{{ st.life.amount | round }}</span>
+    <div class="unit-bar unit-bar--life" title="Health{% if st.life.scale > 0 %}, +{{ st.life.scalePct }}% per level{% endif %}">
+      <span class="storm-scale" data-base="{{ st.life.amount }}" data-scale="{{ st.life.scale }}" data-round="up" data-show-scaling>{{ st.life.amount | round }}</span>
       {% if st.life.regenRate %}<span class="unit-bar__regen{% if st.life.regenRate < 0 %} unit-bar__regen--decay{% endif %}"><span class="storm-scale" data-base="{{ st.life.regenRate }}" data-scale="{{ st.life.regenScale }}" data-decimals="2" data-per-tick>{{ st.life.regenRate | round(precision=2) }}</span>/s</span>{% endif %}
     </div>
     {% if st.resource %}
@@ -222,7 +222,7 @@
   </div>
   <dl class="unit-strip__stats">
     {% if w %}
-    <div class="ability-stat">{{<heroes.ability_stat_label kind="damage" label="Damage" />}}<dd class="ability-stat__value"><span class="storm-scale" data-base="{{ w.damage }}" data-scale="{{ w.damageScale }}" title="+{{ (w.damageScale * 100) | round }}% per level">{{ w.damage | round }}</span></dd></div>
+    <div class="ability-stat">{{<heroes.ability_stat_label kind="damage" label="Damage" />}}<dd class="ability-stat__value"><span class="storm-scale" data-base="{{ w.damage }}" data-scale="{{ w.damageScale }}" title="+{{ w.damageScalePct }}% per level">{{ w.damage | round }}</span></dd></div>
     <div class="ability-stat">{{<heroes.ability_stat_label kind="attack-speed" label="Attack speed" />}}<dd class="ability-stat__value" title="Period {{ w.period | round(precision=2) }}s{% if windup %}, {{ tm.damagePoint }}s windup{% if tm.backswing %}, {{ tm.backswing }}s backswing{% endif %}{% endif %}">{{ w.attackSpeed | round(precision=2) }}/s</dd></div>
     <div class="ability-stat">{{<heroes.ability_stat_label kind="range" label="Range" />}}<dd class="ability-stat__value">{{ w.range | round(precision=2) }}</dd></div>
     {% if missile %}<div class="ability-stat">{{<heroes.ability_stat_label kind="missile" label="Missile speed" />}}<dd class="ability-stat__value" title="{% for p in tm.missilePhases %}{% if not loop.first %} → {% endif %}{{ p.speed }}{% if p.fromDistance %} (last {{ p.fromDistance | join(sep="-") }}u){% endif %}{% endfor %}">{{ tm.missilePhases | first | get(key="speed") }}</dd></div>{% endif %}

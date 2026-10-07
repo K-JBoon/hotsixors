@@ -233,17 +233,21 @@ export function primaryWeapon(hero: HeroStatsSource): HeroWeaponData | undefined
   return enabled.reduce<HeroWeaponData | undefined>((best, w) => (!best || w.range > best.range ? w : best), undefined);
 }
 
+const toPct = (scale: number): number => Number((scale * 100).toFixed(2));
+
 export function buildHeroStats(hero: HeroStatsSource, catalog: CatalogLookup = NO_CATALOG): HeroStats | null {
   if (!hero.life) return null;
   const life = {
     amount: hero.life.amount,
     scale: hero.life.scale ?? 0,
+    scalePct: toPct(hero.life.scale ?? 0),
     regenRate: hero.life.regenRate,
     regenScale: hero.life.regenScale ?? 0,
   };
   const shield = hero.shield ? {
     amount: hero.shield.amount,
     scale: hero.shield.scale ?? 0,
+    scalePct: toPct(hero.shield.scale ?? 0),
     regenRate: hero.shield.regenRate,
     regenScale: hero.shield.regenScale ?? 0,
     regenDelay: hero.shield.regenDelay ?? 0,
@@ -269,6 +273,7 @@ export function buildHeroStats(hero: HeroStatsSource, catalog: CatalogLookup = N
     weapon = {
       damage: w.damage * catalog.weaponDamageMultiplier(w.nameId),
       damageScale: w.damageScale ?? 0,
+      damageScalePct: toPct(w.damageScale ?? 0),
       range: w.range,
       period: w.period,
       attackSpeed: w.period > 0 ? 1 / w.period : 0,

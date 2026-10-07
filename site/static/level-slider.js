@@ -27,7 +27,7 @@
     const isPercent = el.dataset.percent === "true";
     const perTick = "perTick" in el.dataset;
     const roundUp = el.dataset.round === "up";
-    const compact = el.closest(COMPACT_VALUE_SELECTOR) !== null;
+    const compact = el.closest(COMPACT_VALUE_SELECTOR) !== null && !("showScaling" in el.dataset);
     let decimals;
     if (el.dataset.decimals != null) {
       decimals = parseInt(el.dataset.decimals, 10);
@@ -75,7 +75,7 @@
     for (const e of entries) {
       const formatted = format(scaledValue(e, level), e.decimals, e.isPercent, e.roundUp);
       if (level === 0 && e.scale > 0 && !e.compact) {
-        const pct = Math.round(e.scale * 100);
+        const pct = Number((e.scale * 100).toFixed(2));
         e.el.innerHTML = escape(formatted) + ' <span class="storm-scaling">(+' + pct + "% per level)</span>";
       } else {
         e.el.textContent = formatted;
