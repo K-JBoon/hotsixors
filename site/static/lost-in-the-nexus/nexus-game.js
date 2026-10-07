@@ -65,13 +65,18 @@ function pickChoices(maps, count) {
     const j = Math.floor(Math.random() * (i + 1));
     [slugs[i], slugs[j]] = [slugs[j], slugs[i]];
   }
-  return slugs.slice(0, count).map((slug) => ({ slug, name: maps[slug].name || slug, bytes: maps[slug].bytes }));
+  return slugs.slice(0, count);
 }
 
 export function createNexusGame({ nexus, page, lobbyCode, setStatus }) {
   const storage = createStorage();
   const view = createGameUi({ page });
   const shots = createShotView({ shotHost: view.shotHost });
+  const mapEntry = (slug) => ({
+    slug,
+    name: nexus.maps[slug].name || slug,
+    bytes: (nexus.maps[slug].bytes || 0) + (nexus.terrainIndex[slug]?.bytes || 0),
+  });
 
   let net = null;
   let selfPeerId = null;
@@ -311,7 +316,7 @@ export function createNexusGame({ nexus, page, lobbyCode, setStatus }) {
   function startGame() {
     if (!isHost || guessers().length < 1) return;
     phase = 'map-select';
-    choices = pickChoices(allowedMaps(nexus.maps), MAP_CHOICES);
+    choices = pickChoices(allowedMaps(nexus.maps), MAP_CHOICES).map(mapEntry);
     broadcast({ kind: 'map-options', choices, limitSec });
     render();
   }
@@ -602,7 +607,7 @@ export function createNexusGame({ nexus, page, lobbyCode, setStatus }) {
       if (!mapPanelShown) {
         mapPanelShown = true;
         setPanel(mapSelectPanel({
-          maps: Object.entries(allowedMaps(nexus.maps)).map(([slug, map]) => ({ slug, name: map.name || slug, bytes: map.bytes })),
+          maps: Object.keys(allowedMaps(nexus.maps)).map(mapEntry),
           choices,
           limitSec,
           isHost,

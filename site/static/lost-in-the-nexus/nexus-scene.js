@@ -324,7 +324,38 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
   controls.screenSpacePanning = false;
   controls.maxPolarAngle = Math.PI / 2 - 0.02; // no going under the ground
 
-  const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
+  // GLTFLoader caches images per file, but many models share art. Textures
+  // sharing one Source are fetched and uploaded once per map.
+  const sharedArt = new Map();
+  const bitmaps = new THREE.ImageBitmapLoader();
+
+  function art(url) {
+    if (!sharedArt.has(url)) {
+      const base = bitmaps.loadAsync(url).then((bitmap) => new THREE.Texture(bitmap));
+      base.catch(() => sharedArt.delete(url));
+      sharedArt.set(url, base);
+    }
+    return sharedArt.get(url);
+  }
+
+  // Version 0 until the image lands, so the renderer skips it meanwhile.
+  // Bitmaps ignore flipY.
+  function sharedTexture(url) {
+    const texture = new THREE.Texture();
+    texture.flipY = false;
+    art(url).then((base) => {
+      texture.source = base.source;
+      texture.needsUpdate = true;
+    }, () => {});
+    return texture;
+  }
+
+  const artManager = new THREE.LoadingManager().addHandler(/\.webp$/i, {
+    load(url, onLoad, onProgress, onError) {
+      art(url).then((base) => onLoad(base.clone()), onError);
+    },
+  });
+  const loader = new GLTFLoader(artManager).setMeshoptDecoder(MeshoptDecoder);
   const mixers = [];
   const scrollers = [];
   const emitters = [];  // the particle systems of the loaded map
@@ -400,10 +431,9 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
   const textures = new THREE.TextureLoader();
 
   function applyMask(material, { uri, tiling, scroll, offset = [0, 0], uv = 0 }) {
-    const map = textures.load(asset('/lost-in-the-nexus/models/' + uri));
+    const map = sharedTexture(asset('/lost-in-the-nexus/models/' + uri));
     map.wrapS = THREE.RepeatWrapping;
     map.wrapT = THREE.RepeatWrapping;
-    map.flipY = false; // glTF UVs, and the art it masks comes in that way
     map.repeat.set(tiling[0], tiling[1]);
     map.offset.set(offset[0], offset[1]);
     // A mask can read the model's second unwrap while the art reads the first.
@@ -593,9 +623,8 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
       envioMaskTiling: { value: new THREE.Vector2(...maskTiling) },
     };
     if (mask) {
-      const maskMap = textures.load(asset('/lost-in-the-nexus/models/' + mask));
+      const maskMap = sharedTexture(asset('/lost-in-the-nexus/models/' + mask));
       maskMap.wrapS = maskMap.wrapT = THREE.RepeatWrapping;
-      maskMap.flipY = false;
       uniforms.envioMask.value = maskMap;
     }
     envioUniforms.set(material, uniforms);
@@ -688,9 +717,8 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
     material.userData.teamLit = true;
     const uniforms = { teamEmissive: { value: TEAM_EMISSIVE[NEUTRAL] }, teamLight: { value: null } };
     if (uri) {
-      const map = textures.load(asset('/lost-in-the-nexus/models/' + uri));
+      const map = sharedTexture(asset('/lost-in-the-nexus/models/' + uri));
       map.wrapS = map.wrapT = THREE.RepeatWrapping;
-      map.flipY = false;
       map.repeat.set(tiling[0], tiling[1]);
       uniforms.teamLight.value = map;
     }
@@ -847,8 +875,7 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
   const waterClock = { value: 0 };
 
   function waterSurface(material, { uri, grid: [columns, rows], frames, fps }, tiling, scroll) {
-    const sheet = textures.load(asset(uri));
-    sheet.flipY = false;
+    const sheet = sharedTexture(asset(uri));
     const frame = { value: 0 };
     if (fps) flipbooks.push({ frame, fps, count: frames });
     keyProgram(material, `water:${columns}x${rows}:${frames}`);
@@ -950,6 +977,7 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
       material.dispose();
     }
     teamMaterials.clear();
+    sharedArt.clear();
   }
 
   async function loadMap(slug, onStatus = () => {}, { skip } = {}) {
@@ -1069,8 +1097,7 @@ export async function createNexusScene({ view, assets = '', pitch = 55, hotkeys 
     for (const [name, list] of placements) {
       if (!wanted.includes(name)) continue;
       for (const spec of models.models[name].particles) {
-        const texture = textures.load(asset('/lost-in-the-nexus/models/' + spec.uri));
-        texture.flipY = false;
+        const texture = sharedTexture(asset('/lost-in-the-nexus/models/' + spec.uri));
         const mesh = emitterMesh(spec, texture, list);
         if (!mesh) continue;
         world.add(mesh);
