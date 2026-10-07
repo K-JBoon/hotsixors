@@ -21,12 +21,12 @@
   <section class="gd-editor">
     <header class="gd-toolbar" data-gd-file-path="{{ page.extra.file_path }}">
       <h1 class="visually-hidden">{{ page.extra.file_path | default(value=file_name) }}</h1>
-      <span class="gd-filechip" data-ext="{{ page.extra.file_ext | default(value='xml') }}">{{ file_name }}</span>
+      <span class="chip is-active gd-filechip" data-ext="{{ page.extra.file_ext | default(value='xml') }}">{{ file_name }}</span>
       {{<gd.breadcrumb display_path={page.extra.file_path} url_path={page.extra.url_path} />}}
       <div class="gd-toolbar__actions" data-gd-actions>
-        <button class="gd-btn" type="button" data-gd-copy-path>Copy path</button>
-        <button class="gd-btn" type="button" aria-pressed="false" title="Collapse every indented section" data-gd-fold>Collapse all</button>
-        <button class="gd-btn" type="button" aria-pressed="false" title="Wrap long lines instead of scrolling sideways" data-gd-wrap>Wrap</button>
+        <button class="btn btn--sm gd-btn" type="button" data-gd-copy-path>Copy path</button>
+        <button class="btn btn--sm gd-btn" type="button" aria-pressed="false" title="Collapse every indented section" data-gd-fold>Collapse all</button>
+        <button class="btn btn--sm gd-btn" type="button" aria-pressed="false" title="Wrap long lines instead of scrolling sideways" data-gd-wrap>Wrap</button>
       </div>
     </header>
 

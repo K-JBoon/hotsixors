@@ -9,7 +9,7 @@
 
 <div class="battleground-detail">
 
-  <div class="hero-banner role-battleground">
+  <div class="panel hero-banner role-battleground">
     {% if page.extra.loading_screen %}
       {{<images.optimized path={'images/battlegrounds/' ~ page.extra.battleground_slug ~ '.png'} class="hero-banner__loading" alt="" width={340} height={124} op="fit" display_width={340} display_height={124} loading="eager" />}}
     {% endif %}
@@ -31,7 +31,7 @@
     <h2>Map Objectives</h2>
     <div class="bg-objectives-grid">
       {% for obj in bg.objectives %}
-      <div class="bg-objective-card">
+      <div class="card bg-objective-card">
         {{<images.optimized path={obj.image} class="bg-objective-card__image" alt="" width={340} height={190} op="fit" display_width={340} display_height={190} loading="lazy" />}}
         <h3 class="bg-objective-card__title">{{ obj.title }}</h3>
         <p class="bg-objective-card__desc">{{<prose.lines text={obj.description} />}}</p>
@@ -66,7 +66,7 @@
   {% if bg.timers %}
   <section class="bg-group">
     <h2>Map Cheatsheet</h2>
-    <table class="bg-timers-table">
+    <table class="table bg-timers-table">
       <thead>
         <tr>
           <th scope="col">Event</th>
@@ -105,7 +105,7 @@
   <div class="bg-section">
     <h3>Units</h3>
     {% for summon in bg.summons %}
-    <div class="summon-card{% if summon.variants | length > 1 %} summon-card--multi{% endif %}">
+    <div class="card summon-card{% if summon.variants | length > 1 %} summon-card--multi{% endif %}">
       <div class="summon-card__header">
         <h3 class="summon-card__name">{{ summon.label }}</h3>
       </div>
@@ -162,7 +162,7 @@
           {% if v.weapons %}
           <div class="summon-card__weapons">
             <h5>Weapons</h5>
-            <table class="bg-timers-table">
+            <table class="table bg-timers-table">
               <thead><tr><th scope="col" data-datamining>ID</th><th scope="col">Damage</th><th scope="col">Period</th><th scope="col">Range</th></tr></thead>
               <tbody>
                 {% for w in v.weapons %}

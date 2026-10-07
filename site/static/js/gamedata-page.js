@@ -412,7 +412,7 @@ async function initGameDataXref() {
     outlineButton.setAttribute("aria-pressed", String(!panel.hidden));
     setStoredBoolean(storage, XREF_PANEL_KEY, !panel.hidden);
   });
-  outlineButton.className = "gd-btn";
+  outlineButton.className = "btn btn--sm gd-btn";
   outlineButton.setAttribute("aria-pressed", "false");
   document.querySelector("[data-gd-actions]")?.appendChild(outlineButton);
 

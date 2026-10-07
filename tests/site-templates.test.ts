@@ -5,6 +5,14 @@ import test from "node:test";
 // Pages hand most of their markup to components, so an assertion about what a page renders has to
 // see the components it calls too. Returns the template followed by every component file it uses.
 const TEMPLATE_ROOT = new URL("../site/templates/", import.meta.url);
+const CSS_ROOT = new URL("../site/css/", import.meta.url);
+
+function siteStyles(): string {
+  return readdirSync(CSS_ROOT)
+    .filter((file) => file.endsWith(".css"))
+    .map((file) => readFileSync(new URL(file, CSS_ROOT), "utf-8"))
+    .join("\n");
+}
 
 function componentFiles(): Map<string, string> {
   const found = new Map<string, string>();
@@ -50,7 +58,7 @@ test("base navigation exposes the approved player-first IA", () => {
 
 test("base navigation exposes mobile menu toggle hooks", () => {
   const template = readFileSync(new URL("../site/templates/base.html", import.meta.url), "utf-8");
-  const styles = readFileSync(new URL("../site/sass/main.scss", import.meta.url), "utf-8");
+  const styles = siteStyles();
   const script = readFileSync(new URL("../site/static/hotsixors.js", import.meta.url), "utf-8");
 
   assert.match(template, /class="nav-toggle"/);
@@ -67,7 +75,7 @@ test("base navigation exposes mobile menu toggle hooks", () => {
 
 test("base navigation exposes persisted datamining toggle", () => {
   const template = readFileSync(new URL("../site/templates/base.html", import.meta.url), "utf-8");
-  const styles = readFileSync(new URL("../site/sass/main.scss", import.meta.url), "utf-8");
+  const styles = siteStyles();
   const script = readFileSync(new URL("../site/static/hotsixors.js", import.meta.url), "utf-8");
   const storage = readFileSync(new URL("../site/static/js/storage.js", import.meta.url), "utf-8");
 
@@ -82,7 +90,7 @@ test("base navigation exposes persisted datamining toggle", () => {
 
 test("fonts are vendored and loaded without blocking first render", () => {
   const baseTemplate = readFileSync(new URL("../site/templates/base.html", import.meta.url), "utf-8");
-  const styles = readFileSync(new URL("../site/sass/main.scss", import.meta.url), "utf-8");
+  const styles = siteStyles();
 
   assert.match(baseTemplate, /rel="preload" href="\{\{ get_url\(path='fonts\/inter-latin-400\.woff2'\) \}\}" as="font" type="font\/woff2" crossorigin/);
   assert.match(baseTemplate, /rel="preload" href="\{\{ get_url\(path='fonts\/rajdhani-latin-600\.woff2'\) \}\}" as="font" type="font\/woff2" crossorigin/);
@@ -144,7 +152,7 @@ test("effect index template consumes cross-reference data and exposes filter hoo
 
   assert.match(template, /load_data\(path="data\/cross-references\.json"\)/);
   assert.match(template, /class="effect-index-layout"/);
-  assert.match(template, /class="effect-index-sidebar"/);
+  assert.match(template, /class="[^"]*\beffect-index-sidebar\b[^"]*"/);
   assert.match(template, /href="#\{\{ mechanic\.category \| slugify \}\}"/);
   assert.match(template, /data-effect-search/);
   assert.match(template, />Show all<\/button>/);
@@ -219,7 +227,7 @@ test("about page renders generated build and source version metadata", () => {
 test("minion and structure tables render compact scaling summaries", () => {
   const minionsTemplate = readFileSync(new URL("../site/templates/minions-and-mercs.html", import.meta.url), "utf-8");
   const structuresTemplate = readFileSync(new URL("../site/templates/structures.html", import.meta.url), "utf-8");
-  const styles = readFileSync(new URL("../site/sass/main.scss", import.meta.url), "utf-8");
+  const styles = siteStyles();
 
   assert.match(minionsTemplate, /unit\.scalingRows/);
   assert.match(minionsTemplate, /class="scaling-summary"/);
@@ -239,19 +247,19 @@ test("battleground summon XML paths use generated gamedata URLs", () => {
 });
 
 test("hero banner loading images cap width and crop from the left", () => {
-  const styles = readFileSync(new URL("../site/sass/main.scss", import.meta.url), "utf-8");
+  const styles = siteStyles();
 
-  assert.match(styles, /&__loading\s*\{[^}]*flex:\s*0\s+1\s+33%/s);
-  assert.match(styles, /&__loading\s*\{[^}]*max-width:\s*33%/s);
-  assert.match(styles, /&__loading\s*\{[^}]*width:\s*33%/s);
-  assert.match(styles, /&__loading\s*\{[^}]*object-position:\s*right\s+center/s);
+  assert.match(styles, /\.hero-banner__loading\s*\{[^}]*flex:\s*0\s+1\s+33%/s);
+  assert.match(styles, /\.hero-banner__loading\s*\{[^}]*max-width:\s*33%/s);
+  assert.match(styles, /\.hero-banner__loading\s*\{[^}]*width:\s*33%/s);
+  assert.match(styles, /\.hero-banner__loading\s*\{[^}]*object-position:\s*right\s+center/s);
 });
 
 test("hero and battleground lists expose a filter field plus typeahead hooks", () => {
   const heroTemplate = renderedBy("heroes/list.html");
   const homeTemplate = renderedBy("index.html");
   const battlegroundTemplate = renderedBy("battlegrounds/list.html");
-  const styles = readFileSync(new URL("../site/sass/main.scss", import.meta.url), "utf-8");
+  const styles = siteStyles();
   const script = readFileSync(new URL("../site/static/hotsixors.js", import.meta.url), "utf-8");
 
   for (const template of [heroTemplate, homeTemplate, battlegroundTemplate]) {

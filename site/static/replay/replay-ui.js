@@ -407,30 +407,30 @@ function renderShell() {
           <div class="replay-settings" data-settings-panel hidden role="dialog" aria-label="View settings">
             <div class="replay-settings__group">
               <div class="replay-settings__legend">Layers</div>
-              <label class="rp-switch"><input type="checkbox" data-trails checked><span class="rp-switch__track"></span>Trails</label>
-              <label class="rp-switch"><input type="checkbox" data-minions checked><span class="rp-switch__track"></span>Minions &amp; mercs</label>
-              <label class="rp-switch"><input type="checkbox" data-objectives checked><span class="rp-switch__track"></span>Objectives</label>
-              <label class="rp-switch"><input type="checkbox" data-camera checked><span class="rp-switch__track"></span>Camera of selected hero</label>
+              <label class="switch rp-switch"><input type="checkbox" data-trails checked>Trails</label>
+              <label class="switch rp-switch"><input type="checkbox" data-minions checked>Minions &amp; mercs</label>
+              <label class="switch rp-switch"><input type="checkbox" data-objectives checked>Objectives</label>
+              <label class="switch rp-switch"><input type="checkbox" data-camera checked>Camera of selected hero</label>
             </div>
             <div class="replay-settings__group" data-map-style-group hidden>
               <div class="replay-settings__legend">Map style</div>
-              <div class="rp-segmented">
-                <label><input type="radio" name="mapstyle" value="rendered" checked data-map-style><span>Rendered</span></label>
-                <label><input type="radio" name="mapstyle" value="schematic" data-map-style><span>Schematic</span></label>
+              <div class="segmented rp-segmented">
+                <label class="segmented__btn"><input type="radio" name="mapstyle" value="rendered" checked data-map-style><span>Rendered</span></label>
+                <label class="segmented__btn"><input type="radio" name="mapstyle" value="schematic" data-map-style><span>Schematic</span></label>
               </div>
             </div>
             <div class="replay-settings__group">
               <div class="replay-settings__legend">Fog of war</div>
-              <div class="rp-segmented">
-                <label><input type="radio" name="vision" value="" checked data-vision><span>Off</span></label>
-                <label style="--seg-color:${TEAM_COLORS[0]}"><input type="radio" name="vision" value="0" data-vision><span>Blue</span></label>
-                <label style="--seg-color:${TEAM_COLORS[1]}"><input type="radio" name="vision" value="1" data-vision><span>Red</span></label>
+              <div class="segmented rp-segmented">
+                <label class="segmented__btn"><input type="radio" name="vision" value="" checked data-vision><span>Off</span></label>
+                <label class="segmented__btn" style="--seg-color:${TEAM_COLORS[0]}"><input type="radio" name="vision" value="0" data-vision><span>Blue</span></label>
+                <label class="segmented__btn" style="--seg-color:${TEAM_COLORS[1]}"><input type="radio" name="vision" value="1" data-vision><span>Red</span></label>
               </div>
             </div>
           </div>
         </div>
         <div class="replay-controls">
-          <button data-play title="Play/Pause" aria-label="Play">${icon('play')}</button>
+          <button class="btn" data-play title="Play/Pause" aria-label="Play">${icon('play')}</button>
           <div class="replay-track">
             ${objectiveBandHtml(model)}
             <input type="range" data-scrub min="0" max="${model.durationLoops}" value="${state.loop}" step="8">
@@ -443,9 +443,9 @@ function renderShell() {
             <option value="8">8×</option>
             <option value="16">16×</option>
           </select>
-          <button data-reset-view title="Reset zoom (r)" hidden>Reset view</button>
-          <button data-settings title="View settings" aria-label="View settings" aria-expanded="false">${icon('gear')}</button>
-          <button data-fullscreen title="Full screen (f)" aria-label="Full screen">${icon('expand')}</button>
+          <button class="btn" data-reset-view title="Reset zoom (r)" hidden>Reset view</button>
+          <button class="btn" data-settings title="View settings" aria-label="View settings" aria-expanded="false">${icon('gear')}</button>
+          <button class="btn" data-fullscreen title="Full screen (f)" aria-label="Full screen">${icon('expand')}</button>
         </div>
         <details class="replay-notes">
           <summary>About this view</summary>
@@ -460,17 +460,17 @@ function renderShell() {
       <div class="replay-feed-pane">
         <div class="replay-feed-head">
           <span data-feed-title>All events</span>
-          <button data-clear-select hidden>Show all</button>
+          <button class="btn btn--sm" data-clear-select hidden>Show all</button>
         </div>
         <div class="replay-feed-filters">
           <div class="feed-filter-row" data-kind-row>
-            <button class="feed-filter feed-filter--all" data-kind-all>None</button>
+            <button class="chip feed-filter feed-filter--all" data-kind-all>None</button>
             ${FEED_KINDS.map(
-              (k) => `<button class="feed-filter${k.off ? '' : ' is-on'}" data-kind="${k.id}">${k.label}</button>`
+              (k) => `<button class="chip feed-filter${k.off ? '' : ' is-on'}" data-kind="${k.id}">${k.label}</button>`
             ).join('')}
           </div>
           <div class="feed-filter-row" data-hero-row>
-            <button class="feed-filter feed-filter--all" data-hero-all>None</button>
+            <button class="chip feed-filter feed-filter--all" data-hero-all>None</button>
             <div class="feed-hero-grid">
               ${teams
                 .map(
@@ -488,7 +488,7 @@ function renderShell() {
                 .join('')}
             </div>
           </div>
-          <input type="search" class="feed-search" data-feed-search placeholder="Search events…" aria-label="Search events">
+          <input type="search" class="input feed-search" data-feed-search placeholder="Search events…" aria-label="Search events">
         </div>
         <ol class="replay-feed" data-feed></ol>
       </div>

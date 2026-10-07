@@ -1,0 +1,100 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+
+:root {
+  --site-anchor-offset: 5rem;
+  scroll-padding-top: var(--site-anchor-offset);
+}
+
+[id] { scroll-margin-top: var(--site-anchor-offset); }
+
+body {
+  background: var(--bg-deep);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: var(--text-md);
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+a { color: var(--accent-blue); text-decoration: none; }
+
+a:hover { text-decoration: underline; color: var(--accent-blue-hover); }
+
+:is(p, li, dd, blockquote) a { text-decoration: underline; text-underline-offset: 0.15em; }
+
+.footer-links a,
+.library-links a,
+.mechanics-source-list a,
+.bg-xml-list a,
+.effect-index-entry a,
+.effect-index-sidebar__nav a,
+.tree-file,
+.tree-dir__view { text-decoration: none; }
+.footer-links a:hover,
+.library-links a:hover,
+.mechanics-source-list a:hover,
+.bg-xml-list a:hover,
+.effect-index-entry a:hover,
+.effect-index-sidebar__nav a:hover,
+.tree-file:hover,
+.tree-dir__view:hover { text-decoration: underline; }
+
+.storm-game-string .storm-color { font-weight: 600; }
+.storm-game-string .storm-style { font-weight: 600; }
+.storm-game-string .storm-scaling { color: var(--accent-blue); }
+.storm-game-string .storm-scale {
+  color: var(--accent-blue);
+  font-variant-numeric: tabular-nums;
+  border-bottom: 1px dotted var(--blue-line);
+  cursor: help;
+}
+
+.storm-scale {
+  font-variant-numeric: tabular-nums;
+  color: var(--accent-blue);
+  border-bottom: 1px dotted var(--blue-line);
+  cursor: help;
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+summary:focus-visible,
+[role=button]:focus-visible { outline: 3px solid var(--accent-gold); outline-offset: 3px; }
+
+.site-main:focus { outline: none; }
+
+.skip-link {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 1000;
+  transform: translateY(-150%);
+  background: var(--accent-gold);
+  border: 2px solid var(--bg-deep);
+  border-radius: var(--radius-sm);
+  color: var(--bg-deep);
+  font-weight: 700;
+  padding: var(--space-xs) var(--space-sm);
+  transition: transform 0.15s;
+}
+.skip-link:focus-visible { transform: translateY(0); text-decoration: none; }
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-primary);
+}

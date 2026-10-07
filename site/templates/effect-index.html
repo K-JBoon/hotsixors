@@ -7,7 +7,7 @@
 
 <div class="effect-index-page">
   <div class="effect-index-layout">
-    <aside class="effect-index-sidebar">
+    <aside class="panel effect-index-sidebar">
       <nav class="effect-index-sidebar__nav" aria-label="Effect groups">
         <ul>
           {% set_global sidebar_category = "" %}
@@ -26,14 +26,14 @@
 
       <div class="effect-index-controls">
         <div class="effect-index-controls__bar">
-          <input type="search" class="effect-index-search" data-effect-search
+          <input type="search" class="input effect-index-search" data-effect-search
                  placeholder="Filter by hero, ability or talent…" aria-label="Filter entries">
           <div class="effect-index-bulk-actions" role="group" aria-label="Enable or disable all mechanics">
-            <button type="button" class="effect-index-filter-button" data-effect-enable-all>Show all</button>
-            <button type="button" class="effect-index-filter-button" data-effect-disable-all>Hide all</button>
+            <button type="button" class="btn effect-index-filter-button" data-effect-enable-all>Show all</button>
+            <button type="button" class="btn effect-index-filter-button" data-effect-disable-all>Hide all</button>
           </div>
         </div>
-        <div class="effect-index-chips" data-effect-chips>
+        <div class="panel effect-index-chips" data-effect-chips>
           {% set_global chip_category = "" %}
           {% for mechanic in data.mechanics %}
             {% if mechanic.category != chip_category %}
@@ -43,7 +43,7 @@
               <span class="effect-index-chip-group__label">{{ mechanic.category }}</span>
               <div class="effect-index-chip-group__chips">
             {% endif %}
-            <button type="button" class="effect-index-chip" data-effect-chip="{{ mechanic.slug }}" aria-pressed="true">{{ mechanic.name }}</button>
+            <button type="button" class="chip effect-index-chip" data-effect-chip="{{ mechanic.slug }}" aria-pressed="true">{{ mechanic.name }}</button>
             {% if loop.last %}</div></div>{% endif %}
           {% endfor %}
         </div>
@@ -55,21 +55,21 @@
           {% set_global current_category = mechanic.category %}
           <h2 class="effect-index-category" id="{{ mechanic.category | slugify }}" data-effect-category="{{ mechanic.category | slugify }}">{{ mechanic.category }}</h2>
         {% endif %}
-        <section class="effect-index-mechanic" id="{{ mechanic.slug }}" data-effect-mechanic="{{ mechanic.slug }}" data-effect-category="{{ mechanic.category | slugify }}">
+        <section class="panel effect-index-mechanic" id="{{ mechanic.slug }}" data-effect-mechanic="{{ mechanic.slug }}" data-effect-category="{{ mechanic.category | slugify }}">
           <h3>{{ mechanic.name }} <span class="effect-index-count">{{ mechanic.entries | length }}</span></h3>
           {{<mechanics.composition mechanic={mechanic} class="effect-index-composition" />}}
           {% if mechanic.entries | length == 0 %}
             <p class="effect-index-empty">No hero applies this directly.</p>
           {% else %}
           <div class="effect-table-wrap">
-          <table class="effect-table" data-effect-table>
+          <table class="table effect-table" data-effect-table>
             <thead>
               <tr>
                 <th scope="col" aria-sort="ascending"><button type="button" data-sort="hero">Hero</button></th>
                 <th scope="col"><button type="button" data-sort="name">Ability or talent</button></th>
                 <th scope="col"><button type="button" data-sort="kind">Kind</button></th>
-                {% if mechanic.amountUnit %}<th scope="col" class="effect-table__num"><button type="button" data-sort="amount">Amount</button></th>{% endif %}
-                {% if mechanic.hasDuration %}<th scope="col" class="effect-table__num"><button type="button" data-sort="duration">Duration</button></th>{% endif %}
+                {% if mechanic.amountUnit %}<th scope="col" class="num"><button type="button" data-sort="amount">Amount</button></th>{% endif %}
+                {% if mechanic.hasDuration %}<th scope="col" class="num"><button type="button" data-sort="duration">Duration</button></th>{% endif %}
               </tr>
             </thead>
             <tbody>
@@ -87,8 +87,8 @@
                 </span>
               </td>
               <td class="effect-table__kind">{{ entry.kind }}{% if entry.abilityType %} · {{ entry.abilityType }}{% endif %}{% if entry.talentTier %} · {{ entry.talentTier | replace(from="level", to="Level ") }}{% endif %}</td>
-              {% if mechanic.amountUnit %}<td class="effect-table__num">{% if inst.amount is defined %}{{ inst.amount }}{% if inst.maxAmount is defined %}–{{ inst.maxAmount }}{% endif %}{% if inst.scales %}+{% endif %}{% if inst.unit == "armor" %} armor{% else %}{{ inst.unit }}{% endif %}{% else %}<span class="effect-table__none">–</span>{% endif %}</td>{% endif %}
-              {% if mechanic.hasDuration %}<td class="effect-table__num">{% if inst.duration is defined %}{{ inst.duration }}s{% else %}<span class="effect-table__none">–</span>{% endif %}</td>{% endif %}
+              {% if mechanic.amountUnit %}<td class="num">{% if inst.amount is defined %}{{ inst.amount }}{% if inst.maxAmount is defined %}–{{ inst.maxAmount }}{% endif %}{% if inst.scales %}+{% endif %}{% if inst.unit == "armor" %} armor{% else %}{{ inst.unit }}{% endif %}{% else %}<span class="effect-table__none">–</span>{% endif %}</td>{% endif %}
+              {% if mechanic.hasDuration %}<td class="num">{% if inst.duration is defined %}{{ inst.duration }}s{% else %}<span class="effect-table__none">–</span>{% endif %}</td>{% endif %}
             </tr>
             {% endfor %}
             {% endfor %}

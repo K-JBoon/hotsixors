@@ -27,7 +27,7 @@ export const SITE_DATA_HEROES = path.join(REPO_ROOT, "site/data/heroes");
 export const SITE_CONTENT_GAMEDATA = path.join(REPO_ROOT, "site/content/gamedata");
 export const SITE_STATIC_IMAGES = path.join(REPO_ROOT, "site/static/images");
 export const SITE_STATIC = path.join(REPO_ROOT, "site/static");
-export const SITE_SASS = path.join(REPO_ROOT, "site/sass");
+export const SITE_CSS = path.join(REPO_ROOT, "site/css");
 /** Unsubset webfonts; `gen-fonts.ts` instances them into site/static/fonts. */
 export const FONT_SOURCES = path.join(REPO_ROOT, "data/fonts");
 export const SITE_STATIC_REPLAY = path.join(REPO_ROOT, "site/static/replay");

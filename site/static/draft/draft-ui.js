@@ -73,8 +73,8 @@ export function renderLanding(root, { onCreate, onJoin, prefilledCode = "", pref
   root.innerHTML = "";
   root.dataset.state = "landing";
 
-  const nameInput = el("input", { type: "text", placeholder: "Your name", class: "draft-input", maxlength: "20", value: prefilledName });
-  const codeInput = el("input", { type: "text", placeholder: "ABCD", class: "draft-input draft-input--code", maxlength: "4", value: prefilledCode });
+  const nameInput = el("input", { type: "text", placeholder: "Your name", class: "input draft-input", maxlength: "20", value: prefilledName });
+  const codeInput = el("input", { type: "text", placeholder: "ABCD", class: "input draft-input draft-input--code", maxlength: "4", value: prefilledCode });
 
   codeInput.addEventListener("input", () => {
     const norm = normalizeLobbyCode(codeInput.value);
@@ -83,7 +83,7 @@ export function renderLanding(root, { onCreate, onJoin, prefilledCode = "", pref
 
   const hasPrefill = !!prefilledCode;
   const createBtn = el("button", {
-    class: hasPrefill ? "draft-btn" : "draft-btn draft-btn--primary",
+    class: hasPrefill ? "btn" : "btn btn--primary",
     onClick: () => {
       const name = nameInput.value.trim();
       if (!name) { nameInput.focus(); return; }
@@ -92,7 +92,7 @@ export function renderLanding(root, { onCreate, onJoin, prefilledCode = "", pref
   }, "Create lobby");
 
   const joinBtn = el("button", {
-    class: hasPrefill ? "draft-btn draft-btn--primary" : "draft-btn",
+    class: hasPrefill ? "btn btn--primary" : "btn",
     onClick: () => {
       const name = nameInput.value.trim();
       const lobbyCode = normalizeLobbyCode(codeInput.value);
@@ -140,10 +140,10 @@ export function renderLobby(root, {
     el("div", { class: "draft-lobby__code" }, ["Lobby ", el("strong", {}, lobbyCode)]),
     el("div", { class: "draft-actions" }, [
       el("button", {
-        class: "draft-btn",
+        class: "btn",
         onClick: () => { navigator.clipboard?.writeText(lobbyUrl); },
       }, "Copy link"),
-      el("button", { class: "draft-btn", onClick: () => onLeave?.() }, "Leave"),
+      el("button", { class: "btn", onClick: () => onLeave?.() }, "Leave"),
     ]),
   ]);
 
@@ -182,14 +182,14 @@ export function renderLobby(root, {
       el("option", { value: "off", selected: !hostConfig.fearless }, "Off"),
       el("option", { value: "on",  selected: hostConfig.fearless }, "On"),
     ]);
-    configNode = el("div", { class: "draft-config" }, [
+    configNode = el("div", { class: "panel draft-config" }, [
       el("label", {}, ["Timer mode", timerSel]),
       el("label", {}, ["First pick",  fpSel]),
       el("label", {}, ["Map selection", mapModeSel]),
       el("label", {}, ["Fearless draft", fearlessSel]),
     ]);
   } else {
-    configNode = el("div", { class: "draft-config" }, [
+    configNode = el("div", { class: "panel draft-config" }, [
       el("div", {}, `Timer mode: ${hostConfig.timerMode}`),
       el("div", {}, `First pick: ${hostConfig.firstPick}`),
       el("div", {}, `Map selection: ${hostConfig.mapPickMode === "captain" ? "second-pick captain" : "random"}`),
@@ -200,7 +200,7 @@ export function renderLobby(root, {
   let fearlessNode = null;
   if (hostConfig.fearless) {
     const preset = hostConfig.presetLocked;
-    fearlessNode = el("div", { class: "draft-fearless" }, [
+    fearlessNode = el("div", { class: "panel draft-fearless" }, [
       el("div", { class: "draft-fearless__heading" }, `Unavailable from game 1 (${preset.length})`),
       isHost
         ? presetPicker(draftData, preset, (hero) => onConfigChange({ ...hostConfig, presetLocked: togglePresetHero(preset, hero) }))
@@ -230,13 +230,13 @@ export function renderLobby(root, {
       el("div", {}, "Pick the battleground:"),
       el("div", { class: "draft-map__grid" },
         draftData.battlegrounds.map(b =>
-          el("button", { class: "draft-map__btn", onClick: () => onPickMap({ map: b.slug }) }, b.name)
+          el("button", { class: "btn draft-map__btn", onClick: () => onPickMap({ map: b.slug }) }, b.name)
         )),
     ]);
   } else if (hostConfig.mapPickMode === "random" && isHost) {
     mapNode = el("div", { class: "draft-map draft-map--pick" }, [
       el("button", {
-        class: "draft-btn",
+        class: "btn",
         onClick: () => {
           const pool = draftData.battlegrounds;
           const choice = pool[Math.floor(Math.random() * pool.length)];
@@ -257,7 +257,7 @@ export function renderLobby(root, {
   const fpResolved = hostConfig.firstPick !== "random";
   const startNode = isHost
     ? el("button", {
-        class: "draft-btn draft-btn--primary",
+        class: "btn btn--primary",
         disabled: !canStart,
         onClick: () => { if (canStart) onStartDraft(); },
       }, canStart ? "Start draft" : (fpResolved ? "Waiting…" : "Pick first-pick team"))
@@ -412,7 +412,7 @@ export function renderDraft(root, { state, draftData, role, highlight, searchQue
   }
   const searchInput = el("input", {
     type: "search",
-    class: "draft-search__input",
+    class: "input draft-search__input",
     value: searchQuery,
     placeholder: "Search heroes",
     autocomplete: "off",
@@ -513,7 +513,7 @@ export function renderMapPick(root, { draftData, captains, hostConfig, series, r
         el("div", {}, "Pick the battleground:"),
         el("div", { class: "draft-map__grid" },
           openMaps(draftData.battlegrounds, series).map(b =>
-            el("button", { class: "draft-map__btn", onClick: () => onPickMap({ map: b.slug }) }, b.name))),
+            el("button", { class: "btn draft-map__btn", onClick: () => onPickMap({ map: b.slug }) }, b.name))),
       ])
     : el("div", { class: "draft-await" }, `${captainName(captains, mapPicker)} is picking the map…`);
 
@@ -545,23 +545,23 @@ function resultActions({ shareUrl, live }) {
     return el("div", { class: "draft-result__series" }, [
       el("div", {}, "Who takes first pick? The other captain picks the map."),
       el("div", { class: "draft-actions draft-result__actions" }, ["blue", "red"].map(team =>
-        el("button", { class: "draft-btn draft-btn--primary", onClick: () => live.onNextGame(team) },
+        el("button", { class: "btn btn--primary", onClick: () => live.onNextGame(team) },
           captainName(live.captains, team)))),
       el("div", { class: "draft-actions draft-result__actions" }, [
-        el("button", { class: "draft-btn", onClick: () => live.onEndSeries() }, "End series"),
+        el("button", { class: "btn", onClick: () => live.onEndSeries() }, "End series"),
       ]),
     ]);
   }
   return shareUrl
     ? el("div", { class: "draft-actions draft-result__actions" }, [
         el("button", {
-          class: "draft-btn draft-btn--primary",
+          class: "btn btn--primary",
           onClick: () => navigator.clipboard?.writeText(shareUrl),
         }, "Copy result link"),
-        el("a", { class: "draft-btn", href: location.pathname }, "New draft"),
+        el("a", { class: "btn", href: location.pathname }, "New draft"),
       ])
     : el("div", { class: "draft-actions draft-result__actions" }, [
-        el("a", { class: "draft-btn draft-btn--primary", href: location.pathname }, "Start your own draft"),
+        el("a", { class: "btn btn--primary", href: location.pathname }, "Start your own draft"),
       ]);
 }
 

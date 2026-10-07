@@ -8,7 +8,7 @@
 {%- set mana = entry | get(key="manaCost", default=0) -%}
 {%- if entry.costText -%}{%- set mana = entry.costText -%}{%- endif -%}
 {%- set cd = entry | get(key="cooldown", default=0) -%}
-<div class="ability-card ability-card--guide" id="ability-{{ id }}">
+<div class="card ability-card ability-card--guide" id="ability-{{ id }}">
   {%- if entry.icon -%}
   {{<images.optimized path={'images/abilitytalents/' ~ entry.icon} class="ability-card__icon" alt="" width={48} height={48} op="fill" display_width={48} display_height={48} loading="lazy" />}}
   {%- endif -%}

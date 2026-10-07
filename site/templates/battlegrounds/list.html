@@ -8,7 +8,7 @@
     <h1 class="page-title">Battlegrounds</h1>
     <div class="select-search" role="search" aria-label="Battlegrounds">
       <label class="visually-hidden" for="battleground-filter">Filter battlegrounds by name</label>
-      <input class="select-search__input"
+      <input class="input select-search__input"
              id="battleground-filter"
              type="search"
              placeholder="Filter battlegrounds"
@@ -21,7 +21,7 @@
   </div>
   <div class="battlegrounds-grid">
     {% for page in section.pages | sort(attribute="title") %}
-    <a class="battleground-card"
+    <a class="card card--interactive battleground-card"
        href="{{ page.permalink }}"
        data-select-search-card
        data-select-search-id="{{ page.slug }}"

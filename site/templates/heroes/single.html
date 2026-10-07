@@ -11,7 +11,7 @@
 
 <div class="hero-detail" data-level-scope>
 
-  <section class="hero-head">
+  <section class="panel hero-head">
     <div class="hero-head__body">
       <div class="hero-banner hero-banner--bio role-{{ hero.role | lower }}">
         <div class="hero-banner__info">
@@ -121,7 +121,7 @@
           <h3 class="talent-tier__label">Level <span class="talent-tier__num">{{ tier | replace(from="level", to="") }}</span></h3>
           <div class="talent-row">
             {% for tal in tier_talents | sort(attribute="sort") %}
-            <div class="talent-card"
+            <div class="card card--interactive talent-card"
                  id="talent-{{ tal.nameId }}"
                  data-talent-id="{{ tal.nameId }}"
                  data-talent-tier="{{ tier }}">
@@ -151,8 +151,8 @@
     {% endfor %}
     <div class="talent-build-actions" data-share-build-actions>
       <div class="build-code-field">
-        <input class="build-code-preview" type="text" aria-label="Talent build code" data-build-code-preview value="[T0000000,{{ hero.hero_name }}]" size="22" disabled hidden>
-        <button class="build-code-copy" type="button" data-copy-build-code aria-label="Copy build code" title="Copy build code" hidden>
+        <input class="input build-code-preview" type="text" aria-label="Talent build code" data-build-code-preview value="[T0000000,{{ hero.hero_name }}]" size="22" disabled hidden>
+        <button class="btn build-code-copy" type="button" data-copy-build-code aria-label="Copy build code" title="Copy build code" hidden>
           <svg class="build-code-copy__idle" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" aria-hidden="true">
             <rect x="5.75" y="5.75" width="7.5" height="8.5" rx="1.5"/>
             <path d="M10.25 5.75V3.5A1.5 1.5 0 0 0 8.75 2h-5A1.5 1.5 0 0 0 2.25 3.5v6.75a1.5 1.5 0 0 0 1.5 1.5h2"/>
@@ -162,7 +162,7 @@
           </svg>
         </button>
       </div>
-      <button class="share-build-button talent-build-actions__share-url" type="button" data-share-build hidden>
+      <button class="btn btn--primary share-build-button talent-build-actions__share-url" type="button" data-share-build hidden>
         <span class="share-build-button__idle">Copy Build URL</span>
         <span class="share-build-button__done" aria-hidden="true">Copied</span>
       </button>

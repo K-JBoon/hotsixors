@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="guide-layout">
-  <aside class="guide-sidebar" aria-label="Guide navigation">
+  <aside class="panel guide-sidebar" aria-label="Guide navigation">
     {% if page.extra.hero %}
       {% set hero_slug = page.extra.hero | lower %}
       <a class="guide-sidebar__hero-link" href="{{ get_url(path='heroes/' ~ hero_slug) }}">

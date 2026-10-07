@@ -34,7 +34,7 @@ index. Without them each of the 37 mechanics re-walked the whole graph.
 
 | Script | Writes | Notes |
 | --- | --- | --- |
-| `gen-fonts` | `static/fonts/*.woff2` | instances `data/fonts/` to the weights `main.scss` declares; see below |
+| `gen-fonts` | `static/fonts/*.woff2` | instances `data/fonts/` to the weights `css/fonts.css` declares; see below |
 | `gen-gamedata` | `content/gamedata/**`, `data/anchor-map.json`, `data/gamedata-tree.json`, `static/gamedata-tree.json`, `static/id-lookup.json` | a page per XML/Galaxy file, plus an ID/file index |
 | `gen-mechanics` | `data/mechanics.json` | the gameplay mechanics the effect index is built around |
 | `gen-heroes` | `content/heroes/*.md`, `data/heroes/*.json`, `static/shortcode-data.json`, `static/hero-aliases.json`, `static/images/` | |
@@ -90,11 +90,12 @@ three entry points (`hotsixors.js`, `replay/replay-ui.js`, `draft/draft.js`) as
 ES modules with code splitting, plus the two classic scripts
 (`level-slider.js`, `underdog-calc.js`) as IIFEs, into `static/bundle/`.
 
-Stylesheets go through the same pass. The bundler compiles `sass/main.scss` and
-`sass/gamedata.scss` with dart-sass into `static/`, then takes those two plus
-`replay/replay.css`, `draft/draft.css` and `lost-in-the-nexus/viewer.css` as CSS
-entry points. Zola's own `compile_sass` is off. A `.scss` edit therefore needs
-`npm run bundle`; `zola serve` alone will not pick it up.
+Stylesheets go through the same pass. `css/main.css` and `css/gamedata.css`
+`@import` the shared files under `css/`; esbuild inlines them and takes
+`replay/replay.css`, `draft/draft.css` and `lost-in-the-nexus/viewer.css` as
+further CSS entry points. A browser target makes esbuild flatten native nesting.
+All theme values are custom properties in `css/tokens.css`. A stylesheet edit
+needs `npm run bundle`; `zola serve` alone will not pick it up.
 
 Output names carry a content hash, so `_headers` caches the whole directory
 immutably. Templates resolve an entry through `data/bundles.json`, which the

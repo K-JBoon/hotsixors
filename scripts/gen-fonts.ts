@@ -1,7 +1,7 @@
 import { readFile, readdir } from "node:fs/promises";
 import * as path from "node:path";
 import subsetFont from "subset-font";
-import { SITE_STATIC, SITE_SASS, FONT_SOURCES } from "./lib/paths.ts";
+import { SITE_STATIC, SITE_CSS, FONT_SOURCES } from "./lib/paths.ts";
 import { writeBinary } from "./lib/fs.ts";
 
 const OUT_DIR = path.join(SITE_STATIC, "fonts");
@@ -34,7 +34,7 @@ function expandRange(range: string): string {
   return chars.join("");
 }
 
-const faces = readFaces(await readFile(path.join(SITE_SASS, "main.scss"), "utf-8"));
+const faces = readFaces(await readFile(path.join(SITE_CSS, "fonts.css"), "utf-8"));
 const sources = new Set(await readdir(FONT_SOURCES));
 
 for (const face of faces) {

@@ -8,7 +8,7 @@
   {% if section.pages %}
     <div class="guide-cards">
       {% for page in section.pages %}
-        <a class="guide-card" href="{{ page.permalink }}">
+        <a class="card card--interactive guide-card" href="{{ page.permalink }}">
           <div class="guide-card__header">
             <h2 class="guide-card__title">{{ page.title }}</h2>
             {% if page.extra.hero %}

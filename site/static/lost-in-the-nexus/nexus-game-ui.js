@@ -24,7 +24,9 @@ const MAP_IMAGE = (slug) => `/draft/maps/${slug}.webp`;
 export function createGameUi({ page }) {
   if (!document.querySelector('link[data-nexus-game]')) {
     document.head.append(el('link', {
-      rel: 'stylesheet', href: '/lost-in-the-nexus/nexus-game.css', 'data-nexus-game': true,
+      rel: 'stylesheet',
+      href: document.querySelector('[data-nexus-game-css]').dataset.nexusGameCss,
+      'data-nexus-game': true,
     }));
   }
   const hud = el('div', { class: 'ng-hud' });
@@ -46,7 +48,7 @@ export function createGameUi({ page }) {
 }
 
 export function namePanel({ name, lobbyCode, onSubmit }) {
-  const input = el('input', { class: 'ng-input', type: 'text', maxlength: '18', value: name || '', placeholder: 'Your name' });
+  const input = el('input', { class: 'input ng-input', type: 'text', maxlength: '18', value: name || '', placeholder: 'Your name' });
   const submit = () => {
     const value = input.value.trim();
     if (value) onSubmit(value);
@@ -56,22 +58,22 @@ export function namePanel({ name, lobbyCode, onSubmit }) {
     e.stopPropagation();
   };
   queueMicrotask(() => input.focus());
-  return el('div', { class: 'ng-panel' }, [
+  return el('div', { class: 'panel ng-panel' }, [
     el('h2', { text: lobbyCode ? `Join lobby ${lobbyCode}` : 'Lost in the Nexus' }),
     el('p', { class: 'ng-muted', text: 'The lobby host will have one minute to fly around the map and take a picture. Players then have a few minutes to find the exact spot they took that picture! How close can you get?' }),
     input,
-    el('button', { class: 'ng-btn ng-btn--primary', text: lobbyCode ? 'Join' : 'Create lobby', onClick: submit }),
+    el('button', { class: 'btn btn--primary', text: lobbyCode ? 'Join' : 'Create lobby', onClick: submit }),
   ]);
 }
 
 export function lobbyPanel({ lobbyCode, players, selfPeerId, isHost, streamerMode, onStart, onLeave, onMakeHost }) {
   const link = `${location.origin}${location.pathname}?game=${lobbyCode}`;
-  const copy = el('button', { class: 'ng-btn', text: 'Copy invite link' });
+  const copy = el('button', { class: 'btn', text: 'Copy invite link' });
   copy.onclick = () => {
     navigator.clipboard?.writeText(link).then(() => { copy.textContent = 'Copied'; });
   };
   const enough = players.length >= 2;
-  return el('div', { class: 'ng-panel' }, [
+  return el('div', { class: 'panel ng-panel' }, [
     el('h2', { text: 'Lobby' }),
     el('div', { class: 'ng-code', text: streamerMode ? '••••••' : lobbyCode }),
     el('ul', { class: 'ng-players' }, players.map((p) => el('li', {
@@ -81,7 +83,7 @@ export function lobbyPanel({ lobbyCode, players, selfPeerId, isHost, streamerMod
       el('span', { class: 'ng-player__actions' }, [
         p.isHost ? el('span', { class: 'ng-tag', text: 'host' }) : null,
         isHost && !p.isHost ? el('button', {
-          class: 'ng-btn ng-btn--quiet ng-btn--small',
+          class: 'btn btn--sm ng-btn--quiet',
           text: 'Make host',
           onClick: () => onMakeHost(p.peerId),
         }) : null,
@@ -91,12 +93,12 @@ export function lobbyPanel({ lobbyCode, players, selfPeerId, isHost, streamerMod
     el('div', { class: 'ng-row' }, [
       copy,
       isHost ? el('button', {
-        class: 'ng-btn ng-btn--primary',
+        class: 'btn btn--primary',
         text: enough ? 'Start' : 'Waiting for players',
         disabled: !enough,
         onClick: () => enough && onStart(),
       }) : el('span', { class: 'ng-muted', text: 'Waiting for the host to start.' }),
-      el('button', { class: 'ng-btn ng-btn--quiet', text: 'Leave', onClick: onLeave }),
+      el('button', { class: 'btn ng-btn--quiet', text: 'Leave', onClick: onLeave }),
     ]),
   ]);
 }
@@ -154,7 +156,7 @@ export function mapSelectPanel({ maps, choices, limitSec, isHost, onPick, onLimi
   };
   slider.onkeydown = (e) => e.stopPropagation();
 
-  return el('div', { class: 'ng-panel ng-panel--wide' }, [
+  return el('div', { class: 'panel ng-panel ng-panel--wide' }, [
     el('h2', { text: isHost ? 'Pick a battleground' : 'The host is picking a battleground' }),
     grid,
     isHost ? el('label', { class: 'ng-limit' }, [
@@ -194,12 +196,12 @@ export function hudView({ label, timeLeft, players, selfPeerId, action }) {
 }
 
 export function confirmPanel({ image, onLockIn, onRetake }) {
-  return el('div', { class: 'ng-panel ng-panel--wide' }, [
+  return el('div', { class: 'panel ng-panel ng-panel--wide' }, [
     el('h2', { text: 'Lock in this picture?' }),
     el('img', { class: 'ng-preview ng-preview--large', src: image, alt: 'Your picture' }),
     el('div', { class: 'ng-row' }, [
-      el('button', { class: 'ng-btn ng-btn--primary', text: 'Lock in', onClick: onLockIn }),
-      el('button', { class: 'ng-btn ng-btn--quiet', text: 'Keep looking', onClick: onRetake }),
+      el('button', { class: 'btn btn--primary', text: 'Lock in', onClick: onLockIn }),
+      el('button', { class: 'btn ng-btn--quiet', text: 'Keep looking', onClick: onRetake }),
     ]),
   ]);
 }
@@ -267,7 +269,7 @@ function countUp(node, to) {
 
 export function resultsPanel({ target, isHost, onLeave, onOpenImage, onPlayAgain }) {
   const list = el('ol', { class: 'ng-results' });
-  const panel = el('div', { class: 'ng-panel ng-panel--wide' }, [
+  const panel = el('div', { class: 'panel ng-panel ng-panel--wide' }, [
     el('h2', { text: 'Results' }),
     el('p', { class: 'ng-muted', text: "The host's picture. Tap any picture to enlarge it." }),
     el('img', {
@@ -278,8 +280,8 @@ export function resultsPanel({ target, isHost, onLeave, onOpenImage, onPlayAgain
     }),
     list,
     el('div', { class: 'ng-row' }, [
-      isHost ? el('button', { class: 'ng-btn ng-btn--primary', text: 'Play again', onClick: onPlayAgain }) : null,
-      el('button', { class: 'ng-btn ng-btn--quiet', text: 'Leave', onClick: onLeave }),
+      isHost ? el('button', { class: 'btn btn--primary', text: 'Play again', onClick: onPlayAgain }) : null,
+      el('button', { class: 'btn ng-btn--quiet', text: 'Leave', onClick: onLeave }),
     ]),
   ]);
   return {
@@ -316,12 +318,12 @@ export function resultsPanel({ target, isHost, onLeave, onOpenImage, onPlayAgain
 }
 
 export function noticePanel({ title, body, onLeave, onPlay }) {
-  return el('div', { class: 'ng-panel' }, [
+  return el('div', { class: 'panel ng-panel' }, [
     el('h2', { text: title }),
     body ? el('p', { class: 'ng-muted', text: body }) : null,
     el('div', { class: 'ng-row' }, [
-      onPlay ? el('button', { class: 'ng-btn ng-btn--primary', text: 'Play Game', onClick: onPlay }) : null,
-      onLeave ? el('button', { class: 'ng-btn ng-btn--quiet', text: 'Leave', onClick: onLeave }) : null,
+      onPlay ? el('button', { class: 'btn btn--primary', text: 'Play Game', onClick: onPlay }) : null,
+      onLeave ? el('button', { class: 'btn ng-btn--quiet', text: 'Leave', onClick: onLeave }) : null,
     ]),
   ]);
 }

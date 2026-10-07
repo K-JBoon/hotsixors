@@ -570,7 +570,7 @@ export function createNexusGame({ nexus, page, lobbyCode, setStatus }) {
   function actionButton() {
     if (!canShoot()) return null;
     const onClick = phase === 'host-shot' ? () => takeHostShot() : () => offerLockIn();
-    return el('button', { class: 'ng-btn ng-btn--primary', text: 'Take a Picture', onClick });
+    return el('button', { class: 'btn btn--primary', text: 'Take a Picture', onClick });
   }
 
   function hudLabel() {

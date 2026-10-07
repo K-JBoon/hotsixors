@@ -1,0 +1,168 @@
+.minions-page,
+.structures-page,
+.mechanics-page { max-width: 1180px; margin: 0 auto; }
+.minions-page h1,
+.structures-page h1,
+.mechanics-page h1 { font-size: var(--text-2xl); color: var(--accent-gold); margin-bottom: var(--space-lg); }
+.minions-page p > code,
+.minions-page .underdog-example li > code,
+.structures-page p > code,
+.structures-page .underdog-example li > code,
+.mechanics-page p > code,
+.mechanics-page .underdog-example li > code {
+  background: var(--bg-card);
+  border: 1px solid var(--border-dim);
+  border-radius: var(--radius-sm);
+  padding: 0.1em 0.4em;
+  font-size: 0.85em;
+  color: var(--text-primary);
+}
+
+.experience-tier-delta { color: var(--text-muted); font-size: var(--text-xs); white-space: nowrap; }
+
+.mechanics-section > p { margin: var(--space-md) 0; line-height: 1.6; }
+.mechanics-section .minions-table-wrap { margin: var(--space-md) 0; }
+.mechanics-section .mechanics-source-list { margin-top: var(--space-xl); }
+
+.underdog-example { margin: var(--space-lg) 0; }
+.underdog-example p { margin: 0 0 var(--space-xs); }
+.underdog-example ol {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  margin: 0;
+  padding-left: var(--space-lg);
+  color: var(--text-muted);
+  line-height: 1.55;
+}
+
+.underdog-calc:not(:empty) {
+  margin: var(--space-lg) 0;
+  padding: var(--space-md) var(--space-md);
+  background: var(--bg-card);
+  border: 1px solid var(--border-dim);
+  border-radius: var(--radius-md);
+}
+.underdog-calc h3 { font-size: var(--text-md); color: var(--accent-gold); margin: 0 0 var(--space-sm); }
+.underdog-calc__fields { display: flex; flex-wrap: wrap; gap: var(--space-md); }
+.underdog-calc__fields label {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3xs);
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+.underdog-calc__fields input {
+  width: 9rem;
+  padding: var(--space-2xs) var(--space-xs);
+  background: var(--bg-deep);
+  border: 1px solid var(--border-dim);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: var(--text-md);
+}
+.underdog-calc__fields input:focus { outline: none; border-color: var(--accent-gold); }
+.underdog-calc__hint { margin: var(--space-xs) 0 0; font-size: var(--text-xs); color: var(--text-muted); }
+.underdog-calc__result { margin: var(--space-sm) 0 0; font-size: var(--text-md); }
+.underdog-calc__result strong { color: var(--accent-gold); }
+
+.minions-section,
+.mechanics-section { margin-top: var(--space-xl); }
+.minions-section:first-of-type,
+.mechanics-section:first-of-type { margin-top: 0; }
+.minions-section__header,
+.mechanics-section__header { margin-bottom: var(--space-sm); }
+.minions-section__header h2,
+.mechanics-section__header h2 { font-size: var(--text-lg); color: var(--accent-gold); margin-bottom: var(--space-2xs); }
+.minions-section__header p,
+.mechanics-section__header p { color: var(--text-muted); margin: 0; }
+
+.minions-table,
+.mechanics-table { min-width: 1080px; }
+.minions-table tbody th,
+.mechanics-table tbody th { width: 190px; }
+.minions-table tbody th code,
+.minions-table tbody th span,
+.mechanics-table tbody th code,
+.mechanics-table tbody th span { display: block; }
+.minions-table tbody th code,
+.mechanics-table tbody th code {
+  width: fit-content;
+  margin: var(--space-3xs) 0;
+  color: var(--accent-blue);
+  font-size: var(--text-xs);
+}
+.minions-table tbody th span:last-child,
+.mechanics-table tbody th span:last-child { color: var(--text-muted); font-weight: 400; }
+.minions-table td,
+.mechanics-table td { color: var(--text-muted); line-height: 1.45; }
+.minions-table td span,
+.mechanics-table td span { display: block; margin-top: var(--space-3xs); color: var(--text-muted); }
+.minions-table__unit { color: var(--text-primary); font-weight: 600; }
+.minions-table a,
+.mechanics-table a { color: var(--accent-blue); text-decoration: underline; }
+
+.mechanics-composition { margin: var(--space-2xs) 0 0; font-size: var(--text-xs); }
+
+.structures-table { min-width: 1040px; }
+.structures-table__note {
+  max-width: 22rem;
+  margin: var(--space-xs) 0 0;
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+  line-height: 1.4;
+}
+
+.minions-table.minions-table--timings { min-width: 0; }
+.minions-table.minions-table--timings tbody td:first-of-type {
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.minions-timings-caveat { margin: var(--space-lg) 0 0; color: var(--text-muted); line-height: 1.6; }
+
+.mechanics-table { min-width: 940px; }
+.mechanics-table tbody th { width: 230px; }
+
+html:not(.datamining-enabled) .mechanics-table { min-width: 0; }
+
+.experience-levels-table,
+.experience-underdog-table { min-width: 480px; }
+.experience-levels-table tbody th,
+.experience-underdog-table tbody th { width: auto; }
+
+.minions-weapons,
+.mechanics-source-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.minions-weapons li,
+.mechanics-source-list li { display: flex; flex-direction: column; gap: var(--space-3xs); }
+.minions-weapons code,
+.mechanics-source-list code { width: fit-content; color: var(--accent-blue); font-size: var(--text-xs); }
+
+.mechanics-source-list li { margin-bottom: var(--space-xs); }
+.mechanics-source-list li:last-child { margin-bottom: 0; }
+.mechanics-source-list a,
+.mechanics-source-list span { display: block; }
+.mechanics-source-list span { color: var(--text-muted); font-size: var(--text-xs); }
+
+.scaling-summary { display: grid; gap: var(--space-xs); margin: 0; }
+.scaling-summary div { display: grid; gap: var(--space-3xs); }
+.scaling-summary dt {
+  color: var(--text-primary);
+  font-family: var(--font-display);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+.scaling-summary dd { color: var(--text-muted); line-height: 1.35; margin: 0; }
+
+.minions-xp-summary { color: var(--text-muted); }

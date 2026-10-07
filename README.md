@@ -55,7 +55,7 @@ site/             the Zola site
   content/        pages (mostly generated)
   templates/      Tera templates
   static/         client-side JS, CSS and generated JSON
-  sass/           styles
+  css/            site stylesheets, bundled by esbuild
 submodules/       heroprotocol, the one external source left
 .gamedata/        extracted game data (generated, ignored)
 tests/            node:test suites
