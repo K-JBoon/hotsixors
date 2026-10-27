@@ -31,6 +31,7 @@ import {
   loadWeaponCatalogFiles,
   readBuffModification,
   readWeaponDamageMultiplier,
+  readMissileSpeed,
   readWeaponTiming,
   type BuffModification,
 } from "./lib/weapon-timing.ts";
@@ -685,7 +686,7 @@ async function main(): Promise<void> {
   const isUnreachable = createReachability(graph, reverseRefs, offeredTalents);
   const { isDeadCondition } = createDeadGates(graph, reverseRefs, offeredTalents);
   const { resolveEntry, shortcodeData, abilityDescriptions, missingIcons, foundAreas, foundTicks, foundNotes } =
-    createEntryResolver(gs, anchorMap ?? {}, declAnchorMap ?? {}, graph);
+    createEntryResolver(gs, anchorMap ?? {}, declAnchorMap ?? {}, graph, (id) => readMissileSpeed(catalogIndex, id));
 
   for (const [heroName, rawHero] of Object.entries(heroData)) {
     const hero = withResourceType(gs, heroName, rawHero);

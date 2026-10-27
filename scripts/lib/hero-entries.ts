@@ -19,7 +19,7 @@ import { GAMEDATA_DIR, HEROES_IMAGES_DIR, SITE_STATIC_IMAGES } from "./paths.ts"
 import { isToggleOffButton, parseAbilityStats } from "./abilityxml.ts";
 import { abilityGeometry, type GatedArea } from "./ability-geometry.ts";
 import { abilityTicks, type GatedTick } from "./ability-ticks.ts";
-import { abilityNotes, type GatedNote } from "./ability-notes.ts";
+import { abilityNotes, abilitySpeeds, type GatedNote } from "./ability-notes.ts";
 import { scriptRange } from "./script-ranges.ts";
 import type { EffectGraph } from "./effect-graph/index.ts";
 import {
@@ -118,6 +118,7 @@ export function createEntryResolver(
   anchorMap: AnchorMap,
   declAnchorMap: AnchorMap = {},
   graph?: EffectGraph,
+  missileSpeed: (launchId: string) => number | null = () => null,
 ) {
   const shortcodeData: ShortcodeData = {};
   const abilityDescriptions: Record<string, string> = {};
@@ -184,10 +185,11 @@ export function createEntryResolver(
     if (ticks.length > 0) foundTicks.set(nameId, ticks);
     const notes = graph ? abilityNotes(graph, nameId, (id) => nameByAbilId(gs, id)) : [];
     if (notes.length > 0) foundNotes.set(nameId, notes);
+    const speeds = graph ? abilitySpeeds(graph, nameId, missileSpeed) : { dashSpeed: null, missileSpeed: null };
     const xmlStats = xmlData ? parseAbilityStats(xmlData.xml, nameId, entry.buttonId, xmlData.xmlPath) : null;
     const costText = opts?.costless || xmlStats?.manaCost != null ? "" : getAbilityCostText(gs, entry.linkId);
     const stats = xmlStats
-      ? { ...xmlStats, ...geometry, range: scriptRange(nameId) ?? range, costKind: ctx.resourceKind, costText }
+      ? { ...xmlStats, ...geometry, ...speeds, range: scriptRange(nameId) ?? range, costKind: ctx.resourceKind, costText }
       : null;
 
     const anchor = declAnchor(nameId);

@@ -296,16 +296,20 @@
   {% set range = show_stats and st and st.range %}
   {% set radius = show_stats and st and st.radius %}
   {% set width = show_stats and st and st.width %}
+  {% set dash = show_stats and st and st.dashSpeed %}
+  {% set missile = show_stats and st and st.missileSpeed %}
   {% set areas = show_stats and ab.areas | default(value=[]) %}
   {% set notes = show_stats and ab.notes | default(value=[]) %}
   {% set xml = sc_entry and sc_entry.xmlPath %}
-  {% if multi_charge or cast or range or radius or width or xml %}
+  {% if multi_charge or cast or range or radius or width or dash or missile or xml %}
   <div class="ability-card__footer">
-    {% if multi_charge or cast or range or radius or width %}
+    {% if multi_charge or cast or range or radius or width or dash or missile %}
     <dl class="stat-chips">
       {% if range %}<div class="ability-stat">{{<heroes.ability_stat_label kind="range" label="Range" />}}<dd class="ability-stat__value">{{ st.range }}</dd></div>{% endif %}
       {% if radius %}<div class="ability-stat">{{<heroes.ability_stat_label kind="radius" label="Radius" />}}<dd class="ability-stat__value">{{ st.radius }}</dd></div>{% endif %}
       {% if width %}<div class="ability-stat">{{<heroes.ability_stat_label kind="width" label="Width" />}}<dd class="ability-stat__value">{{ st.width }}</dd></div>{% endif %}
+      {% if dash %}<div class="ability-stat">{{<heroes.ability_stat_label kind="missile" label="Dash speed" />}}<dd class="ability-stat__value">{{ st.dashSpeed }}</dd></div>{% endif %}
+      {% if missile %}<div class="ability-stat">{{<heroes.ability_stat_label kind="missile" label="Missile speed" />}}<dd class="ability-stat__value">{{ st.missileSpeed }}</dd></div>{% endif %}
       {% if multi_charge %}<div class="ability-stat">{{<heroes.ability_stat_label kind="charges" label="Charges" />}}<dd class="ability-stat__value">{{ st.chargeCountMax }}</dd></div>{% endif %}
       {% if cast %}<div class="ability-stat">{{<heroes.ability_stat_label kind="cast" label="Cast time" />}}<dd class="ability-stat__value">{{ st.castIntroTime }}{% if st.castFinishTime %} + {{ st.castFinishTime }}{% endif %}s</dd></div>{% endif %}
     </dl>

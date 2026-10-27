@@ -53,6 +53,8 @@ export interface AbilityStats {
   range: number | null;             // cast range, missile reach, or cone length
   radius: number | null;            // targeting circle, or the first area the cast hits
   width: number | null;             // rectangle width of the targeting guide or hitbox
+  dashSpeed: number | null;         // fixed caster speed while a dash buff or caster-carrying missile runs
+  missileSpeed: number | null;      // first missile that does not carry the caster
   sources: Partial<Record<AbilityStatKey, AbilityStatSource>>;
 }
 

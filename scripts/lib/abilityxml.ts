@@ -71,7 +71,7 @@ export function parseAbilityStats(
   abilityId: string,
   buttonId: string,
   xmlPath: string,
-): Omit<AbilityStats, "range" | "radius" | "width"> {
+): Omit<AbilityStats, "range" | "radius" | "width" | "dashSpeed" | "missileSpeed"> {
   const abilBlock = catalogBlock(xml, "CAbil", abilityId);
   const consts = constantsCache.get(xmlPath) ?? parseConstants(xml);
   constantsCache.set(xmlPath, consts);

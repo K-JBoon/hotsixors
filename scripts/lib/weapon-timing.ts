@@ -232,6 +232,17 @@ function missilePhases(index: CatalogIndex, launchId: string): HeroStatsMissileP
   return out;
 }
 
+// A dash whose mover takes over a unit of travel to reach its cap has no single speed.
+export function readMissileSpeed(index: CatalogIndex, launchId: string): number | null {
+  const phase = motionPhases(index, launchMover(index, launchId)).find((p) => p && (phaseSpeed(index, p) ?? 0) > 0);
+  if (!phase) return null;
+  const num = (field: string) => resolveNumber(phase[field] ?? null, index.consts);
+  const [accel, max] = [num("Acceleration") ?? 0, num("MaxSpeed")];
+  const launch = Math.max(num("Speed") ?? 0, num("MinSpeed") ?? 0);
+  if (accel > 0 && max !== null && (max ** 2 - launch ** 2) / (2 * accel) > 1) return null;
+  return phaseSpeed(index, phase);
+}
+
 export function readWeaponTiming(index: CatalogIndex, weaponId: string): HeroStatsWeaponTiming | null {
   if (!index.entries.has(`CWeapon:${weaponId}`)) return null;
   const effectId = fieldNode(index, "CWeapon", weaponId, "Effect")?.attrs.value;

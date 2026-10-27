@@ -367,6 +367,48 @@ function endNotes(graph: EffectGraph, nodes: GraphNode[]) {
   ];
 }
 
+function modificationNumber(graph: EffectGraph, id: string, tag: string) {
+  for (const ancestor of parentChain(graph, id)) {
+    const fields = graph.nodes.get(ancestor)?.elements.filter((e) => e.tag === "Modification").flatMap((m) => m.children) ?? [];
+    const value = fields.filter((c) => c.tag === tag).at(-1)?.attrs.value;
+    if (value) return number(graph, value);
+  }
+  return null;
+}
+
+// Min and max pinned to one value fix the speed; a lone max is only a cap.
+function fixedMoveSpeed(graph: EffectGraph, id: string) {
+  const min = modificationNumber(graph, id, "MoveSpeedMinimum");
+  return min !== null && min === modificationNumber(graph, id, "MoveSpeedMaximum") ? positive(min) : null;
+}
+
+// Shared launches that nudge a unit off unpathable ground; not the ability's own travel.
+function isMissile(graph: EffectGraph, visit: Visit) {
+  return graph.nodes.get(visit.id)!.tag.startsWith("CEffectLaunchMissile") && !visit.id.startsWith("HeroGenericMissileInterrupt");
+}
+
+// Without an ammo unit the launch moves the unit at its launch location; past a spawn, the caster is the spawned unit.
+function launchesCaster(graph: EffectGraph, visit: Visit) {
+  const location = inheritedValueAttr(graph, visit.id, "LaunchLocation") ?? inheritedValue(graph, visit.id, "LaunchLocation");
+  return (
+    isMissile(graph, visit) &&
+    inheritedValue(graph, visit.id, "AmmoUnit") === null &&
+    [null, "CasterUnit"].includes(location) &&
+    !visit.path.some((id) => graph.nodes.get(id)?.tag === "CEffectCreateUnit")
+  );
+}
+
+export function abilitySpeeds(graph: EffectGraph, abilId: string, missileSpeed: (launchId: string) => number | null) {
+  if (!graph.nodes.get(abilId)?.tag.startsWith("CAbil")) return { dashSpeed: null, missileSpeed: null };
+  const visits = walk(graph, abilId, null).filter((v) => v.gates.length === 0);
+  const first = (speedOf: (v: Visit) => number | null) => visits.map(speedOf).find((s) => s !== null) ?? null;
+  const dashes = (v: Visit) => carriesCaster(graph, v) || launchesCaster(graph, v);
+  return {
+    dashSpeed: first((v) => (isCasterBuff(graph, v) ? fixedMoveSpeed(graph, v.id) : dashes(v) ? missileSpeed(v.id) : null)),
+    missileSpeed: first((v) => (isMissile(graph, v) && !dashes(v) ? missileSpeed(v.id) : null)),
+  };
+}
+
 export function abilityNotes(graph: EffectGraph, abilId: string, nameOf: NameOf): GatedNote[] {
   if (!graph.nodes.get(abilId)?.tag.startsWith("CAbil")) return [];
   const visits = walk(graph, abilId, null);
