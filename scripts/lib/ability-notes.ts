@@ -3,6 +3,7 @@
 import type { AbilityNote } from "../types.ts";
 import type { EffectGraph, Element, GraphNode } from "./effect-graph/types.ts";
 import { findFirst } from "./effect-graph/traverse.ts";
+import { resolvedNumber } from "./effect-graph/xml.ts";
 import { parentChain } from "./effect-graph/walk.ts";
 import { inheritedValue, number, ownGates, positive, walk, walkRefs, type Visit } from "./ability-geometry.ts";
 import { COMPARES, absentBehavior, inheritedValueAttr, lockout, onCaster, reached } from "./ability-ticks.ts";
@@ -407,6 +408,38 @@ export function abilitySpeeds(graph: EffectGraph, abilId: string, missileSpeed: 
     dashSpeed: first((v) => (isCasterBuff(graph, v) ? fixedMoveSpeed(graph, v.id) : dashes(v) ? missileSpeed(v.id) : null)),
     missileSpeed: first((v) => (isMissile(graph, v) && !dashes(v) ? missileSpeed(v.id) : null)),
   };
+}
+
+const cooldownSets = new WeakMap<EffectGraph, Map<string, number>>();
+
+// Sets from another ability or a death, not the abil's own cooldown.
+const FOREIGN_COOLDOWN_SETS = new Set(["FlightoftheBetrayerModifyCooldown", "RexxarMishaDeadAddSpiritBondCooldown"]);
+
+// `<Cost Abil CooldownOperation CooldownTimeUse/>` or `<Cost Abil><Cooldown><Operation/><TimeUse/></Cooldown></Cost>`.
+function setCooldown(graph: EffectGraph, cost: Element): number | null {
+  const nested = findFirst(cost.children, "Cooldown")?.children ?? [];
+  const field = (tag: string) => nested.find((e) => e.tag === tag)?.attrs.value;
+  const operation = cost.attrs.CooldownOperation ?? field("Operation");
+  const timeUse = cost.attrs.CooldownTimeUse ?? field("TimeUse");
+  return operation === "Set" && timeUse ? resolvedNumber(graph, timeUse) : null;
+}
+
+// Largest cooldown any effect sets on the abil. Abils that only pay a short lockout up front start their real cooldown this way.
+export function setAbilCooldown(graph: EffectGraph, abilId: string): number | null {
+  let sets = cooldownSets.get(graph);
+  if (!sets) {
+    sets = new Map();
+    for (const node of graph.nodes.values()) {
+      if (FOREIGN_COOLDOWN_SETS.has(node.id)) continue;
+      for (const cost of node.elements.filter((e) => e.tag === "Cost" && e.attrs.Abil)) {
+        const id = cost.attrs.Abil.split(",")[0];
+        const value = setCooldown(graph, cost);
+        if (value !== null && value > (sets.get(id) ?? 0)) sets.set(id, value);
+      }
+    }
+    cooldownSets.set(graph, sets);
+  }
+  return sets.get(abilId) ?? null;
 }
 
 export function abilityNotes(graph: EffectGraph, abilId: string, nameOf: NameOf): GatedNote[] {

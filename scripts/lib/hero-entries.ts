@@ -19,7 +19,7 @@ import { GAMEDATA_DIR, HEROES_IMAGES_DIR, SITE_STATIC_IMAGES } from "./paths.ts"
 import { isToggleOffButton, parseAbilityStats } from "./abilityxml.ts";
 import { abilityGeometry, type GatedArea } from "./ability-geometry.ts";
 import { abilityTicks, type GatedTick } from "./ability-ticks.ts";
-import { abilityNotes, abilitySpeeds, type GatedNote } from "./ability-notes.ts";
+import { abilityNotes, abilitySpeeds, setAbilCooldown, type GatedNote } from "./ability-notes.ts";
 import { scriptRange } from "./script-ranges.ts";
 import type { EffectGraph } from "./effect-graph/index.ts";
 import {
@@ -113,6 +113,8 @@ function anchorXmlPathToAbsPath(xmlPath: string): string {
   return path.join(GAMEDATA_DIR, xmlPath.replace(/^mods\//, "").replace(/-xml$/, ".xml"));
 }
 
+const LOCKOUT_COOLDOWN = 1;
+
 export function createEntryResolver(
   gs: Gamestrings,
   anchorMap: AnchorMap,
@@ -187,9 +189,12 @@ export function createEntryResolver(
     if (notes.length > 0) foundNotes.set(nameId, notes);
     const speeds = graph ? abilitySpeeds(graph, nameId, missileSpeed) : { dashSpeed: null, missileSpeed: null };
     const xmlStats = xmlData ? parseAbilityStats(xmlData.xml, nameId, entry.buttonId, xmlData.xmlPath) : null;
+    const lockout = xmlStats && xmlStats.chargeTimeUse === null && (xmlStats.cooldown ?? 0) <= LOCKOUT_COOLDOWN;
+    const setCd = graph && lockout ? setAbilCooldown(graph, nameId) : null;
+    const deferred = setCd !== null && setCd > (xmlStats?.cooldown ?? 0) ? { cooldown: setCd } : {};
     const costText = opts?.costless || xmlStats?.manaCost != null ? "" : getAbilityCostText(gs, entry.linkId);
     const stats = xmlStats
-      ? { ...xmlStats, ...geometry, ...speeds, range: scriptRange(nameId) ?? range, costKind: ctx.resourceKind, costText }
+      ? { ...xmlStats, ...geometry, ...speeds, ...deferred, range: scriptRange(nameId) ?? range, costKind: ctx.resourceKind, costText }
       : null;
 
     const anchor = declAnchor(nameId);

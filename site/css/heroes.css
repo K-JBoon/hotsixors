@@ -608,6 +608,7 @@
   margin: 0;
 }
 
+.talent-card__stats,
 .talent-card__notes { margin-top: var(--space-2xs); }
 
 .ability-notes { font-size: var(--text-xs); color: var(--text-muted); }

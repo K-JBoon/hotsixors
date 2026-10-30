@@ -264,6 +264,31 @@
 </details>
 {% endcomponent heroes.ability_notes %}
 
+{% component heroes.ability_meta(st) %}
+{% set cost = st.manaCost %}{% if st.costText %}{% set cost = st.costText %}{% endif %}
+{% if cost or st.chargeTimeUse or st.cooldown %}
+<p class="ability-card__meta">
+  {% if cost %}<span class="ability-card__meta-item"><span class="ability-card__meta-label">{{ st.costKind | default(value="Mana") }}</span> {{ cost }}</span>{% endif %}
+  {% if st.chargeTimeUse %}<span class="ability-card__meta-item"><span class="ability-card__meta-label">{% if st.chargeCountMax > 1 %}Charge CD{% else %}Cooldown{% endif %}</span> {{ st.chargeTimeUse }}s</span>{% elif st.cooldown %}<span class="ability-card__meta-item"><span class="ability-card__meta-label">Cooldown</span> {{ st.cooldown }}s</span>{% endif %}
+</p>
+{% endif %}
+{% endcomponent heroes.ability_meta %}
+
+{% component heroes.ability_chips(st, class="") %}
+{% set multi_charge = st.chargeCountMax and st.chargeCountMax > 1 %}
+{% if st.range or st.radius or st.width or st.dashSpeed or st.missileSpeed or st.castIntroTime or multi_charge %}
+<dl class="stat-chips {{ class }}">
+  {% if st.range %}<div class="ability-stat">{{<heroes.ability_stat_label kind="range" label="Range" />}}<dd class="ability-stat__value">{{ st.range }}</dd></div>{% endif %}
+  {% if st.radius %}<div class="ability-stat">{{<heroes.ability_stat_label kind="radius" label="Radius" />}}<dd class="ability-stat__value">{{ st.radius }}</dd></div>{% endif %}
+  {% if st.width %}<div class="ability-stat">{{<heroes.ability_stat_label kind="width" label="Width" />}}<dd class="ability-stat__value">{{ st.width }}</dd></div>{% endif %}
+  {% if st.dashSpeed %}<div class="ability-stat">{{<heroes.ability_stat_label kind="missile" label="Dash speed" />}}<dd class="ability-stat__value">{{ st.dashSpeed }}</dd></div>{% endif %}
+  {% if st.missileSpeed %}<div class="ability-stat">{{<heroes.ability_stat_label kind="missile" label="Missile speed" />}}<dd class="ability-stat__value">{{ st.missileSpeed }}</dd></div>{% endif %}
+  {% if multi_charge %}<div class="ability-stat">{{<heroes.ability_stat_label kind="charges" label="Charges" />}}<dd class="ability-stat__value">{{ st.chargeCountMax }}</dd></div>{% endif %}
+  {% if st.castIntroTime %}<div class="ability-stat">{{<heroes.ability_stat_label kind="cast" label="Cast time" />}}<dd class="ability-stat__value">{{ st.castIntroTime }}{% if st.castFinishTime %} + {{ st.castFinishTime }}{% endif %}s</dd></div>{% endif %}
+</dl>
+{% endif %}
+{% endcomponent heroes.ability_chips %}
+
 {% component heroes.ability_card(ab, sc, show_stats=false) %}
 {% set st = ab.stats | default(value=false) %}
 {% set sc_entry = sc | get(key=ab.nameId, default=false) %}
@@ -272,13 +297,7 @@
     {{<images.optimized path={'images/abilitytalents/' ~ ab.icon} class="ability-card__icon" alt="" width={44} height={44} op="fill" display_width={44} display_height={44} loading="lazy" />}}
     <div class="ability-card__title">
       <span class="ability-card__name">{{ ab.name }}</span>
-      {% set cost = false %}{% if st %}{% set cost = st.manaCost %}{% if st.costText %}{% set cost = st.costText %}{% endif %}{% endif %}
-      {% if st and (cost or st.chargeTimeUse or st.cooldown) %}
-      <p class="ability-card__meta">
-        {% if cost %}<span class="ability-card__meta-item"><span class="ability-card__meta-label">{{ st.costKind | default(value="Mana") }}</span> {{ cost }}</span>{% endif %}
-        {% if st.chargeTimeUse %}<span class="ability-card__meta-item"><span class="ability-card__meta-label">{% if st.chargeCountMax > 1 %}Charge CD{% else %}Cooldown{% endif %}</span> {{ st.chargeTimeUse }}s</span>{% elif st.cooldown %}<span class="ability-card__meta-item"><span class="ability-card__meta-label">Cooldown</span> {{ st.cooldown }}s</span>{% endif %}
-      </p>
-      {% endif %}
+      {% if st %}{{<heroes.ability_meta st={st} />}}{% endif %}
     </div>
     {% if ab.abilityType | length == 1 %}
     <kbd class="ability-card__key">{{ ab.abilityType }}</kbd>
@@ -291,29 +310,13 @@
   {% elif ab.fullDesc %}
     <p class="ability-card__desc">{{ ab.fullDesc }}</p>
   {% endif %}
-  {% set multi_charge = show_stats and st and st.chargeCountMax and st.chargeCountMax > 1 %}
-  {% set cast = show_stats and st and st.castIntroTime %}
-  {% set range = show_stats and st and st.range %}
-  {% set radius = show_stats and st and st.radius %}
-  {% set width = show_stats and st and st.width %}
-  {% set dash = show_stats and st and st.dashSpeed %}
-  {% set missile = show_stats and st and st.missileSpeed %}
+  {% set chips = show_stats and st and (st.range or st.radius or st.width or st.dashSpeed or st.missileSpeed or st.castIntroTime or (st.chargeCountMax and st.chargeCountMax > 1)) %}
   {% set areas = show_stats and ab.areas | default(value=[]) %}
   {% set notes = show_stats and ab.notes | default(value=[]) %}
   {% set xml = sc_entry and sc_entry.xmlPath %}
-  {% if multi_charge or cast or range or radius or width or dash or missile or xml %}
+  {% if chips or xml %}
   <div class="ability-card__footer">
-    {% if multi_charge or cast or range or radius or width or dash or missile %}
-    <dl class="stat-chips">
-      {% if range %}<div class="ability-stat">{{<heroes.ability_stat_label kind="range" label="Range" />}}<dd class="ability-stat__value">{{ st.range }}</dd></div>{% endif %}
-      {% if radius %}<div class="ability-stat">{{<heroes.ability_stat_label kind="radius" label="Radius" />}}<dd class="ability-stat__value">{{ st.radius }}</dd></div>{% endif %}
-      {% if width %}<div class="ability-stat">{{<heroes.ability_stat_label kind="width" label="Width" />}}<dd class="ability-stat__value">{{ st.width }}</dd></div>{% endif %}
-      {% if dash %}<div class="ability-stat">{{<heroes.ability_stat_label kind="missile" label="Dash speed" />}}<dd class="ability-stat__value">{{ st.dashSpeed }}</dd></div>{% endif %}
-      {% if missile %}<div class="ability-stat">{{<heroes.ability_stat_label kind="missile" label="Missile speed" />}}<dd class="ability-stat__value">{{ st.missileSpeed }}</dd></div>{% endif %}
-      {% if multi_charge %}<div class="ability-stat">{{<heroes.ability_stat_label kind="charges" label="Charges" />}}<dd class="ability-stat__value">{{ st.chargeCountMax }}</dd></div>{% endif %}
-      {% if cast %}<div class="ability-stat">{{<heroes.ability_stat_label kind="cast" label="Cast time" />}}<dd class="ability-stat__value">{{ st.castIntroTime }}{% if st.castFinishTime %} + {{ st.castFinishTime }}{% endif %}s</dd></div>{% endif %}
-    </dl>
-    {% endif %}
+    {% if chips %}{{<heroes.ability_chips st={st} />}}{% endif %}
     {% if xml %}
     <a class="ability-card__xml-link"
        data-datamining

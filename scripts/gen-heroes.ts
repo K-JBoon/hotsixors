@@ -414,10 +414,27 @@ async function resolveTalents(hero: HeroData, ctx: HeroContext, resolve: Resolve
   return out;
 }
 
+function isControlAbility(nameId: string): boolean {
+  return /cancel|retarget|off$/i.test(nameId);
+}
+
 // A group whose every member only cancels, retargets or ends the parent is not
 // a kit of its own, so the page can fold it away.
 function isSecondaryAbility(nameId: string, parentNameId: string): boolean {
-  return /cancel|retarget|off$/i.test(nameId) || nameId === parentNameId;
+  return isControlAbility(nameId) || nameId === parentNameId;
+}
+
+// A talent's own button sits in the sub-ability group keyed by the talent.
+function withGrantedStats(talents: ResolvedTalent[], hero: HeroData, groups: SubAbilityGroup[]): ResolvedTalent[] {
+  const abilityIds = new Map(Object.values(hero.talents ?? {}).flat().map((t) => [t.talentId, t.abilityId]));
+  return talents.map((tal) => {
+    const granted = groups.filter((g) => g.parentNameId === tal.nameId).flatMap((g) => g.abilities);
+    const button =
+      granted.find((ab) => ab.buttonId === tal.buttonId) ??
+      granted.find((ab) => ab.nameId === abilityIds.get(tal.nameId)) ??
+      granted.find((ab) => !isControlAbility(ab.nameId));
+    return button?.stats ? { ...tal, stats: button.stats } : tal;
+  });
 }
 
 async function resolveSubAbilityGroups(
@@ -696,8 +713,9 @@ async function main(): Promise<void> {
 
     await copyPortraits(hero);
     const resolvedAbilities = await resolveAbilities(hero, ctx, resolveEntry);
-    const talents = await resolveTalents(hero, ctx, resolveEntry);
+    const resolvedTalents = await resolveTalents(hero, ctx, resolveEntry);
     const { groups: subAbilityGroups, phases } = await resolveSubAbilityGroups(hero, gs, ctx, resolveEntry, isUnreachable, graph);
+    const talents = withGrantedStats(resolvedTalents, hero, subAbilityGroups);
     const abilities = mergePhases(resolvedAbilities, phases, withPhaseStats);
     const heroUnitAbilities = await resolveHeroUnits(hero, gs, ctx, resolveEntry);
 

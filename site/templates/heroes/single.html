@@ -136,11 +136,13 @@
                        href="/gamedata/{{ sc_entry.xmlPath }}/{% if sc_entry.anchor %}#{{ sc_entry.anchor }}{% endif %}">XML</a>
                   {% endif %}
                 </div>
+                {% if tal.stats %}{{<heroes.ability_meta st={tal.stats} />}}{% endif %}
                 {% if tal.fullDescHtml %}
                   <p class="talent-card__desc storm-game-string">{{ tal.fullDescHtml | safe }}</p>
                 {% elif tal.fullDesc %}
                   <p class="talent-card__desc">{{ tal.fullDesc }}</p>
                 {% endif %}
+                {% if tal.stats %}{{<heroes.ability_chips st={tal.stats} class="talent-card__stats" />}}{% endif %}
                 {% if tal.areas or tal.notes %}{{<heroes.ability_notes areas={tal.areas} notes={tal.notes} class="talent-card__notes" />}}{% endif %}
               </div>
             </div>
