@@ -1,6 +1,10 @@
 
+function stripAccents(value) {
+  return String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+}
+
 export function normalizeSearchValue(value) {
-  return String(value || "")
+  return stripAccents(value)
     .toLowerCase()
     .replace(/&/g, "and")
     .replace(/[^a-z0-9]+/g, "");
@@ -72,7 +76,7 @@ const scoreFields = new WeakMap();
 
 // Apostrophes join, so "Mal'Ganis" stays one word.
 function searchWords(value) {
-  return String(value || "").split(/[^a-z0-9'&]+/i).map(normalizeSearchValue).filter(Boolean);
+  return stripAccents(value).split(/[^a-z0-9'&]+/i).map(normalizeSearchValue).filter(Boolean);
 }
 
 function nameField(value) {
