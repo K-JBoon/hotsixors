@@ -410,36 +410,61 @@ export function abilitySpeeds(graph: EffectGraph, abilId: string, missileSpeed: 
   };
 }
 
+// Attribute, `<Cost><Field value/></Cost>` and `<Cost><Cooldown><Operation/><TimeUse/></Cooldown></Cost>` forms.
+function costField(cost: Element, attr: string, cooldownTag: string): string | undefined {
+  const child = (els: Element[], tag: string) => els.find((e) => e.tag === tag)?.attrs.value;
+  const nested = findFirst(cost.children, "Cooldown")?.children ?? [];
+  return cost.attrs[attr] ?? child(cost.children, attr) ?? child(nested, cooldownTag);
+}
+
+function costCooldown(graph: EffectGraph, cost: Element, operation: string): [string, number] | null {
+  const abil = costField(cost, "Abil", "Abil")?.split(",")[0];
+  const timeUse = costField(cost, "CooldownTimeUse", "TimeUse");
+  if (!abil || !timeUse || costField(cost, "CooldownOperation", "Operation") !== operation) return null;
+  const value = resolvedNumber(graph, timeUse);
+  return value !== null && value > 0 ? [abil, value] : null;
+}
+
+const cooldownCosts = (graph: EffectGraph, node: GraphNode | undefined, operation: string) =>
+  (node?.elements ?? [])
+    .filter((e) => e.tag === "Cost")
+    .map((c) => costCooldown(graph, c, operation))
+    .filter((v): v is [string, number] => v !== null);
+
 const cooldownSets = new WeakMap<EffectGraph, Map<string, number>>();
 
 // Sets from another ability or a death, not the abil's own cooldown.
 const FOREIGN_COOLDOWN_SETS = new Set(["FlightoftheBetrayerModifyCooldown", "RexxarMishaDeadAddSpiritBondCooldown"]);
 
-// `<Cost Abil CooldownOperation CooldownTimeUse/>` or `<Cost Abil><Cooldown><Operation/><TimeUse/></Cooldown></Cost>`.
-function setCooldown(graph: EffectGraph, cost: Element): number | null {
-  const nested = findFirst(cost.children, "Cooldown")?.children ?? [];
-  const field = (tag: string) => nested.find((e) => e.tag === tag)?.attrs.value;
-  const operation = cost.attrs.CooldownOperation ?? field("Operation");
-  const timeUse = cost.attrs.CooldownTimeUse ?? field("TimeUse");
-  return operation === "Set" && timeUse ? resolvedNumber(graph, timeUse) : null;
-}
-
-// Largest cooldown any effect sets on the abil. Abils that only pay a short lockout up front start their real cooldown this way.
-export function setAbilCooldown(graph: EffectGraph, abilId: string): number | null {
+// Sets often fire from triggers the walk does not follow, e.g. a shield's damage response, so they are indexed graph-wide.
+function cooldownSet(graph: EffectGraph, abilId: string): number | null {
   let sets = cooldownSets.get(graph);
   if (!sets) {
     sets = new Map();
     for (const node of graph.nodes.values()) {
       if (FOREIGN_COOLDOWN_SETS.has(node.id)) continue;
-      for (const cost of node.elements.filter((e) => e.tag === "Cost" && e.attrs.Abil)) {
-        const id = cost.attrs.Abil.split(",")[0];
-        const value = setCooldown(graph, cost);
-        if (value !== null && value > (sets.get(id) ?? 0)) sets.set(id, value);
+      for (const [id, value] of cooldownCosts(graph, node, "Set")) {
+        if (value > (sets.get(id) ?? 0)) sets.set(id, value);
       }
     }
     cooldownSets.set(graph, sets);
   }
   return sets.get(abilId) ?? null;
+}
+
+// Positive Adds are also refunds and penalties from other kits, so only the abil's own chain counts.
+function cooldownAdd(graph: EffectGraph, abilId: string): number | null {
+  const values = walk(graph, abilId, null)
+    .flatMap((v) => cooldownCosts(graph, graph.nodes.get(v.id), "Add"))
+    .filter(([id]) => id === abilId)
+    .map(([, value]) => value);
+  return values.length > 0 ? Math.max(...values) : null;
+}
+
+// Abils that only pay a short lockout up front start their real cooldown later in the chain.
+export function setAbilCooldown(graph: EffectGraph, abilId: string): number | null {
+  const values = [cooldownSet(graph, abilId), cooldownAdd(graph, abilId)].filter((v): v is number => v !== null);
+  return values.length > 0 ? Math.max(...values) : null;
 }
 
 export function abilityNotes(graph: EffectGraph, abilId: string, nameOf: NameOf): GatedNote[] {
