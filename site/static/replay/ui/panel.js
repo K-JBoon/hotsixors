@@ -1,5 +1,6 @@
 
 import { LOOPS_PER_SECOND, XP_SOURCES } from '../analyze/stat-events.js';
+import { timelinePositionAt } from '../analyze/timeline.js';
 import { abilityEntryFor } from './abilities.js';
 import { clockText, escapeHtml, externalLink, heroUrl, portraitHtml, talentUrl } from './html.js';
 import { seekTo } from './playback.js';
@@ -25,12 +26,12 @@ const teamLevel = (model, team) => {
   return level || (model.teamLevels[team].at(-1)?.level ?? 0);
 };
 
-function teamRowHtml(model, team, columnCount) {
+function teamRowHtml(model, team, columnCount, cells = `<td colspan="${columnCount}"></td>`) {
   const level = teamLevel(model, team);
   const label = `${team === 0 ? 'Blue' : 'Red'} team${level ? ` · level ${level}` : ''}`;
   return `<tr class="team-row" style="--team-color:${TEAM_COLORS[team]}">
     <th class="hero-cell">${label}</th>
-    <td colspan="${columnCount}"></td>
+    ${cells}
   </tr>`;
 }
 
@@ -384,10 +385,115 @@ export function updateXpCursor() {
   cursor.setAttribute('x1', px);
   cursor.setAttribute('x2', px);
 }
-const PANEL_TABS = [
+const countUpTo = (sorted, loop) => {
+  let lo = 0;
+  let hi = sorted.length;
+  while (lo < hi) {
+    const mid = (lo + hi) >> 1;
+    if (sorted[mid] <= loop) lo = mid + 1;
+    else hi = mid;
+  }
+  return lo;
+};
+const ascending = (loops) => [...loops].sort((a, b) => a - b);
+const lostLoops = (model, team, outcome) =>
+  ascending((model.globes ?? []).filter((g) => g.team === team && g.outcome === outcome).map((g) => g.endLoop));
+
+const distanceAt = (p, g) => {
+  const pos = p && timelinePositionAt(p, g.endLoop);
+  return pos ? Math.hypot(pos[0] - g.x, pos[1] - g.y) : Infinity;
+};
+
+// Tied first pickup events go to the tied hero whose estimated position is nearest the globe.
+function toucherOf(g, playersById) {
+  if (g.toucher != null || !g.tied) return g.toucher;
+  return g.tied.reduce((best, id) =>
+    distanceAt(playersById.get(id), g) < distanceAt(playersById.get(best), g) ? id : best
+  );
+}
+
+function touchedLoopsByPlayer(model) {
+  const playersById = new Map(model.players.map((p) => [p.playerId, p]));
+  const byPlayer = new Map();
+  for (const g of [...(model.globes ?? []), ...(model.mapGlobes ?? [])]) {
+    const id = toucherOf(g, playersById);
+    if (id != null) byPlayer.set(id, [...(byPlayer.get(id) ?? []), g.endLoop]);
+  }
+  return byPlayer;
+}
+
+const GLOBE_COLUMNS = [
+  { label: 'Picked up', title: 'Regen globes this player walked over' },
+  { label: 'Received', title: 'Regen globe heals this player got, from their own pickups and nearby allies' },
+  { label: 'Expired', title: 'Globes this team dropped that nobody picked up' },
+  { label: 'Taken by enemy', title: 'Globes this team dropped that the enemy picked up' },
+];
+
+function globeSeries(model) {
+  const touched = touchedLoopsByPlayer(model);
+  return [0, 1].map((team) => ({
+    team,
+    lost: [lostLoops(model, team, 'expired'), lostLoops(model, team, 'opponent')],
+    players: model.players
+      .filter((p) => p.team === team)
+      .map((p) => ({ p, loops: [ascending(touched.get(p.playerId) ?? []), ascending(p.globes ?? [])] })),
+  }));
+}
+
+let globeView = null;
+
+export function globesTableHtml() {
+  const { model } = state;
+  const series = globeSeries(model);
+  state.globeSeries = series;
+  let cell = 0;
+  const countCell = (title) => `<td class="score-cell" title="${title}" data-globe-cell="${cell++}">0</td>`;
+  const teamBody = ({ team, players }) => {
+    const lost = `<td></td><td></td>${countCell(GLOBE_COLUMNS[2].title)}${countCell(GLOBE_COLUMNS[3].title)}`;
+    const rows = players
+      .map(
+        ({ p }) => `<tr style="--team-color:${TEAM_COLORS[team]}">
+          ${heroCellHtml(p)}
+          ${countCell(GLOBE_COLUMNS[0].title)}${countCell(GLOBE_COLUMNS[1].title)}<td></td><td></td>
+        </tr>`
+      )
+      .join('');
+    return `<tbody>${teamRowHtml(model, team, GLOBE_COLUMNS.length, lost)}${rows}</tbody>`;
+  };
+  const head = GLOBE_COLUMNS.map((c) => `<th class="score-cell" title="${c.title}">${c.label}</th>`).join('');
+  return `
+    <div class="panel-scroll">
+    <table class="talent-table score-table" data-globes>
+      <thead><tr><th>Player</th>${head}</tr></thead>
+      ${series.map(teamBody).join('')}
+    </table>
+    </div>`;
+}
+
+function initGlobes(body) {
+  const table = body.querySelector('[data-globes]');
+  if (!table) return;
+  const loops = state.globeSeries.flatMap(({ lost, players }) => [...lost, ...players.flatMap((x) => x.loops)]);
+  const cells = [...table.querySelectorAll('[data-globe-cell]')];
+  globeView = { table, cells: cells.map((el) => ({ el, loops: loops[Number(el.dataset.globeCell)], shown: -1 })) };
+  updateGlobes();
+}
+
+export function updateGlobes() {
+  if (!globeView || !globeView.table.isConnected) return;
+  for (const c of globeView.cells) {
+    const n = countUpTo(c.loops, state.loop);
+    if (n === c.shown) continue;
+    c.shown = n;
+    c.el.textContent = String(n);
+  }
+}
+
+export const PANEL_TABS = [
   { id: 'talents', label: 'Talents', html: talentTableHtml, init: initTalentTooltip },
   { id: 'scores', label: 'Scores', html: scoreTableHtml, init: initScoreTable },
   { id: 'xp', label: 'XP', html: xpChartHtml, init: initXpChart },
+  { id: 'globes', label: 'Globes', html: globesTableHtml, init: initGlobes },
 ];
 
 export function buildPanel() {

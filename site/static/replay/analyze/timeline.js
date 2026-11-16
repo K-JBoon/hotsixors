@@ -154,6 +154,13 @@ export function buildPositionTimeline(player, durationLoops, options = {}) {
   }
   return { step, samples };
 }
+export function timelinePositionAt(body, loop) {
+  const t = body.timeline;
+  if (!t) return null;
+  const i = Math.min(Math.floor(loop / t.step), t.samples.length / 2 - 1);
+  return [t.samples[i * 2], t.samples[i * 2 + 1]];
+}
+
 export function minionPositionAt(m, loop) {
   if (loop < m.bornLoop || (m.diedLoop != null && loop > m.diedLoop)) return null;
   const a = m.path || m.anchors; // `path` is the marched route; `anchors` are the logged positions

@@ -75,6 +75,8 @@ function newModel(details, header, baseBuild, players) {
     teamLevels: [[], []], // per team: [{loop, level}]
     xpBreakdown: [[], []],
     teamHalls: [null, null],
+    globes: [], // team drops: {team, bornLoop, endLoop, outcome, pickedBy, x, y}
+    mapGlobes: [], // map-source neutrals: {bornLoop, endLoop, outcome: picked|expired, pickedBy, x, y}
   };
 }
 function fillPlayerDefaults(players) {
@@ -84,6 +86,7 @@ function fillPlayerDefaults(players) {
     p.casts ||= [];
     p.deaths ||= [];
     p.talents ||= [];
+    p.globes ||= [];
     p.camera ||= [];
     p.score ||= {};
     if (!p.spans.length) p.spans.push({ from: 0, to: null });

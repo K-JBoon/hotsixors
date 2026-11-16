@@ -1,11 +1,11 @@
 
 import { objectiveOwnerAt, objectivePositionAt } from '../analyze/objective-sites.js';
 import { LOOPS_PER_SECOND } from '../analyze/stat-events.js';
-import { isAliveAt, isDeadAt, minionPositionAt } from '../analyze/timeline.js';
+import { isAliveAt, isDeadAt, minionPositionAt, timelinePositionAt } from '../analyze/timeline.js';
 import { brushPatchAt, castVisibility, pointInShapes } from '../vision.js';
 import { cameraAt, cameraQuad } from './camera.js';
 import { drawDeathCross, drawIcon, iconImages } from './icons.js';
-import { updateXpCursor } from './panel.js';
+import { updateGlobes, updateXpCursor } from './panel.js';
 import { HERO_SIGHT, MERC_RE, SIGHT_OVERRIDES, SIGHT_WHEN_DEPLOYED, WISP_BRUSH_VISION, WISP_BRUSH_VISION_SENTINEL, WISP_FLYING_TALENT, WISP_UNIT } from './sight.js';
 import { root, state, ILLUSION_EDGE, ILLUSION_TINT, TEAM_COLORS } from './state.js';
 import { formatLoop } from './html.js';
@@ -80,11 +80,7 @@ function brushVision(c, loop, pos) {
   return rule;
 }
 
-export function positionAt(p, loop) {
-  if (!p.timeline) return null;
-  const i = Math.min(Math.floor(loop / p.timeline.step), p.timeline.samples.length / 2 - 1);
-  return [p.timeline.samples[i * 2], p.timeline.samples[i * 2 + 1]];
-}
+export const positionAt = timelinePositionAt;
 const BODY_PORTRAITS = {
   HeroOlaf: { file: 'storm_ui_ingame_partyframe_lostvikings_olaf.png', sx: 8 },
   HeroBaleog: { file: 'storm_ui_ingame_partyframe_lostvikings_baelog.png', sx: 37 },
@@ -263,6 +259,7 @@ export function draw() {
   if (state.objectives) drawObjectives(loop);
 
   updateXpCursor();
+  updateGlobes();
   for (const ti of [0, 1]) {
     const el = root.querySelector(`[data-team-level="${ti}"]`);
     if (el) el.textContent = `Level ${teamLevelAt(ti, loop)}`;

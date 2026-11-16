@@ -16,6 +16,7 @@ import {
   flushVolley,
   templeLabel,
 } from './objective-events.js';
+import { buildGlobes, globeBorn, globeDied, globeOwnerChanged, newGlobeLog } from './globes.js';
 import { OBJECTIVE_SITES, newObjectiveSite, openWindow } from './objective-sites.js';
 import { PHASE_BORN_TYPES, PHASE_DIED_TYPES, PHASE_STAT_NAMES, newPhaseSignals } from './phases.js';
 import {
@@ -61,6 +62,7 @@ export function runTrackerPass(data, protocol, model, reg, summons, heroUnits) {
     unitLineAt: new Map(), // OBJECTIVE_UNITS text -> loop of its last line
     teamOfOwner: teamOfOwnerIn(reg.byPlayerId),
     bodyAtLoop: bodyAtLoopOf(reg),
+    globes: newGlobeLog(),
   };
 
   for (const ev of decodeTrackerEvents(data, protocol)) {
@@ -69,6 +71,7 @@ export function runTrackerPass(data, protocol, model, reg, summons, heroUnits) {
   }
 
   for (const run of ctx.volleys.values()) flushVolley(model, run);
+  Object.assign(model, buildGlobes(ctx.globes, model.players));
   return ctx;
 }
 
@@ -79,6 +82,7 @@ const HANDLERS = {
   },
   'NNet.Replay.Tracker.SUnitBornEvent': onUnitBorn,
   'NNet.Replay.Tracker.SUnitOwnerChangeEvent': (ctx, ev) => {
+    globeOwnerChanged(ctx.globes, ev);
     const site = ctx.reg.objSitesByTag.get(tagOf(ev));
     if (!site) return;
     const team = ctx.teamOfOwner(ev.m_controlPlayerId);
@@ -236,6 +240,7 @@ function onUnitBorn(ctx, ev) {
   const name = str(ev.m_unitTypeName);
   const owner = reg.byPlayerId.get(ev.m_controlPlayerId);
   growBounds(model, ev.m_x, ev.m_y);
+  globeBorn(ctx.globes, ev, name);
 
   if (name.startsWith('Hero') && name !== VIKING_CONTROLLER) {
     if (owner && isClonedHero(ctx, name, owner)) bornCompanion(ctx, ev, name, owner, 'clone');
@@ -279,6 +284,7 @@ function onUnitDied(ctx, ev) {
   const { reg } = ctx;
   const tag = tagOf(ev);
   const loop = ev._gameloop;
+  globeDied(ctx.globes, ev);
 
   const c = reg.companionsByTag.get(tag);
   if (c) {
@@ -399,6 +405,10 @@ const STAT_HANDLERS = {
       loop: ev._gameloop,
       name: str(statData(ev, 'm_stringData', 'PurchaseName')),
     });
+  },
+  RegenGlobePickedUp: (ctx, ev) => {
+    const p = ctx.reg.byPlayerId.get(statData(ev, 'm_intData', 'PlayerID'));
+    if (p) (p.globes ||= []).push(ev._gameloop);
   },
   LevelUp: (ctx, ev) => {
     const p = ctx.reg.byPlayerId.get(statData(ev, 'm_intData', 'PlayerID'));

@@ -531,6 +531,54 @@ test("camera targets decode onto the map, near their own hero", { skip: !haveRep
   assert.ok(close / compared > 0.6, `only ${((close / compared) * 100) | 0}% of cameras were on the hero`);
 });
 
+test("globe pickups match the RegenGlobes score", { skip: !haveReplays }, async () => {
+  let compared = 0;
+  for (const file of replayFiles.slice(0, 20)) {
+    const model = await analyzeReplay(loadArchive(file));
+    for (const p of model.players) {
+      assert.ok(p.globes.every((loop, i) => i === 0 || loop >= p.globes[i - 1]), `${file}: pickups are sorted`);
+      const score = p.score.RegenGlobes;
+      if (!score) continue;
+      assert.equal(p.globes.length, score, `${file}: player ${p.playerId}`);
+      compared++;
+    }
+  }
+  assert.ok(compared > 0, "no non-zero RegenGlobes scores to compare");
+});
+
+test("globe pickup events follow a pickup by the picker's team", { skip: !haveReplays }, async () => {
+  const WINDOW = 20;
+  let drops = 0;
+  for (const file of replayFiles) {
+    const model = await analyzeReplay(loadArchive(file));
+    const pickups = [...model.globes, ...model.mapGlobes].filter((g) => g.pickedBy != null);
+    const near = (loop: number, g: { endLoop: number }) => loop >= g.endLoop && loop <= g.endLoop + WINDOW;
+    const deliveries = model.objectiveSites
+      .filter((s) => s.type.startsWith("ControlPointMinimapIcon") && s.diedLoop != null)
+      .map((s) => ({ endLoop: s.diedLoop }));
+    for (const p of model.players) {
+      for (const loop of p.globes) {
+        assert.ok(
+          pickups.some((g) => g.pickedBy === p.team && near(loop, g)) || deliveries.some((d) => near(loop, d)),
+          `${file}: player ${p.playerId} pickup at ${loop} has no globe`
+        );
+      }
+    }
+    for (const g of pickups) {
+      const team = model.players.filter((p) => p.team === g.pickedBy);
+      assert.ok(
+        team.some((p) => p.globes.some((loop) => near(loop, g))),
+        `${file}: globe picked at ${g.endLoop} by team ${g.pickedBy} has no event`
+      );
+    }
+    for (const g of model.globes) {
+      assert.equal(g.outcome, g.pickedBy == null ? "expired" : g.pickedBy === g.team ? "own" : "opponent");
+    }
+    drops += model.globes.length;
+  }
+  assert.ok(drops > 0, "no team-dropped globes");
+});
+
 test("every team has a Hall of Storms", { skip: !haveReplays }, async () => {
   for (const file of replayFiles.slice(0, 20)) {
     const model = await analyzeReplay(loadArchive(file));
