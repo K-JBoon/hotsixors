@@ -278,6 +278,10 @@
 .stats-query__bar { display: flex; flex-wrap: wrap; gap: var(--space-xs); align-items: center; margin-block-end: var(--space-xs); }
 .stats-query__list { display: contents; }
 .stats-query__saved { padding: 0; }
+.stats-query__form { margin-block-end: var(--space-xs); }
+.stats-query__clause { display: flex; gap: var(--space-3xs); align-items: end; }
+.stats-query__clause select:first-child { inline-size: 12rem; }
+.stats-query__btn { block-size: 2.25rem; }
 .stats-query__saved button { padding: var(--space-3xs) var(--space-xs); background: none; border: 0; color: inherit; font: inherit; cursor: pointer; }
 .stats-query__saved button + button { padding-inline-start: 0; opacity: 0.6; }
 .stats-query__saved button + button:hover { opacity: 1; }

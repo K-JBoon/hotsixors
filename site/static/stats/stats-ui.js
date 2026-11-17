@@ -4,7 +4,10 @@ import { clearSummaries, deleteSetting, loadSetting, loadSummaries, persistStora
 import { canPickFolder, droppedReplays, folderDiff, hasReadPermission, requestReadPermission, scanReplays, uniqueGames } from './my-replays.js';
 import { loadSiteResolver } from './resolve.js';
 import { buildTables } from './tables.js';
-import { parseQuery } from './builder/text.js';
+import { parseQuery, printQuery } from './builder/text.js';
+import { query } from './builder/model.js';
+import { tableNames } from './builder/join.js';
+import { builderForm, columnValues } from './builder/form.js';
 import { runQuery } from './builder/run.js';
 import { EXAMPLES } from './builder/examples.js';
 import { renderResult } from './builder/render.js';
@@ -388,6 +391,14 @@ const queryResult = async (stats, text) => {
   }
 };
 
+const parsed = (text) => {
+  try {
+    return parseQuery(text);
+  } catch {
+    return null;
+  }
+};
+
 const debounce = (f, ms) => {
   let timer;
   return () => {
@@ -407,7 +418,7 @@ const VIEWS = {
   async query(stats, filters, heroes, text, el) {
     if (text) queryText = text;
     else history.replaceState(null, '', queryHash(queryText));
-    el.innerHTML = `<section class="stats-section"><div class="stats-query__bar" data-part="examples"></div><div class="stats-query__bar"><input class="input" data-name placeholder="Name" aria-label="Name"><button class="btn" type="button" data-save>Save</button><span class="stats-query__list" data-part="saved"></span></div><textarea class="input stats-query__text" rows="4" spellcheck="false" aria-label="Query"></textarea><div data-part="out"></div></section>`;
+    el.innerHTML = `<section class="stats-section"><div class="stats-query__bar" data-part="examples"></div><div class="stats-query__bar"><input class="input" data-name placeholder="Name" aria-label="Name"><button class="btn" type="button" data-save>Save</button><span class="stats-query__list" data-part="saved"></span></div><form class="stats-filters stats-query__form" data-part="builder"></form><textarea class="input stats-query__text" rows="4" spellcheck="false" aria-label="Query"></textarea><div data-part="out"></div></section>`;
     const input = el.querySelector('textarea');
     const name = el.querySelector('[data-name]');
     const out = part(el, 'out');
@@ -458,6 +469,21 @@ const VIEWS = {
       open(saved.find((x) => x.name === btn.dataset.open));
     });
     examplesEl.addEventListener('click', (e) => open(EXAMPLES.find((x) => x.name === e.target.closest('button')?.dataset.open)));
+    let last = parsed(queryText) ?? query();
+    builderForm(part(el, 'builder'), {
+      names: await tableNames(stats),
+      values: (table, col) => columnValues(stats, table, col),
+      label: (col, v) => (col === 'hero' ? heroName(heroes, v) : String(v)),
+      onChange: (source) => {
+        last = { ...(parsed(input.value) ?? last), ...source };
+        const text = printQuery(last);
+        if (text === input.value) return;
+        input.value = queryText = text;
+        history.replaceState(null, '', queryHash(queryText));
+        showSaved();
+        run();
+      },
+    }).show(last);
     await run();
   },
 
