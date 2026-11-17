@@ -395,14 +395,30 @@ const debounce = (f, ms) => {
   };
 };
 
+const SAVED_KEY = 'queries';
+const loadSaved = () => loadSetting(SAVED_KEY).then((list) => list ?? []).catch(() => []);
+const withSaved = (list, name, text) =>
+  list.some((s) => s.name === name) ? list.map((s) => (s.name === name ? { name, text } : s)) : [...list, { name, text }];
+const withoutSaved = (list, name) => list.filter((s) => s.name !== name);
+const savedChips = (list, text) => list.map((s) => `<span class="chip stats-query__saved${s.text === text ? ' is-active' : ''}"><button type="button" data-open="${escapeHtml(s.name)}">${escapeHtml(s.name)}</button><button type="button" data-delete="${escapeHtml(s.name)}" aria-label="Delete">×</button></span>`).join('');
+
 const VIEWS = {
   async query(stats, filters, heroes, text, el) {
     if (text) queryText = text;
     else history.replaceState(null, '', queryHash(queryText));
-    el.innerHTML = `<section class="stats-section"><textarea class="input stats-query__text" rows="4" spellcheck="false" aria-label="Query"></textarea><div data-part="out"></div></section>`;
+    el.innerHTML = `<section class="stats-section"><div class="stats-query__bar"><input class="input" data-name placeholder="Name" aria-label="Name"><button class="btn" type="button" data-save>Save</button><span class="stats-query__list" data-part="saved"></span></div><textarea class="input stats-query__text" rows="4" spellcheck="false" aria-label="Query"></textarea><div data-part="out"></div></section>`;
     const input = el.querySelector('textarea');
+    const name = el.querySelector('[data-name]');
     const out = part(el, 'out');
-    input.value = queryText;
+    const savedEl = part(el, 'saved');
+    let saved = await loadSaved();
+    const showSaved = () => (savedEl.innerHTML = savedChips(saved, input.value));
+    const store = async (list) => {
+      saved = list;
+      showSaved();
+      await saveSetting(SAVED_KEY, list);
+    };
+    const save = () => name.value.trim() && store(withSaved(saved, name.value.trim(), input.value));
     let token = 0;
     const run = async () => {
       const t = ++token;
@@ -414,8 +430,26 @@ const VIEWS = {
     input.addEventListener('input', debounce(() => {
       queryText = input.value;
       history.replaceState(null, '', queryHash(queryText));
+      showSaved();
       run();
     }, 300));
+    input.value = queryText;
+    name.value = saved.find((s) => s.text === queryText)?.name ?? '';
+    showSaved();
+    el.querySelector('[data-save]').addEventListener('click', save);
+    name.addEventListener('keydown', (e) => e.key === 'Enter' && save());
+    savedEl.addEventListener('click', (e) => {
+      const btn = e.target.closest('button');
+      if (!btn) return;
+      if (btn.dataset.delete != null) return store(withoutSaved(saved, btn.dataset.delete));
+      const s = saved.find((x) => x.name === btn.dataset.open);
+      if (!s) return;
+      input.value = queryText = s.text;
+      name.value = s.name;
+      history.replaceState(null, '', queryHash(queryText));
+      showSaved();
+      run();
+    });
     await run();
   },
 
