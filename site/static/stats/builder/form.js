@@ -429,6 +429,7 @@ export function builderForm(el, { names, values, label = (col, v) => printed(v),
 
   return {
     show(q) {
+      clearTimeout(timer);
       state = normalize({
         from: q.from,
         joins: q.joins,

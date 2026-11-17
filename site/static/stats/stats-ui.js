@@ -5,7 +5,7 @@ import { canPickFolder, droppedReplays, folderDiff, hasReadPermission, requestRe
 import { loadSiteResolver } from './resolve.js';
 import { buildTables } from './tables.js';
 import { parseQuery, printQuery } from './builder/text.js';
-import { query } from './builder/model.js';
+import { query, validateQuery } from './builder/model.js';
 import { tableNames } from './builder/join.js';
 import { builderForm, columnValues } from './builder/form.js';
 import { runQuery } from './builder/run.js';
@@ -450,10 +450,20 @@ const VIEWS = {
         fail(String(e?.message ?? e));
       }
     };
+    let last = parsed(queryText) ?? query();
+    let form;
+    const names = await tableNames(stats);
+    const sync = () => {
+      const q = parsed(input.value);
+      if (!q || validateQuery(q, names).length || printQuery(q) === printQuery(last)) return;
+      last = q;
+      form.show(q);
+    };
     input.addEventListener('input', debounce(() => {
       queryText = input.value;
       history.replaceState(null, '', queryHash(queryText));
       showSaved();
+      sync();
       run();
     }, 300));
     input.value = queryText;
@@ -467,6 +477,7 @@ const VIEWS = {
       name.value = s.name;
       history.replaceState(null, '', queryHash(queryText));
       showSaved();
+      sync();
       run();
     };
     savedEl.addEventListener('click', (e) => {
@@ -476,9 +487,8 @@ const VIEWS = {
       open(saved.find((x) => x.name === btn.dataset.open));
     });
     examplesEl.addEventListener('click', (e) => open(EXAMPLES.find((x) => x.name === e.target.closest('button')?.dataset.open)));
-    let last = parsed(queryText) ?? query();
-    builderForm(part(el, 'builder'), {
-      names: await tableNames(stats),
+    form = builderForm(part(el, 'builder'), {
+      names,
       values: (table, col) => columnValues(stats, table, col),
       label: (col, v) => (col === 'hero' ? heroName(heroes, v) : String(v)),
       columnLabel: (col) => STAT_LABELS.get(col) ?? col,
@@ -491,7 +501,8 @@ const VIEWS = {
         showSaved();
         run();
       },
-    }).show(last);
+    });
+    form.show(last);
     await run();
   },
 
