@@ -120,7 +120,7 @@ export class BitPackedDecoder extends BaseDecoder {
   }
 
   _fourcc() {
-    return this.buffer.readAlignedBytes(4);
+    return this.buffer.readUnalignedBytes(4);
   }
 
   _int(bounds) {

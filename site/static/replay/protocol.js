@@ -8,7 +8,7 @@ let indexPromise = null;
 const protocolCache = new Map();
 
 async function readProtocolJson(name) {
-  if (typeof document !== 'undefined') {
+  if (!globalThis.process?.versions?.node) {
     const res = await fetch(PROTOCOL_DIR + name);
     if (!res.ok) throw new Error(`protocol fetch failed: ${name}`);
     return res.json();

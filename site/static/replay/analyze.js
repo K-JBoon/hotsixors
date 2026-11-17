@@ -14,6 +14,7 @@ import {
   assignObjectiveWindows,
 } from './analyze/objective-sites.js';
 import { runTrackerPass } from './analyze/tracker.js';
+import { cacheHashes } from './summary.js';
 
 export { LOOPS_PER_SECOND, XP_SOURCES } from './analyze/stat-events.js';
 export { layoutObjectivePhases } from './analyze/phases.js';
@@ -41,16 +42,6 @@ function newPlayers(details) {
     hasCompanions: false,
     pets: [],
   }));
-}
-
-// Each handle is a 4-byte type, a 4-byte region, then the file's sha256.
-function cacheHashes(details) {
-  const hex = [];
-  for (const handle of details.m_cacheHandles || []) {
-    if (!(handle instanceof Uint8Array) || handle.length < 40) continue;
-    hex.push(Array.from(handle.subarray(8, 40), (b) => b.toString(16).padStart(2, '0')).join(''));
-  }
-  return hex;
 }
 
 function newModel(details, header, baseBuild, players) {
