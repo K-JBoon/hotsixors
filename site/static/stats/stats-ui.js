@@ -6,6 +6,7 @@ import { loadSiteResolver } from './resolve.js';
 import { buildTables } from './tables.js';
 import { parseQuery } from './builder/text.js';
 import { runQuery } from './builder/run.js';
+import { EXAMPLES } from './builder/examples.js';
 import { renderResult } from './builder/render.js';
 import {
   STAT_COLUMNS, available, facets, gameList, tournamentReport, tournamentTable, heroReport, mapReport, heroTable, mapTable, playerReport, playerTable, teamReport, teamTable,
@@ -400,19 +401,23 @@ const loadSaved = () => loadSetting(SAVED_KEY).then((list) => list ?? []).catch(
 const withSaved = (list, name, text) =>
   list.some((s) => s.name === name) ? list.map((s) => (s.name === name ? { name, text } : s)) : [...list, { name, text }];
 const withoutSaved = (list, name) => list.filter((s) => s.name !== name);
-const savedChips = (list, text) => list.map((s) => `<span class="chip stats-query__saved${s.text === text ? ' is-active' : ''}"><button type="button" data-open="${escapeHtml(s.name)}">${escapeHtml(s.name)}</button><button type="button" data-delete="${escapeHtml(s.name)}" aria-label="Delete">×</button></span>`).join('');
+const queryChips = (list, text, deletable) => list.map((s) => `<span class="chip stats-query__saved${s.text === text ? ' is-active' : ''}"><button type="button" data-open="${escapeHtml(s.name)}">${escapeHtml(s.name)}</button>${deletable ? `<button type="button" data-delete="${escapeHtml(s.name)}" aria-label="Delete">×</button>` : ''}</span>`).join('');
 
 const VIEWS = {
   async query(stats, filters, heroes, text, el) {
     if (text) queryText = text;
     else history.replaceState(null, '', queryHash(queryText));
-    el.innerHTML = `<section class="stats-section"><div class="stats-query__bar"><input class="input" data-name placeholder="Name" aria-label="Name"><button class="btn" type="button" data-save>Save</button><span class="stats-query__list" data-part="saved"></span></div><textarea class="input stats-query__text" rows="4" spellcheck="false" aria-label="Query"></textarea><div data-part="out"></div></section>`;
+    el.innerHTML = `<section class="stats-section"><div class="stats-query__bar" data-part="examples"></div><div class="stats-query__bar"><input class="input" data-name placeholder="Name" aria-label="Name"><button class="btn" type="button" data-save>Save</button><span class="stats-query__list" data-part="saved"></span></div><textarea class="input stats-query__text" rows="4" spellcheck="false" aria-label="Query"></textarea><div data-part="out"></div></section>`;
     const input = el.querySelector('textarea');
     const name = el.querySelector('[data-name]');
     const out = part(el, 'out');
     const savedEl = part(el, 'saved');
+    const examplesEl = part(el, 'examples');
     let saved = await loadSaved();
-    const showSaved = () => (savedEl.innerHTML = savedChips(saved, input.value));
+    const showSaved = () => {
+      savedEl.innerHTML = queryChips(saved, input.value, true);
+      examplesEl.innerHTML = queryChips(EXAMPLES, input.value, false);
+    };
     const store = async (list) => {
       saved = list;
       showSaved();
@@ -434,22 +439,25 @@ const VIEWS = {
       run();
     }, 300));
     input.value = queryText;
-    name.value = saved.find((s) => s.text === queryText)?.name ?? '';
+    name.value = [...saved, ...EXAMPLES].find((s) => s.text === queryText)?.name ?? '';
     showSaved();
     el.querySelector('[data-save]').addEventListener('click', save);
     name.addEventListener('keydown', (e) => e.key === 'Enter' && save());
-    savedEl.addEventListener('click', (e) => {
-      const btn = e.target.closest('button');
-      if (!btn) return;
-      if (btn.dataset.delete != null) return store(withoutSaved(saved, btn.dataset.delete));
-      const s = saved.find((x) => x.name === btn.dataset.open);
+    const open = (s) => {
       if (!s) return;
       input.value = queryText = s.text;
       name.value = s.name;
       history.replaceState(null, '', queryHash(queryText));
       showSaved();
       run();
+    };
+    savedEl.addEventListener('click', (e) => {
+      const btn = e.target.closest('button');
+      if (!btn) return;
+      if (btn.dataset.delete != null) return store(withoutSaved(saved, btn.dataset.delete));
+      open(saved.find((x) => x.name === btn.dataset.open));
     });
+    examplesEl.addEventListener('click', (e) => open(EXAMPLES.find((x) => x.name === e.target.closest('button')?.dataset.open)));
     await run();
   },
 
