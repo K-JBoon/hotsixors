@@ -12,6 +12,7 @@ import { runQuery } from './builder/run.js';
 import { EXAMPLES } from './builder/examples.js';
 import { SCORE_LABELS } from './builder/docs.js';
 import { renderResult } from './builder/render.js';
+import { schemaRail } from './builder/schema.js';
 import {
   STAT_COLUMNS, available, facets, gameList, tournamentReport, tournamentTable, heroReport, mapReport, heroTable, mapTable, playerReport, playerTable, teamReport, teamTable,
 } from './reports.js';
@@ -423,7 +424,7 @@ const VIEWS = {
   async query(stats, filters, heroes, text, el) {
     if (text) queryText = text;
     else history.replaceState(null, '', queryHash(queryText));
-    el.innerHTML = `<section class="stats-section"><div class="stats-query__bar" data-part="examples"></div><div class="stats-query__bar"><input class="input" data-name placeholder="Name" aria-label="Name"><button class="btn" type="button" data-save>Save</button><span class="stats-query__list" data-part="saved"></span></div><div class="stats-filters stats-query__form"><form class="stats-query__controls" data-part="builder"></form><div class="stats-query__editor"><textarea class="input stats-query__text" rows="4" spellcheck="false" aria-label="Query"></textarea><div data-part="note"></div></div></div><div data-part="out"></div></section>`;
+    el.innerHTML = `<div class="stats-layout"><section class="stats-section"><div class="stats-query__bar" data-part="examples"></div><div class="stats-query__bar"><input class="input" data-name placeholder="Name" aria-label="Name"><button class="btn" type="button" data-save>Save</button><span class="stats-query__list" data-part="saved"></span></div><div class="stats-filters stats-query__form"><form class="stats-query__controls" data-part="builder"></form><div class="stats-query__editor"><textarea class="input stats-query__text" rows="4" spellcheck="false" aria-label="Query"></textarea><div data-part="note"></div></div></div></section><div class="stats-layout__cols"><div class="stats-content"><div data-part="out"></div></div><aside class="stats-rail stats-query__rail"><section class="stats-section"><h2 class="stats-section__title">Schema</h2><div data-part="schema"></div></section></aside></div></div>`;
     const input = el.querySelector('textarea');
     const fit = () => (input.rows = Math.max(4, input.value.split('\n').length));
     const name = el.querySelector('[data-name]');
@@ -462,6 +463,7 @@ const VIEWS = {
     let last = parsed(queryText) ?? query();
     let form;
     const names = await tableNames(stats);
+    schemaRail(part(el, 'schema'), names);
     const sync = () => {
       const q = parsed(input.value);
       if (!q || validateQuery(q, names).length || printQuery(q) === printQuery(last)) return;
