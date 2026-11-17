@@ -56,6 +56,7 @@ export function winRateCell(v, games) {
 }
 
 const thin = (n) => typeof n === 'number' && n < THIN_GAMES;
+const thinOf = (counts) => (counts.every(thin) ? () => false : thin);
 
 let heroIndex = null;
 /** Hero slug → `{ name, portrait }` from the draft tool's data. */
@@ -89,6 +90,7 @@ const splitId = (id) => id.replace(/([a-z])([A-Z])/g, '$1 $2');
  */
 export function renderTalentTiers(container, talents, rows, delta = false) {
   const tiers = Map.groupBy(rows, (r) => r.tier);
+  const dim = thinOf(rows.map((r) => r.picks));
   const talentCell = (r) => {
     const t = talents[r.talent];
     if (!t) return `<span class="stats-hero" title="Not in the current game data">${MISSING_ICON}<span>${escapeHtml(splitId(r.talent))}</span></span>`;
@@ -98,7 +100,7 @@ export function renderTalentTiers(container, talents, rows, delta = false) {
   const group = (tier) => {
     const list = tiers.get(tier).sort((a, b) => b.picks - a.picks);
     const level = `<th scope="rowgroup" rowspan="${list.length}" class="stats-talents__level"><span class="talent-tier__num">${TIER_LEVELS[tier - 1] ?? tier}</span></th>`;
-    return `<tbody>${list.map((r, i) => `<tr${thin(r.picks) ? ' class="is-thin"' : ''}>${i ? '' : level}
+    return `<tbody>${list.map((r, i) => `<tr${dim(r.picks) ? ' class="is-thin"' : ''}>${i ? '' : level}
       <td>${talentCell(r)}</td>
       <td class="num">${fmt.pct(r.pickRate)}</td>
       <td class="num">${winRateCell(r.winRate, r.picks)}</td>${delta ? `
@@ -195,9 +197,10 @@ export function renderTable(container, { columns, rows, sortKey, sortDir = -1, p
     const pages = Math.max(1, Math.ceil(sorted.length / size));
     page = Math.min(page, pages - 1);
     const start = page * size;
+    const dim = thinOf(sorted.map((r) => r.games));
     const trs = sorted
       .slice(start, start + size)
-      .map((r) => `<tr${thin(r.games) ? ' class="is-thin"' : ''}>${columns.map((c) => `<td class="${cls(c)}">${cell(c, r)}</td>`).join('')}</tr>`);
+      .map((r) => `<tr${dim(r.games) ? ' class="is-thin"' : ''}>${columns.map((c) => `<td class="${cls(c)}">${cell(c, r)}</td>`).join('')}</tr>`);
     const half = Math.ceil(trs.length / 2);
     const bodies = trs.length > split ? [trs.slice(0, half), trs.slice(half)] : [trs];
     const table = (body) => `<div class="table-wrap"><table class="table stats-table"><thead><tr>${head}</tr></thead><tbody>${body.join('')}</tbody></table></div>`;
