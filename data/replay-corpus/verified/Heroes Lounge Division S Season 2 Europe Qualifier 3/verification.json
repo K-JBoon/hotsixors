@@ -1,0 +1,53 @@
+{
+  "files_sha256": {
+    "2019-11-30 12.00 pepeMLADY vs Schuifpui Schavuiten/Map 1 (Battlefield of Eternity).StormReplay": "e212b23972ce2a8eff0974508d66417646c935c9a9a4aee4b54fd25ec6db8c87",
+    "2019-11-30 12.00 pepeMLADY vs Schuifpui Schavuiten/Map 2 (Tomb of the Spider Queen).StormReplay": "8cd313546c7825f006f257646d7f6ab0fd6690d39e2c309c501e49a3f19e8ded",
+    "2019-11-30 13.00 Disgusting vs Wheel of ORDAH/Map 1 (Towers of Doom).StormReplay": "2aa3b38fa2187d544c3b1e5ce9af2a28a205a2a51d827a0e68f4c369db997acc",
+    "2019-11-30 13.00 Disgusting vs Wheel of ORDAH/Map 2 (Volskaya Foundry).StormReplay": "3e861046238343e9f26c9200869fff5e4bfd354d392d9f328c5452c5242c9b7c",
+    "2019-11-30 13.00 Disgusting vs Wheel of ORDAH/Map 3 (Infernal Shrines).StormReplay": "3dea5792aaddd09d0d6dc44b2d1b048534e5e7f936446a3f8d2ffae368893fa2",
+    "2019-11-30 13.00 KiiKoo Combo vs MassiveHype/Map 1 (Battlefield of Eternity).StormReplay": "88602f502a03957a248b38d4d474cbdca9074bb0c2cdc697d00a09bc91aa5d4b",
+    "2019-11-30 13.00 KiiKoo Combo vs MassiveHype/Map 2 (Sky Temple).StormReplay": "7331af9bf8bb90be614771a33b0aa0e15535f07af5b66f2c5e4a374738547c5c",
+    "2019-11-30 14.00 We are lost vs pepeMLADY/Map 1 (Volskaya Foundry).StormReplay": "0ad8e0dc3c033229e6ed08e96070f7741c220a44e09aa387eb6327de0a0257dc",
+    "2019-11-30 14.00 We are lost vs pepeMLADY/Map 2 (Cursed Hollow).StormReplay": "c70a93d586dbeb6cf2a417eae8bd5c81e0ddc62628ca63b4233d8238e400ad8d",
+    "2019-11-30 15.00 KiiKoo Combo vs Disgusting/Map 1 (Infernal Shrines).StormReplay": "546b15119ab9a652956ac4785617cbf4d9de390b995bb0c0b24df96b227aa4f5",
+    "2019-11-30 15.00 KiiKoo Combo vs Disgusting/Map 2 (Cursed Hollow).StormReplay": "fbb4a797dd36c5c710b533f8665c9db7ead6f94fb66b095efa551eb3a1629aac",
+    "2019-11-30 16.00 KiiKoo Combo vs pepeMLADY/Map 1 (Dragon Shire).StormReplay": "61af6ec84987872ea4be23387e745c21ac7efc894e3b4e48a4918e336d27dd82",
+    "2019-11-30 16.00 KiiKoo Combo vs pepeMLADY/Map 2 (Battlefield of Eternity).StormReplay": "3cba775c451a1a965d3490d70165e9eb2b06ddefd4a1a30475d63468cdd1209a",
+    "2019-11-30 16.00 KiiKoo Combo vs pepeMLADY/Map 3 (Towers of Doom).StormReplay": "c419c20d426c5d96b02337117d622cd4108b5e5b7e7d5cf710c06a0ed30e4aeb",
+    "archive_status.json": "c094673dca8b64330ddf6f49d1988df951dd37ddb65ed58bcaf8d24fcd03c5bb",
+    "liquipedia_maps.csv": "512bf82090e9663e6df23c0f3eb04709e8d40bc0b684641a113cf6cabe5db53d",
+    "liquipedia_sets.csv": "4057d6fe2fb2b0925086e2110f89b9efbe2c86c44f8acbf7a421829e3dfcf7ed",
+    "liquipedia_teams.csv": "95f6ae1b13eca6ba209790899bc2eb1ca5b47f6cae84d3de54a98917cd769190",
+    "liquipedia_url.txt": "a5907d458f378c9a4f746e0d731e378e0379475021885e467d36a3352246f6b6",
+    "maps.csv": "e975694c91103b1c7d8ec02c64a3af8ab5d66758e28a0b76fd20cd5f65f2a680",
+    "player_battletags.csv": "ea74ea80ac5d3f43e7e81b2c7b910e726f214415f3776412f51bf3b140cd6865",
+    "replay_manifest.csv": "68b8c63a2fa8eab42de545f0c442ca8a74a5a3896811bc40973381ecc7b9c935",
+    "sets.csv": "4057d6fe2fb2b0925086e2110f89b9efbe2c86c44f8acbf7a421829e3dfcf7ed",
+    "teams.csv": "95f6ae1b13eca6ba209790899bc2eb1ca5b47f6cae84d3de54a98917cd769190"
+  },
+  "gates": {
+    "complete_replay_coverage": true,
+    "manifest_integrity": true,
+    "no_blocking_reviews": true,
+    "no_stale_overrides": true,
+    "only_approved_inferred_aliases_exported": true
+  },
+  "player_alias_rows": 34,
+  "replay_count": 14,
+  "status": {
+    "blockers": "",
+    "blocking_reviews": 0,
+    "expected_replays": 14,
+    "integrity_errors": 0,
+    "matched_replays": 14,
+    "missing_replays": 0,
+    "pending_alias_reviews": 0,
+    "stale_overrides": 0,
+    "status": "verified",
+    "total_map_rows": 16,
+    "tournament": "Heroes Lounge Division S Season 2 Europe Qualifier 3",
+    "unresolved_maps": 0,
+    "verified": "yes"
+  },
+  "tournament": "Heroes Lounge Division S Season 2 Europe Qualifier 3"
+}

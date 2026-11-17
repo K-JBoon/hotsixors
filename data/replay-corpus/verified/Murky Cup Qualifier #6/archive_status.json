@@ -1,0 +1,14 @@
+{
+  "archive_blockers": [],
+  "counts": {
+    "matched": 12
+  },
+  "expected_replays": 12,
+  "maps_owned_elsewhere": 0,
+  "matched_replays": 12,
+  "no_replay_expected": 0,
+  "status": "fully_archived",
+  "total_map_rows": 12,
+  "tournament": "Murky Cup Qualifier #6",
+  "unresolved_maps": 0
+}

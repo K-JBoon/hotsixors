@@ -1,0 +1,15 @@
+{
+  "archive_blockers": [],
+  "counts": {
+    "matched": 46,
+    "owned_elsewhere": 203
+  },
+  "expected_replays": 46,
+  "maps_owned_elsewhere": 203,
+  "matched_replays": 46,
+  "no_replay_expected": 0,
+  "status": "fully_archived",
+  "total_map_rows": 249,
+  "tournament": "META Madness #8",
+  "unresolved_maps": 0
+}

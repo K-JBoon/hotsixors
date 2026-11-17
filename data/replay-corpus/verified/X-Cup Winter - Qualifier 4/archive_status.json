@@ -1,0 +1,14 @@
+{
+  "archive_blockers": [],
+  "counts": {
+    "matched": 17
+  },
+  "expected_replays": 17,
+  "maps_owned_elsewhere": 0,
+  "matched_replays": 17,
+  "no_replay_expected": 0,
+  "status": "fully_archived",
+  "total_map_rows": 17,
+  "tournament": "X-Cup Winter - Qualifier 4",
+  "unresolved_maps": 0
+}

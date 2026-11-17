@@ -1,0 +1,25 @@
+set_id,date,team_1,team_2,team_1_score,team_2_score,winner,best_of,finished,notes,set_position_in_tournament,source_page
+914058e4-20c4-47b4-b8c4-391ca6e0cdd2,2024-10-26 16:00 UTC,Team Kure,Team Madara,,,,3,,{{player|CPX|flag=us}} subs-in for {{player|Kure|flag=us}} on maps 1 and 2 for Team Kure. {{player|Jun|flag=kr}} subs-in for {{player|LegacY|flag=us}} on the series for Team Madara.,{{HiddenSort|Day 1}},Heroes Captains Clash
+a81bb5b2-3dd3-425c-bf64-b074e9d72a28,2024-10-26 16:00 UTC,Team MasonBlaze,Team Liam,,,,,,{{player|Albatoxx|flag=us}} subs-in for {{player|Zergling|flag=us}} on the series for Team MasonBlaze.,{{HiddenSort|Day 1}},Heroes Captains Clash
+44199019-f7b9-4981-b060-8af94e3915e2,2024-10-26 17:30 UTC,Team Kure,Team Nintorii,,,,,,,{{HiddenSort|Day 1}},Heroes Captains Clash
+17d0b785-5535-407f-a947-daeeb8f2a337,2024-10-26 17:30 UTC,Team YEAAAAABOI,Team Liam,,,,,,,{{HiddenSort|Day 1}},Heroes Captains Clash
+1ce43a13-3d92-4bb8-9bcf-aca85e256221,2024-10-26 19:00 UTC,Team Madara,Team Nintorii,,,,,,{{player|Jun|flag=kr}} subs-in for {{player|LegacY|flag=us}} on the series for Team Madara.,{{HiddenSort|Day 1}},Heroes Captains Clash
+260520dc-f6ec-4813-8189-d73ec0e223dd,2024-10-26 19:00 UTC,Team YEAAAAABOI,Team MasonBlaze,,,,,,{{player|Albatoxx|flag=us}} subs-in for {{player|Zergling|flag=us}} on the series for Team MasonBlaze.,{{HiddenSort|Day 1}},Heroes Captains Clash
+b3e90862-d7ed-42e0-be1e-ba2eb25b842f,2024-10-27 16:00 UTC,Team Nintorii,Team MasonBlaze,,,,3,,{{player|Albatoxx|flag=us}} subs-in for {{player|Zergling|flag=us}} on the series for Team MasonBlaze.,{{HiddenSort|Day 2}},Heroes Captains Clash
+c6b1c73e-49b7-4074-a73a-5526d48edb75,2024-10-27 16:00 UTC,Team Madara,Team YEAAAAABOI,,,,,,"{{player|Kalavothe|flag=ca}}, {{player|deadInside|flag=ru}} and {{player|Jun|flag=kr}} sub-in for {{player|caesarsalad|flag=us}}, {{player|Ultralisk|flag=de}} and {{player|LegacY|flag=us}} on the series for Team Madara.",{{HiddenSort|Day 2}},Heroes Captains Clash
+89b660e6-01cd-48c5-9e5f-ad0f02d4acd4,2024-10-27 17:30 UTC,Team Kure,Team MasonBlaze,,,,,,{{player|Albatoxx|flag=us}} subs-in for {{player|Zergling|flag=us}} on the series for Team MasonBlaze.,{{HiddenSort|Day 2}},Heroes Captains Clash
+65188fec-65be-41e4-9325-0dd8a46f31f2,2024-10-27 17:30 UTC,Team Madara,Team Liam,,,,,,{{player|Jun|flag=kr}} subs-in for {{player|LegacY|flag=us}} on the series and {{player|McGibblets|flag=us}} subs-in for {{player|caesarsalad|flag=us}} on map 1 for Team Madara.,{{HiddenSort|Day 2}},Heroes Captains Clash
+5295dd23-a017-486c-b8a5-047fd9e26996,2024-10-27 19:00 UTC,Team Nintorii,Team YEAAAAABOI,,,,,,,{{HiddenSort|Day 2}},Heroes Captains Clash
+8e8e8252-9457-468c-bc30-13907743e1df,2024-10-27 19:00 UTC,Team Kure,Team Liam,,,,,,,{{HiddenSort|Day 2}},Heroes Captains Clash
+4f468a2c-c3d1-4e8d-a563-3b0be99a6d7c,2024-11-02 16:00 UTC,Team Madara,Team MasonBlaze,,,,,,,{{HiddenSort|Day 3}},Heroes Captains Clash
+86eae588-0b5c-424b-979d-1be66fb3f7f2,2024-11-02 17:30 UTC,Team Nintorii,Team Liam,,,,,,{{player|zimmmbo|flag=}} subs-in for {{player|Jia|flag=se}} on the series for Team Liam.,{{HiddenSort|Day 3}},Heroes Captains Clash
+0f1cecda-206d-4c0a-bea8-99e30984557d,2024-11-02 19:00 UTC,Team Kure,Team YEAAAAABOI,,,,3,,{{player|MyPalVince|flag=us}} subs-in for {{player|cattlepillar|flag=de}} on the series for Team YEAAAAABOI.,{{HiddenSort|Day 3}},Heroes Captains Clash
+06757faf-9efe-434a-be69-8927d21c2470,2024-11-03 17:00 UTC,Team Nintorii,Team Liam,,,,5,,,Upper Bracket Semifinals,Heroes Captains Clash
+23c7a8de-cd72-4b99-a681-3951dc18a0e0,2024-11-03 19:00 UTC,Team Kure,Team YEAAAAABOI,,,,,,,{{Stage|Playoffs}},Heroes Captains Clash
+18dac4af-65a4-4887-879d-d49605cbeab0,2024-11-03 21:00 UTC,Team Nintorii,Team Kure,,,,,,,Upper Bracket Final,Heroes Captains Clash
+11c884c2-447e-46e4-b02f-23effc583ea9,2024-11-09 17:00 UTC,Team YEAAAAABOI,Team MasonBlaze,,,,,,,Lower Bracket Quarterfinals,Heroes Captains Clash
+418d882a-277a-447e-9bfe-c91f2031a7f4,2024-11-09 19:00 UTC,Team Liam,Team Madara,,,,,,,{{Stage|Playoffs}},Heroes Captains Clash
+0c676e0c-cd49-4155-b6d4-523793fd35a6,2024-11-09 21:00 UTC,Team YEAAAAABOI,Team Madara,,,,,,,Lower Bracket Semifinal,Heroes Captains Clash
+ee975ce2-6a74-4a25-86c3-203769de704c,2024-11-10 17:00 UTC,Team Nintorii,Team YEAAAAABOI,,,,,,{{player|aryon70|flag=pl}} subs-in for {{player|TTporky|flag=us}} on the series for Team Nintorii.,Lower Bracket Final,Heroes Captains Clash
+34829044-a208-44a3-a063-dfd341c25f32,2024-11-10 19:30 UTC,Team Kure,Team YEAAAAABOI,3,,,7,,Team Kure has 1 map advantage as an Upper Bracket team.,Grand Final,Heroes Captains Clash
+30e8cf0e-baed-4a0d-aaf8-3e5eab70010e,2024-11-10 19:00 UTC,Team Nintorii,Team Madara,,,,1,,{{player|aryon70|flag=pl}} subs-in for {{player|TTporky|flag=us}} on the series for Team Nintorii.,{{Stage|ARAM Showdown}},Heroes Captains Clash

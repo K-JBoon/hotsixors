@@ -1,0 +1,16 @@
+{
+  "archive_blockers": [],
+  "counts": {
+    "matched": 25,
+    "no_replay_expected": 2,
+    "owned_elsewhere": 42
+  },
+  "expected_replays": 25,
+  "maps_owned_elsewhere": 42,
+  "matched_replays": 25,
+  "no_replay_expected": 2,
+  "status": "fully_archived",
+  "total_map_rows": 69,
+  "tournament": "Light Hots Tournament 2025",
+  "unresolved_maps": 0
+}

@@ -1,0 +1,14 @@
+{
+  "archive_blockers": [],
+  "counts": {
+    "matched": 58
+  },
+  "expected_replays": 58,
+  "maps_owned_elsewhere": 0,
+  "matched_replays": 58,
+  "no_replay_expected": 0,
+  "status": "fully_archived",
+  "total_map_rows": 58,
+  "tournament": "Khaldor's Underdog Cup 2026",
+  "unresolved_maps": 0
+}

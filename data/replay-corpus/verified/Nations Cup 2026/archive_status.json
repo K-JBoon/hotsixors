@@ -1,0 +1,14 @@
+{
+  "archive_blockers": [],
+  "counts": {
+    "matched": 203
+  },
+  "expected_replays": 203,
+  "maps_owned_elsewhere": 0,
+  "matched_replays": 203,
+  "no_replay_expected": 0,
+  "status": "fully_archived",
+  "total_map_rows": 203,
+  "tournament": "Nations Cup 2026",
+  "unresolved_maps": 0
+}

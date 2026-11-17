@@ -1,0 +1,14 @@
+{
+  "archive_blockers": [],
+  "counts": {
+    "matched": 77
+  },
+  "expected_replays": 77,
+  "maps_owned_elsewhere": 0,
+  "matched_replays": 77,
+  "no_replay_expected": 0,
+  "status": "fully_archived",
+  "total_map_rows": 77,
+  "tournament": "Khaldor's Underdog Cup 2025 [0328224f]",
+  "unresolved_maps": 0
+}

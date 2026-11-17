@@ -1,0 +1,15 @@
+{
+  "archive_blockers": [],
+  "counts": {
+    "matched": 125,
+    "owned_elsewhere": 38
+  },
+  "expected_replays": 125,
+  "maps_owned_elsewhere": 38,
+  "matched_replays": 125,
+  "no_replay_expected": 0,
+  "status": "fully_archived",
+  "total_map_rows": 163,
+  "tournament": "NGS Storm Division - Season 5",
+  "unresolved_maps": 0
+}

@@ -1,0 +1,24 @@
+set_id,date,team_1,team_2,team_1_score,team_2_score,winner,best_of,finished,notes,set_position_in_tournament,source_page
+0701e0d3-9d73-4b96-9ba4-a54138bc46cf,2023-08-26 16:40 UTC,Team Dynouh,Team BananaH,,,,3,,{{player|Unforgiven|flag=rs}} subs-in for {{player|Johann|flag=es}} on map 1 for Team Dynouh.,{{HiddenSort|Week 1}},Raven Court Inhouse League
+8b3800fa-9848-4523-9d6a-4fa8d5c8b239,2023-08-26 17:50 UTC,Team Dynouh,Team Ultralisk,,,,,,{{player|Unforgiven|flag=rs}} subs-in for {{player|darkmok|flag=de}} on map 1 and {{player|HlopakA|flag=ua}} subs-in for {{player|Nano|flag=es}} on the series for Team Ultralisk.,{{HiddenSort|Week 1}},Raven Court Inhouse League
+ad368057-5a49-4573-be5b-7aeb7f3bbc94,2023-08-26 19:40 UTC,Team BananaH,Team Ultralisk,,,,,,{{player|HlopakA|flag=ua}} subs-in for {{player|Nano|flag=es}} on the series for Team Ultralisk.,{{HiddenSort|Week 1}},Raven Court Inhouse League
+e7dd0633-b2a1-4887-8d6a-b8071d33243c,2023-08-27 16:45 UTC,Team Skogh,Team Kure,,,,,,"{{player|Siro|flag=se}} subs-in for {{player|Gaflo|flag=de}} on map 1 for Team Skogh, {{player|Galnegunnar|flag=se}} subs-in for {{player|LegacY|flag=us}} on the series for Team Kure.",{{HiddenSort|Week 1}},Raven Court Inhouse League
+831c8d87-6d66-44b6-b54c-26a087984020,2023-08-27 18:10 UTC,Team Skogh,Team Madara,,,,,,,{{HiddenSort|Week 1}},Raven Court Inhouse League
+1eaaa6dc-da48-4910-85d0-4a8a7dd9a655,2023-08-27 19:25 UTC,Team Kure,Team Madara,,,,,true,{{player|Galnegunnar|flag=se}} subs-in for {{player|LegacY|flag=us}} on the series for Team Kure.,{{HiddenSort|Week 1}},Raven Court Inhouse League
+7793b20e-5550-465f-b5d4-a0d92632524b,2023-09-02 16:40 UTC,Team Dynouh,Team Skogh,,,,3,,,{{HiddenSort|Week 2}},Raven Court Inhouse League
+a1aa1f5d-f8de-4c34-a5de-279007b2f9bf,2023-09-02 17:45 UTC,Team Dynouh,Team Kure,,,,,,{{player|HlopakA|flag=ua}} subs-in for {{player|Jia|flag=se}} on the series for Team Kure.,{{HiddenSort|Week 2}},Raven Court Inhouse League
+76795ed6-2f1a-40c6-9d47-6015cd56d0bc,2023-09-02 19:00 UTC,Team BananaH,Team Skogh,,,,,,,{{HiddenSort|Week 2}},Raven Court Inhouse League
+2513f808-46f5-4f1d-8b84-20df0174cc9a,2023-09-03 16:30 UTC,Team BananaH,Team Kure,,,,,,,{{HiddenSort|Week 2}},Raven Court Inhouse League
+3eeb6caa-0d86-41bf-85cb-b0b22d3dcd1d,2023-09-03 18:20 UTC,Team BananaH,Team Madara,,,,,,,{{HiddenSort|Week 2}},Raven Court Inhouse League
+b7cb94af-f8b4-4fcc-b757-cb7db18144cd,2023-09-03 19:40 UTC,Team Ultralisk,Team Kure,,,,,,,{{HiddenSort|Week 2}},Raven Court Inhouse League
+7c4f5457-a6c4-49fd-a595-38e99b2abc30,2023-09-09 16:30 UTC,Team Dynouh,Team Madara,,,,3,,,{{HiddenSort|Week 3}},Raven Court Inhouse League
+97ad2dca-9b3f-478d-bb02-ff614f801648,2023-09-09 18:10 UTC,Team Ultralisk,Team Skogh,,,,,,{{player|Hiraeth|flag=nl}} subs-in for {{player|MaxPassion|flag=se}} on the series for Team Skogh.,{{HiddenSort|Week 3}},Raven Court Inhouse League
+4d4aa81a-c7fd-4daa-99d1-ea07f4879323,2023-09-09 19:15 UTC,Team Ultralisk,Team Madara,,,,,,,{{HiddenSort|Week 3}},Raven Court Inhouse League
+c1a2c844-325a-43e2-8df6-79af6746d46b,2023-09-16 16:50 UTC,Team Skogh,Team Ultralisk,,,,5,,{{player|HlopakA|flag=ua}} subs-in for {{player|Nano|flag=es}} on the series for Team Ultralisk.,Upper Bracket Semifinals,Raven Court Inhouse League
+57933a4f-1257-41d0-a2ef-e6981ce74e07,2023-09-16 18:35 UTC,Team Dynouh,Team Madara,,,,,,,{{HiddenSort|Bracket}},Raven Court Inhouse League
+12ab77c0-6f5d-4beb-bacf-c8e79a431a2f,2023-09-23 16:35 UTC,Team Skogh,Team Dynouh,,,,,,,Upper Bracket Final,Raven Court Inhouse League
+c3a74f5c-9ba7-4a87-aa2c-28fb03ebaff5,2023-09-17 16:40 UTC,Team Madara,Team BananaH,,,,,,{{player|HlopakA|flag=ua}} subs-in for {{player|MyTry|flag=ru}} on the series for Team BananaH.,Lower Bracket Quarterfinals,Raven Court Inhouse League
+86b23dff-f4dd-4f6f-bf99-2908171910c8,2023-09-17 19:45 UTC,Team Ultralisk,Team Kure,,,,,,,{{HiddenSort|Bracket}},Raven Court Inhouse League
+1bb4a059-8b56-4898-a5c1-2dccac403982,2023-09-23 19:25 UTC,Team BananaH,Team Ultralisk,,,,,,{{player|HlopakA|flag=ua}} and {{player|Murenas|flag=ru}} sub-in for {{player|MyTry|flag=ru}} and {{player|Veikzu|flag=fi}} on the series for Team BananaH.,Lower Bracket Semifinal,Raven Court Inhouse League
+2ad2982d-cde8-4202-988e-543a5da87f54,2023-09-24 16:35 UTC,Team Dynouh,Team Ultralisk,,,,,,{{player|HlopakA|flag=ua}} subs-in for {{player|Daykwaza|flag=fr}} on map 1 for Team Dynouh.,Lower Bracket Final,Raven Court Inhouse League
+643873fc-04b6-4653-8789-59c67af43c69,2023-09-24 18:15 UTC,Team Skogh,Team Dynouh,,,,7,,Team Skogh has a map pick and a first pick advantage on map 1 as an Upper-Bracket team.,Grand Final,Raven Court Inhouse League

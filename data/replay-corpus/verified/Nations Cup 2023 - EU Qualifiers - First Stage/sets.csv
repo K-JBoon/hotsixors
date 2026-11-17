@@ -1,0 +1,71 @@
+set_id,date,team_1,team_2,team_1_score,team_2_score,winner,best_of,finished,notes,set_position_in_tournament,source_page
+98d38550-08e6-429c-9338-1201abc9b24c,2023-04-18 17:00 UTC,Germany,Hungary,,,1,,true,{{player|darkmok|flag=de}} subs-in for {{player|Ultralisk|flag=de}} on the series for Germany.,{{HiddenSort|Group A}},Nations Cup 2023/EU Qualifiers
+21db8df5-94b8-4512-bc38-b74c81c9bc05,2023-04-18 17:50 UTC,Netherlands,Austria,,,1,,true,,{{HiddenSort|Group A}},Nations Cup 2023/EU Qualifiers
+d36342e4-04b3-462f-9eaa-610362603203,2023-04-18 18:50 UTC,Germany,Austria,,,1,,true,{{player|darkmok|flag=de}} subs-in for {{player|Ultralisk|flag=de}} on the series for Germany.,{{HiddenSort|Group A}},Nations Cup 2023/EU Qualifiers
+23278a95-5b85-4ade-b2e9-d355f7fb5b96,2023-04-19 17:00 UTC,Hungary,Netherlands,,,2,,true,,{{HiddenSort|Group A}},Nations Cup 2023/EU Qualifiers
+817fa5c1-d820-4c82-bb16-377048f50bf8,2023-04-19 18:00 UTC,Germany,Netherlands,,,1,,true,,{{HiddenSort|Group A}},Nations Cup 2023/EU Qualifiers
+c280b6cd-4982-46e8-ac97-812e61196e0d,2023-04-19 19:00 UTC,Austria,Hungary,,,1,,true,,{{HiddenSort|Group A}},Nations Cup 2023/EU Qualifiers
+6d8b592d-e10c-4cbe-97ff-725ed0d8e908,2023-04-20 17:00 UTC,Russia,Norway,,,1,,true,,{{HiddenSort|Group B}},Nations Cup 2023/EU Qualifiers
+b129def9-579a-4791-8e72-176c432573ca,2023-04-20 18:00 UTC,Poland,Finland,,,1,,true,,{{HiddenSort|Group B}},Nations Cup 2023/EU Qualifiers
+277713c1-938c-4e92-9660-742ac776f5b9,2023-04-20 19:00 UTC,Russia,Finland,,,1,,true,,{{HiddenSort|Group B}},Nations Cup 2023/EU Qualifiers
+c0dcc1fb-8d00-49dc-b8c8-32d121f01db9,2023-04-21 17:00 UTC,Norway,Poland,,,2,,true,,{{HiddenSort|Group B}},Nations Cup 2023/EU Qualifiers
+17cdbe24-5a93-4f47-bcba-fd9a90fd98e1,2023-04-21 17:50 UTC,Russia,Poland,,,1,,true,,{{HiddenSort|Group B}},Nations Cup 2023/EU Qualifiers
+a208b9ab-0a81-4dc3-a9d6-c88d69e03ff7,2023-04-21 18:50 UTC,Finland,Norway,,,1,,true,,{{HiddenSort|Group B}},Nations Cup 2023/EU Qualifiers
+f7e03e55-2395-48ae-921e-4552d804d643,2023-04-22 12:00 UTC,France,Bulgaria,,,1,,true,,{{HiddenSort|Group C}},Nations Cup 2023/EU Qualifiers
+01ff8f18-e7f9-421c-bc81-9567d5352241,2023-04-22 13:00 UTC,Spain,Czech Republic,,,1,,true,,{{HiddenSort|Group C}},Nations Cup 2023/EU Qualifiers
+3c3d82ac-0d5d-4d27-991a-c5b0a96cc7b1,2023-04-22 14:00 UTC,France,Czech Republic,,,1,,true,,{{HiddenSort|Group C}},Nations Cup 2023/EU Qualifiers
+711971c5-59fa-4a15-a6ad-8f9b5f08953a,2023-04-22 15:00 UTC,France,Spain,,,1,,true,,{{HiddenSort|Group C}},Nations Cup 2023/EU Qualifiers
+34f8b33f-e0e3-4e11-b701-746b4964cad8,2023-04-22 16:00 UTC,Bulgaria,Spain,,,2,,true,,{{HiddenSort|Group C}},Nations Cup 2023/EU Qualifiers
+52a82ad3-acd6-49e4-8ef7-048c9112adb3,2023-04-22 17:00 UTC,Czech Republic,Bulgaria,,,1,,true,,{{HiddenSort|Group C}},Nations Cup 2023/EU Qualifiers
+ea385b74-5c63-4ad2-bfbe-ed9d5460fc69,2023-04-23 12:00 UTC,Sweden,United Kingdom,,,1,,true,,{{HiddenSort|Group D}},Nations Cup 2023/EU Qualifiers
+dcc37e1d-6c67-429d-8882-fdee44b7c829,2023-04-23 13:00 UTC,Sweden,Denmark,,,1,,true,,{{HiddenSort|Group D}},Nations Cup 2023/EU Qualifiers
+8c1b75f4-8746-4db4-8b99-2e4e92eed50b,2023-04-23 14:00 UTC,Ukraine,Denmark,,,1,,true,,{{HiddenSort|Group D}},Nations Cup 2023/EU Qualifiers
+8d63958c-a9b6-4ee9-b73c-f8c362235d41,2023-04-23 15:00 UTC,United Kingdom,Ukraine,,,2,,true,,{{HiddenSort|Group D}},Nations Cup 2023/EU Qualifiers
+338dbad8-3ea9-41d2-91b0-a1234b595262,2023-04-23 16:00 UTC,Sweden,Ukraine,,,1,,true,,{{HiddenSort|Group D}},Nations Cup 2023/EU Qualifiers
+96daa424-1777-41b5-8125-ea75369a5c89,2023-04-23 17:00 UTC,Denmark,United Kingdom,,,1,,true,,{{HiddenSort|Group D}},Nations Cup 2023/EU Qualifiers
+38ab0eeb-acf6-4f96-a096-928065714987,2023-05-02 16:00 UTC,Denmark,Czech Republic,,,1,,true,,{{HiddenSort|Third Places Tiebreakers}},Nations Cup 2023/EU Qualifiers
+de1a3f34-581b-4d3a-ad59-2fc4c214950c,2023-05-02 17:00 UTC,Austria,Denmark,,,2,,true,,{{HiddenSort|Third Places Tiebreakers}},Nations Cup 2023/EU Qualifiers
+57a45467-de90-4829-a7ea-4c5d431b8d9d,2023-05-02 18:00 UTC,Finland,Denmark,,,2,,true,,{{HiddenSort|Third Places Tiebreakers}},Nations Cup 2023/EU Qualifiers
+89257e36-2709-4b60-ab8c-7236118f93ab,2023-05-03 16:00 UTC,Austria,Czech Republic,,,2,,true,{{player|Ermin|flag=at}} subs-in on the series for Austria {{player|Sheydy|flag=cz}} subs-in on the series for Czech Republic,{{HiddenSort|Third Places Tiebreakers}},Nations Cup 2023/EU Qualifiers
+8354f90b-26cb-4dc1-9499-4648dbeb3734,2023-05-03 17:30 UTC,Czech Republic,Finland,,,2,,true,{{player|Sheydy|flag=cz}} subs-in on the series for Czech Republic {{player|Leijonamieli|flag=fi}} subs-in on the series for Finland,{{HiddenSort|Third Places Tiebreakers}},Nations Cup 2023/EU Qualifiers
+3524b92c-b5ad-4792-8642-0ada05fb8e80,2023-05-03 18:35 UTC,Austria,Finland,,,2,,true,{{player|Ermin|flag=at}} subs-in on the series for Austria {{player|Leijonamieli|flag=fi}} subs-in on the series for Finland,{{HiddenSort|Third Places Tiebreakers}},Nations Cup 2023/EU Qualifiers
+5879cfa3-271a-4bce-955b-eea91af722b5,2023-04-19 18:30 UTC,Czech Republic #2,Czech Republic #1,0,3,2,,true,,Grand Final,Nations Cup 2023/EU Qualifiers/Country Break
+8a638955-8023-43d4-9a9d-363f4412ed56,2023-04-18 19:00 UTC,Mad Vikings,Denmark #1,0,3,2,,true,,Grand Final,Nations Cup 2023/EU Qualifiers/Country Break
+85b4b68c-3b04-4f45-9aae-09904f6d1485,2023-04-16 14:00 UTC,Les saucissonneurs,Pigs,,,2,,true,,{{HiddenSort|France Country Break}},Nations Cup 2023/EU Qualifiers/Country Break
+f4024285-6fc4-4d4b-b3e7-68d3473131be,2023-04-16 19:00 UTC,SomethingNew,Pigs,,,2,,true,,{{HiddenSort|France Country Break}},Nations Cup 2023/EU Qualifiers/Country Break
+18211d5d-680a-46d2-9163-1dbddc89431d,2023-04-14 19:30 UTC,Germany #1,Zermettrlinge,,,1,,true,,{{HiddenSort|Germany Country Break}},Nations Cup 2023/EU Qualifiers/Country Break
+c908c018-35e4-4aa2-a1be-09bea2c05b66,2023-04-15 18:00 UTC,Zermettrlinge,Oettinger Allstars,,,2,,true,,{{HiddenSort|Germany Country Break}},Nations Cup 2023/EU Qualifiers/Country Break
+5041d3f7-5a75-47c7-9ab8-ecb17fd9cae8,2023-04-17 17:00 UTC,Germany #1,Oettinger Allstars,,,1,,true,,{{HiddenSort|Germany Country Break}},Nations Cup 2023/EU Qualifiers/Country Break
+36c484b3-e664-43e0-986c-46289eceac69,2023-04-19 17:00 UTC,Nårge,Norway #1,3,0,1,,true,,Grand Final,Nations Cup 2023/EU Qualifiers/Country Break
+df17a983-affa-45e5-bbed-81c34a380a0f,2023-04-06 18:00 UTC,Disgusting,RossPierrDoll,3,0,1,,true,,Grand Final,Nations Cup 2023/EU Qualifiers/Country Break
+54cf45c4-e194-4766-a72a-f2decd3dbf15,2023-04-11 18:00 UTC,Even More Clowns,Motståndarlaget,,,1,,true,,{{HiddenSort|Sweden Country Break}},Nations Cup 2023/EU Qualifiers/Country Break
+816b1737-3bd8-4c71-82e8-37708c1a5aee,2023-04-17 18:00 UTC,Even More Clowns,In å veva,,,1,,true,,{{HiddenSort|Sweden Country Break}},Nations Cup 2023/EU Qualifiers/Country Break
+15e70e86-8eb9-49f9-be91-305dc1b86199,2023-04-17 19:00 UTC,United Kingdom #1,Britannia Rules The Lanes,3,0,1,,true,,Grand Final,Nations Cup 2023/EU Qualifiers/Country Break
+47a77899-1d6b-41d1-a81d-c9cb676cfde0,2023-05-07 12:05 UTC,team germany,team ukraine,,,1,,true,{{player|darkmok|flag=de}} subs-in for {{player|Ultralisk|flag=de}} on the series for {{flag|de}} Germany,{{HiddenSort|Round 1}},Nations Cup 2023/EU Qualifiers/Second Stage
+217fda8b-fe7c-4841-9d28-b1dd59db2e20,2023-05-07 13:35 UTC,team denmark,team spain,,,2,,true,{{player|Freakz|flag=dk}} & {{player|LiLBooty|flag=dk}} subs-in on the series for {{flag|dk}} Denmark. {{flag|dk}} Denmark withdrew from the tournament after Round 1. {{flag|es}} Spain retained victory for this match.,{{HiddenSort|Round 1}},Nations Cup 2023/EU Qualifiers/Second Stage
+acd4f26b-1b63-4db2-932e-72bd0de8ae6b,2023-05-07 15:00 UTC,team france,team poland,,,1,,true,,{{HiddenSort|Round 1}},Nations Cup 2023/EU Qualifiers/Second Stage
+c4b7a873-7558-46b1-a564-e194c12a8ae8,2023-05-07 16:30 UTC,team sweden,team netherlands,,,1,,true,,{{HiddenSort|Round 1}},Nations Cup 2023/EU Qualifiers/Second Stage
+e28859d2-43a8-438c-869b-01924850512c,2023-05-13 12:00 UTC,team germany,team spain,,,1,,true,,{{HiddenSort|Round 2}},Nations Cup 2023/EU Qualifiers/Second Stage
+7e2f512e-d37e-4aac-a10c-c860b2dfd26c,2023-05-13 13:45 UTC,team ukraine,team poland,,,2,,true,,{{HiddenSort|Round 2}},Nations Cup 2023/EU Qualifiers/Second Stage
+cebae6dd-5940-4d76-9a3f-e4b6fffee916,2023-05-13 16:15 UTC,team france,team sweden,,,2,,true,{{player|MGQB|flag=fr}} subs-in for {{player|PandaColada|flag=fr}} on map 1 for {{flag|fr}} France {{player|Captenrex|flag=se}} & {{player|Sven|flag=se}} sub-in for {{player|Henn1ng|flag=se}} & {{player|Jia|flag=se}} on the series for {{flag|se}} Sweden,{{HiddenSort|Round 2}},Nations Cup 2023/EU Qualifiers/Second Stage
+a450945d-e647-4a69-9dab-f102c86c7163,2023-05-16 17:00 UTC,team finland,team netherlands,,,1,,true,,{{HiddenSort|Round 2}},Nations Cup 2023/EU Qualifiers/Second Stage
+2ee1b260-d3c9-4648-bd3a-c252883a5338,2023-05-14 12:10 UTC,team germany,team poland,,,1,,true,,{{HiddenSort|Round 3}},Nations Cup 2023/EU Qualifiers/Second Stage
+7bb21cb1-87ee-4e8c-a75e-7b6cf0760d84,2023-05-14 13:35 UTC,team spain,team netherlands,,,1,,true,{{player|NoScopeNinja|flag=nl}} subs-in for {{player|Ukkie|flag=nl}} on the series for {{flag|nl}} Netherlands,{{HiddenSort|Round 3}},Nations Cup 2023/EU Qualifiers/Second Stage
+040fff49-05a8-4de8-9eb6-e056b4ed8d29,2023-05-14 15:05 UTC,team ukraine,team sweden,,,2,,true,{{player|Arreku|flag=ua}} subs-in for {{player|Denardo|flag=ua}} on the series for {{flag|ua}} Ukraine,{{HiddenSort|Round 3}},Nations Cup 2023/EU Qualifiers/Second Stage
+df74f3c8-def8-4905-9c7d-2a174407238c,2023-05-17 18:30 UTC,team finland,team france,,,2,,true,,{{HiddenSort|Round 3}},Nations Cup 2023/EU Qualifiers/Second Stage
+b8dbbe93-ff3c-4a02-91d3-a0940fcc5428,2023-05-20 12:05 UTC,team germany,team netherlands,,,1,,true,,{{HiddenSort|Round 4}},Nations Cup 2023/EU Qualifiers/Second Stage
+33c35592-7381-42e6-bada-a8a7e9a1906d,2023-05-20 13:35 UTC,team poland,team sweden,,,2,,true,{{player|Aether|flag=pl}} subs-in for {{player|RydzuSA|flag=pl}} on the series for {{flag|pl}} Poland,{{HiddenSort|Round 4}},Nations Cup 2023/EU Qualifiers/Second Stage
+415d6cd4-cc27-4126-a88d-5e2280aad930,2023-05-20 15:30 UTC,team spain,team france,,,2,,true,{{player|Malganyr|flag=fr}} subs-in on map 4 for {{flag|fr}} France,{{HiddenSort|Round 4}},Nations Cup 2023/EU Qualifiers/Second Stage
+0b9bb607-a4bb-4b7a-ab91-22b5f83c92be,2023-05-20 17:30 UTC,team ukraine,team finland,,,1,,true,{{player|Puokki|flag=fi}} subs-in for {{player|MXD|flag=fi}} on the series for {{flag|fi}} Finland,{{HiddenSort|Round 4}},Nations Cup 2023/EU Qualifiers/Second Stage
+789fe707-2cfc-4280-8490-f9ae35373e17,2023-05-21 12:05 UTC,team germany,team sweden,,,1,,true,,{{HiddenSort|Round 5}},Nations Cup 2023/EU Qualifiers/Second Stage
+cddb748b-3ca6-48d7-8f6c-09e8d1999e11,2023-05-21 14:50 UTC,team netherlands,team france,,,2,,true,{{player|Iksir|flag=fr}} subs-in for {{player|Daykwaza|flag=fr}} on map 3 for {{flag|fr}} France,{{HiddenSort|Round 5}},Nations Cup 2023/EU Qualifiers/Second Stage
+f92e65ce-06b3-4d84-83fb-d751ee784b31,2023-05-21 16:25 UTC,team poland,team finland,,,1,,true,,{{HiddenSort|Round 5}},Nations Cup 2023/EU Qualifiers/Second Stage
+8ea79b37-2aa3-4f84-b75d-3c8375eaedb5,2023-05-21 18:25 UTC,team spain,team ukraine,,,1,,true,,{{HiddenSort|Round 5}},Nations Cup 2023/EU Qualifiers/Second Stage
+e36be611-96e3-4580-86f7-da5f58a2a688,2023-05-27 12:00 UTC,team germany,team france,,,1,,true,{{player|Gaflo|flag=de}} subs-in for {{player|Deathknight|flag=de}} on the series for {{flag|de}} Germany,{{HiddenSort|Round 6}},Nations Cup 2023/EU Qualifiers/Second Stage
+67f2ba9f-5dac-4d77-aa20-ce76bffc84ec,2023-05-27 14:30 UTC,team sweden,team finland,,,1,,true,{{player|Mylly|flag=fi}} subs-in for {{player|Surrey|flag=fi}} on map 1 & {{player|hammasvalas|flag=fi}} subs-in for {{player|Veikzu|flag=fi}} on the series for {{flag|fi}} Finland,{{HiddenSort|Round 6}},Nations Cup 2023/EU Qualifiers/Second Stage
+cd76d87a-07bb-4ec5-a952-2ce54ddd0532,2023-05-27 15:50 UTC,team netherlands,team ukraine,FF,W,2,,true,{{Flag|nl}} Netherlands has forfeited the match due to not having enough players,{{HiddenSort|Round 6}},Nations Cup 2023/EU Qualifiers/Second Stage
+2602f793-5f7a-4702-99ba-0b1c976e2603,2023-05-27 15:50 UTC,team poland,team spain,,,1,,true,,{{HiddenSort|Round 6}},Nations Cup 2023/EU Qualifiers/Second Stage
+fbead2fb-2503-489e-89ff-ba5f0b8524b1,2023-05-28 12:10 UTC,team germany,team finland,,,1,,true,{{player|darkmok|flag=de}} subs-in for {{player|Deathknight|flag=de}} on the series for {{flag|de}} Germany {{player|Puokki|flag=fi}} subs-in for {{player|Veikzu|flag=fi}} on the series for {{flag|fi}} Finland,{{HiddenSort|Round 7}},Nations Cup 2023/EU Qualifiers/Second Stage
+0d958469-399a-45e2-8f05-67f0dd7814d1,2023-05-28 13:55 UTC,team sweden,team spain,W,FF,1,,true,{{Flag|es}} Spain has forfeited the match,{{HiddenSort|Round 7}},Nations Cup 2023/EU Qualifiers/Second Stage
+c30f8163-446d-42b3-84cb-20c0a0c21c79,2023-05-28 13:55 UTC,team netherlands,team poland,FF,W,2,,true,{{Flag|nl}} Netherlands has forfeited the match,{{HiddenSort|Round 7}},Nations Cup 2023/EU Qualifiers/Second Stage
+941fac21-0a14-4143-84a3-ded6041a3008,2023-05-28 13:55 UTC,team france,team ukraine,,,1,,true,"{{player|Eowea|flag=fr}} subs-in on maps 3, 4 and 5 for {{flag|fr}} France",{{HiddenSort|Round 7}},Nations Cup 2023/EU Qualifiers/Second Stage

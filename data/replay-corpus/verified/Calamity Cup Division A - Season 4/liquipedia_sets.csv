@@ -1,0 +1,32 @@
+set_id,date,team_1,team_2,team_1_score,team_2_score,winner,best_of,finished,notes,set_position_in_tournament,source_page
+c68ce49b-1c69-43fe-af71-3c8136a6d875,2022-09-16 23:00 UTC,Cult of the Yog,Riders on the Storm,,,1,,true,,{{HiddenSort|Round 1}},Calamity Cup Season 4/Group Stage
+07289a36-fcfb-4be4-8c87-40740ea079c4,2022-09-17 00:00 UTC,Lagados e Tiltados,Scorpions,,,draw,,true,{{player|Ryan|flag=br}} subs-in on map 1 for Lagados e Tiltados.,{{HiddenSort|Round 1}},Calamity Cup Season 4/Group Stage
+4f080741-4c68-40db-a571-f401fb2a0000,2022-09-17 01:00 UTC,Marmottas,Bar 34,,,2,,true,,{{HiddenSort|Round 1}},Calamity Cup Season 4/Group Stage
+3b649ee9-0f80-466c-b3bf-d7c1b5c9cdac,2022-09-18 00:00 UTC,Cult of the Yog,Bar 34,,,draw,,true,,{{HiddenSort|Round 2}},Calamity Cup Season 4/Group Stage
+ca05513a-944f-4f84-b3f5-94819f8029ba,2022-09-18 01:00 UTC,Lagados e Tiltados,Marmottas,,,1,,true,,{{HiddenSort|Round 2}},Calamity Cup Season 4/Group Stage
+06ef4192-16c5-495f-bd5b-413d1ab7a2b9,2022-09-23 01:00 UTC,Patch Eterno,Riders on the Storm,,,1,,true,{{player|SirKou|flag=br}} subs-in on the series for Riders on the Storm.,{{HiddenSort|Round 2}},Calamity Cup Season 4/Group Stage
+31d1994f-7899-4901-aa71-32395a8a0b28,2022-09-24 00:00 UTC,Riders on the Storm,Bar 34,,,2,,true,{{player|SirKou|flag=br}} subs-in on the series for Riders on the Storm.,{{HiddenSort|Round 3}},Calamity Cup Season 4/Group Stage
+23b304ca-ceba-4fca-8f09-ff23dd60b02d,2022-09-24 01:00 UTC,Cult of the Yog,Lagados e Tiltados,,,2,,true,,{{HiddenSort|Round 3}},Calamity Cup Season 4/Group Stage
+3872cb89-f799-450a-b7fe-d0402529968f,2022-09-28 23:00 UTC,Patch Eterno,Scorpions,,,draw,,true,,{{HiddenSort|Round 3}},Calamity Cup Season 4/Group Stage
+5ff73ed1-53be-494b-8266-87326aaa6bb6,2022-09-24 23:00 UTC,Patch Eterno,Bar 34,,,2,,true,,{{HiddenSort|Round 4}},Calamity Cup Season 4/Group Stage
+09548bc1-c4f8-4644-bc6b-df3ceb35915c,2022-09-25 00:00 UTC,Scorpions,Marmottas,,,2,,true,{{player|SirKou|flag=br}} subs-in on the series for Scorpions.,{{HiddenSort|Round 4}},Calamity Cup Season 4/Group Stage
+36bbceae-2a79-4313-b1e6-bced3f4bec23,2022-09-25 01:00 UTC,Riders on the Storm,Lagados e Tiltados,,,2,,true,{{player|SirKou|flag=br}} subs-in on map 1 for Riders on the Storm. Riders on the Storm forfeited map 2.,{{HiddenSort|Round 4}},Calamity Cup Season 4/Group Stage
+97fde278-8328-4b10-8696-f77b03c6934b,2022-10-02 00:00 UTC,Patch Eterno,Marmottas,,,2,,true,,{{HiddenSort|Round 5}},Calamity Cup Season 4/Group Stage
+4c5bfb46-c5e9-4648-810d-524defee07fc,2022-10-06 23:00 UTC,Scorpions,Cult of the Yog,,,2,,true,,{{HiddenSort|Round 5}},Calamity Cup Season 4/Group Stage
+975032c4-d32e-4368-a099-6c905c9a99c0,2022-10-07 22:00 UTC,Bar 34,Lagados e Tiltados,,,2,,true,,{{HiddenSort|Round 5}},Calamity Cup Season 4/Group Stage
+ab1aa2a3-0689-4914-9244-75d708a25ab9,2022-09-30 23:00 UTC,Marmottas,Cult of the Yog,,,draw,,true,{{player|Lawthyx|flag=br}} subs-in on map 1 for Marmottas.,{{HiddenSort|Round 6}},Calamity Cup Season 4/Group Stage
+bf1d5b6e-0a8a-43ec-929b-6b3ddf38a170,2022-10-01 23:00 UTC,Patch Eterno,Lagados e Tiltados,,,2,,true,,{{HiddenSort|Round 6}},Calamity Cup Season 4/Group Stage
+75140f2d-5ea5-4ef2-bd63-5b1c6a3730db,,Scorpions,Riders on the Storm,W,FF,1,,true,Riders on the Storm forfeited the match.,{{HiddenSort|Round 6}},Calamity Cup Season 4/Group Stage
+20e838f6-0f4c-4f4e-9767-f045f8c2a3de,2022-10-07 23:00 UTC,Bar 34,Scorpions,,,2,,true,,{{HiddenSort|Round 7}},Calamity Cup Season 4/Group Stage
+213a1ff8-161e-4b9b-a44c-2186eab6b51d,2022-10-08 00:00 UTC,Marmottas,Riders on the Storm,W,FF,1,,true,Riders on the Storm forfeited the match.,{{HiddenSort|Round 7}},Calamity Cup Season 4/Group Stage
+54418b74-e40d-4bd5-bf38-987f385bb828,2022-10-13 23:00 UTC,Patch Eterno,Cult of the Yog,,,2,,true,,{{HiddenSort|Round 7}},Calamity Cup Season 4/Group Stage
+94fdb80d-3c59-42b4-a8d1-f0eaabfc5386,,Lagados e Tiltados,bye,W,,1,,true,,Upper Bracket Semifinals,Calamity Cup Season 4/Playoffs
+5b256ebf-4157-48f4-858c-ab7fff83f032,2022-10-14 23:00 UTC,Cult of the Yog,Bar 34,3,1,1,,true,,Upper Bracket Semifinals,Calamity Cup Season 4/Playoffs
+a1379743-4eb6-4954-973c-48a94baf96f4,2022-10-16 00:45 UTC,Lagados e Tiltados,Cult of the Yog,3,0,1,,true,,Upper Bracket Final,Calamity Cup Season 4/Playoffs
+afc81a43-0dec-493e-b961-06d0b0d0d4cb,2022-10-15 00:30 UTC,Marmottas,Riders on the Storm,3,0,1,,true,{{player|Ryan|flag=br}} subs-in on the series for Marmottas. {{player|Betanoob42|flag=br}} subs-in on the series for Riders on the Storm,Lower Bracket Round 1,Calamity Cup Season 4/Playoffs
+9416e68e-572d-43ee-932f-a8604370b312,2022-10-15 23:00 UTC,Scorpions,Patch Eterno,3,0,1,,true,{{player|SirKou|flag=br}} subs-in on the series for Patch Eterno.,Playoffs Results,Calamity Cup Season 4/Playoffs
+e88c27f2-e197-4f4b-8371-f7d47d79859f,2022-10-21 23:00 UTC,Bar 34,Marmottas,0,3,2,,true,,Lower Bracket Quarterfinals,Calamity Cup Season 4/Playoffs
+fa0a7046-fc55-463b-ba5f-7b1a2b1e2d4c,,bye,Scorpions,,W,2,,true,,Playoffs Results,Calamity Cup Season 4/Playoffs
+0eaf5a05-ceae-4ac1-8541-ef2f4dee8968,2022-10-22 01:15 UTC,Marmottas,Scorpions,3,0,1,,true,,Lower Bracket Semifinal,Calamity Cup Season 4/Playoffs
+37c06756-8737-4656-ae41-b7ce9981a0db,2022-10-22 23:00 UTC,Cult of the Yog,Marmottas,1,3,2,,true,,Lower Bracket Final,Calamity Cup Season 4/Playoffs
+01d11ebf-479f-4441-8107-66033da1a56f,2022-10-23 01:15 UTC,Lagados e Tiltados,Marmottas,4,0,1,,true,Winners' bracket advantage of 1 game,Grand Final,Calamity Cup Season 4/Playoffs

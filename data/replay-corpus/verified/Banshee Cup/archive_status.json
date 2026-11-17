@@ -1,0 +1,15 @@
+{
+  "archive_blockers": [],
+  "counts": {
+    "matched": 50,
+    "owned_elsewhere": 337
+  },
+  "expected_replays": 50,
+  "maps_owned_elsewhere": 337,
+  "matched_replays": 50,
+  "no_replay_expected": 0,
+  "status": "fully_archived",
+  "total_map_rows": 387,
+  "tournament": "Banshee Cup",
+  "unresolved_maps": 0
+}

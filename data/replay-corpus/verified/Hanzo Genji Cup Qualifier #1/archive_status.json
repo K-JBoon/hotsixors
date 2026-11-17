@@ -1,0 +1,15 @@
+{
+  "archive_blockers": [],
+  "counts": {
+    "matched": 6,
+    "owned_elsewhere": 21
+  },
+  "expected_replays": 6,
+  "maps_owned_elsewhere": 21,
+  "matched_replays": 6,
+  "no_replay_expected": 0,
+  "status": "fully_archived",
+  "total_map_rows": 27,
+  "tournament": "Hanzo Genji Cup Qualifier #1",
+  "unresolved_maps": 0
+}

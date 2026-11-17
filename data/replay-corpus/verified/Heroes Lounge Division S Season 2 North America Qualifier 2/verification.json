@@ -1,0 +1,45 @@
+{
+  "files_sha256": {
+    "2019-11-23 perfect gems vs regen/Map 1 (Infernal Shrines).StormReplay": "705ca148f29c536f716d981c48965a163de0074352b31216994690e1ce148ebd",
+    "2019-11-23 perfect gems vs regen/Map 2 (Volskaya Foundry).StormReplay": "39772717646f1530dc6c7e2b276dd8037e5e7c55c0f656a59ffedcafe49ccd95",
+    "2019-11-23 perfect gems vs rewind/Map 1 (Infernal Shrines).StormReplay": "1e28bca82b2083f6a9ba8a6afa2e88d1fc9370a06d2578a193817999c084ec7d",
+    "2019-11-23 perfect gems vs rewind/Map 2 (Tomb of the Spider Queen).StormReplay": "acc9067b9846b5fbd0cf6062decdfaf8ba20c9a3d1c1e45df282fd6554344c63",
+    "2019-11-23 rewind vs tee tee w/Map 1 (Towers of Doom).StormReplay": "86e05be171ec537c3d0d09d5166632250b6115fb5268a16027f9eeff9f89220b",
+    "2019-11-23 rewind vs tee tee w/Map 2 (Dragon Shire).StormReplay": "a2a1ac084c15877f1d5dd2991a19afe14a20974a18007453e637b92f9de2af8e",
+    "archive_status.json": "536fbce035a3413845dcbca17085cc43c101edb2b2a89800223aaff32ccb0b99",
+    "liquipedia_maps.csv": "b8e874b43894983c1618618751d8cf935988e4beeb79cd4c356d17a4b8f90fc4",
+    "liquipedia_sets.csv": "817ec1b692aa446979dc20113e4fce04e76504d2b7b5c8a30a786ea6292ad291",
+    "liquipedia_teams.csv": "a900e6413a152e1ae9562beb3329ff55af40737a81fa8197e0859b07a296e40a",
+    "liquipedia_url.txt": "04ff89f3e2f84a096cf9a6c22ff524e0218c2a41c43a45d0f6cd204b10b5378b",
+    "maps.csv": "2f0f4ae2067a763bf619abc57203b8e18211d610140c9485595fd854e53a6111",
+    "player_battletags.csv": "3112ef4404cbdfe0a568dc140d273f3664d3f02dbbb4b0643942cd9f83550df6",
+    "replay_manifest.csv": "c37c7d4956c6216028663c190cfe532cb303dc5286e0123cdab4627df1674c64",
+    "sets.csv": "817ec1b692aa446979dc20113e4fce04e76504d2b7b5c8a30a786ea6292ad291",
+    "teams.csv": "a900e6413a152e1ae9562beb3329ff55af40737a81fa8197e0859b07a296e40a"
+  },
+  "gates": {
+    "complete_replay_coverage": true,
+    "manifest_integrity": true,
+    "no_blocking_reviews": true,
+    "no_stale_overrides": true,
+    "only_approved_inferred_aliases_exported": true
+  },
+  "player_alias_rows": 0,
+  "replay_count": 6,
+  "status": {
+    "blockers": "",
+    "blocking_reviews": 0,
+    "expected_replays": 6,
+    "integrity_errors": 0,
+    "matched_replays": 6,
+    "missing_replays": 0,
+    "pending_alias_reviews": 0,
+    "stale_overrides": 0,
+    "status": "verified",
+    "total_map_rows": 10,
+    "tournament": "Heroes Lounge Division S Season 2 North America Qualifier 2",
+    "unresolved_maps": 0,
+    "verified": "yes"
+  },
+  "tournament": "Heroes Lounge Division S Season 2 North America Qualifier 2"
+}

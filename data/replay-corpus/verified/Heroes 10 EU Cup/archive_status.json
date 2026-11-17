@@ -1,0 +1,14 @@
+{
+  "archive_blockers": [],
+  "counts": {
+    "matched": 110
+  },
+  "expected_replays": 110,
+  "maps_owned_elsewhere": 0,
+  "matched_replays": 110,
+  "no_replay_expected": 0,
+  "status": "fully_archived",
+  "total_map_rows": 110,
+  "tournament": "Heroes 10 EU Cup",
+  "unresolved_maps": 0
+}

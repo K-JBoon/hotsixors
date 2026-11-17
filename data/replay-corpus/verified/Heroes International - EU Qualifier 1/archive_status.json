@@ -1,0 +1,14 @@
+{
+  "archive_blockers": [],
+  "counts": {
+    "matched": 34
+  },
+  "expected_replays": 34,
+  "maps_owned_elsewhere": 0,
+  "matched_replays": 34,
+  "no_replay_expected": 0,
+  "status": "fully_archived",
+  "total_map_rows": 34,
+  "tournament": "Heroes International - EU Qualifier 1",
+  "unresolved_maps": 0
+}

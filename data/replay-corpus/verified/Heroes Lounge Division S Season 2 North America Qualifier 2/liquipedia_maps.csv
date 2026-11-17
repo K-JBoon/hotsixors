@@ -1,0 +1,11 @@
+map_id,set_id,date,team_1,team_2,map,team_1_heroes,team_2_heroes,team_1_bans,team_2_bans,notes,map_number_in_set,set_position_in_tournament,map_pick_team,map_winner
+c01fc5d7-84cd-43eb-8937-8fa8ee34026c,c4ab7801-bacb-450d-a192-48967a9db69d,2019-11-23,rewind,tee tee w,,,,,,,1,Participating teams,,
+4c1ec4fd-ec9f-4bec-a65c-75db5b35721b,c4ab7801-bacb-450d-a192-48967a9db69d,2019-11-23,rewind,tee tee w,,,,,,,2,Participating teams,,
+6733da35-1953-47f1-b35a-5f8fbabfbd09,57fd53ed-33c9-44b5-8d13-b7e49b97377c,2019-11-23,regen,teamnut,,,,,,,1,Participating teams,,
+9a61f60d-f2e8-434b-ad34-fd29a1235363,57fd53ed-33c9-44b5-8d13-b7e49b97377c,2019-11-23,regen,teamnut,,,,,,,2,Participating teams,,
+59fc44d0-e933-4775-a079-b03f9233f213,932472ca-b505-431f-b2c0-67f830eff47b,2019-11-23,perfect gems,rewind,,,,,,,1,Participating teams,,
+59d98273-ff0b-4268-95e5-1752a6b47696,932472ca-b505-431f-b2c0-67f830eff47b,2019-11-23,perfect gems,rewind,,,,,,,2,Participating teams,,
+3d767806-f0ff-479a-86d3-4a63a462ee47,79a2904b-4c48-4048-9684-4e7440aa33db,2019-11-23,broken alliance,regen,,,,,,,1,Participating teams,,
+69b88c18-aa1a-49c6-aee6-af334d878f25,79a2904b-4c48-4048-9684-4e7440aa33db,2019-11-23,broken alliance,regen,,,,,,,2,Participating teams,,
+aa5cf15c-ac1c-4b6d-8550-8c76a55f40de,e87d71a8-9023-46ae-9478-0c8ed7ee7bb3,2019-11-23,perfect gems,regen,,,,,,,1,Grand Final,,
+46aa7d51-e305-43ac-b080-91fac2af0a51,e87d71a8-9023-46ae-9478-0c8ed7ee7bb3,2019-11-23,perfect gems,regen,,,,,,,2,Grand Final,,

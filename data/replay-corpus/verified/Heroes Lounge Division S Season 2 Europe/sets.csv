@@ -1,0 +1,77 @@
+set_id,date,team_1,team_2,team_1_score,team_2_score,winner,best_of,finished,notes,set_position_in_tournament,source_page
+968694c4-e277-46a4-b053-43f07cc9a571,2019-12-15 12:00 UTC,Go Next,Schuifpui Schavuiten,2,0,1,,true,,Upper Bracket Quarterfinals,Heroes Lounge Division S/Season 2/Europe/Crucible
+e2262bd8-f8f3-43a7-a589-5c3610afd10d,2019-12-15 12:00 UTC,Feel the Heat,pepeMLADY,2,0,1,,true,,Upper Bracket Quarterfinals,Heroes Lounge Division S/Season 2/Europe/Crucible
+3e4fdba1-3769-4034-90a8-71b86b04d1a9,2019-12-15 12:00 UTC,Memeldors Meme Machines,Wheel of ORDAH?,2,0,1,,true,,Upper Bracket Quarterfinals,Heroes Lounge Division S/Season 2/Europe/Crucible
+c48f1bfa-9939-4d64-8cc1-de2159aacbf5,2019-12-15 12:00 UTC,kiikoo combo,Disgusting,2,0,1,,true,,Participating teams,Heroes Lounge Division S/Season 2/Europe/Crucible
+de07f7c8-960e-401f-8b60-3cbbec61da88,2019-12-15 14:00 UTC,Go Next,Feel the Heat,0,2,2,,true,,Upper Bracket Semifinals,Heroes Lounge Division S/Season 2/Europe/Crucible
+3678a4ec-f2e0-43fa-bcd6-f1ca024e5c05,2019-12-15 14:00 UTC,Memeldors Meme Machines,kiikoo combo,0,2,2,,true,,Participating teams,Heroes Lounge Division S/Season 2/Europe/Crucible
+7f1ba0cb-a1e1-4b32-9060-77e14efc2078,2019-12-15 13:00 UTC,pepeMLADY,Schuifpui Schavuiten,2,1,1,,true,,Lower Bracket Quarterfinals,Heroes Lounge Division S/Season 2/Europe/Crucible
+d0e748ae-b12e-4360-ac73-46403786ce7d,2019-12-15 13:00 UTC,Wheel of ORDAH?,Disgusting,0,2,2,,true,,Lower Bracket Quarterfinals,Heroes Lounge Division S/Season 2/Europe/Crucible
+6cc6099f-c885-478a-83a0-2f38ddb9f151,2019-12-15 16:00 UTC,Memeldors Meme Machines,pepeMLADY,0,2,2,,true,,Lower Bracket Semifinal,Heroes Lounge Division S/Season 2/Europe/Crucible
+d01fe843-f4fc-42e0-84bf-e85b50711f76,2019-12-15 16:00 UTC,Go Next,Disgusting,2,0,1,,true,,Participating teams,Heroes Lounge Division S/Season 2/Europe/Crucible
+fac87a75-4bba-4f75-81a4-840cb98b5f41,2020-01-14 18:00 UTC,wps,fth,,,2,,true,,{{HiddenSort|Week 1}},Heroes Lounge Division S/Season 2/Europe/Group Stage
+aa8f7be6-a650-422d-a754-696f7f245463,2020-01-14 20:00 UTC,aLbeus'r fnaculb,Disgusting,,,1,,true,,{{HiddenSort|Week 1}},Heroes Lounge Division S/Season 2/Europe/Group Stage
+7ee9ac3d-5bd6-4fa2-9897-e5b43d655e29,2020-01-17 18:00 UTC,Washed Up,pepeMLADY,,,1,,true,,{{HiddenSort|Week 1}},Heroes Lounge Division S/Season 2/Europe/Group Stage
+fcd21b87-6559-40c9-ac56-c6cc1a7a0b2f,2020-01-17 20:00 UTC,Go Next,Crystal Gaming,,,2,,true,,{{HiddenSort|Week 1}},Heroes Lounge Division S/Season 2/Europe/Group Stage
+5b648ad5-1b69-4021-954e-adb6f619087f,2020-01-23 18:00 UTC,Disgusting,fth,,,2,,true,,{{HiddenSort|Week 2}},Heroes Lounge Division S/Season 2/Europe/Group Stage
+cbd58a08-a9a2-4e37-9b2b-b269abf2bc5f,2020-01-23 20:00 UTC,aLbeus'r fnaculb,Go Next,,,1,,true,,{{HiddenSort|Week 2}},Heroes Lounge Division S/Season 2/Europe/Group Stage
+f9e75a5d-6267-4f12-b53a-7cf946022d7e,2020-01-24 20:00 UTC,pepeMLADY,Crystal Gaming,,,1,,true,,{{HiddenSort|Week 2}},Heroes Lounge Division S/Season 2/Europe/Group Stage
+71c7cf13-6dd2-4ad6-9d22-71d88eaebfd9,2020-01-29 18:00 UTC,wps,pepeMLADY,,,1,,true,,{{HiddenSort|Week 3}},Heroes Lounge Division S/Season 2/Europe/Group Stage
+82eb5cbb-bce2-4370-bc3b-512f95327843,2020-01-30 20:00 UTC,Crystal Gaming,Disgusting,,,1,,true,,{{HiddenSort|Week 3}},Heroes Lounge Division S/Season 2/Europe/Group Stage
+bd0dcc4d-000a-46b1-b012-3ecffd71f5a2,2020-01-31 18:00 UTC,Washed Up,wps,,,1,,true,,{{HiddenSort|Week 3}},Heroes Lounge Division S/Season 2/Europe/Group Stage
+49a2199b-dba4-480b-a3d4-23a5f63164f7,2020-02-02 15:00 UTC,aLbeus'r fnaculb,fth,,,1,,true,,{{HiddenSort|Week 3}},Heroes Lounge Division S/Season 2/Europe/Group Stage
+f618482b-65c3-4b14-be93-a272942a1219,2020-02-02 19:30 UTC,Go Next,Washed Up,,,2,,true,,{{HiddenSort|Week 3}},Heroes Lounge Division S/Season 2/Europe/Group Stage
+f1f39a77-59a7-4daf-a853-9e64dedc8d0e,2020-02-04 20:00 UTC,wps,aLbeus'r fnaculb,,,1,,true,,{{HiddenSort|Week 4}},Heroes Lounge Division S/Season 2/Europe/Group Stage
+81bb3799-0c7d-4729-b2b9-04e3beea3e79,2020-02-06 20:00 UTC,Go Next,pepeMLADY,FF,W,2,,true,Go Next forfeited the tournament.,{{HiddenSort|Week 4}},Heroes Lounge Division S/Season 2/Europe/Group Stage
+aee06fff-076b-41dd-8ddb-b423dd53d13b,2020-02-07 18:00 UTC,Washed Up,Disgusting,,,1,,true,,{{HiddenSort|Week 4}},Heroes Lounge Division S/Season 2/Europe/Group Stage
+259f57f3-739f-40eb-839f-ebc9082cad19,2020-02-07 19:00 UTC,Crystal Gaming,fth,,,2,,true,,{{HiddenSort|Week 4}},Heroes Lounge Division S/Season 2/Europe/Group Stage
+92529eaa-951e-4e49-8356-d3d85d181ca2,2020-02-16 17:00 UTC,Crystal Gaming,wps,,,2,,true,,{{HiddenSort|Week 5}},Heroes Lounge Division S/Season 2/Europe/Group Stage
+173c3092-1e75-43c6-b11e-57dba37876af,2020-02-17 18:00 UTC,Disgusting,pepeMLADY,,,2,,true,,{{HiddenSort|Week 5}},Heroes Lounge Division S/Season 2/Europe/Group Stage
+3fa0c9d0-fe26-485e-a2eb-614928be4ca2,2020-02-17 20:00 UTC,Washed Up,aLbeus'r fnaculb,,,1,,true,,{{HiddenSort|Week 5}},Heroes Lounge Division S/Season 2/Europe/Group Stage
+72a194c3-f209-4d1a-afba-7f0b020d9f72,2020-02-18 18:00 UTC,Washed Up,fth,,,1,,true,,{{HiddenSort|Week 5}},Heroes Lounge Division S/Season 2/Europe/Group Stage
+8da16a8e-2f55-4514-bdfd-f0190af9b116,2020-02-21 18:00 UTC,fth,pepeMLADY,,,1,,true,,{{HiddenSort|Week 6}},Heroes Lounge Division S/Season 2/Europe/Group Stage
+7f6636e8-ba2f-4141-9877-a6cc99802628,2020-02-23 16:00 UTC,Crystal Gaming,aLbeus'r fnaculb,,,2,,true,,{{HiddenSort|Week 6}},Heroes Lounge Division S/Season 2/Europe/Group Stage
+cb4d858b-fd5b-46f0-bd08-b03347c741b1,2020-02-24 19:00 UTC,Disgusting,wps,,,2,,true,,{{HiddenSort|Week 7}},Heroes Lounge Division S/Season 2/Europe/Group Stage
+d41fa468-6f7a-41b4-a2ff-f72f5c74a589,2020-02-26 19:00 UTC,aLbeus'r fnaculb,pepeMLADY,,,1,,true,,{{HiddenSort|Week 7}},Heroes Lounge Division S/Season 2/Europe/Group Stage
+64a2c91e-fa69-4f50-ac32-638965301c49,2020-03-03 17:30 UTC,Washed Up,Crystal Gaming,,,1,,true,,{{HiddenSort|Week 7}},Heroes Lounge Division S/Season 2/Europe/Group Stage
+51114e74-d141-4d21-a8a8-098eca54521e,"February 8, 2020",Go Next,wps,FF,W,2,,,,{{HiddenSort|Week 7}},Heroes Lounge Division S/Season 2/Europe/Group Stage
+a9b7bd79-08a8-4602-8940-929d3dfc9dfa,"February 8, 2020",Go Next,fth,FF,W,2,,,,{{HiddenSort|Week 7}},Heroes Lounge Division S/Season 2/Europe/Group Stage
+b6eb8f2b-9e12-4008-8071-86fc3effa460,"February 13, 2020",Go Next,Disgusting,FF,W,2,,,,{{HiddenSort|Week 7}},Heroes Lounge Division S/Season 2/Europe/Group Stage
+aa32afa7-fa86-408d-b1e4-d3d377219937,2020-03-14 12:00 UTC,wps,pepeMLADY,3,0,1,,true,,Upper Bracket Quarterfinals,Heroes Lounge Division S/Season 2/Europe/Playoffs
+87fc5855-efcb-434e-93b2-9341213f6f87,2020-03-14 12:00 UTC,fth,Crystal Gaming,3,1,1,,true,,{{HiddenSort|Bracket}},Heroes Lounge Division S/Season 2/Europe/Playoffs
+6dcaff58-6073-473c-8de8-00c77a42a595,2020-03-14 14:00 UTC,Washed Up,wps,3,2,1,,true,,Upper Bracket Semifinals,Heroes Lounge Division S/Season 2/Europe/Playoffs
+b0312fb2-d362-42f8-98f3-c4bca6059213,2020-03-14 16:00 UTC,aLbeus'r fnaculb,fth,3,1,1,,true,,{{HiddenSort|Bracket}},Heroes Lounge Division S/Season 2/Europe/Playoffs
+e7bb8541-9f28-41b1-b62f-e8692a131477,2020-03-15 14:00 UTC,Washed Up,aLbeus'r fnaculb,3,1,1,,true,,Upper Bracket Final,Heroes Lounge Division S/Season 2/Europe/Playoffs
+16687009-f897-4f9c-8f6a-321d2dd56732,2020-03-14 20:00 UTC,pepeMLADY,fth,2,3,2,,true,,Lower Bracket Quarterfinals,Heroes Lounge Division S/Season 2/Europe/Playoffs
+fbfd4f92-ac3e-4dab-84a6-bedbb20bdfe5,2020-03-14 18:00 UTC,Crystal Gaming,wps,2,3,2,,true,,{{HiddenSort|Bracket}},Heroes Lounge Division S/Season 2/Europe/Playoffs
+9483a90b-cb5c-47c3-a166-922b0e9ed5de,2020-03-15 12:00 UTC,fth,wps,3,1,1,,true,,Lower Bracket Semifinal,Heroes Lounge Division S/Season 2/Europe/Playoffs
+26ed0c3d-bb71-4593-8994-cfdd135c4fdf,2020-03-15 16:00 UTC,aLbeus'r fnaculb,fth,3,2,1,,true,,Lower Bracket Final,Heroes Lounge Division S/Season 2/Europe/Playoffs
+205e58c5-61f0-440f-ab48-3158a310a1f0,2020-03-15 18:00 UTC,Washed Up,aLbeus'r fnaculb,3,0,1,,true,,Grand Final,Heroes Lounge Division S/Season 2/Europe/Playoffs
+56e03070-aaa3-4fa5-93f1-81c084125ce2,,Hoplita eSports,Disgusting,0,2,2,,true,,Participating teams,Heroes Lounge Division S/Season 2/Europe/Qualifiers/1
+acc4250b-cf38-43bf-9cf1-bf3c99ad9c85,,kiikoo combo,Schuifpui Schavuiten,2,0,1,,true,,Participating teams,Heroes Lounge Division S/Season 2/Europe/Qualifiers/1
+7ac12c1b-8e40-46a3-8b4e-7e4b776b8a58,,Feel the Heat,eXon-esports,2,0,1,,true,,Participating teams,Heroes Lounge Division S/Season 2/Europe/Qualifiers/1
+aeb25cc5-94f7-4e58-b833-be0ffc015006,,Hold My Beer,MoustachesDivS,2,0,1,,true,,Participating teams,Heroes Lounge Division S/Season 2/Europe/Qualifiers/1
+ae57963a-a0a0-4b2c-a6ad-ed42b2265729,,Disgusting,kiikoo combo,0,2,2,,true,,Participating teams,Heroes Lounge Division S/Season 2/Europe/Qualifiers/1
+953017b8-a818-44e5-94da-af445a62671a,,Feel the Heat,Hold My Beer,2,1,1,,true,,Participating teams,Heroes Lounge Division S/Season 2/Europe/Qualifiers/1
+18f0a30c-74a2-4bc3-9db2-90eac36c819c,,kiikoo combo,Feel the Heat,2,0,1,,true,,Grand Final,Heroes Lounge Division S/Season 2/Europe/Qualifiers/1
+8183bb83-642f-443c-ac90-36bced17fd9e,,kiikoo combo,Wheel of ORDAH?,2,0,1,,true,,Participating teams,Heroes Lounge Division S/Season 2/Europe/Qualifiers/2
+4161c98a-dbf6-456b-8ee9-6fbf626c35d6,,Disgusting,Hoplita eSports,2,0,1,,true,,Participating teams,Heroes Lounge Division S/Season 2/Europe/Qualifiers/2
+eb6992a8-6d33-4328-b370-b49b0023e6cc,,Feel the Heat,Daementis,2,0,1,,true,,Participating teams,Heroes Lounge Division S/Season 2/Europe/Qualifiers/2
+543aed3e-0290-4465-9acc-7670f87722fc,,pepeMLADY,Lucky Play,2,0,1,,true,,Participating teams,Heroes Lounge Division S/Season 2/Europe/Qualifiers/2
+576aaf7c-cbd8-45c5-8898-9bdc993ff6f6,,kiikoo combo,Disgusting,2,0,1,,true,,Participating teams,Heroes Lounge Division S/Season 2/Europe/Qualifiers/2
+acf662de-a0cc-47d6-b12f-0ad326f92aba,,Feel the Heat,pepeMLADY,2,1,1,,true,,Participating teams,Heroes Lounge Division S/Season 2/Europe/Qualifiers/2
+51e9a9a5-34ce-4ba3-90dd-13877647033f,,kiikoo combo,Feel the Heat,2,0,1,,true,,Grand Final,Heroes Lounge Division S/Season 2/Europe/Qualifiers/2
+668d3732-555a-44ea-8c01-d4ae2cc4b9d6,,kiikoo combo,MassiveHype,2,0,1,,true,,Participating teams,Heroes Lounge Division S/Season 2/Europe/Qualifiers/3
+a7ad014c-13d3-483f-946d-39e91387da08,,Disgusting,Wheel of ORDAH?,2,1,1,,true,,Participating teams,Heroes Lounge Division S/Season 2/Europe/Qualifiers/3
+781b3e15-19dc-4bc1-af4c-8d52565ba546,,Feel the Heat,We are lost,0,2,2,,true,,Participating teams,Heroes Lounge Division S/Season 2/Europe/Qualifiers/3
+bc25f9f6-babd-418c-8080-dce57b5b6765,,pepeMLADY,Schuifpui Schavuiten,2,0,1,,true,,Participating teams,Heroes Lounge Division S/Season 2/Europe/Qualifiers/3
+5dc72165-baf4-480a-ba27-77b720f7c30a,,kiikoo combo,Disgusting,2,0,1,,true,,Participating teams,Heroes Lounge Division S/Season 2/Europe/Qualifiers/3
+3734a566-74e5-420e-ba93-057914d12e29,,We are lost,pepeMLADY,0,2,2,,true,,Participating teams,Heroes Lounge Division S/Season 2/Europe/Qualifiers/3
+37ce0323-dcf7-450b-9c0e-be25e89ad3d5,,kiikoo combo,pepeMLADY,2,1,1,,true,,Grand Final,Heroes Lounge Division S/Season 2/Europe/Qualifiers/3
+6d336a2f-5d0c-47dd-a4e2-df315331faf7,,kiikoo combo,Bye,W,,1,,true,,Participating teams,Heroes Lounge Division S/Season 2/Europe/Qualifiers/4
+5e32ad46-202b-49c7-84bc-a547144284e6,,Disgusting,Wheel of ORDAH?,0,2,2,,true,,Participating teams,Heroes Lounge Division S/Season 2/Europe/Qualifiers/4
+dae8c8ba-80c9-4a19-aa12-4acff5420f45,,pepeMLADY,MassiveHype,2,0,1,,true,,Participating teams,Heroes Lounge Division S/Season 2/Europe/Qualifiers/4
+34a98b3f-8c0e-4354-ba5f-80524d601de3,,Feel the Heat,Schuifpui Schavuiten,2,0,1,,true,,Participating teams,Heroes Lounge Division S/Season 2/Europe/Qualifiers/4
+010c0104-7348-4612-979e-1f9a0ba71f5f,,kiikoo combo,Wheel of ORDAH?,2,0,1,,true,,Participating teams,Heroes Lounge Division S/Season 2/Europe/Qualifiers/4
+531e38ae-7611-415d-b8ce-259629e1579e,,pepeMLADY,Feel the Heat,0,2,2,,true,,Participating teams,Heroes Lounge Division S/Season 2/Europe/Qualifiers/4
+d4cef327-0118-4612-8df4-1029c9b25c65,,kiikoo combo,Feel the Heat,1,2,2,,true,,Grand Final,Heroes Lounge Division S/Season 2/Europe/Qualifiers/4

@@ -1,0 +1,15 @@
+{
+  "archive_blockers": [],
+  "counts": {
+    "matched": 22,
+    "owned_elsewhere": 61
+  },
+  "expected_replays": 22,
+  "maps_owned_elsewhere": 61,
+  "matched_replays": 22,
+  "no_replay_expected": 0,
+  "status": "fully_archived",
+  "total_map_rows": 83,
+  "tournament": "Eternal Conflict Season 2 Finale",
+  "unresolved_maps": 0
+}

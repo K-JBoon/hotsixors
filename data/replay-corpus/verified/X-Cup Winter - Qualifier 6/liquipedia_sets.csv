@@ -1,0 +1,17 @@
+set_id,date,team_1,team_2,team_1_score,team_2_score,winner,best_of,finished,notes,set_position_in_tournament,source_page
+929af3e3-8083-433b-b7d9-a4caa17339a4,2022-01-19,wah,bye,W,,1,,true,,Round 1,X-Cup Winter/Qualifiers/6
+1b179cde-aab4-4b52-8aaf-db1b9b2fa4b7,2022-01-19,HYPE,5 Shots Of Copium,0,1,2,,true,,Round 1,X-Cup Winter/Qualifiers/6
+215762ae-cb54-4e84-b342-67ceda4f8f3b,2022-01-19,The Hardos,MK Robotics,1,0,1,,true,,Round 1,X-Cup Winter/Qualifiers/6
+347b1ea2-f513-4f80-b4ab-5d78d381f9b2,2022-01-19,The Donuts,Masters Clash Academy,W,FF,1,,true,,Round 1,X-Cup Winter/Qualifiers/6
+36a8f602-66c4-4f2a-99e5-9dbb3d88b46e,2022-01-19,ArthasStroitHram,bye,W,,1,,true,,Participating Teams,X-Cup Winter/Qualifiers/6
+5100c737-f215-4323-af7d-53ebe9e8c476,2022-01-19,Random team,Hungover,1,0,1,,true,,Participating Teams,X-Cup Winter/Qualifiers/6
+2ca7b09d-a5af-431b-a4c9-2a49f62d8c6e,2022-01-19,3 Legged Cat,The Monkes,1,0,1,,true,,Participating Teams,X-Cup Winter/Qualifiers/6
+4f1b8c43-2573-4587-82a7-0e43c1738a0a,2022-01-19,Time For Int,rqg,0,1,2,,true,,Participating Teams,X-Cup Winter/Qualifiers/6
+116f3822-e43a-4372-82b8-1e6f34bb79d2,2022-01-19,wah,5 Shots Of Copium,1,0,1,,true,,Participating Teams,X-Cup Winter/Qualifiers/6
+45938f9f-e2d2-4edf-9184-087d449d2aee,2022-01-19,The Hardos,The Donuts,1,0,1,,true,,Participating Teams,X-Cup Winter/Qualifiers/6
+f4844a58-34f4-4b01-95d1-704b30b1f2a5,2022-01-19,ArthasStroitHram,Random team,1,0,1,,true,,Participating Teams,X-Cup Winter/Qualifiers/6
+1a9eef82-1c59-47f7-a9ac-244cf9462f82,2022-01-19,3 Legged Cat,rqg,0,1,2,,true,,Participating Teams,X-Cup Winter/Qualifiers/6
+df39ee52-195f-4ce8-90b1-8e8145761621,2022-01-19,wah,The Hardos,0,2,2,,true,,Participating Teams,X-Cup Winter/Qualifiers/6
+bb07a433-22dc-4af9-954e-2500c97b4c2e,2022-01-19,ArthasStroitHram,rqg,2,0,1,,true,,Participating Teams,X-Cup Winter/Qualifiers/6
+23649533-62a4-4c05-bf9a-47bbbda23570,2022-01-19,The Hardos,ArthasStroitHram,2,0,1,,true,,Grand Final,X-Cup Winter/Qualifiers/6
+3efdbe27-0684-4f69-a24b-4e871b0c4a7c,2022-01-19,wah,rqg,FF,W,2,,true,,Grand Final,X-Cup Winter/Qualifiers/6

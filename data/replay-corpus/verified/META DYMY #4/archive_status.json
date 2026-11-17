@@ -1,0 +1,14 @@
+{
+  "archive_blockers": [],
+  "counts": {
+    "matched": 61
+  },
+  "expected_replays": 61,
+  "maps_owned_elsewhere": 0,
+  "matched_replays": 61,
+  "no_replay_expected": 0,
+  "status": "fully_archived",
+  "total_map_rows": 61,
+  "tournament": "META DYMY #4",
+  "unresolved_maps": 0
+}

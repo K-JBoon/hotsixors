@@ -1,0 +1,53 @@
+{
+  "files_sha256": {
+    "2021-01-21 01.00 The Fools Gambit vs Phoenix Rising Esports/Map 1 (Volskaya Foundry).StormReplay": "06b799c159153adfcd54ecb1f45718fdcf889fba48690b916301a2ea2f9a6d46",
+    "2021-01-21 01.00 The Fools Gambit vs Phoenix Rising Esports/Map 2 (Dragon Shire).StormReplay": "f0f0ef4ba856d0217de309499993455fe76555548b07a2faa6997b52855bdbcc",
+    "2021-01-21 01.00 The Fools Gambit vs Phoenix Rising Esports/Map 3 (Infernal Shrines).StormReplay": "83c99dfc896577cca8ed247b9e922166651c65980ea60cc07ff5d402c454f411",
+    "2021-01-21 01.00 WildHeart Alpha vs ReGen/Map 1 (Tomb of the Spider Queen).StormReplay": "b16f6e6034f4e020587ede77ba79ac170cee7eb03cf0353b59aa130388b3d0be",
+    "2021-01-21 01.00 WildHeart Alpha vs ReGen/Map 2 (Battlefield of Eternity).StormReplay": "e7e4ce9044ff94d67133757185a3cdcdde45c85a4bb46711f3f81f21bf36cc84",
+    "2021-01-21 01.00 WildHeart Omega vs Dead Game Players/Map 1 (Braxis Holdout).StormReplay": "69b73280a42703a334d5592a6c56fb9ba2222cb3a18669cea450bbf34106da43",
+    "2021-01-21 01.00 WildHeart Omega vs Dead Game Players/Map 2 (Volskaya Foundry).StormReplay": "766a14be27a8f7b357b7e6f9fa99b9fd99cb48b23a5335343324eee74d3de5bd",
+    "2021-01-22 01.00 Juan Direction vs The Fools Gambit/Map 1 (Infernal Shrines).StormReplay": "f626f3e2866dd224dca5e08966a34106b41636ab299e62c87a0e8bcf0cb49466",
+    "2021-01-22 01.00 Juan Direction vs The Fools Gambit/Map 2 (Dragon Shire).StormReplay": "0375790cc90b3c6e030ebd1a6effb9797d6299c1f7f7e0e4ccbed2cd932ee304",
+    "2021-01-22 01.00 ReGen vs WildHeart Omega/Map 1 (Infernal Shrines).StormReplay": "10b5eb9b9e3daac9015d5ca609cd044bc04a7f47d969295c906620142319f0d0",
+    "2021-01-22 01.00 ReGen vs WildHeart Omega/Map 2 (Volskaya Foundry).StormReplay": "b6fe97054e3e797660c2774ebb7db2cbd22efbfeb1b7c62cc871063f8bb65fc0",
+    "2021-01-22 02.30 Juan Direction vs ReGen/Map 1 (Tomb of the Spider Queen).StormReplay": "3163840f772a143c5ae5fe7daf57111b584a454efa8cd7a4f41da87cf26ef9f7",
+    "2021-01-22 02.30 Juan Direction vs ReGen/Map 2 (Towers of Doom).StormReplay": "500313e407ef1030e654456c580a46e8cab2ec3bf8cd88d9739ddc0563e7c1a2",
+    "2021-01-22 02.30 Juan Direction vs ReGen/Map 3 (Volskaya Foundry).StormReplay": "edca1b69dd877e70d51822d991e99c692b53dd54e7511f72669c17b01f8419c3",
+    "archive_status.json": "8a1cee9d41214c5231c9887baf4581655a705d9c7955fed1991cf1041bba4faa",
+    "liquipedia_maps.csv": "cee3795dbffe3a727f82c5bb8d2edc26ca10a66fbc70fdcd30eb6605c8916722",
+    "liquipedia_sets.csv": "0a9c46989800f70c4ac6ced75b8d02bef47806bed1cbb9f10061e43466d9939e",
+    "liquipedia_teams.csv": "301ce4dc69cd848ca4b4e3b6ed9a9e1019d78dbb80de7af4706b282081d9eca9",
+    "liquipedia_url.txt": "a765a879496280813c2800b62a3149ca6121ba9172ce115e35497ecc5a8b5bf7",
+    "maps.csv": "ef05e516da1acbcabc5577a5b6f0cfd1c09e1ffd8c8245a3c23108985f062b72",
+    "player_battletags.csv": "ddad8873965ac3be383ba626369231f6bd66f0b0b31a7868aaa8655fba2d09ce",
+    "replay_manifest.csv": "ab46bd16325c30b03689d427cbe5883aa0a7bc75f0ea957110ef3185f1bec7ab",
+    "sets.csv": "0a9c46989800f70c4ac6ced75b8d02bef47806bed1cbb9f10061e43466d9939e",
+    "teams.csv": "301ce4dc69cd848ca4b4e3b6ed9a9e1019d78dbb80de7af4706b282081d9eca9"
+  },
+  "gates": {
+    "complete_replay_coverage": true,
+    "manifest_integrity": true,
+    "no_blocking_reviews": true,
+    "no_stale_overrides": true,
+    "only_approved_inferred_aliases_exported": true
+  },
+  "player_alias_rows": 27,
+  "replay_count": 14,
+  "status": {
+    "blockers": "",
+    "blocking_reviews": 0,
+    "expected_replays": 14,
+    "integrity_errors": 0,
+    "matched_replays": 14,
+    "missing_replays": 0,
+    "pending_alias_reviews": 0,
+    "stale_overrides": 0,
+    "status": "verified",
+    "total_map_rows": 14,
+    "tournament": "NGS Storm Division - Season 2 - Qualifier #3",
+    "unresolved_maps": 0,
+    "verified": "yes"
+  },
+  "tournament": "NGS Storm Division - Season 2 - Qualifier #3"
+}

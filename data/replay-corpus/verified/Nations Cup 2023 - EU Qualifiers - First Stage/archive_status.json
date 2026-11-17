@@ -1,0 +1,15 @@
+{
+  "archive_blockers": [],
+  "counts": {
+    "matched": 62,
+    "owned_elsewhere": 131
+  },
+  "expected_replays": 62,
+  "maps_owned_elsewhere": 131,
+  "matched_replays": 62,
+  "no_replay_expected": 0,
+  "status": "fully_archived",
+  "total_map_rows": 193,
+  "tournament": "Nations Cup 2023 - EU Qualifiers - First Stage",
+  "unresolved_maps": 0
+}

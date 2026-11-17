@@ -1,0 +1,49 @@
+{
+  "files_sha256": {
+    "2021-09-10 Inting For Ruby vs Chilly Mountain/Map 1 (Infernal Shrines).StormReplay": "fa92b045eb5c52bbcd7617340f348672270641a589e7754ada3e255d6084d755",
+    "2021-09-10 Inting For Ruby vs Chilly Mountain/Map 2 (Battlefield of Eternity).StormReplay": "a23c82f369f174f0fa7e8b10eab2527408e45ba9f8f8f2273a067100f3a1af47",
+    "2021-09-10 Inting For Ruby vs Chilly Mountain/Map 3 (Tomb of the Spider Queen).StormReplay": "e8b033af864bd4a119dc40ca5c15addebff5cc46a37a16571bfd5d18f3891f98",
+    "2021-09-10 Rage & Quit Gaming vs Chilly Mountain/Map 1 (Infernal Shrines).StormReplay": "1debf80979287c40d7114461b7d03a7dc2b9ad881cd12534c82bcdfdee68e89b",
+    "2021-09-10 Rage & Quit Gaming vs Chilly Mountain/Map 2 (Battlefield of Eternity).StormReplay": "5cdaa7496e8bd1fcda9a9323bc13102b60e386e79e66d2b42abbe2ee62d65f1a",
+    "2021-09-10 RossPierrDoll vs Inting For Ruby/Map 1 (Dragon Shire).StormReplay": "003178fc5e1c039ffa6280c9a44be341461770334be5f456833f39edd8141201",
+    "2021-09-10 RossPierrDoll vs Inting For Ruby/Map 2 (Tomb of the Spider Queen).StormReplay": "721162dbf8f5cb8b05c90ca961f736cafeb9f46ded694f8e167dfe25f4fb5635",
+    "2021-09-10 RossPierrDoll vs Inting For Ruby/Map 3 (Battlefield of Eternity).StormReplay": "713523a8c7608fc23a807eed7ce48ea08ffc4ea8fb657f25600caf37399c50f6",
+    "2021-09-10 RossPierrDoll vs Rage & Quit Gaming/Map 1 (Battlefield of Eternity).StormReplay": "ab8c84ffdef19feeaac600b66396a6b7e57951ced27651ddd511374f2b5b6e05",
+    "2021-09-10 RossPierrDoll vs Rage & Quit Gaming/Map 2 (Towers of Doom).StormReplay": "ab8f74cd710eb600e2c436954bd03a86fb3c83a8bec77671b9f2b64518b7e5f0",
+    "archive_status.json": "0c1ef7270fa6826f54671711eaf22484d091d00a21dfd60a56fb0f000809acb7",
+    "liquipedia_maps.csv": "b0402c0978d48a7b614a55545f1d59952120a801a86ae87d6480831b4edbcbf0",
+    "liquipedia_sets.csv": "c984995b28a721694a9db86d237ed683c8f90516095b1fd74d54a4f899471507",
+    "liquipedia_teams.csv": "1de16bf8705e28e4d2896f19eed8b4be9d7053469ab734ccd612aac270bc00f9",
+    "liquipedia_url.txt": "8ad32b7b608f996cd212654788e6045eaefe7b07691966312bc86d82be9795d6",
+    "maps.csv": "82a933f96e8d9f930ec892d7ee34d33fbeae2c96bfb813708d985d5c2fead368",
+    "player_battletags.csv": "2c3750f02d9c8ab8041d7854a79f82f3e3f125a86359ab11b2b8ad24a3dba4b2",
+    "replay_manifest.csv": "93c43055d230bb3b4922737637fed193bd6c0e1306ea6febd3f7500d9f68be7c",
+    "sets.csv": "c984995b28a721694a9db86d237ed683c8f90516095b1fd74d54a4f899471507",
+    "teams.csv": "1de16bf8705e28e4d2896f19eed8b4be9d7053469ab734ccd612aac270bc00f9"
+  },
+  "gates": {
+    "complete_replay_coverage": true,
+    "manifest_integrity": true,
+    "no_blocking_reviews": true,
+    "no_stale_overrides": true,
+    "only_approved_inferred_aliases_exported": true
+  },
+  "player_alias_rows": 19,
+  "replay_count": 10,
+  "status": {
+    "blockers": "",
+    "blocking_reviews": 0,
+    "expected_replays": 10,
+    "integrity_errors": 0,
+    "matched_replays": 10,
+    "missing_replays": 0,
+    "pending_alias_reviews": 0,
+    "stale_overrides": 0,
+    "status": "verified",
+    "total_map_rows": 10,
+    "tournament": "META Madness #5 Qualifier #2",
+    "unresolved_maps": 0,
+    "verified": "yes"
+  },
+  "tournament": "META Madness #5 Qualifier #2"
+}

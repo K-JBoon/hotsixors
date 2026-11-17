@@ -1,0 +1,48 @@
+{
+  "files_sha256": {
+    "2026-06-11 18.00 Munchies vs Deckard's Gym Buddies/Map 1 (Dragon Shire).StormReplay": "56949394313ed8ed047ede8439e0db21bbcd4d7a32bbbd2ec7577a9409d2d93b",
+    "2026-06-11 18.00 Munchies vs Deckard's Gym Buddies/Map 2 (Garden of Terror).StormReplay": "41fbabaaa3b1b0e7f3b1950b60fb8ffa53b81b095147535300e0f735d30fd413",
+    "2026-06-11 18.00 Munchies vs Deckard's Gym Buddies/Map 3 (Battlefield of Eternity).StormReplay": "6893ed8a0152cb7f80165862f9202ed15ad5bab01ee9802ed2d5c595726801f4",
+    "2026-06-11 19.00 Lore Refreshment vs Exodia Stack/Map 1 (Dragon Shire).StormReplay": "07fd57df5c703feaf7ec76d46a3239395101a6f930e2758446e5d0b3b355e0a5",
+    "2026-06-11 19.00 Lore Refreshment vs Exodia Stack/Map 2 (Warhead Junction).StormReplay": "05e27fa8974e01391bec6f25fd796a2a381b8c66584c093d5bc4734ab8aed25d",
+    "2026-06-18 18.00 Deckard's Gym Buddies vs Exodia Stack/Map 1 (Towers of Doom).StormReplay": "12c046ce9e57c630e815ba021bb0ca3888252c8fa22df52e7624bcd5064e26e9",
+    "2026-06-18 18.00 Deckard's Gym Buddies vs Exodia Stack/Map 2 (Alterac Pass).StormReplay": "78d20f327f695c2e6e678160747c38f6e23305b7f21726ef1416e6980c0fe730",
+    "2026-06-18 18.00 Deckard's Gym Buddies vs Exodia Stack/Map 3 (Haunted Mines).StormReplay": "0cb7214081ee6f04eaaac2fe829996f94395dea8f6413626fd06806776b49a20",
+    "2026-06-18 18.00 Deckard's Gym Buddies vs Exodia Stack/Map 4 (Battlefield of Eternity).StormReplay": "e4a143ac6fc317168946c43d86aa8ba4d237275eeb5efaf8eff1260cbdfd8a8b",
+    "archive_status.json": "5f47cd82d7650b1ec08d0586a222283ccb73995f2b4c0daa5bd376c28e4fa1c0",
+    "liquipedia_maps.csv": "a8c7b03bd960aa5812ba1fad94ebce8f0626698483cf9d21c660f7e7cc7e18a4",
+    "liquipedia_sets.csv": "ae048c0c1dfb89a22a12c61fa2cc1acc4611fe3b6dd650abd5591202a4b5acbf",
+    "liquipedia_teams.csv": "da718ad176d1d3da1d6754b4b4a24cfac18b84a3e3550a870578736d96abf56f",
+    "liquipedia_url.txt": "c6722d24062a7d421ce8e3371731c50f42dfd3149fb405eddbcde7ad8a5cfb0f",
+    "maps.csv": "cd2742899800e91504ae1c39b64e3f6774ce5720047c4d8e055fed1c4fba5c6a",
+    "player_battletags.csv": "c1bcb52a2d3b11e2a71873c5e62f04985a594aaaf451b8836354b010b0de0365",
+    "replay_manifest.csv": "6802d91572498dcb858477790a32b6a319aeeaa3fafc4560cb83d34bdcbdbd80",
+    "sets.csv": "ae048c0c1dfb89a22a12c61fa2cc1acc4611fe3b6dd650abd5591202a4b5acbf",
+    "teams.csv": "da718ad176d1d3da1d6754b4b4a24cfac18b84a3e3550a870578736d96abf56f"
+  },
+  "gates": {
+    "complete_replay_coverage": true,
+    "manifest_integrity": true,
+    "no_blocking_reviews": true,
+    "no_stale_overrides": true,
+    "only_approved_inferred_aliases_exported": true
+  },
+  "player_alias_rows": 22,
+  "replay_count": 9,
+  "status": {
+    "blockers": "",
+    "blocking_reviews": 0,
+    "expected_replays": 9,
+    "integrity_errors": 0,
+    "matched_replays": 9,
+    "missing_replays": 0,
+    "pending_alias_reviews": 1,
+    "stale_overrides": 0,
+    "status": "verified",
+    "total_map_rows": 9,
+    "tournament": "Heroes Pulsing #2",
+    "unresolved_maps": 0,
+    "verified": "yes"
+  },
+  "tournament": "Heroes Pulsing #2"
+}

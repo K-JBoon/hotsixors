@@ -1,0 +1,14 @@
+{
+  "archive_blockers": [],
+  "counts": {
+    "matched": 10
+  },
+  "expected_replays": 10,
+  "maps_owned_elsewhere": 0,
+  "matched_replays": 10,
+  "no_replay_expected": 0,
+  "status": "fully_archived",
+  "total_map_rows": 10,
+  "tournament": "META Madness #5 Qualifier #2",
+  "unresolved_maps": 0
+}

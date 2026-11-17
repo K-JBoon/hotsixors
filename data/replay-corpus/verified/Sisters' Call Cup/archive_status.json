@@ -1,0 +1,14 @@
+{
+  "archive_blockers": [],
+  "counts": {
+    "matched": 63
+  },
+  "expected_replays": 63,
+  "maps_owned_elsewhere": 0,
+  "matched_replays": 63,
+  "no_replay_expected": 0,
+  "status": "fully_archived",
+  "total_map_rows": 63,
+  "tournament": "Sisters' Call Cup",
+  "unresolved_maps": 0
+}

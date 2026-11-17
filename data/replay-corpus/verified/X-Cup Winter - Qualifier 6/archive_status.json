@@ -1,0 +1,14 @@
+{
+  "archive_blockers": [],
+  "counts": {
+    "matched": 15
+  },
+  "expected_replays": 15,
+  "maps_owned_elsewhere": 0,
+  "matched_replays": 15,
+  "no_replay_expected": 0,
+  "status": "fully_archived",
+  "total_map_rows": 15,
+  "tournament": "X-Cup Winter - Qualifier 6",
+  "unresolved_maps": 0
+}

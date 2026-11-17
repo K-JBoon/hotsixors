@@ -1,0 +1,44 @@
+{
+  "files_sha256": {
+    "2021-11-10 Inting for Ruby vs Charming Tomcats/Map 1 (Battlefield of Eternity).StormReplay": "077c161615ce4fb7e58c48d827c405bbc925c1d2db52884a02e399323bee89d6",
+    "2021-11-10 Inting for Ruby vs Charming Tomcats/Map 2 (Tomb of the Spider Queen).StormReplay": "c72891971e391c07ba7b0719e182df9202df1227fcc15465949be0496d6c48f4",
+    "2021-11-10 Inting for Ruby vs Charming Tomcats/Map 3 (Infernal Shrines).StormReplay": "ace2004739eed765a31b2847c20d94122714cc1ecfeeaeb07aef7d6d88aabec4",
+    "2021-11-10 Wurst And Homies vs Inting for Ruby/Map 1 (Cursed Hollow).StormReplay": "1991c4b48ff559ccf4072938ec97dbbec46d7e4ef6e91c0582d4a89ab911ad60",
+    "2021-11-10 Wurst And Homies vs Inting for Ruby/Map 2 (Garden of Terror).StormReplay": "830268fc5285a7af86430746bf34cfa7aac3fda388524ee156ea3ea47a4a2354",
+    "archive_status.json": "394a86f769a8dae60dc4716bedaa44c015da0251d6d0b1f63399f3705602bea0",
+    "liquipedia_maps.csv": "ac9492c283ade8e576608a32fb56d5f796d04b1f9a7a21aab22f97e29662825b",
+    "liquipedia_sets.csv": "ad42bac895d94c57b73812412b5ef6cdb0b46a06fcc31f198cdf857819fa8921",
+    "liquipedia_teams.csv": "1db69612a687fe645e2a6ac13b1d77653363686979e6e31634f85a1a416dc1cb",
+    "liquipedia_url.txt": "a4f2ad99daaad0c4338eb15fea534aa8bfa1cdeb2139609c765c2f48ccf8e459",
+    "maps.csv": "d67c9de8f8514f4ec21711fdb894154284ed9d3ef87171f0522da92da1e2fc27",
+    "player_battletags.csv": "2bd00be7a7c5a6f7d20643ac90e94faf01c2f1cca282461a8f9a3abe24beedb3",
+    "replay_manifest.csv": "27fb5cdbc20984b5ae6f962b82fb128e091fa1ed2561c5e8d1bc89ab0a7c306a",
+    "sets.csv": "ad42bac895d94c57b73812412b5ef6cdb0b46a06fcc31f198cdf857819fa8921",
+    "teams.csv": "1db69612a687fe645e2a6ac13b1d77653363686979e6e31634f85a1a416dc1cb"
+  },
+  "gates": {
+    "complete_replay_coverage": true,
+    "manifest_integrity": true,
+    "no_blocking_reviews": true,
+    "no_stale_overrides": true,
+    "only_approved_inferred_aliases_exported": true
+  },
+  "player_alias_rows": 16,
+  "replay_count": 5,
+  "status": {
+    "blockers": "",
+    "blocking_reviews": 0,
+    "expected_replays": 5,
+    "integrity_errors": 0,
+    "matched_replays": 5,
+    "missing_replays": 0,
+    "pending_alias_reviews": 0,
+    "stale_overrides": 0,
+    "status": "verified",
+    "total_map_rows": 5,
+    "tournament": "X-Cup Fall - Qualifier 10",
+    "unresolved_maps": 0,
+    "verified": "yes"
+  },
+  "tournament": "X-Cup Fall - Qualifier 10"
+}

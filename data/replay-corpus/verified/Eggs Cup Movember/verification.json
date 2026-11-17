@@ -1,0 +1,53 @@
+{
+  "files_sha256": {
+    "2024-11-30 12.00 Please Buff Illidan vs Norway/Map 1 (Infernal Shrines).StormReplay": "9887c59e165fc010ccaed72ab0e6a5679292a7a31afb5299c73ea3f80fb29b8c",
+    "2024-11-30 12.00 Please Buff Illidan vs Norway/Map 2 (Tomb of the Spider Queen).StormReplay": "52b02475abd722bdd6fdb3e31cb34ba495980ffcb687c32b8b0ebf880b7f5c2f",
+    "2024-11-30 12.00 Team Cat Green vs Team Liquid Metal/Map 1 (Dragon Shire).StormReplay": "e2270cea932471967c20e243b41a244e76dfc85163d6546c422ecbff48d834eb",
+    "2024-11-30 12.00 Team Cat Green vs Team Liquid Metal/Map 2 (Tomb of the Spider Queen).StormReplay": "6fdc717b660c4704b138c2cc0fa9c855cf68cd13582a684b166f7713d7227d14",
+    "2024-11-30 12.00 Team Cat Green vs Team Liquid Metal/Map 3 (Battlefield of Eternity).StormReplay": "56293e3f4f302376d23d37702448cc3fecac634b741b6c5e4ac0361374762ec8",
+    "2024-11-30 13.45 Team Liquid Metal vs Please Buff Illidan/Map 1 (Alterac Pass).StormReplay": "b52823d70688a2ef7e8c58b2fc41b48adde2db262fdd3314dbe29d43529bafb4",
+    "2024-11-30 13.45 Team Liquid Metal vs Please Buff Illidan/Map 2 (Dragon Shire).StormReplay": "815fdf5cfd495785703916c3bc7b5e594be7727a2f5a9195fd7de881149f72b6",
+    "2024-11-30 14.50 Franco's Eggpostles vs Watchparty/Map 1 (Garden of Terror).StormReplay": "6a843f0091c13f05301b8261a85f36a9f73e71993eac2fed7dfeeea3f3806e4a",
+    "2024-11-30 14.50 Franco's Eggpostles vs Watchparty/Map 2 (Tomb of the Spider Queen).StormReplay": "b5ac2313a041bc1c2fd31cab28b069301a1dde8a32a75cc9a4d821fce7e23ae9",
+    "2024-11-30 15.50 Franco's Eggpostles vs Please Buff Illidan/Map 1 (Infernal Shrines).StormReplay": "f66b1173b06cd6c7f502c03bf57d0021fb85719e2f23fc828ef05e4096023847",
+    "2024-11-30 15.50 Franco's Eggpostles vs Please Buff Illidan/Map 2 (Garden of Terror).StormReplay": "dd36813532305930f578a8a0fd733d18f3fa3aeea378471ebfebeabd121ca72f",
+    "2024-11-30 16.40 Watchparty vs Please Buff Illidan/Map 1 (Towers of Doom).StormReplay": "844af7136ffa8226625764b70c681ad5f0c6ec6c00af2aa193499f4ad79ae941",
+    "2024-11-30 16.40 Watchparty vs Please Buff Illidan/Map 2 (Cursed Hollow).StormReplay": "ad37bb2503177e1124b2bb134f715a8e6b22c79e89ebe31bc7ca40d3fcfd1abd",
+    "2024-11-30 16.40 Watchparty vs Please Buff Illidan/Map 3 (Battlefield of Eternity).StormReplay": "945455a751ec2d444c5a7b48345c2d20e6b44d78e42f5130dc9805b83f0edf0b",
+    "archive_status.json": "87d50b48e5faf686695f9988e701a58b8352fedc20235146e17b2e857ef147a6",
+    "liquipedia_maps.csv": "c9ed04847b62476d5df273efae1acab1e8659d5fbd99231b9642ec20f277a1a3",
+    "liquipedia_sets.csv": "87b7e2fb5a381475dd214f327ca1014d5d636425ce0e7aa6834b95f59803d4c4",
+    "liquipedia_teams.csv": "e27edce4089d765138f649f03ea32c5f2a90ca62f068c64f982165db21072c97",
+    "liquipedia_url.txt": "9b3dadffe283e95019bedba0aeb9f0320f6b0260c04d49c11d6ecca9d8d18d9d",
+    "maps.csv": "c9ed04847b62476d5df273efae1acab1e8659d5fbd99231b9642ec20f277a1a3",
+    "player_battletags.csv": "b5a33dff95e7437be60cfbcaf4042b7d11cc05aba25e0eef422063a9bdde0832",
+    "replay_manifest.csv": "0cbad9d1c2bd2fbb3bf0a99bad24d740d178fb230bb03bbdc283793305af9cf0",
+    "sets.csv": "87b7e2fb5a381475dd214f327ca1014d5d636425ce0e7aa6834b95f59803d4c4",
+    "teams.csv": "e27edce4089d765138f649f03ea32c5f2a90ca62f068c64f982165db21072c97"
+  },
+  "gates": {
+    "complete_replay_coverage": true,
+    "manifest_integrity": true,
+    "no_blocking_reviews": true,
+    "no_stale_overrides": true,
+    "only_approved_inferred_aliases_exported": true
+  },
+  "player_alias_rows": 30,
+  "replay_count": 14,
+  "status": {
+    "blockers": "",
+    "blocking_reviews": 0,
+    "expected_replays": 14,
+    "integrity_errors": 0,
+    "matched_replays": 14,
+    "missing_replays": 0,
+    "pending_alias_reviews": 0,
+    "stale_overrides": 0,
+    "status": "verified",
+    "total_map_rows": 14,
+    "tournament": "Eggs Cup Movember",
+    "unresolved_maps": 0,
+    "verified": "yes"
+  },
+  "tournament": "Eggs Cup Movember"
+}

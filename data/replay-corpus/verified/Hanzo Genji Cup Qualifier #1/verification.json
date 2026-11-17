@@ -1,0 +1,45 @@
+{
+  "files_sha256": {
+    "2024-05-25 16.00 Juan Direction vs HGCEULUL/Map 1 (Tomb of the Spider Queen).StormReplay": "e0bb01fe84510d689a6a4b94388268a52fdbb47c3e264957626936772d67d7c8",
+    "2024-05-25 16.00 Juan Direction vs HGCEULUL/Map 2 (Infernal Shrines).StormReplay": "38a439beb06a2582e45e0fae1028deb3455342460883e9ea5a95bc9c15f8b560",
+    "2024-05-25 17.10 Hopium Incoming vs 30k/Map 1 (Alterac Pass).StormReplay": "a3ba620221edc139ab878f0f4e247c29cb4b960951aaca96ef06509a2b242c1e",
+    "2024-05-25 17.10 Hopium Incoming vs 30k/Map 2 (Towers of Doom).StormReplay": "15252c0a34898a626eff2a93fd5bf0b6ee1af3d9bc23f440ad47a1e0dd7c0af8",
+    "2024-05-25 18.05 Anti-Clown Association vs HGCEULUL/Map 1 (Tomb of the Spider Queen).StormReplay": "032a262e1042a5a0e58e0dafc25c08b022e454cf33f701e56f1781a159d0154c",
+    "2024-05-25 18.05 Anti-Clown Association vs HGCEULUL/Map 2 (Infernal Shrines).StormReplay": "f5895b8a3b810c1ff5ae4e9582d30fef6e00a8d6d1de3c897db931307ed8a54a",
+    "archive_status.json": "4b7c36ae73e669f23364a0196b76b1019ac3b977865262e289e80543a0045193",
+    "liquipedia_maps.csv": "a8a7ba4f44124bf2c32a7a53ed92f45f5e050a7248fec2e0a193d9df9ecc5d8b",
+    "liquipedia_sets.csv": "be665954ad398392beeeb86cde37fe6ab6204381104cc5542ffc031dd7cab084",
+    "liquipedia_teams.csv": "dc35e033e5b6bef7287c55c5c6910241d777474e3b01a3a39b3e7c124102b4fa",
+    "liquipedia_url.txt": "6b05f760af61385e0fa4af5c5a968f23730bc0dc5383e44d5ccec6ef4456ef08",
+    "maps.csv": "a8a7ba4f44124bf2c32a7a53ed92f45f5e050a7248fec2e0a193d9df9ecc5d8b",
+    "player_battletags.csv": "418c5082362413df7a69bf67cb84f884fe9f67c039d526ba29283a66ffc492e2",
+    "replay_manifest.csv": "ddc40d06b06a2152eea27d2ebf3ea0c30ce33fc8c551586791406868daf4f5fc",
+    "sets.csv": "be665954ad398392beeeb86cde37fe6ab6204381104cc5542ffc031dd7cab084",
+    "teams.csv": "dc35e033e5b6bef7287c55c5c6910241d777474e3b01a3a39b3e7c124102b4fa"
+  },
+  "gates": {
+    "complete_replay_coverage": true,
+    "manifest_integrity": true,
+    "no_blocking_reviews": true,
+    "no_stale_overrides": true,
+    "only_approved_inferred_aliases_exported": true
+  },
+  "player_alias_rows": 24,
+  "replay_count": 6,
+  "status": {
+    "blockers": "",
+    "blocking_reviews": 0,
+    "expected_replays": 6,
+    "integrity_errors": 0,
+    "matched_replays": 6,
+    "missing_replays": 0,
+    "pending_alias_reviews": 0,
+    "stale_overrides": 0,
+    "status": "verified",
+    "total_map_rows": 27,
+    "tournament": "Hanzo Genji Cup Qualifier #1",
+    "unresolved_maps": 0,
+    "verified": "yes"
+  },
+  "tournament": "Hanzo Genji Cup Qualifier #1"
+}

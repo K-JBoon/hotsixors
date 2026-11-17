@@ -1,0 +1,53 @@
+{
+  "files_sha256": {
+    "2019-12-19 Phi Mu Rho Gaming vs Cloud 10/Map 1 (Cursed Hollow).StormReplay": "67279a1554da3be1736b9ba50b8cb3694f8ec0af942edd51e6b113186b6a4550",
+    "2019-12-19 Phi Mu Rho Gaming vs Cloud 10/Map 2 (Infernal Shrines).StormReplay": "d90d48dcfe6f14c8c49ff98532de4ae2a7e115171ca7c960fb6e84e9804e02c9",
+    "2019-12-19 broken alliance vs Phi Mu Rho Gaming/Map 1 (Cursed Hollow).StormReplay": "d8a3f4000cb8c01749e3fb06e45269c56c206c35ca2b08412e2cf4a6952e6bb2",
+    "2019-12-19 broken alliance vs Phi Mu Rho Gaming/Map 2 (Infernal Shrines).StormReplay": "e112f0523184e4b75fd3a41ea5c7bb9261b477a0eb44e012e6f72ce45357976c",
+    "2019-12-19 broken alliance vs Phi Mu Rho Gaming/Map 3 (Battlefield of Eternity).StormReplay": "3ca2cacb82f53b5b1a4dd510e9b4583993404fea020c3100b8908fd41fc4531c",
+    "2019-12-19 broken alliance vs inters anonymous/Map 1 (Cursed Hollow).StormReplay": "05fae87a577f2d8cf8986e541e245a31bc146ace6422a5f6f1357e28bdfccee1",
+    "2019-12-19 broken alliance vs inters anonymous/Map 2 (Volskaya Foundry).StormReplay": "e25290f89e02b1fd2ccc1977ff11926db80bcc4875926933f644aac3e66e565e",
+    "2019-12-19 broken alliance vs inters anonymous/Map 3 (Infernal Shrines).StormReplay": "69c4fcc4efdad0630d25b507f2c6370a61a343d89d4ac66e87925eecc7180856",
+    "2019-12-19 inters anonymous vs Phoenix Riding Topaz/Map 1 (Battlefield of Eternity).StormReplay": "c8b39622ed8a1c5dac3531f1f82072b7b33257c82c4bcf87c3baac73b7e973c4",
+    "2019-12-19 inters anonymous vs Phoenix Riding Topaz/Map 2 (Towers of Doom).StormReplay": "6d36717d6a277d28b48c76af5c2ae508bfdcbecfb8b3f068cd3b0ff97319319b",
+    "2019-12-19 rewind vs Pro-Clown Association/Map 1 (Dragon Shire).StormReplay": "1e389f1d73cccc763d761c2d8d596d4be4bd69b7f1ac5665283a2e80f2aab565",
+    "2019-12-19 rewind vs Pro-Clown Association/Map 2 (Towers of Doom).StormReplay": "e9edf9a51e335fc0706be365d6a3fb1c5aad6de80e3d58a41a00c2c6e37206e8",
+    "2019-12-19 teamnut vs broken alliance/Map 1 (Battlefield of Eternity).StormReplay": "0929441c2f284991275101a2412dd664b2ecfb23eef0abbce30370cd3bc4f0c8",
+    "2019-12-19 teamnut vs broken alliance/Map 2 (Cursed Hollow).StormReplay": "b66dc2bee8a49e0cfed09badb5748e9c668f27b60c5b40f15abc1088233d68de",
+    "archive_status.json": "48d8515ec054572f15e97f1407498d3356f59a9f77a6d5f64db4c01de7dd501f",
+    "liquipedia_maps.csv": "6d2889f895458c9c3cf1a446de254d2588aa3a40a6e22ae34c397e7dd4d6eda5",
+    "liquipedia_sets.csv": "b3d0017f91d1df6f2194cdcf79f347f1515cf1b3e33e29e3b3fdc9d97890e713",
+    "liquipedia_teams.csv": "a900e6413a152e1ae9562beb3329ff55af40737a81fa8197e0859b07a296e40a",
+    "liquipedia_url.txt": "023d8f5f18b2d8c748405bd3cf62ca7eb31d30eb4d14b5257c0faa1d326268be",
+    "maps.csv": "54c639b399cb7d00ed3c6525e707077d219ace41a0766ca97be94c7e1f6a10e2",
+    "player_battletags.csv": "3112ef4404cbdfe0a568dc140d273f3664d3f02dbbb4b0643942cd9f83550df6",
+    "replay_manifest.csv": "80fc3b1cc57b9b7e1321eab760552bf3dabe07c3342292e44a2b030c547032a1",
+    "sets.csv": "b3d0017f91d1df6f2194cdcf79f347f1515cf1b3e33e29e3b3fdc9d97890e713",
+    "teams.csv": "a900e6413a152e1ae9562beb3329ff55af40737a81fa8197e0859b07a296e40a"
+  },
+  "gates": {
+    "complete_replay_coverage": true,
+    "manifest_integrity": true,
+    "no_blocking_reviews": true,
+    "no_stale_overrides": true,
+    "only_approved_inferred_aliases_exported": true
+  },
+  "player_alias_rows": 0,
+  "replay_count": 14,
+  "status": {
+    "blockers": "",
+    "blocking_reviews": 0,
+    "expected_replays": 14,
+    "integrity_errors": 0,
+    "matched_replays": 14,
+    "missing_replays": 0,
+    "pending_alias_reviews": 0,
+    "stale_overrides": 0,
+    "status": "verified",
+    "total_map_rows": 20,
+    "tournament": "Heroes Lounge Division S Season 2 North America Qualifier 5",
+    "unresolved_maps": 0,
+    "verified": "yes"
+  },
+  "tournament": "Heroes Lounge Division S Season 2 North America Qualifier 5"
+}

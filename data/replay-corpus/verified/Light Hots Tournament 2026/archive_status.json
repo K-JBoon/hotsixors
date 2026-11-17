@@ -1,0 +1,15 @@
+{
+  "archive_blockers": [],
+  "counts": {
+    "matched": 42,
+    "no_replay_expected": 1
+  },
+  "expected_replays": 42,
+  "maps_owned_elsewhere": 0,
+  "matched_replays": 42,
+  "no_replay_expected": 1,
+  "status": "fully_archived",
+  "total_map_rows": 43,
+  "tournament": "Light Hots Tournament 2026",
+  "unresolved_maps": 0
+}

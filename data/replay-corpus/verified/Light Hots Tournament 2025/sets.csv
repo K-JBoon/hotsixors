@@ -1,0 +1,40 @@
+set_id,date,team_1,team_2,team_1_score,team_2_score,winner,best_of,finished,notes,set_position_in_tournament,source_page
+22f0b0a0-543b-483b-98bb-1180eec96ea3,2025-11-08 18:00 UTC,Беда,Посейвовей,,,,1,,Map is picked by viewers.,Round 1,Light Hots Tournament
+84034451-f646-43c5-9e39-eb16d1ad200b,2025-11-09 12:00 UTC,Gemina Nox,Рандомы,W,FF,,1,,Map is picked by viewers. Рандомы forfeited their spot in R2.,Round 1,Light Hots Tournament
+b0f59385-73ed-4a84-81ac-31b8366d2e40,2025-11-15 19:00 UTC,Посейвовей,Gemina Nox,,,,1,,Map is picked by viewers. Рандомы forfeited their spot in R2.,Round 2,Light Hots Tournament
+bf111e7d-9ada-483e-a092-14b90f6f8d15,2025-11-09 11:20 UTC,NoGameNoLife,Dead Bit Dawn,,,,1,,Map is picked by viewers.,{{Stage|Qualifiers}},Light Hots Tournament
+0d0ed1e4-99ce-433e-bb88-1ea1d435091e,2025-11-12 19:00 UTC,Kabanchik,DeepDiveXtreme,,,,1,,Map is picked by viewers.,{{Stage|Qualifiers}},Light Hots Tournament
+4484441d-aeae-4e3f-b9d8-6f2d1d7ce38f,2025-11-09 18:00 UTC,безтрусoff,Uprising,,,,1,,Map is picked by viewers.,{{Stage|Qualifiers}},Light Hots Tournament
+cf3d8867-dd27-49ad-9be2-927d54fa51dc,2025-11-09 17:00 UTC,ГазМяс,QushBaranQush,,,,1,,Map is picked by viewers.,{{Stage|Qualifiers}},Light Hots Tournament
+13cece02-4def-4321-ab3b-2440f0c99906,2025-11-09 20:00 UTC,ЭлектроСталь,Клод Моне,,,,1,,Map is picked by viewers.,{{Stage|Qualifiers}},Light Hots Tournament
+3c3afbb4-6eda-4341-9575-1e133663b438,2025-11-08 19:00 UTC,Railagony,Оверагрессив,,,,1,,Map is picked by viewers.,{{Stage|Qualifiers}},Light Hots Tournament
+3701f6b4-c53d-479b-a878-b3c26061ffe2,2025-11-06 18:00 UTC,Смерть в нищите,FeedingMentality,,,,1,,Map is picked by viewers.,{{Stage|Qualifiers}},Light Hots Tournament
+0e3dea32-ba3f-477a-9006-13f75e63f8e2,2025-11-15 20:00 UTC,DDX,Railagony,,,,3,,,{{Stage|Main Event}},Light Hots Tournament
+9c645845-d269-430c-8260-39db8a5c7c4f,2025-11-18 18:00 UTC,Uprising,NoGameNoLife,,,,3,,,{{Stage|Main Event}},Light Hots Tournament
+3db45853-2624-4098-b893-6546c8751093,2025-11-29 18:30 UTC,Посейвовей,ЭлектроСталь,,,,3,,,{{Stage|Main Event}},Light Hots Tournament
+9bd2e5c1-8526-4edd-ae59-799a123a7c2e,2025-11-15 17:00 UTC,Смерть в нищите,QushBaranQush,,,,3,,,{{Stage|Main Event}},Light Hots Tournament
+48737b55-0ce0-41af-8b33-55ccae5038ce,2025-11-21 19:30 UTC,DDX,NoGameNoLife,,,,3,,,{{Stage|Main Event}},Light Hots Tournament
+4fb26fe5-7566-49c9-a07b-b35ccdb760e3,2025-11-30 19:00 UTC,Посейвовей,Смерть в нищите,,,,3,,,{{Stage|Main Event}},Light Hots Tournament
+c038aa5e-a566-4643-ae1b-40d3657e97dd,2025-12-01 18:30 UTC,NoGameNoLife,Смерть в нищите,,,,3,,Maps are predetermined by rules.,Grand Final,Light Hots Tournament
+42132f7a-b712-43e1-906e-4ca5c3cb5148,2025-12-06 17:30 UTC,Uprising,Смерть в нищите,,,,5,,All heroes and maps are picked randomly.,{{Stage|Showmatch}},Light Hots Tournament
+656186f5-e0f1-4913-a02d-d9d18c6a3704,2026-08-01 17:00 UTC,Deckard's Gym Buddies,ХОТС живи,,,,3,,,{{HiddenSort|Group A}},Light Hots Tournament/2026
+ba7cb603-eb12-45fa-92fa-cf3937394e98,2026-08-01 18:00 UTC,Smells like team spirit,ХОТС живи,,,,3,,,{{HiddenSort|Group A}},Light Hots Tournament/2026
+724a8139-61fa-479d-bce4-8c4dfa5103ea,2026-08-01 19:00 UTC,Deckard's Gym Buddies,Smells like team spirit,,,,3,,Map 3 is picked by viewers.,{{HiddenSort|Group A}},Light Hots Tournament/2026
+fccad445-a272-447f-a440-b858db9445c2,2026-08-02 12:00 UTC,52FPS,Мактрахерс,,,,3,,,{{HiddenSort|Group B}},Light Hots Tournament/2026
+70a6cba4-7d92-405f-aea6-2c8d9f2b4beb,2026-08-02 13:00 UTC,Мактрахерс,Uprising,,,,3,,,{{HiddenSort|Group B}},Light Hots Tournament/2026
+17d72b80-d33d-46ae-b946-eec1483fc005,2026-08-02 14:00 UTC,Мактрахерс,Сидиван,,,,3,,Team СидИван was disqualified after map 1.,{{HiddenSort|Group B}},Light Hots Tournament/2026
+3e22e81a-1a2c-4be7-990e-a0342f571ede,2026-08-02 15:00 UTC,52FPS,Сидиван,W,FF,,3,,Team СидИван was disqualified.,{{HiddenSort|Group B}},Light Hots Tournament/2026
+bc0b3b0a-466e-4948-bc54-485e060f9e72,2026-08-02 16:00 UTC,Uprising,Сидиван,W,FF,,3,,Team СидИван was disqualified.,{{HiddenSort|Group B}},Light Hots Tournament/2026
+a4c968fe-b2a5-4499-b7bc-90c3ffcf21ff,2026-08-02 17:00 UTC,52FPS,Uprising,,,,3,,,{{HiddenSort|Group B}},Light Hots Tournament/2026
+fc8c2a4b-4ed5-417d-b379-d1bf2b0c7653,2026-08-03 16:00 UTC,Белое Дерево Гондора,Cybletes,,,,3,,,{{HiddenSort|Group C}},Light Hots Tournament/2026
+e54d009d-f242-4826-a5bd-bf5b8422d162,2026-08-03 17:00 UTC,Пачка крипов,Cybletes,,,,3,,,{{HiddenSort|Group C}},Light Hots Tournament/2026
+872a0b1b-3208-437d-b400-0d37c002e922,2026-08-03 18:00 UTC,Белое Дерево Гондора,Пачка крипов,,,,3,,,{{HiddenSort|Group C}},Light Hots Tournament/2026
+37f3396a-f042-498f-ac60-08effaf2b644,2026-08-05 16:00 UTC,Lore Refreshment,Проклятие 5ой бронзы,,,,3,,"Lore Refreshment substitution: Ash in, claudistroy out",{{HiddenSort|Group D}},Light Hots Tournament/2026
+77591d17-e459-42ad-bc2f-5130281847a0,2026-08-05 17:00 UTC,Agents Squad,Lore Refreshment,,,,3,,Map 3 is picked by viewers.,{{HiddenSort|Group D}},Light Hots Tournament/2026
+9c7edc44-dc62-4fb0-b5e2-2d5324444714,"August 5, 2026",Проклятие 5ой бронзы,Agents Squad,,,,3,true,Match was cancelled.,{{HiddenSort|Group D}},Light Hots Tournament/2026
+14d55aba-1aad-47cb-8b7f-04d439405fa8,2026-08-09 18:00 UTC,Sirs,Exodia Stack,,,,3,,,{{Stage|Playoffs}},Light Hots Tournament/2026
+cd45f059-5ad6-4d2b-8c0c-6360dd3d5b0a,2026-08-09 16:00 UTC,Bathrobe Mafia,Белое Дерево Гондора,,,,3,,"Bathrobe Mafia substitution: Ultralisk in, Sniper out",{{Stage|Playoffs}},Light Hots Tournament/2026
+33ee1588-74df-40d8-99ed-9fe00080997e,2026-08-08 19:30 UTC,Lore Refreshment,HUMBR,,,,3,,"Lore Refreshment substitution: Itrax in, MasterDwarf out",{{Stage|Playoffs}},Light Hots Tournament/2026
+39ade76b-0b87-47bb-8cb2-52dd03885bfc,2026-08-15 18:00 UTC,Deckard's Gym Buddies,52FPS,,,,3,,Map 3 is picked by viewers.,{{Stage|Playoffs}},Light Hots Tournament/2026
+642ee209-5463-4e73-b885-04d62e2d5cd1,,Exodia Stack,Bathrobe Mafia,,,,3,,Map 3 is picked by viewers.-->,{{Stage|Playoffs}},Light Hots Tournament/2026
+c5545ee4-13c2-4006-b2a4-dd6191b69a0f,,HUMBR,52FPS,,,,3,,Map 3 is picked by viewers.-->,{{Stage|Playoffs}},Light Hots Tournament/2026

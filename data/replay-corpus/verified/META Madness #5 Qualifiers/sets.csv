@@ -1,0 +1,26 @@
+set_id,date,team_1,team_2,team_1_score,team_2_score,winner,best_of,finished,notes,set_position_in_tournament,source_page
+b5d1f789-c910-423e-afcd-82e03a989fb7,2021-09-15,FlippingMafia,RossPierrDoll,2,1,1,,true,,Grand Final,META Madness/5/Qualifiers
+f8576f33-148d-4f92-9f27-d411449d1ad8,2021-09-08,Corridor Comrades,ifr,0,1,2,,true,,Notable Participating Teams,META Madness/5/Qualifiers/1
+85c6c1a7-81e2-41c7-8cca-fe07fe5a52bc,2021-09-08,RossPierrDoll,bye,W,,1,,true,,Notable Participating Teams,META Madness/5/Qualifiers/1
+ad7a8460-3beb-4955-85f9-d760cad79b89,2021-09-08,Chilly Mountain,hivemind,1,0,1,,true,,Notable Participating Teams,META Madness/5/Qualifiers/1
+2b43d067-5e54-4dd6-9c14-c973e767c909,2021-09-08,rqg,FlippingMafia,0,1,2,,true,,Notable Participating Teams,META Madness/5/Qualifiers/1
+54db9455-81ae-44b9-b5f3-e9b921c296fc,2021-09-08,ifr,RossPierrDoll,2,1,1,,true,,Notable Participating Teams,META Madness/5/Qualifiers/1
+c6f77316-2b58-4812-8732-f8e231140f9a,2021-09-08,Chilly Mountain,FlippingMafia,0,2,2,,true,,Notable Participating Teams,META Madness/5/Qualifiers/1
+2c64b431-fbce-40d9-bbe8-28ab8a44a02d,2021-09-08,ifr,FlippingMafia,0,2,2,,true,,Grand Final,META Madness/5/Qualifiers/1
+6a0ad534-7f96-4334-a668-d8a52bd30ed7,2021-09-08,RossPierrDoll,Chilly Mountain,2,1,1,,true,,Grand Final,META Madness/5/Qualifiers/1
+20af8918-7b6d-46ee-b1f6-879d3877b3cc,2021-09-10,RossPierrDoll,rqg,0,2,2,,true,,Participating Teams,META Madness/5/Qualifiers/2
+7de974bd-05bf-4592-807c-90babefee965,2021-09-10,ifr,Chilly Mountain,1,2,2,,true,,Participating Teams,META Madness/5/Qualifiers/2
+c35f0270-8b28-477c-a45c-fe291da01361,2021-09-10,rqg,Chilly Mountain,2,0,1,,true,,Grand Final,META Madness/5/Qualifiers/2
+a476a5f2-6213-4365-a26e-ee95cc171d58,2021-09-10,RossPierrDoll,ifr,2,1,1,,true,,Grand Final,META Madness/5/Qualifiers/2
+c3457f74-87cf-4f8a-a101-bce9c5798567,2021-09-11,Chilly Mountain,hivemind,1,0,1,,true,,Notable Participating Teams,META Madness/5/Qualifiers/3
+79748708-3b90-4ec2-93d6-0774c1f0aa12,2021-09-11,rqg,FlippingMafia,1,0,1,,true,,Notable Participating Teams,META Madness/5/Qualifiers/3
+fc0d1428-aa3d-4aca-83aa-ec0633916005,2021-09-11,ifr,Chilly Mountain,0,2,2,,true,,Notable Participating Teams,META Madness/5/Qualifiers/3
+ca30b8af-d564-4d4c-a547-304e914b9d04,2021-09-11,RossPierrDoll,rqg,0,2,2,,true,,Notable Participating Teams,META Madness/5/Qualifiers/3
+57a6675f-7bd8-438c-86a3-b4500f3a2fbf,2021-09-11,Chilly Mountain,rqg,2,1,1,,true,,Grand Final,META Madness/5/Qualifiers/3
+f386b4b2-4a6a-4033-a0cb-43d6aafb63e6,2021-09-11,ifr,RossPierrDoll,2,1,1,,true,,Grand Final,META Madness/5/Qualifiers/3
+06d5e7f1-a893-4756-b12b-885bc86e8192,2021-09-14,RossPierrDoll,FlippingMafia,0,1,2,,true,,Participating Teams,META Madness/5/Qualifiers/4
+430515b3-8bfd-4d4a-96b5-c3139908d1c2,2021-09-14,rqg,Masters Clash Academy,0,1,2,,true,,Participating Teams,META Madness/5/Qualifiers/4
+a4b57e69-1413-4221-b8a7-128e411bf0f1,2021-09-14,Chilly Mountain,FlippingMafia,2,0,1,,true,,Participating Teams,META Madness/5/Qualifiers/4
+4fbe1930-bab7-47ce-84fd-3c525536f5ce,2021-09-14,ifr,Masters Clash Academy,0,2,2,,true,,Participating Teams,META Madness/5/Qualifiers/4
+cbebbbba-3b4a-4bc7-9930-21840abf6046,2021-09-14,Chilly Mountain,Masters Clash Academy,2,0,1,,true,,Grand Final,META Madness/5/Qualifiers/4
+a3c31f81-18c3-483c-a925-19a38d16b9b1,2021-09-14,FlippingMafia,ifr,2,0,1,,true,,Grand Final,META Madness/5/Qualifiers/4

@@ -1,0 +1,48 @@
+{
+  "files_sha256": {
+    "2024-08-10 14.00 3 Legged Cat vs The Dudes/Map 1 (Cursed Hollow).StormReplay": "eab45351d894e55e8079aeebc641a3f6edd942ba4c4b352d240b173a890049d7",
+    "2024-08-10 14.00 3 Legged Cat vs The Dudes/Map 2 (Tomb of the Spider Queen).StormReplay": "f4e8ba133d8b51a3d5caa41996a69cb6497c92a220e8691543641759ec879075",
+    "2024-08-10 15.00 Exodia Stack vs The Dudes/Map 1 (Alterac Pass).StormReplay": "11206ce5b5c908a4c78aebbe6b195209ddf2748ccbd50ac426d9ecb2814d97b0",
+    "2024-08-10 15.00 Exodia Stack vs The Dudes/Map 2 (Infernal Shrines).StormReplay": "bd182ac904a097f2932d338e828b8f8403deb56066004d26dc9ad88e7c69c6e2",
+    "2024-08-10 16.05 Krankle Krew vs ASH/Map 1 (Battlefield of Eternity).StormReplay": "d588560504be39ccd1514f7922188e3660b9c514163139aa3840b50405b47e1f",
+    "2024-08-10 16.05 Krankle Krew vs ASH/Map 2 (Garden of Terror).StormReplay": "df456aab5d3b4a5bbc6562aa5de57834b2c3a1199267c94b18c20adbb44eaa5d",
+    "2024-08-10 17.15 The Dudes vs Krankle Krew/Map 1 (Warhead Junction).StormReplay": "494d23e5bd9c45874b5eaf80a6b1ab70240eca9409c744475bb964e1345757fd",
+    "2024-08-10 17.15 The Dudes vs Krankle Krew/Map 2 (Battlefield of Eternity).StormReplay": "bf619042584c7db399b5433cf022186a63332ea12fff564b3ff1fe82ed09e196",
+    "2024-08-10 17.15 The Dudes vs Krankle Krew/Map 3 (Infernal Shrines).StormReplay": "d030e9bc7bb51bdb642a67b60432ba5a7f5fb5f2b2aed086cf5eb515824d5939",
+    "archive_status.json": "edb1ac0c4991b3a7e2a1671b5e6ee905d80da7361cad167ce444f3da5c78349a",
+    "liquipedia_maps.csv": "27d454b5df7bdc7bf312e153bb83e745cfea8a8b69ba85726e61ef2f2d38c949",
+    "liquipedia_sets.csv": "16f4a45f57ceb29d28eee970bf008626a32bca48aa62870bc5af54b33c3b3fc1",
+    "liquipedia_teams.csv": "d9b2a93895eee0c08ebe86f75578011a2ca5be1fc5c921d41f898f0e33d82b5f",
+    "liquipedia_url.txt": "4c736c76f354a064f005038c39ca90b11ba4ae8954a56fcb0b1e9a0b6d05566e",
+    "maps.csv": "27d454b5df7bdc7bf312e153bb83e745cfea8a8b69ba85726e61ef2f2d38c949",
+    "player_battletags.csv": "c79f191221a50fa6df6aaced701fc38e6332e42f543b4f270318d487e956b15e",
+    "replay_manifest.csv": "76c68a332c93ac131d3f29c3557c68f86356ac42c2820d3cb5ecec873fca2975",
+    "sets.csv": "16f4a45f57ceb29d28eee970bf008626a32bca48aa62870bc5af54b33c3b3fc1",
+    "teams.csv": "d9b2a93895eee0c08ebe86f75578011a2ca5be1fc5c921d41f898f0e33d82b5f"
+  },
+  "gates": {
+    "complete_replay_coverage": true,
+    "manifest_integrity": true,
+    "no_blocking_reviews": true,
+    "no_stale_overrides": true,
+    "only_approved_inferred_aliases_exported": true
+  },
+  "player_alias_rows": 23,
+  "replay_count": 9,
+  "status": {
+    "blockers": "",
+    "blocking_reviews": 0,
+    "expected_replays": 9,
+    "integrity_errors": 0,
+    "matched_replays": 9,
+    "missing_replays": 0,
+    "pending_alias_reviews": 0,
+    "stale_overrides": 0,
+    "status": "verified",
+    "total_map_rows": 9,
+    "tournament": "Murky Cup Qualifier #2",
+    "unresolved_maps": 0,
+    "verified": "yes"
+  },
+  "tournament": "Murky Cup Qualifier #2"
+}

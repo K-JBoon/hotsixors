@@ -1,0 +1,15 @@
+{
+  "archive_blockers": [],
+  "counts": {
+    "matched": 45,
+    "owned_elsewhere": 162
+  },
+  "expected_replays": 45,
+  "maps_owned_elsewhere": 162,
+  "matched_replays": 45,
+  "no_replay_expected": 0,
+  "status": "fully_archived",
+  "total_map_rows": 207,
+  "tournament": "Heroes International 2022",
+  "unresolved_maps": 0
+}

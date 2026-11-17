@@ -1,0 +1,14 @@
+{
+  "archive_blockers": [],
+  "counts": {
+    "matched": 21
+  },
+  "expected_replays": 21,
+  "maps_owned_elsewhere": 0,
+  "matched_replays": 21,
+  "no_replay_expected": 0,
+  "status": "fully_archived",
+  "total_map_rows": 21,
+  "tournament": "Heroes Lounge Division S Season 2 Europe Crucible",
+  "unresolved_maps": 0
+}

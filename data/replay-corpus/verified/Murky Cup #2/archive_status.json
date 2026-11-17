@@ -1,0 +1,14 @@
+{
+  "archive_blockers": [],
+  "counts": {
+    "matched": 102
+  },
+  "expected_replays": 102,
+  "maps_owned_elsewhere": 0,
+  "matched_replays": 102,
+  "no_replay_expected": 0,
+  "status": "fully_archived",
+  "total_map_rows": 102,
+  "tournament": "Murky Cup #2",
+  "unresolved_maps": 0
+}

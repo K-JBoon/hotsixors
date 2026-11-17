@@ -1,0 +1,15 @@
+{
+  "archive_blockers": [],
+  "counts": {
+    "matched": 26,
+    "owned_elsewhere": 161
+  },
+  "expected_replays": 26,
+  "maps_owned_elsewhere": 161,
+  "matched_replays": 26,
+  "no_replay_expected": 0,
+  "status": "fully_archived",
+  "total_map_rows": 187,
+  "tournament": "Method Mayhem EU June 2020",
+  "unresolved_maps": 0
+}

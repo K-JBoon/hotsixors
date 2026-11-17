@@ -1,0 +1,47 @@
+{
+  "files_sha256": {
+    "2025-06-22 12.00 Без вариантов vs Замьюченные души/Map 1 (Dragon Shire).StormReplay": "7cafac3e666adf3f296edb797e005c39ae28d8ddb077a3d378ec97ab445b092e",
+    "2025-06-27 17.00 ОПСЦ vs Бёдра Алекстразы/Map 1 (Tomb of the Spider Queen).StormReplay": "ae7f0d1585fa2e6200e1bf1ba00bc27d3fdb685c93eaf4840f13b8ca10e0404e",
+    "2025-06-29 15.30 Без вариантов vs ОПСЦ/Map 1 (Blackheart's Bay).StormReplay": "21345aa2fe8c5a8f1065323257d6e9c3d0453f029da63a5232da850041505933",
+    "2025-06-29 15.30 Без вариантов vs ОПСЦ/Map 2 (Battlefield of Eternity).StormReplay": "89cc1d11549f5acc4773881c2d071e2bfadfa4514d1635cd918ce2a9e0259278",
+    "2025-06-29 15.30 Без вариантов vs ОПСЦ/Map 3 (Blackheart's Bay).StormReplay": "4899f140e7adad2932e89cbbf8037ec552fcc06d6b77b5a8d93602c4d618f9c2",
+    "2025-07-06 Замьюченные души vs Бёдра Алекстразы/Map 1 (Battlefield of Eternity).StormReplay": "994c4539452f8a60f87aa2e0d8bef66b2034d659bfd802721022f92f08e908b8",
+    "2025-07-06 Замьюченные души vs Бёдра Алекстразы/Map 2 (Towers of Doom).StormReplay": "c3b135c8e950b27d0c9c508764d157a90f39a45c7c4602880a9cffbcad36d53b",
+    "2025-07-06 Замьюченные души vs Бёдра Алекстразы/Map 3 (Garden of Terror).StormReplay": "cfc166c87ec683509e6e59b65acede35c34b0cbd6c72f3c5f77cac95c67bcb90",
+    "archive_status.json": "6c2f7f5d4f0b7a8f1077b3ad6c317ef8025c9494cedaea5997ab8603375af322",
+    "liquipedia_maps.csv": "4be204da7c47e354db486610b01adde4a592b90863e1abf39bbf6c3eb5a96d20",
+    "liquipedia_sets.csv": "2f168d3af0e57885cf5e4c5d5895867a9d35a4a3cfca056c948283da5df92e82",
+    "liquipedia_teams.csv": "3375e92fe0267f848be93ab02039304cf97bdcf9e09a840de0485647fb17f2ca",
+    "liquipedia_url.txt": "e391b7937489d4bd876adfc755bad6eb91b67ccae08e3333065eddbe5ac47771",
+    "maps.csv": "ced73906f840031441293c2a7cf6e4293847efc51715bad461a0b2fbcf65a50a",
+    "player_battletags.csv": "e2e5fe4ef5cb876a89a28bb2536313e7483937f80cc25f1e20e99278aeaafc5e",
+    "replay_manifest.csv": "d3ce97ddcbd0e558b3376115fc4e1cc0d5cfc15e01a4be2cc93a88b617b16270",
+    "sets.csv": "2f168d3af0e57885cf5e4c5d5895867a9d35a4a3cfca056c948283da5df92e82",
+    "teams.csv": "3375e92fe0267f848be93ab02039304cf97bdcf9e09a840de0485647fb17f2ca"
+  },
+  "gates": {
+    "complete_replay_coverage": true,
+    "manifest_integrity": true,
+    "no_blocking_reviews": true,
+    "no_stale_overrides": true,
+    "only_approved_inferred_aliases_exported": true
+  },
+  "player_alias_rows": 20,
+  "replay_count": 8,
+  "status": {
+    "blockers": "",
+    "blocking_reviews": 0,
+    "expected_replays": 8,
+    "integrity_errors": 0,
+    "matched_replays": 8,
+    "missing_replays": 0,
+    "pending_alias_reviews": 1,
+    "stale_overrides": 0,
+    "status": "verified",
+    "total_map_rows": 8,
+    "tournament": "Nexus Club Random Cup",
+    "unresolved_maps": 0,
+    "verified": "yes"
+  },
+  "tournament": "Nexus Club Random Cup"
+}

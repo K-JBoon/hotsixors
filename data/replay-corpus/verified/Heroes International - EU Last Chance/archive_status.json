@@ -1,0 +1,14 @@
+{
+  "archive_blockers": [],
+  "counts": {
+    "matched": 19
+  },
+  "expected_replays": 19,
+  "maps_owned_elsewhere": 0,
+  "matched_replays": 19,
+  "no_replay_expected": 0,
+  "status": "fully_archived",
+  "total_map_rows": 19,
+  "tournament": "Heroes International - EU Last Chance",
+  "unresolved_maps": 0
+}

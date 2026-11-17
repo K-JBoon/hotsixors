@@ -1,0 +1,51 @@
+{
+  "files_sha256": {
+    "2024-08-17 14.00 Exodia Stack vs SL Enjoyers/Map 1 (Towers of Doom).StormReplay": "119542315a4ee2f9422548ce2ad53c8488e035aa153f59f96d32adb5376b8b5a",
+    "2024-08-17 14.00 Exodia Stack vs SL Enjoyers/Map 2 (Garden of Terror).StormReplay": "dcdb234d842fe16f1daefa0007029cbc3ecd0ede3fad3d763f2e2ad5a1e4d7d3",
+    "2024-08-17 14.00 Exodia Stack vs SL Enjoyers/Map 3 (Infernal Shrines).StormReplay": "ed4d9fd76fc62afa52805c9055456e7339f3c182d4b3a01462b6290765aa66ac",
+    "2024-08-17 14.00 Krankle Krew vs 3 Legged Cat/Map 1 (Infernal Shrines).StormReplay": "8a0babbd0fdc7bd37de64273606b299e869716d4d354f2a2aa8166fb57fca44d",
+    "2024-08-17 14.00 Krankle Krew vs 3 Legged Cat/Map 2 (Battlefield of Eternity).StormReplay": "791195ac561c11471ce41218f5bfe6446268fb27c2449c13dce33793a83f99d5",
+    "2024-08-17 15.40 ASH vs Krankle Krew/Map 1 (Tomb of the Spider Queen).StormReplay": "7cb7bbdaa2c7270472f62311d1796129a0ffb724bedecbbe6efc28e3709acedf",
+    "2024-08-17 15.40 ASH vs Krankle Krew/Map 2 (Garden of Terror).StormReplay": "9dd81d265216b38afec5f9a964dffee34b6c5d092059086819f3ad730897b5a5",
+    "2024-08-17 16.50 The Dudes vs SL Enjoyers/Map 1 (Infernal Shrines).StormReplay": "1ce865fd3a7d784b384890b948071cfdb0badf23f8ff217eb024abd272e7200a",
+    "2024-08-17 16.50 The Dudes vs SL Enjoyers/Map 2 (Towers of Doom).StormReplay": "32b9428082c04eb2ef83adc86dd25e3c3963e4578e615671cbf9e7d21d4f075e",
+    "2024-08-17 18.00 The Dudes vs Krankle Krew/Map 1 (Braxis Holdout).StormReplay": "071a634344453e6c4f5e472f17b0dc4662e676e179cd913d5a1fe3268cc42636",
+    "2024-08-17 18.00 The Dudes vs Krankle Krew/Map 2 (Tomb of the Spider Queen).StormReplay": "6209244572ce5a64cc0e8a14a7fbec39810a86d803e54ca3087abac891d92987",
+    "2024-08-17 18.00 The Dudes vs Krankle Krew/Map 3 (Battlefield of Eternity).StormReplay": "06be2a2ff6709f937ac4e99b07110660ba4f4568a43243f9ecfdd0dc8defecee",
+    "archive_status.json": "6d616f3d3a24e38cc11c6668624b98002b01d82b52d1fe94226c0ee4373c25ca",
+    "liquipedia_maps.csv": "0987b9cef02e8dd4898e9a5e89fe1917eab9b70d9749aa88bf10597baa50bc40",
+    "liquipedia_sets.csv": "fec44f024f9d9db32d101b2f5dd8c7f978fd7bdea129f568ae81e77cea7e4deb",
+    "liquipedia_teams.csv": "730120fb0751ed98e77f7200b937bd8152c99d61d1e760e27a6d191e237ce0b2",
+    "liquipedia_url.txt": "a975bd53c871644e408fa29740ce26128af0721313eecfc2bff3abec48eeaace",
+    "maps.csv": "0987b9cef02e8dd4898e9a5e89fe1917eab9b70d9749aa88bf10597baa50bc40",
+    "player_battletags.csv": "8681fadb6e8b028347e067919b4e525404526975a967d8bd75c2886789a7cd1f",
+    "replay_manifest.csv": "7fd808964d5c16a6333f9ec22b5ed09deaf480f7be05ab5c98c90ae42b6c6b53",
+    "sets.csv": "fec44f024f9d9db32d101b2f5dd8c7f978fd7bdea129f568ae81e77cea7e4deb",
+    "teams.csv": "730120fb0751ed98e77f7200b937bd8152c99d61d1e760e27a6d191e237ce0b2"
+  },
+  "gates": {
+    "complete_replay_coverage": true,
+    "manifest_integrity": true,
+    "no_blocking_reviews": true,
+    "no_stale_overrides": true,
+    "only_approved_inferred_aliases_exported": true
+  },
+  "player_alias_rows": 28,
+  "replay_count": 12,
+  "status": {
+    "blockers": "",
+    "blocking_reviews": 0,
+    "expected_replays": 12,
+    "integrity_errors": 0,
+    "matched_replays": 12,
+    "missing_replays": 0,
+    "pending_alias_reviews": 0,
+    "stale_overrides": 0,
+    "status": "verified",
+    "total_map_rows": 12,
+    "tournament": "Murky Cup Qualifier #4",
+    "unresolved_maps": 0,
+    "verified": "yes"
+  },
+  "tournament": "Murky Cup Qualifier #4"
+}

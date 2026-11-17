@@ -1,0 +1,141 @@
+set_id,date,team_1,team_2,team_1_score,team_2_score,winner,best_of,finished,notes,set_position_in_tournament,source_page
+ca8fba38-89f2-42b5-b820-cb4425d7b6fc,2021-11-26 14:00 UTC,WAH,tnc,2,0,1,,true,,Upper Bracket Quarterfinals,X-Cup Fall/Playoffs
+057b0925-eaf2-41a0-a58c-2f09f8418e04,2021-11-26 15:30 UTC,Charming Tomcats,ifr,2,1,1,,true,,{{HiddenSort|Bracket}},X-Cup Fall/Playoffs
+a18a5510-8360-40d5-82bf-689bbb6d4390,2021-11-26 17:00 UTC,The Hardos,The Donuts,1,2,2,,true,,{{HiddenSort|Bracket}},X-Cup Fall/Playoffs
+fb28cf12-d3ae-46d8-afc4-f13a38b4a8fa,2021-11-26 18:30 UTC,GUNNARS ON,ORDAH,2,0,1,,true,,{{HiddenSort|Bracket}},X-Cup Fall/Playoffs
+7b40ab3f-9bee-4851-bb04-684771eef157,2021-11-27 14:00 UTC,WAH,Charming Tomcats,3,0,1,,true,,Upper Bracket Semifinals,X-Cup Fall/Playoffs
+69c82734-32dc-415b-97f7-783a3e12c7a3,2021-11-27 16:00 UTC,The Donuts,GUNNARS ON,3,0,1,,true,,{{HiddenSort|Bracket}},X-Cup Fall/Playoffs
+7f02285b-fada-432f-a482-3d54a0980863,2021-11-28 14:00 UTC,WAH,The Donuts,3,0,1,,true,,Upper Bracket Final,X-Cup Fall/Playoffs
+8aacb063-41cc-4c83-b5a2-f7246264d878,2021-11-27 14:00 UTC,tnc,ifr,2,3,2,,true,,Lower Bracket Round 1,X-Cup Fall/Playoffs
+8c86f43c-7b2f-4650-b13e-7dbe4d2d560f,2021-11-27 14:00 UTC,The Hardos,ORDAH,3,0,1,,true,,Lower Bracket Round 1,X-Cup Fall/Playoffs
+6db5b23f-52e0-463c-9c55-80760f90fcbb,2021-11-27 20:00 UTC,GUNNARS ON,ifr,3,0,1,,true,,Lower Bracket Quarterfinals,X-Cup Fall/Playoffs
+389944a7-e37e-4c27-82fd-b96d93448fd9,2021-11-27 18:00 UTC,Charming Tomcats,The Hardos,0,3,2,,true,,{{HiddenSort|Bracket}},X-Cup Fall/Playoffs
+b75df0e6-60c3-44ba-bc4e-e3cf21b5a7ea,2021-11-28 16:00 UTC,GUNNARS ON,The Hardos,1,3,2,,true,,Lower Bracket Semifinal,X-Cup Fall/Playoffs
+66f81412-611d-4759-a247-994b2c7c349c,2021-11-28 18:00 UTC,The Donuts,The Hardos,3,1,1,,true,,Lower Bracket Final,X-Cup Fall/Playoffs
+f7fd0ccd-3ad7-4a1f-a360-32dc208dd852,2021-11-28 20:00 UTC,WAH,The Donuts,4,0,1,,true,Winner bracket advantage of 1 game,Grand Final,X-Cup Fall/Playoffs
+c0cc1ac5-532b-4d7c-88f0-cbbe2aeedf6e,2021-10-10,Wurst And Homies,bye,W,,1,,true,,Round 1,X-Cup Fall/Qualifiers/1
+7024cd48-bb44-417a-abe1-749f8b72d6de,2021-10-10,Salato come il mare,bye,W,,1,,true,,Round 1,X-Cup Fall/Qualifiers/1
+6c775eb3-1201-4898-a36f-46811652ae22,2021-10-10,Jag e bakis,bye,W,,1,,true,,Round 1,X-Cup Fall/Qualifiers/1
+4ed261c2-a995-4157-a4e0-d40ff240419c,2021-10-10,Kalla Berget,bye,W,,1,,true,,Round 1,X-Cup Fall/Qualifiers/1
+2b2fd6f2-4955-433d-b18d-a9d6a40ff5f4,2021-10-10,The Hardos,hype,1,0,1,,true,,Round 1,X-Cup Fall/Qualifiers/1
+c35bfeca-7410-4a19-ae2e-e9fdb7137d22,2021-10-10,ifr,Charming Tomcats,1,0,1,,true,,Participating Teams,X-Cup Fall/Qualifiers/1
+d7c2841b-69ef-4930-83b4-8cb8b33f2d3e,2021-10-10,ORDAH,The Donuts,0,1,2,,true,,Participating Teams,X-Cup Fall/Qualifiers/1
+6755e820-a50c-489d-bb6d-aa82f941e085,2021-10-10,monkaSTEER,Masters Clash Academy,1,0,1,,true,,Participating Teams,X-Cup Fall/Qualifiers/1
+fd4fda95-b0a9-423d-884f-fad5e56ef03d,2021-10-10,Wurst And Homies,Salato come il mare,1,0,1,,true,,Participating Teams,X-Cup Fall/Qualifiers/1
+fee7851b-0a0a-4d32-b7db-1e5c6dea1ebd,2021-10-10,Jag e bakis,Kalla Berget,0,1,2,,true,,Participating Teams,X-Cup Fall/Qualifiers/1
+f845d48a-ebc7-486b-8936-f5602eaacde4,2021-10-10,The Hardos,ifr,1,0,1,,true,,Participating Teams,X-Cup Fall/Qualifiers/1
+d1adc404-f4b3-4e55-abe0-09f76aba8b72,2021-10-10,The Donuts,monkaSTEER,1,0,1,,true,,Participating Teams,X-Cup Fall/Qualifiers/1
+33da18c3-4bbf-4703-b805-e0eb4801c07f,2021-10-10,Wurst And Homies,Kalla Berget,2,1,1,,true,,Participating Teams,X-Cup Fall/Qualifiers/1
+f402b3aa-7fe1-4830-895d-d2bb31eadb6e,2021-10-10,The Hardos,The Donuts,2,1,1,,true,,Participating Teams,X-Cup Fall/Qualifiers/1
+0a5a900a-2018-451d-84e2-a93cfedf62a5,2021-10-10,Wurst And Homies,The Hardos,2,1,1,,true,,Grand Final,X-Cup Fall/Qualifiers/1
+525f4bb4-b849-4f06-829a-aef8746e2156,2021-10-10,Kalla Berget,The Donuts,FF,W,2,,true,,Grand Final,X-Cup Fall/Qualifiers/1
+ac2205ed-cfd8-426d-831d-9233e909ea69,2021-11-10,ifr,Charming Tomcats,2,1,1,,true,,Participating Teams,X-Cup Fall/Qualifiers/10
+39c14700-77db-4906-ac6d-07bea8a314f4,2021-11-10,Wurst And Homies,ifr,2,0,1,,true,,Grand Final,X-Cup Fall/Qualifiers/10
+455009f2-38a4-4bc9-91d7-9b6aec0aa3a3,2021-10-13,Wurst And Homies,bye,W,,1,,true,,Round 1,X-Cup Fall/Qualifiers/2
+7a23efba-53e0-448f-ab06-650e8306a793,2021-10-13,5subs,bye,W,,1,,true,,Round 1,X-Cup Fall/Qualifiers/2
+4d7f8b42-4dbc-4b46-ba13-abdc8068f4ed,2021-10-13,ifr,bye,W,,1,,true,,Round 1,X-Cup Fall/Qualifiers/2
+ec553e2b-9d81-4737-99bd-086de8131485,2021-10-13,Team Name Change,bye,W,,1,,true,,Round 1,X-Cup Fall/Qualifiers/2
+06cea7d4-00f2-4f93-90fd-0ea7a8b30bc1,2021-10-13,GUNNARS ON,bye,W,,1,,true,,Round 1,X-Cup Fall/Qualifiers/2
+b80c771e-ee66-46e5-a359-c752f7205277,2021-10-13,Masters Clash Academy,ORDAH,0,1,2,,true,,Participating Teams,X-Cup Fall/Qualifiers/2
+dc4207ae-3474-43de-a89b-d7d180c0d173,2021-10-13,Salato come il mare,Charming Tomcats,0,1,2,,true,,Participating Teams,X-Cup Fall/Qualifiers/2
+b94cdc57-1f91-4f81-88ba-67736d01f5cb,2021-10-13,Corridor Comrades,Woodleague Clownfiesta,1,0,1,,true,,Participating Teams,X-Cup Fall/Qualifiers/2
+52b19c81-3645-4bdb-bb9c-55283bb4c81c,2021-10-13,Wurst And Homies,5subs,1,0,1,,true,,Participating Teams,X-Cup Fall/Qualifiers/2
+90a09ffc-12d7-451d-81fa-87076e5fddb8,2021-10-13,ifr,Team Name Change,0,1,2,,true,,Participating Teams,X-Cup Fall/Qualifiers/2
+5b54f1a3-6263-4d95-b297-d6c047bc2a44,2021-10-13,GUNNARS ON,ORDAH,1,0,1,,true,,Participating Teams,X-Cup Fall/Qualifiers/2
+e85b4f6e-b689-4858-ba85-0cf9cae02029,2021-10-13,Charming Tomcats,Corridor Comrades,0,1,2,,true,,Participating Teams,X-Cup Fall/Qualifiers/2
+22339b8e-2882-40b2-8363-0174e024af4a,2021-10-13,Wurst And Homies,Team Name Change,0,2,2,,true,,Participating Teams,X-Cup Fall/Qualifiers/2
+e3ecede9-649b-48ab-aada-3392094d3b74,2021-10-13,GUNNARS ON,Charming Tomcats,2,0,1,,true,,Participating Teams,X-Cup Fall/Qualifiers/2
+3db39773-6e4c-4b59-b5fe-edef8e028fef,2021-10-13,Team Name Change,GUNNARS ON,0,2,2,,true,,Grand Final,X-Cup Fall/Qualifiers/2
+b465235b-30c0-40af-a3cc-229ea78509fe,2021-10-13,Charming Tomcats,Wurst And Homies,W,FF,1,,true,,Grand Final,X-Cup Fall/Qualifiers/2
+cc9097e2-4e40-4512-b800-a7785c9e7271,2021-10-17,Wurst And Homies,bye,W,,1,,true,,Round 1,X-Cup Fall/Qualifiers/3
+2f957545-98d1-4054-b35f-ba5f69fb17e7,2021-10-17,5subs,bye,W,,1,,true,,Round 1,X-Cup Fall/Qualifiers/3
+c3df5d90-d5d1-4536-ab99-dd4fdbecdfb4,2021-10-17,Team Name Change,bye,W,,1,,true,,Round 1,X-Cup Fall/Qualifiers/3
+d1391da4-e547-4dab-9c1c-3d63afd2dc13,2021-10-17,Charming Tomcats,bye,W,,1,,true,,Round 1,X-Cup Fall/Qualifiers/3
+e42f8957-21df-4678-ac0d-f267357e6137,2021-10-17,GUNNARS ON,bye,W,,1,,true,,Round 1,X-Cup Fall/Qualifiers/3
+210f4ca0-3e72-4336-a06f-7616f4549eb9,2021-10-17,Salato come il mare,ORDAH,0,1,2,,true,,Participating Teams,X-Cup Fall/Qualifiers/3
+c1304579-6982-4dd8-a5b5-4066003e150f,2021-10-17,The Hardos,Masters Clash Academy,1,0,1,,true,,Participating Teams,X-Cup Fall/Qualifiers/3
+ca326e6a-a901-4d25-8c49-47df9a47e803,2021-10-17,ifr,Corridor Comrades,1,0,1,,true,,Participating Teams,X-Cup Fall/Qualifiers/3
+b15f2b7a-6776-4e40-b16e-84fa62fe7fc3,2021-10-17,Wurst And Homies,5subs,1,0,1,,true,,Participating Teams,X-Cup Fall/Qualifiers/3
+17ac1a7b-0039-4e51-98de-4236f2e9b2a5,2021-10-17,Team Name Change,Charming Tomcats,1,0,1,,true,,Participating Teams,X-Cup Fall/Qualifiers/3
+f7a41792-3e85-4bdc-bbe0-a02679a20340,2021-10-17,GUNNARS ON,ORDAH,1,0,1,,true,,Participating Teams,X-Cup Fall/Qualifiers/3
+68ad5698-fad8-4d51-b568-c0c9c06a1059,2021-10-17,The Hardos,ifr,1,0,1,,true,,Participating Teams,X-Cup Fall/Qualifiers/3
+d5a49ebb-de1f-44e8-915b-e610e85157e2,2021-10-17,Wurst And Homies,Team Name Change,2,0,1,,true,,Participating Teams,X-Cup Fall/Qualifiers/3
+5dbdef92-7e8a-4d61-809b-302e22176c3f,2021-10-17,GUNNARS ON,The Hardos,1,2,2,,true,,Participating Teams,X-Cup Fall/Qualifiers/3
+5c896d10-8ec0-4a0e-a3c5-d15cd3a4709f,2021-10-17,Wurst And Homies,The Hardos,2,0,1,,true,,Grand Final,X-Cup Fall/Qualifiers/3
+a5f02e64-edfe-42c5-ba4e-8154222068fd,2021-10-17,Team Name Change,GUNNARS ON,0,2,2,,true,,Grand Final,X-Cup Fall/Qualifiers/3
+b64f1ac4-a415-4c23-87a3-167cceb6e990,2021-10-20,Wurst And Homies,bye,W,,1,,true,,Round 1,X-Cup Fall/Qualifiers/4
+68a3f1c9-3b2c-47c9-b2e4-a56e2efd6260,2021-10-20,Salato come il mare,Corridor Comrades,0,1,2,,true,,Round 1,X-Cup Fall/Qualifiers/4
+fc55c13c-4c30-4d79-8afc-6b02dd39c21b,2021-10-20,Charming Tomcats,Masters Clash Academy,1,0,1,,true,,Round 1,X-Cup Fall/Qualifiers/4
+0ac6fdca-b15c-4582-8859-a9958dc7ceaa,2021-10-20,inting for ruby,bye,W,,1,,true,,Round 1,X-Cup Fall/Qualifiers/4
+20bb4bac-0f33-4b00-be58-04929ada80fd,2021-10-20,The Hardos,bye,W,,1,,true,,Participating Teams,X-Cup Fall/Qualifiers/4
+a6c20890-0d58-4075-bb0c-5590365f5915,2021-10-20,ORDAH,bye,W,,1,,true,,Participating Teams,X-Cup Fall/Qualifiers/4
+6feb5554-b49d-4fa9-83c5-86289f4ade86,2021-10-20,Team Name Change,bye,W,,1,,true,,Participating Teams,X-Cup Fall/Qualifiers/4
+88c9b30f-53e3-4a28-9a78-e93fea94617f,2021-10-20,5subs,bye,W,,1,,true,,Participating Teams,X-Cup Fall/Qualifiers/4
+f92b68d1-91bd-4fda-bbf0-0d45f6d3a3e3,2021-10-20,Wurst And Homies,Corridor Comrades,1,0,1,,true,,Participating Teams,X-Cup Fall/Qualifiers/4
+47d61c67-a415-422b-9139-c2e5bdd68968,2021-10-20,Charming Tomcats,inting for ruby,0,1,2,,true,,Participating Teams,X-Cup Fall/Qualifiers/4
+e224c884-efb1-484a-a9d4-2bc8b50471ed,2021-10-20,The Hardos,ORDAH,1,0,1,,true,,Participating Teams,X-Cup Fall/Qualifiers/4
+07a5f187-bf4a-41f3-8aab-60eccd9f460a,2021-10-20,Team Name Change,5subs,1,0,1,,true,,Participating Teams,X-Cup Fall/Qualifiers/4
+a4549209-dd8f-4ae6-b104-600e48aa9c14,2021-10-20,Wurst And Homies,inting for ruby,2,1,1,,true,,Participating Teams,X-Cup Fall/Qualifiers/4
+31995a3a-4cd8-4c2c-a35b-8092333ae3ca,2021-10-20,The Hardos,Team Name Change,2,0,1,,true,,Participating Teams,X-Cup Fall/Qualifiers/4
+e87b68e7-5524-4f73-b011-3fc9b6b626ec,2021-10-20,Wurst And Homies,The Hardos,0,2,2,,true,,Grand Final,X-Cup Fall/Qualifiers/4
+b4289b30-5b18-4ee4-97ce-8fb9f99af633,2021-10-20,5subs,inting for ruby,1,2,2,,true,,Grand Final,X-Cup Fall/Qualifiers/4
+29a489bf-6bb3-4ae7-9916-70a9e699190d,2021-10-24,Wurst And Homies,bye,W,,1,,true,,Round 1,X-Cup Fall/Qualifiers/5
+20e76a67-33e0-4a01-894c-be84b84b6b0b,2021-10-24,Salato come il mare,bye,W,,1,,true,,Round 1,X-Cup Fall/Qualifiers/5
+39023513-d693-43f9-9fd0-ea8beebf8221,2021-10-24,Charming Tomcats,bye,W,,1,,true,,Round 1,X-Cup Fall/Qualifiers/5
+52785c74-eb0c-4e80-bb1e-f8bcb1966be7,2021-10-24,5subs,bye,W,,1,,true,,Round 1,X-Cup Fall/Qualifiers/5
+df8df3b9-ecd8-4839-9d1a-dff0aba39341,2021-10-24,The Hardos,Masters Clash Academy,0,1,2,,true,,Round 1,X-Cup Fall/Qualifiers/5
+45c0eaf8-8def-4b6a-9cb3-36c50506335e,2021-10-24,Corridor Comrades,The Donuts,0,1,2,,true,,Participating Teams,X-Cup Fall/Qualifiers/5
+11315bbc-fa54-409a-887b-79968835343e,2021-10-24,ifr,bye,W,,1,,true,,Participating Teams,X-Cup Fall/Qualifiers/5
+547d00d6-bdaf-4095-bd1e-72f25e2bd373,2021-10-24,ORDAH,bye,W,,1,,true,,Participating Teams,X-Cup Fall/Qualifiers/5
+46c246bc-0f6d-4b4f-af42-d1721ebe5901,2021-10-24,Wurst And Homies,Salato come il mare,1,0,1,,true,,Participating Teams,X-Cup Fall/Qualifiers/5
+a5e17989-6906-499f-8e32-d11e33599900,2021-10-24,Charming Tomcats,5subs,1,0,1,,true,,Participating Teams,X-Cup Fall/Qualifiers/5
+ecc98ad3-11a8-4df9-8657-eb3b5b47ba33,2021-10-24,Masters Clash Academy,The Donuts,0,1,2,,true,,Participating Teams,X-Cup Fall/Qualifiers/5
+6e92b22b-412a-47bc-a54d-7f9dc902b104,2021-10-24,ifr,ORDAH,0,1,2,,true,,Participating Teams,X-Cup Fall/Qualifiers/5
+5d2af3d6-023e-4967-8bc3-c27b2ebc6f40,2021-10-24,Wurst And Homies,Charming Tomcats,2,0,1,,true,,Participating Teams,X-Cup Fall/Qualifiers/5
+1f48a167-939c-4840-9aee-c3ae79bfcd87,2021-10-24,The Donuts,ORDAH,2,0,1,,true,,Participating Teams,X-Cup Fall/Qualifiers/5
+d1472106-253e-48f3-95d4-be2b2f1ed838,2021-10-24,Wurst And Homies,The Donuts,1,2,2,,true,,Grand Final,X-Cup Fall/Qualifiers/5
+23fddb61-1467-4b01-9ef5-e6cb316d53f6,2021-10-24,Charming Tomcats,ORDAH,0,2,2,,true,,Grand Final,X-Cup Fall/Qualifiers/5
+44e8f7c6-0c53-4c82-b3df-f122ff9536de,2021-10-27,Corridor Comrades,bye,W,,1,,true,,Round 1,X-Cup Fall/Qualifiers/6
+2ba1c83b-877d-4566-bef8-f7c47674b750,2021-10-27,The Donuts,bye,W,,1,,true,,Round 1,X-Cup Fall/Qualifiers/6
+4ee3ab94-7e77-440c-84e4-311adcfb57a1,2021-10-27,5subs,Masters Clash Academy,0,1,2,,true,,Round 1,X-Cup Fall/Qualifiers/6
+fe52cbda-4ba9-49fe-b3fd-6a0c53ce63a4,2021-10-27,ORDAH,Salato come il mare,0,1,2,,true,,Round 1,X-Cup Fall/Qualifiers/6
+46aae925-c251-4218-9009-389167ba9a70,2021-10-27,Wurst And Homies,Corridor Comrades,1,0,1,,true,,Participating Teams,X-Cup Fall/Qualifiers/6
+f6d15a66-1c2e-4e90-9aa0-407bea760080,2021-10-27,ifr,The Donuts,0,1,2,,true,,Participating Teams,X-Cup Fall/Qualifiers/6
+7cc9d666-5831-4479-a803-119286dbe4c8,2021-10-27,GUNNARS ON,Masters Clash Academy,1,0,1,,true,,Participating Teams,X-Cup Fall/Qualifiers/6
+eb55fdec-c01b-4339-9938-aef9e6957985,2021-10-27,Team Name Change,Salato come il mare,1,0,1,,true,,Participating Teams,X-Cup Fall/Qualifiers/6
+98363625-d3c6-43ce-9614-d140d3e0ecbd,2021-10-27,Wurst And Homies,The Donuts,2,1,1,,true,,Participating Teams,X-Cup Fall/Qualifiers/6
+e5cdca57-0cfe-4dd4-8095-fb55e09149a0,2021-10-27,GUNNARS ON,Team Name Change,2,0,1,,true,,Participating Teams,X-Cup Fall/Qualifiers/6
+1e166c50-2a67-46c2-bac4-a8b31253fd34,2021-10-27,Wurst And Homies,GUNNARS ON,2,0,1,,true,,Grand Final,X-Cup Fall/Qualifiers/6
+97a0d2bc-4135-411c-98a7-526e424cc2af,2021-10-27,The Donuts,Team Name Change,W,FF,1,,true,,Grand Final,X-Cup Fall/Qualifiers/6
+476dfff4-a024-4315-b128-eef617391c3f,2021-10-31,Masters Clash Academy,Corridor Comrades,0,1,2,,true,,Round 1,X-Cup Fall/Qualifiers/7
+5f8464ac-8be2-439b-b994-6e2247a48d7d,2021-10-31,ifr,bye,W,,1,,true,,Round 1,X-Cup Fall/Qualifiers/7
+c4cc992c-8471-4bb6-ab2d-2ca1c0e863f3,2021-10-31,5subs,bye,W,,1,,true,,Round 1,X-Cup Fall/Qualifiers/7
+d7dfef62-143b-4b80-a432-0fa73730068a,2021-10-31,ORDAH,bye,W,,1,,true,,Round 1,X-Cup Fall/Qualifiers/7
+80918b55-6213-4332-82e5-5ce3e0c73e42,2021-10-31,GUNNARS ON,Corridor Comrades,1,0,1,,true,,Round 1,X-Cup Fall/Qualifiers/7
+c66245da-2377-4aeb-987f-bd44d396b06e,2021-10-31,Charming Tomcats,ifr,1,0,1,,true,,Participating Teams,X-Cup Fall/Qualifiers/7
+d9d322a8-de93-42b8-a0a4-b6f48f50b460,2021-10-31,The Hardos,5subs,1,0,1,,true,,Participating Teams,X-Cup Fall/Qualifiers/7
+e50d3adb-f005-4000-b1d8-14d2cd484394,2021-10-31,The Donuts,ORDAH,0,1,2,,true,,Participating Teams,X-Cup Fall/Qualifiers/7
+dd10a46b-a795-48a9-aba0-056fc8e1ab20,2021-10-31,GUNNARS ON,Charming Tomcats,2,0,1,,true,,Participating Teams,X-Cup Fall/Qualifiers/7
+93a7cb9f-0fe3-4bed-ad06-4d05a09d7a1c,2021-10-31,The Hardos,ORDAH,2,0,1,,true,,Participating Teams,X-Cup Fall/Qualifiers/7
+46c50d9c-1d47-40f7-a97d-4622439209f6,2021-10-31,GUNNARS ON,The Hardos,0,2,2,,true,,Grand Final,X-Cup Fall/Qualifiers/7
+95ad9cba-c560-4fbb-b9e7-6686ae360bc7,2021-10-31,Charming Tomcats,ORDAH,FF,W,2,,true,,Grand Final,X-Cup Fall/Qualifiers/7
+6efbbccf-e8a2-4083-8d95-2d74b51d0d20,2021-11-03,5subs,Masters Clash Academy,0,1,2,,true,,Round 1,X-Cup Fall/Qualifiers/8
+6e84ad4e-a744-4bf8-ab7c-5e3df6c66891,2021-11-03,Charming Tomcats,bye,W,,1,,true,,Round 1,X-Cup Fall/Qualifiers/8
+1c10f178-af7b-4f5b-8342-f3402964fbaa,2021-11-03,ifr,bye,W,,1,,true,,Round 1,X-Cup Fall/Qualifiers/8
+9069bd85-6483-448b-9478-6d5d5f22c19b,2021-11-03,ORDAH,bye,W,,1,,true,,Round 1,X-Cup Fall/Qualifiers/8
+480092ef-3fb7-4a39-8458-91ed1ef103bd,2021-11-03,Wurst And Homies,Masters Clash Academy,1,0,1,,true,,Round 1,X-Cup Fall/Qualifiers/8
+224710bd-1d92-42a8-9ace-309a07aefa29,2021-11-03,Team Name Change,Charming Tomcats,0,1,2,,true,,Participating Teams,X-Cup Fall/Qualifiers/8
+3703b8eb-4706-43a4-89e3-3c1a16b66308,2021-11-03,GUNNARS ON,ifr,0,1,2,,true,,Participating Teams,X-Cup Fall/Qualifiers/8
+d2d41230-88e7-434a-894c-d594d1e3df5c,2021-11-03,The Donuts,ORDAH,1,0,1,,true,,Participating Teams,X-Cup Fall/Qualifiers/8
+10460a73-7615-48e5-843f-bccc56b52457,2021-11-03,Wurst And Homies,Charming Tomcats,2,0,1,,true,,Participating Teams,X-Cup Fall/Qualifiers/8
+78932c2b-c007-40cd-84c5-2da55715cdbc,2021-11-03,ifr,The Donuts,2,1,1,,true,,Participating Teams,X-Cup Fall/Qualifiers/8
+7492d887-8cda-4d59-86b1-485354d82c12,2021-11-03,Wurst And Homies,ifr,,,,,true,,Grand Final,X-Cup Fall/Qualifiers/8
+9b6da8df-7eac-4a32-93f4-b4d33934a191,2021-11-03,Charming Tomcats,The Donuts,W,FF,1,,true,,Grand Final,X-Cup Fall/Qualifiers/8
+cb3bc704-f478-4b76-b825-8aae23a8e2e7,2021-11-07,GUNNARS ON,Masters Clash Academy,1,0,1,,true,,Participating Teams,X-Cup Fall/Qualifiers/9
+d66e8e12-08e8-408d-add4-96bf4741edb2,2021-11-07,ifr,tnc,0,1,2,,true,,Participating Teams,X-Cup Fall/Qualifiers/9
+ebbd0495-42eb-4a56-a69d-20326aa1c614,2021-11-07,The Hardos,5subs,1,0,1,,true,,Participating Teams,X-Cup Fall/Qualifiers/9
+a3121809-50df-4e87-a069-88329a2e7b9b,2021-11-07,Charming Tomcats,ORDAH,0,1,2,,true,,Participating Teams,X-Cup Fall/Qualifiers/9
+74f5dd1b-dbdb-4f8c-b0b5-f172a2c95899,2021-11-07,GUNNARS ON,tnc,2,0,1,,true,,Participating Teams,X-Cup Fall/Qualifiers/9
+e859c5f1-f35f-49f4-850d-1e0cae699229,2021-11-07,The Hardos,ORDAH,2,0,1,,true,,Participating Teams,X-Cup Fall/Qualifiers/9
+9d1b7515-eb7e-467d-a62b-d78d8149d43d,2021-11-07,GUNNARS ON,The Hardos,0,2,2,,true,,Grand Final,X-Cup Fall/Qualifiers/9
+dfb8aeae-3d2c-40f0-ac35-d820f47e9c08,2021-11-07,tnc,ORDAH,1,2,2,,true,,Grand Final,X-Cup Fall/Qualifiers/9

@@ -1,0 +1,14 @@
+{
+  "archive_blockers": [],
+  "counts": {
+    "matched": 18
+  },
+  "expected_replays": 18,
+  "maps_owned_elsewhere": 0,
+  "matched_replays": 18,
+  "no_replay_expected": 0,
+  "status": "fully_archived",
+  "total_map_rows": 18,
+  "tournament": "Eternal Conflict Season 2 Episode 3",
+  "unresolved_maps": 0
+}

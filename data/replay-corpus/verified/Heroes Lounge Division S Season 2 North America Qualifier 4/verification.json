@@ -1,0 +1,46 @@
+{
+  "files_sha256": {
+    "2019-12-14 rewind vs inters anonymous/Map 1 (Dragon Shire).StormReplay": "2b8fe59087155902345d4ea49fbbe252141b8a81b2fe896869fe8b45de80dbab",
+    "2019-12-14 rewind vs inters anonymous/Map 2 (Cursed Hollow).StormReplay": "c9383666785b79b872c2b94afa49e5701523dbe1764c658ae6782df30b9e0444",
+    "2019-12-14 rewind vs inters anonymous/Map 3 (Volskaya Foundry).StormReplay": "1086c5f792ba58e9efd04d6eff122aacb9ab26d0e68b877946b6fb8d3353ec98",
+    "2019-12-14 rewind vs last minute sweep/Map 1 (Infernal Shrines).StormReplay": "6c4e454ea99aa28c63ab3972341a767531a1975a5e254b391c336999dc593959",
+    "2019-12-14 rewind vs last minute sweep/Map 2 (Dragon Shire).StormReplay": "ef4a1b590d34c4d9eefd2a7d6dd3b914ea24a58dc48522cde91173e5132faf1b",
+    "2019-12-14 tee tee w vs last minute sweep/Map 1 (Battlefield of Eternity).StormReplay": "b13e696d9cff6cffdb6e1ab9caab857658ef20262bff3ec7d805fab221f1e175",
+    "2019-12-14 tee tee w vs last minute sweep/Map 2 (Infernal Shrines).StormReplay": "3fdbc77e2ef4b1cadc69802f9c823d55975ca0bc70e2a9a990250b61b9758de3",
+    "archive_status.json": "a804fefa4299bad498bc97f5c057f226010cd9443ca8717d148abaa77a4a9f4d",
+    "liquipedia_maps.csv": "0b732de50dd356d3b62ad7e579e2842fc269f112db631f73c3f8a868b30c8cd7",
+    "liquipedia_sets.csv": "2136bf242fc38a1402aa42bba362399c89df313242fd04ddba5a9276c55e6936",
+    "liquipedia_teams.csv": "a900e6413a152e1ae9562beb3329ff55af40737a81fa8197e0859b07a296e40a",
+    "liquipedia_url.txt": "377c0ea563e144d24947343a77c74e3e8630ce57c53611757f4f10207b7f0684",
+    "maps.csv": "2ffc90b9463a0371150d18adc72c0d9a8c0e6797fcbdc6df1ccd64d7339575df",
+    "player_battletags.csv": "3112ef4404cbdfe0a568dc140d273f3664d3f02dbbb4b0643942cd9f83550df6",
+    "replay_manifest.csv": "e5cac8eb1c64d6090102ce5cb06fe79f65ba3aeb0ed5477e44e629ec4dbc850b",
+    "sets.csv": "2136bf242fc38a1402aa42bba362399c89df313242fd04ddba5a9276c55e6936",
+    "teams.csv": "a900e6413a152e1ae9562beb3329ff55af40737a81fa8197e0859b07a296e40a"
+  },
+  "gates": {
+    "complete_replay_coverage": true,
+    "manifest_integrity": true,
+    "no_blocking_reviews": true,
+    "no_stale_overrides": true,
+    "only_approved_inferred_aliases_exported": true
+  },
+  "player_alias_rows": 0,
+  "replay_count": 7,
+  "status": {
+    "blockers": "",
+    "blocking_reviews": 0,
+    "expected_replays": 7,
+    "integrity_errors": 0,
+    "matched_replays": 7,
+    "missing_replays": 0,
+    "pending_alias_reviews": 0,
+    "stale_overrides": 0,
+    "status": "verified",
+    "total_map_rows": 7,
+    "tournament": "Heroes Lounge Division S Season 2 North America Qualifier 4",
+    "unresolved_maps": 0,
+    "verified": "yes"
+  },
+  "tournament": "Heroes Lounge Division S Season 2 North America Qualifier 4"
+}

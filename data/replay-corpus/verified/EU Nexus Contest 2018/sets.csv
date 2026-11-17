@@ -1,0 +1,33 @@
+set_id,date,team_1,team_2,team_1_score,team_2_score,winner,best_of,finished,notes,set_position_in_tournament,source_page
+6774fdfe-e148-4428-8897-a1b85de9faca,2019-01-08 17:00 UTC,Finland,France,,,2,,true,,{{HiddenSort|Group A}},EU Nexus Contest 2018/Group Stage
+3b1d0575-eb96-4a9b-9e1f-438e89f8ec74,2019-01-08 20:00 UTC,Spain,Italy,,,2,,true,,{{HiddenSort|Group A}},EU Nexus Contest 2018/Group Stage
+c4594f59-64ee-4e21-af08-994cca52f816,2019-01-10 17:00 UTC,Finland,Italy,,,2,,true,,{{HiddenSort|Group A}},EU Nexus Contest 2018/Group Stage
+c27491db-9227-414d-94dd-6dec9c3237d7,2019-01-10 20:00 UTC,France,Spain,,,1,,true,,{{HiddenSort|Group A}},EU Nexus Contest 2018/Group Stage
+58eb72c2-8b44-43b8-8a1d-b9ad716961f4,2019-01-12 18:30 UTC,Finland,Spain,,,2,,true,,{{HiddenSort|Group A}},EU Nexus Contest 2018/Group Stage
+85320463-64e2-4051-a046-51520fc36adf,2019-01-12 20:00 UTC,Italy,France,,,2,,true,,{{HiddenSort|Group A}},EU Nexus Contest 2018/Group Stage
+2fbd79bc-f36c-4e06-b302-a78e4891fd9d,2019-01-08 18:30 UTC,Russia,portugal,W,FF,1,,true,Team Portugal forfeited the match due to inability to find substitutes for missing players.,{{HiddenSort|Group B}},EU Nexus Contest 2018/Group Stage
+5e1df6e5-18b0-433d-8b53-0f20e3051096,2019-01-08 21:30 UTC,Poland,Ukraine,,,2,,true,,{{HiddenSort|Group B}},EU Nexus Contest 2018/Group Stage
+b9ebb1c0-46e8-4465-bd67-f71b5dca1abf,2019-01-10 18:30 UTC,Russia,Ukraine,,,1,,true,,{{HiddenSort|Group B}},EU Nexus Contest 2018/Group Stage
+5033976d-6e51-4846-92e9-5e7059cc1db3,2019-01-10 21:30 UTC,portugal,Poland,FF,W,2,,true,Team Portugal forfeited the match due to inability to find substitutes for missing players.,{{HiddenSort|Group B}},EU Nexus Contest 2018/Group Stage
+34af7a24-f7cd-42bc-a8d3-0b5629ff2beb,2019-01-11 17:00 UTC,Russia,Poland,,,1,,true,,{{HiddenSort|Group B}},EU Nexus Contest 2018/Group Stage
+11b30d1a-6066-43a7-a98f-1f5270eab845,2019-01-12 21:30 UTC,Ukraine,portugal,W,FF,1,,true,Team Portugal forfeited the match due to inability to find substitutes for missing players.,{{HiddenSort|Group B}},EU Nexus Contest 2018/Group Stage
+72a07066-864a-4cbf-aeee-515eab4c712c,2019-01-09 17:00 UTC,Hungary,Denmark,,,2,,true,,{{HiddenSort|Group C}},EU Nexus Contest 2018/Group Stage
+c45e011e-c54b-4898-839b-80ff73ceebab,2019-01-09 20:00 UTC,Germany,Czech Republic,,,1,,true,,{{HiddenSort|Group C}},EU Nexus Contest 2018/Group Stage
+d9669eab-b633-44be-927f-29e41272e923,2019-01-11 20:00 UTC,Denmark,Germany,,,2,,true,,{{HiddenSort|Group C}},EU Nexus Contest 2018/Group Stage
+f2c256d5-993a-402d-a5b8-fcab06faa674,2019-01-12 21:30 UTC,Hungary,Czech Republic,,,2,,true,,{{HiddenSort|Group C}},EU Nexus Contest 2018/Group Stage
+29e295b0-aa48-4020-9dd1-b72fdaf2cb28,2019-01-13 17:00 UTC,Hungary,Germany,,,2,,true,,{{HiddenSort|Group C}},EU Nexus Contest 2018/Group Stage
+9c4b1bd4-c591-4803-8e20-e671c321d974,2019-01-13 20:00 UTC,Czech Republic,Denmark,,,2,,true,,{{HiddenSort|Group C}},EU Nexus Contest 2018/Group Stage
+ea6b44dc-185a-4347-b5e2-65d1a1abda1b,2019-01-09 18:30 UTC,Belgium,United Kingdom,,,2,,true,,{{HiddenSort|Group D}},EU Nexus Contest 2018/Group Stage
+daa96fba-89d0-4d22-afc3-bd071a6046a8,2019-01-09 21:30 UTC,Sweden,Netherlands,,,1,,true,,{{HiddenSort|Group D}},EU Nexus Contest 2018/Group Stage
+921a9e4e-b293-492f-9412-36fafc7a28b9,2019-01-11 18:30 UTC,Belgium,Netherlands,,,1,,true,,{{HiddenSort|Group D}},EU Nexus Contest 2018/Group Stage
+0d70832e-cb0f-4ac4-9c07-d7ad0d33f28c,2019-01-11 21:30 UTC,United Kingdom,Sweden,,,2,,true,,{{HiddenSort|Group D}},EU Nexus Contest 2018/Group Stage
+f6aff942-364f-4697-905f-8633fba37314,2019-01-13 18:30 UTC,Belgium,Sweden,,,2,,true,,{{HiddenSort|Group D}},EU Nexus Contest 2018/Group Stage
+dc695158-5198-4e5b-b2e2-69f5bd30f232,2019-01-13 19:30 UTC,Netherlands,United Kingdom,,,2,,true,,{{HiddenSort|Group D}},EU Nexus Contest 2018/Group Stage
+b4253d91-1a64-4a00-bf3e-13db1d302e56,2019-01-17 17:30 UTC,France,United Kingdom,3,0,1,,true,,{{HiddenSort|Bracket}},EU Nexus Contest 2018/Playoffs
+f8c88627-deeb-4546-9a43-30967483b860,2019-01-17 20:00 UTC,Ukraine,Germany,3,0,1,,true,,{{HiddenSort|Bracket}},EU Nexus Contest 2018/Playoffs
+9eeae118-9283-4fd8-81b2-a8099ebd5694,2019-01-18 17:30 UTC,Italy,Sweden,0,3,2,,true,,{{HiddenSort|Bracket}},EU Nexus Contest 2018/Playoffs
+1e7a0632-83d7-44b0-94c9-737eaa80c473,2019-01-18 20:00 UTC,Denmark,Russia,1,3,2,,true,,{{HiddenSort|Bracket}},EU Nexus Contest 2018/Playoffs
+13c93f58-e273-4cf5-aa5c-b50bc048cd88,2019-01-19 17:30 UTC,France,Ukraine,3,1,1,,true,,{{HiddenSort|Bracket}},EU Nexus Contest 2018/Playoffs
+8ff9c20c-030e-48a3-b48f-4d0e8ed35b97,2019-01-19 20:00 UTC,Sweden,Russia,2,3,2,,true,,{{HiddenSort|Bracket}},EU Nexus Contest 2018/Playoffs
+e9fa8b51-a636-4594-a2d5-f16dab9b2a1f,2019-01-20 19:30 UTC,France,Russia,2,4,2,,true,,Grand Final,EU Nexus Contest 2018/Playoffs
+1f8f4f9b-8f5a-429f-8dfe-7031bb131582,2019-01-20 17:00 UTC,Sweden,Ukraine,3,2,1,,true,,{{HiddenSort|Bracket}},EU Nexus Contest 2018/Playoffs

@@ -1,0 +1,14 @@
+{
+  "archive_blockers": [],
+  "counts": {
+    "matched": 22
+  },
+  "expected_replays": 22,
+  "maps_owned_elsewhere": 0,
+  "matched_replays": 22,
+  "no_replay_expected": 0,
+  "status": "fully_archived",
+  "total_map_rows": 22,
+  "tournament": "Kuram Kup",
+  "unresolved_maps": 0
+}

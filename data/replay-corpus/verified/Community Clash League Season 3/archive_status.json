@@ -1,0 +1,14 @@
+{
+  "archive_blockers": [],
+  "counts": {
+    "matched": 142
+  },
+  "expected_replays": 142,
+  "maps_owned_elsewhere": 0,
+  "matched_replays": 142,
+  "no_replay_expected": 0,
+  "status": "fully_archived",
+  "total_map_rows": 142,
+  "tournament": "Community Clash League Season 3",
+  "unresolved_maps": 0
+}

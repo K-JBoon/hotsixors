@@ -1,0 +1,14 @@
+{
+  "archive_blockers": [],
+  "counts": {
+    "matched": 37
+  },
+  "expected_replays": 37,
+  "maps_owned_elsewhere": 0,
+  "matched_replays": 37,
+  "no_replay_expected": 0,
+  "status": "fully_archived",
+  "total_map_rows": 37,
+  "tournament": "META Madness #8 Qualifier #2",
+  "unresolved_maps": 0
+}

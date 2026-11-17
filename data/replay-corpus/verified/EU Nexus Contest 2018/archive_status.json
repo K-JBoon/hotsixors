@@ -1,0 +1,14 @@
+{
+  "archive_blockers": [],
+  "counts": {
+    "matched": 81
+  },
+  "expected_replays": 81,
+  "maps_owned_elsewhere": 0,
+  "matched_replays": 81,
+  "no_replay_expected": 0,
+  "status": "fully_archived",
+  "total_map_rows": 81,
+  "tournament": "EU Nexus Contest 2018",
+  "unresolved_maps": 0
+}

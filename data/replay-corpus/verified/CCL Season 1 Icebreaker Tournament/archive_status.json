@@ -1,0 +1,14 @@
+{
+  "archive_blockers": [],
+  "counts": {
+    "matched": 20
+  },
+  "expected_replays": 20,
+  "maps_owned_elsewhere": 0,
+  "matched_replays": 20,
+  "no_replay_expected": 0,
+  "status": "fully_archived",
+  "total_map_rows": 20,
+  "tournament": "CCL Season 1 Icebreaker Tournament",
+  "unresolved_maps": 0
+}

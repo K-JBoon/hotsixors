@@ -1,0 +1,49 @@
+{
+  "files_sha256": {
+    "2022-07-06 Anti-Clown Association vs Fun Sappers/Map 1 (Volskaya Foundry).StormReplay": "5e9aec3913b8914944d21b5cddd4a811ee27029ad182df6b0c332fc50da02b55",
+    "2022-07-06 Anti-Clown Association vs Fun Sappers/Map 2 (Battlefield of Eternity).StormReplay": "a630f3f18758bd8f4a199d322a17d4d46e1bdff4b569b56909ae8e036154da8c",
+    "2022-07-06 Anti-Clown Association vs IMAGINE/Map 1 (Tomb of the Spider Queen).StormReplay": "d5f445c2e4e7e99c230e5a01518313ab6c48ca46357394fb2dd20598f4c543b9",
+    "2022-07-06 Anti-Clown Association vs IMAGINE/Map 2 (Dragon Shire).StormReplay": "b93955209628c80520b62e0a0ebe3a3d7ef7f550f6f97ade236beac1f9d699e4",
+    "2022-07-06 Baby Diamond Hands vs Fun Sappers/Map 1 (Cursed Hollow).StormReplay": "3454e04bdfa8c2782ca075a18fd7f248417cd2c5d8ecb4a492f811789ab22cdd",
+    "2022-07-06 Baby Diamond Hands vs Fun Sappers/Map 2 (Battlefield of Eternity).StormReplay": "65dca5e6ebb0037bdf0f50bfec2bbdde0f5eb1b0eef475346b7e4137b7fa0834",
+    "2022-07-06 Fun Sappers vs Caffeinated Knights/Map 1 (Infernal Shrines).StormReplay": "60144ed4614de46654a6f5a4f06f246455b25231515145869c452a7aac069004",
+    "2022-07-06 Fun Sappers vs Caffeinated Knights/Map 2 (Towers of Doom).StormReplay": "ea3f2ecad2a4ec67766748b8caf433e2fd7cec206d19417af2e1c66e897575b1",
+    "2022-07-06 IMAGINE vs Minion Miners/Map 1 (Dragon Shire).StormReplay": "3db14e8a7f674c40aec2d717ff8fd6899ff7e6dc396e8513360a88a6b152a64c",
+    "2022-07-06 IMAGINE vs Minion Miners/Map 2 (Infernal Shrines).StormReplay": "0df085f6ccfc817a563d1aa47353afc7b23c9c97bbc49f6cc9fcefb6b886407d",
+    "archive_status.json": "c9e8fd2f20d11b1b9c6a98ad2c2e0dce55434fa6efaf026ecf219f3cff302b56",
+    "liquipedia_maps.csv": "e83ed7f7a60e1f9304382c4e425d6b43902883e16c1759c6731b48b411dedcc0",
+    "liquipedia_sets.csv": "e8984992f9582179219913f0fc48011af72c0c33708d5db4ebda6becd8a27a6d",
+    "liquipedia_teams.csv": "d58841147e24a3cfe012887b059d51ab6452dc3455764085d49e2dcad0846b78",
+    "liquipedia_url.txt": "3e8f17bb7a243a446b4fd5a711cce807050dae73c8eab8bef35133b9c469d6ff",
+    "maps.csv": "e83ed7f7a60e1f9304382c4e425d6b43902883e16c1759c6731b48b411dedcc0",
+    "player_battletags.csv": "e5b063f3d819d7c4e1bd4e4c60c1958ddaa9eb58c51a80d5f1a792e78ab8a04a",
+    "replay_manifest.csv": "0a34dceede66e47b8fdaad01b7e85ceca656128f104f60a1158cb7f785e48c3f",
+    "sets.csv": "e8984992f9582179219913f0fc48011af72c0c33708d5db4ebda6becd8a27a6d",
+    "teams.csv": "d58841147e24a3cfe012887b059d51ab6452dc3455764085d49e2dcad0846b78"
+  },
+  "gates": {
+    "complete_replay_coverage": true,
+    "manifest_integrity": true,
+    "no_blocking_reviews": true,
+    "no_stale_overrides": true,
+    "only_approved_inferred_aliases_exported": true
+  },
+  "player_alias_rows": 28,
+  "replay_count": 10,
+  "status": {
+    "blockers": "",
+    "blocking_reviews": 0,
+    "expected_replays": 10,
+    "integrity_errors": 0,
+    "matched_replays": 10,
+    "missing_replays": 0,
+    "pending_alias_reviews": 1,
+    "stale_overrides": 0,
+    "status": "verified",
+    "total_map_rows": 10,
+    "tournament": "NGS Storm Division - Season 5 - Qualifier #1",
+    "unresolved_maps": 0,
+    "verified": "yes"
+  },
+  "tournament": "NGS Storm Division - Season 5 - Qualifier #1"
+}

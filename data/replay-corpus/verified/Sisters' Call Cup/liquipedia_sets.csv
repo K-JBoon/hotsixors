@@ -1,0 +1,26 @@
+set_id,date,team_1,team_2,team_1_score,team_2_score,winner,best_of,finished,notes,set_position_in_tournament,source_page
+6aa65c7d-4e33-4438-901f-ada48347e005,2025-08-30 12:00 UTC,Team Voice,Team Agumi,0,2,2,3,,,{{HiddenSort|Day 1}},Sisters Call Cup
+5f82ac8c-cc74-4d6f-865b-fa021969722a,2025-08-30 13:30 UTC,Team ViViQ,Team Zaxi,0,2,2,3,,,{{HiddenSort|Day 1}},Sisters Call Cup
+28780777-80f7-410c-ad01-9769921fcd7a,2025-08-30 13:30 UTC,Team Zaxi,Team Gumis,2,0,1,3,,,{{HiddenSort|Day 1}},Sisters Call Cup
+bfc2aeac-46d4-44b9-a32e-b53cf2cb3ecf,2025-08-30 15:00 UTC,Team Gachi,Team Voice,2,1,1,3,,,{{HiddenSort|Day 1}},Sisters Call Cup
+13d73b4a-4b76-4bd4-8ab3-c5b2d28146b4,2025-08-30 15:00 UTC,Team Gumis,Team Gachi,0,2,2,3,,,{{HiddenSort|Day 1}},Sisters Call Cup
+45cc1092-8f3e-48ca-a5f7-e635e5ed6ec9,2025-08-30 15:00 UTC,Team Agumi,Team ViViQ,2,0,1,3,,,{{HiddenSort|Day 1}},Sisters Call Cup
+4480dbab-6bbc-4e11-be01-9891c73a63f3,2025-08-30 16:30 UTC,Team Gachi,Team Zaxi,2,1,1,3,,,{{HiddenSort|Day 1}},Sisters Call Cup
+1cfe4fca-eb59-4f16-8176-e8c01975edca,2025-08-30 16:30 UTC,Team Gumis,Team Agumi,1,2,2,3,,,{{HiddenSort|Day 1}},Sisters Call Cup
+57acea95-1894-4921-a3ba-16f83f75b158,2025-08-31 12:00 UTC,Team Voice,Team ViViQ,1,2,2,3,,,{{HiddenSort|Day 2}},Sisters Call Cup
+7327e9f5-f73a-4758-b72f-5c8268feebba,2025-08-31 13:30 UTC,Team ViViQ,Team Gumis,2,0,1,3,,,{{HiddenSort|Day 2}},Sisters Call Cup
+19e13bee-f32d-4760-b09c-79e4b6c0c749,2025-08-31 15:00 UTC,Team Zaxi,Team Voice,2,0,1,3,,,{{HiddenSort|Day 2}},Sisters Call Cup
+eae9910c-5879-4db6-bf7c-339836d21b80,2025-08-31 15:00 UTC,Team Agumi,Team Gachi,,,,3,,,{{HiddenSort|Day 2}},Sisters Call Cup
+1eb0937c-d585-4831-8d45-650d8ecb01a9,2025-08-31 15:00 UTC,Team Voice,Team Gumis,2,0,1,3,,,{{HiddenSort|Day 2}},Sisters Call Cup
+e1a3ce2e-9cf1-4aa8-9b77-4969fca3ce6d,2025-08-31 16:30 UTC,Team Gachi,Team ViViQ,1,2,2,3,,,{{HiddenSort|Day 2}},Sisters Call Cup
+fb9601af-b2de-4ca8-9d78-9071e578210d,2025-08-31 16:30 UTC,Team Zaxi,Team Agumi,,,,3,,,{{HiddenSort|Day 2}},Sisters Call Cup
+af4fa809-273b-4e86-9ae3-05a1e5c50bb4,2025-09-06 12:00 UTC,Team Gachi,Team Voice,,,,3,,,Upper Bracket Quarterfinals,Sisters Call Cup
+dafd9a04-118c-4d25-8c27-10e8d3354f93,2025-09-06 12:00 UTC,Team ViViQ,Team Gumis,,,,3,,,{{Stage|Playoffs}},Sisters Call Cup
+68004c11-93f5-43d0-a5a1-b9781f9cd031,2025-09-06 13:30 UTC,Team Zaxi,Team Voice,,,,3,,"Team Zaxi substitution: Sieciech in, whhitee out",Upper Bracket Semifinals,Sisters Call Cup
+0bb8c9be-0e2f-4340-ab9b-8b8dbea0e2ba,2025-09-06 15:00 UTC,Team Agumi,Team ViViQ,,,,3,,,{{Stage|Playoffs}},Sisters Call Cup
+c1358745-942c-4771-a29a-29a99371ee87,2025-09-07 13:00 UTC,Team Zaxi,Team Agumi,,,,3,,,Upper Bracket Final,Sisters Call Cup
+ca7cd903-459c-45c7-a301-952aa8e45560,2025-09-06 16:30 UTC,Team ViViQ,Team Gachi,,,,3,,,Lower Bracket Quarterfinals,Sisters Call Cup
+9d9880cb-ea53-41a2-9d3f-47ac881820e3,2025-09-06 16:30 UTC,Team Voice,Team Gumis,,,,3,,,{{Stage|Playoffs}},Sisters Call Cup
+ab7cfb94-3de6-4be9-afcf-732f3397dc11,2025-09-07 12:00 UTC,Team Gachi,Team Voice,,,,3,,,Lower Bracket Semifinal,Sisters Call Cup
+8b483a71-ecca-475d-b055-fefef4c640a7,2025-09-07 14:30 UTC,Team Zaxi,Team Gachi,,,,5,,,Lower Bracket Final,Sisters Call Cup
+be77ad4d-6a1c-4f5c-adf1-9d68503a4f8b,2025-09-07 17:00 UTC,Team Agumi,Team Gachi,,,,5,,,Grand Final,Sisters Call Cup

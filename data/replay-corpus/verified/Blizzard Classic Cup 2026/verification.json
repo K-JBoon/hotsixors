@@ -1,0 +1,42 @@
+{
+  "files_sha256": {
+    "2026-09-12 20.30 Gen.G vs Dignitas/Map 1 (Haunted Mines).StormReplay": "0d5b73a42fc362c6dd90691790b7977ec8b9e21c0d9ab012dd5e74ef5bdcbe2d",
+    "2026-09-12 20.30 Gen.G vs Dignitas/Map 2 (Infernal Shrines).StormReplay": "197b6cd870908dae1910b48294b0ef38a615d7c498f40211d752303564ac2a95",
+    "2026-09-12 20.30 Gen.G vs Dignitas/Map 3 (Sky Temple).StormReplay": "45a56b1613a7e8c2d8333356c1985c529014a0c4ab4233d3f1ea6952172ad858",
+    "archive_status.json": "c881129677b5497010934b99e14566c2f21a0bd51c0b51b5e53432672cb0279b",
+    "liquipedia_maps.csv": "c0f8227e32ddecb75323c18c934aa68cdf28cb4b9d46c3f8f86e437b465221fa",
+    "liquipedia_sets.csv": "0b9ecb3c45e4730b156f5c5fc77609894091eddd902dd66f9936bb7627134f3f",
+    "liquipedia_teams.csv": "906c66c6603017ce7420b4d970db52bdd0c5803d85235f44a9dcc705187451b0",
+    "liquipedia_url.txt": "0389dfefe1f3918257f00f671e42ac2fa7186d0fecf765cfef054d4abb99e1e9",
+    "maps.csv": "c0f8227e32ddecb75323c18c934aa68cdf28cb4b9d46c3f8f86e437b465221fa",
+    "player_battletags.csv": "b318d7a74e80e51728199ab51dc7656d5e7109e72901100bb0eef8b0652b8b0d",
+    "replay_manifest.csv": "14aa22a0710b662f221240015d04ea69fc64833f1ad2a093f2c8fc7023a0e464",
+    "sets.csv": "0b9ecb3c45e4730b156f5c5fc77609894091eddd902dd66f9936bb7627134f3f",
+    "teams.csv": "906c66c6603017ce7420b4d970db52bdd0c5803d85235f44a9dcc705187451b0"
+  },
+  "gates": {
+    "complete_replay_coverage": true,
+    "manifest_integrity": true,
+    "no_blocking_reviews": true,
+    "no_stale_overrides": true,
+    "only_approved_inferred_aliases_exported": true
+  },
+  "player_alias_rows": 9,
+  "replay_count": 3,
+  "status": {
+    "blockers": "",
+    "blocking_reviews": 0,
+    "expected_replays": 3,
+    "integrity_errors": 0,
+    "matched_replays": 3,
+    "missing_replays": 0,
+    "pending_alias_reviews": 1,
+    "stale_overrides": 0,
+    "status": "verified",
+    "total_map_rows": 3,
+    "tournament": "Blizzard Classic Cup 2026",
+    "unresolved_maps": 0,
+    "verified": "yes"
+  },
+  "tournament": "Blizzard Classic Cup 2026"
+}

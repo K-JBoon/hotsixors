@@ -1,0 +1,53 @@
+{
+  "files_sha256": {
+    "2019-11-16 anti-clown association vs perfect gems/Map 1 (Volskaya Foundry).StormReplay": "1d4c6ff5969f7a6f0fce68764d102bed6a014fe9c81a739c143b94abf83265cd",
+    "2019-11-16 anti-clown association vs perfect gems/Map 2 (Cursed Hollow).StormReplay": "c60c284d762b0369edaf9f58289866309389f9553c9ab2ec6e8f1ba67581d2b1",
+    "2019-11-16 anti-clown association vs perfect gems/Map 3 (Tomb of the Spider Queen).StormReplay": "ff470390a61e2fbb14f9c8587586579e565ae74c578c830a2d3b124644870851",
+    "2019-11-16 anti-clown association vs rewind/Map 1 (Battlefield of Eternity).StormReplay": "79b998a8b53ca616e712f73f0a1e0c5450b6b2c0e720ee764bbe7f38a8053f94",
+    "2019-11-16 anti-clown association vs rewind/Map 2 (Dragon Shire).StormReplay": "b7da003e7ba0f86c0ecef1abc663b3a7928e8bc4cf842689cf98b636bd2415ee",
+    "2019-11-16 broken alliance vs anti-clown association/Map 1 (Tomb of the Spider Queen).StormReplay": "d97f9d97c9f62eeda22eb754c745b3c1e0513d5d14c24b6eeb9982e4378276e0",
+    "2019-11-16 broken alliance vs anti-clown association/Map 2 (Battlefield of Eternity).StormReplay": "709446c3f942b04814c0a239583d3eb4ef92c36ab4cabcb0a43ba879b95791c9",
+    "2019-11-16 perfect gems vs regen/Map 1 (Volskaya Foundry).StormReplay": "b6b01278d60fc87e7f663eeecdaeeb8b7d4872fc9af7291fec2b9c08bf1af0a2",
+    "2019-11-16 perfect gems vs regen/Map 2 (Infernal Shrines).StormReplay": "e9d4e54b959c4bb2968b8db104fd382ea58ed809040632938cdad0bae893d4b3",
+    "2019-11-16 perfect gems vs regen/Map 3 (Dragon Shire).StormReplay": "dc1d3e0a3b59697867fa922e0548dba733d96162b66d429fcfca188690e91153",
+    "2019-11-16 perfect gems vs teamnut/Map 1 (Infernal Shrines).StormReplay": "42ddf8458ecb242c7bef2abf778fd74260ed97fa9e4e2f05af291aab410b2793",
+    "2019-11-16 perfect gems vs teamnut/Map 2 (Volskaya Foundry).StormReplay": "b47dace58602524a303c502b77918223753b617a606273af95a74169792bfc12",
+    "2019-11-16 regen vs michaelan is a tyrant/Map 1 (Dragon Shire).StormReplay": "15648ceccfabd611e477293c2043f5c7852efbe9ad9b3a0c47a679c737c7d599",
+    "2019-11-16 regen vs michaelan is a tyrant/Map 2 (Volskaya Foundry).StormReplay": "72f9e3ad7feb2f87e7115339b584d1a30caed018df47207851d2c731cfa9264d",
+    "archive_status.json": "8b3faaadf498404ddea028b1f4662bb92c6441df99bc4b2833c32bb62176df38",
+    "liquipedia_maps.csv": "00761307f0a85b3ec35796588756358f69abda833ca158229fb8c8b859e049fc",
+    "liquipedia_sets.csv": "12f60734cc55de76da35daabc292c47fcfebb5eb98cd2c5b25016c7365ac51cd",
+    "liquipedia_teams.csv": "a900e6413a152e1ae9562beb3329ff55af40737a81fa8197e0859b07a296e40a",
+    "liquipedia_url.txt": "c9e45b7f901157a16d611c7dd64de613647d1bc09a5c7b9e18ef4b8e110592c2",
+    "maps.csv": "f85042c6ed616dcddd41f39077d775321a3b7098c3d51bc2b2d3157214b94b16",
+    "player_battletags.csv": "3112ef4404cbdfe0a568dc140d273f3664d3f02dbbb4b0643942cd9f83550df6",
+    "replay_manifest.csv": "fe03f5c7ccef54abc34e45e7991e69fb13c8c050b29d1c25e1635f3c034c647b",
+    "sets.csv": "12f60734cc55de76da35daabc292c47fcfebb5eb98cd2c5b25016c7365ac51cd",
+    "teams.csv": "a900e6413a152e1ae9562beb3329ff55af40737a81fa8197e0859b07a296e40a"
+  },
+  "gates": {
+    "complete_replay_coverage": true,
+    "manifest_integrity": true,
+    "no_blocking_reviews": true,
+    "no_stale_overrides": true,
+    "only_approved_inferred_aliases_exported": true
+  },
+  "player_alias_rows": 0,
+  "replay_count": 14,
+  "status": {
+    "blockers": "",
+    "blocking_reviews": 0,
+    "expected_replays": 14,
+    "integrity_errors": 0,
+    "matched_replays": 14,
+    "missing_replays": 0,
+    "pending_alias_reviews": 0,
+    "stale_overrides": 0,
+    "status": "verified",
+    "total_map_rows": 16,
+    "tournament": "Heroes Lounge Division S Season 2 North America Qualifier 1",
+    "unresolved_maps": 0,
+    "verified": "yes"
+  },
+  "tournament": "Heroes Lounge Division S Season 2 North America Qualifier 1"
+}

@@ -1,0 +1,50 @@
+{
+  "files_sha256": {
+    "2024-06-08 16.10 Sexy Probius vs Squeal Team 6/Map 1 (Alterac Pass).StormReplay": "fafd5334ef5654d9015924aeb2355038fd91ce75c03b38c5ccd969e5b6e2e716",
+    "2024-06-08 16.10 Sexy Probius vs Squeal Team 6/Map 2 (Towers of Doom).StormReplay": "6c331aa1412e2fa6d9f51ab81f42b2a12b7233c9b4622689a9159603abc308cd",
+    "2024-06-08 17.00 Juan Direction vs SL Enjoyers/Map 1 (Towers of Doom).StormReplay": "160e5f6758e598f04a6f6070669b2d7d567e6674dfca2428637f0d2a63ed4dee",
+    "2024-06-08 17.00 Juan Direction vs SL Enjoyers/Map 2 (Battlefield of Eternity).StormReplay": "5ec7f5a4773f40d8497d2c1c6cd27e93e892c1e9d6947f470638c489fc4fc288",
+    "2024-06-08 17.00 Juan Direction vs SL Enjoyers/Map 3 (Dragon Shire).StormReplay": "d4bd4d86a40ab16900573d01b061577bd13d3ff857249b205025a5236ee2ec30",
+    "2024-06-08 18.20 HGCEULUL vs Squeal Team 6/Map 1 (Sky Temple).StormReplay": "b72484e6e7d51434a510e16fc6d05c0cdfda5c85fe61a6143c5558a9315bdba1",
+    "2024-06-08 18.20 HGCEULUL vs Squeal Team 6/Map 2 (Tomb of the Spider Queen).StormReplay": "35d429e95edd312ee0097547d774b6eead761cc6a9abaa50201d498982e922a1",
+    "2024-06-08 18.20 HGCEULUL vs Squeal Team 6/Map 3 (Towers of Doom).StormReplay": "cf634e6b4e9c08de428952c0657e621fd1ae92cd4b98cdacae71dbe41fb2606a",
+    "2024-06-08 20.00 Hopium Incoming vs SL Enjoyers/Map 1 (Alterac Pass).StormReplay": "5a788c2c775591c2330169f6d44fce00f56384539fee809a496dfb46fa503ffe",
+    "2024-06-08 20.00 Hopium Incoming vs SL Enjoyers/Map 2 (Dragon Shire).StormReplay": "349424aa93af2ce0d3d45fcd55b58ca7539e4640cc70d086395aac92bae409c2",
+    "2024-06-08 20.00 Hopium Incoming vs SL Enjoyers/Map 3 (Garden of Terror).StormReplay": "f4b862c257bd9926f72697ab892e47a65bddf63ca7897e40572fd98d1eba3e43",
+    "archive_status.json": "f5735b2801d924e7aabf7bce81b93a9e41e8d1b30348bfc1ba03db7c4b5459ea",
+    "liquipedia_maps.csv": "c55ba6af23a180debe9d39a43deec890b74fba4445511540aff345419b04e6da",
+    "liquipedia_sets.csv": "7c6eb52b600b67ef6240c552915d16d08114fcff25a3c522ade0a26f24973cf1",
+    "liquipedia_teams.csv": "29fd9addcd26a894984e117a4f6fc98c0318aadaef38d3e829a6e36727bd8035",
+    "liquipedia_url.txt": "fb336b03de0c0aabad1d4068fd4eb16db47a9ccd4d024cf813465cf96fa04189",
+    "maps.csv": "c55ba6af23a180debe9d39a43deec890b74fba4445511540aff345419b04e6da",
+    "player_battletags.csv": "1bfbc0ffc4d26b1afd9215a8e943f2e1755f765fc72c268ab1a7499ae0485942",
+    "replay_manifest.csv": "a18694c02c09166522e107930d0e913430339a85d7d0a649f2982e42aef5a27d",
+    "sets.csv": "7c6eb52b600b67ef6240c552915d16d08114fcff25a3c522ade0a26f24973cf1",
+    "teams.csv": "29fd9addcd26a894984e117a4f6fc98c0318aadaef38d3e829a6e36727bd8035"
+  },
+  "gates": {
+    "complete_replay_coverage": true,
+    "manifest_integrity": true,
+    "no_blocking_reviews": true,
+    "no_stale_overrides": true,
+    "only_approved_inferred_aliases_exported": true
+  },
+  "player_alias_rows": 29,
+  "replay_count": 11,
+  "status": {
+    "blockers": "",
+    "blocking_reviews": 0,
+    "expected_replays": 11,
+    "integrity_errors": 0,
+    "matched_replays": 11,
+    "missing_replays": 0,
+    "pending_alias_reviews": 0,
+    "stale_overrides": 0,
+    "status": "verified",
+    "total_map_rows": 11,
+    "tournament": "Hanzo Genji Cup Qualifier #2",
+    "unresolved_maps": 0,
+    "verified": "yes"
+  },
+  "tournament": "Hanzo Genji Cup Qualifier #2"
+}

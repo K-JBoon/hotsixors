@@ -1,0 +1,15 @@
+{
+  "archive_blockers": [],
+  "counts": {
+    "matched": 14,
+    "no_replay_expected": 2
+  },
+  "expected_replays": 14,
+  "maps_owned_elsewhere": 0,
+  "matched_replays": 14,
+  "no_replay_expected": 2,
+  "status": "fully_archived",
+  "total_map_rows": 16,
+  "tournament": "Heroes Lounge Division S Season 2 Europe Qualifier 3",
+  "unresolved_maps": 0
+}

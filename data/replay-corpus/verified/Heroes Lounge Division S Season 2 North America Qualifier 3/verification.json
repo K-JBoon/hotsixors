@@ -1,0 +1,45 @@
+{
+  "files_sha256": {
+    "2019-12-07 broken alliance vs tee tee w/Map 1 (Volskaya Foundry).StormReplay": "401fbb6d2d513b46a15a83a62329725c90d73634e05ac1655def6c2434788f35",
+    "2019-12-07 broken alliance vs tee tee w/Map 2 (Battlefield of Eternity).StormReplay": "770fca4a282fe26f2de148d3b0515fd59fbe7e59a325a2a80fd35b215827f4a4",
+    "2019-12-07 regen vs broken alliance/Map 1 (Tomb of the Spider Queen).StormReplay": "78085b26151b1c180731a1418349a0ee56f6f5f609176ffbc05131ad1603c507",
+    "2019-12-07 regen vs broken alliance/Map 2 (Infernal Shrines).StormReplay": "b265c5a23776b6c42b6301a78473683c9f5287bbeee7c16e6ec79e983d083c9c",
+    "2019-12-07 regen vs rewind/Map 1 (Infernal Shrines).StormReplay": "ac954a3421dd5e05a55f3c22b34538d9f8cc8a1360acf1a8d6f36917db62ecc1",
+    "2019-12-07 regen vs rewind/Map 2 (Battlefield of Eternity).StormReplay": "931ab103a859932a92c0b81692fe2b73340ead228cf53a35a610bb8c9c4c66e1",
+    "archive_status.json": "02c3fbec2f822c6914aaf434c51a4647c1930b4afe7842ad7464218747a5d5e8",
+    "liquipedia_maps.csv": "fdb4ce97ca0fd0c50db8a76c671377785b30d524b50a44d59177c4a6566735a7",
+    "liquipedia_sets.csv": "eec82251c971a4fb604ed93079469447d43d1b3d92150f517d2b9a5b023a35c7",
+    "liquipedia_teams.csv": "a900e6413a152e1ae9562beb3329ff55af40737a81fa8197e0859b07a296e40a",
+    "liquipedia_url.txt": "ef8deff4f84f01bd75a52cc3ea86e3d03ba3116a583c206ae2cb848b085fe46b",
+    "maps.csv": "ff8ef5e6c7fc95bcc2ecdafb5ae048933897ad3a6125ad2664a0a71f304360da",
+    "player_battletags.csv": "3112ef4404cbdfe0a568dc140d273f3664d3f02dbbb4b0643942cd9f83550df6",
+    "replay_manifest.csv": "7a18701820a3f28bf805ef048f2c3fcb486332a2ad758d72539676169f2c1cf9",
+    "sets.csv": "eec82251c971a4fb604ed93079469447d43d1b3d92150f517d2b9a5b023a35c7",
+    "teams.csv": "a900e6413a152e1ae9562beb3329ff55af40737a81fa8197e0859b07a296e40a"
+  },
+  "gates": {
+    "complete_replay_coverage": true,
+    "manifest_integrity": true,
+    "no_blocking_reviews": true,
+    "no_stale_overrides": true,
+    "only_approved_inferred_aliases_exported": true
+  },
+  "player_alias_rows": 0,
+  "replay_count": 6,
+  "status": {
+    "blockers": "",
+    "blocking_reviews": 0,
+    "expected_replays": 6,
+    "integrity_errors": 0,
+    "matched_replays": 6,
+    "missing_replays": 0,
+    "pending_alias_reviews": 0,
+    "stale_overrides": 0,
+    "status": "verified",
+    "total_map_rows": 8,
+    "tournament": "Heroes Lounge Division S Season 2 North America Qualifier 3",
+    "unresolved_maps": 0,
+    "verified": "yes"
+  },
+  "tournament": "Heroes Lounge Division S Season 2 North America Qualifier 3"
+}

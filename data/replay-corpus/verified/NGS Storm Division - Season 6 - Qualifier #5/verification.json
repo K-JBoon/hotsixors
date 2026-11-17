@@ -1,0 +1,43 @@
+{
+  "files_sha256": {
+    "2023-01-19 01.00 Can't Censor Ship vs Vendetta/Map 1 (Alterac Pass).StormReplay": "34380d8ecbd15aab49e17c1dcf0315174b4ec490f9f7f9594f8e97102684718e",
+    "2023-01-19 01.00 Can't Censor Ship vs Vendetta/Map 2 (Dragon Shire).StormReplay": "d93f24375d9e9d0d469e1d303818433f5604465ae0d297e8a962cdcd3553fd48",
+    "2023-01-19 02.15 30 Kroissants vs Can't Censor Ship/Map 1 (Infernal Shrines).StormReplay": "375ce09975ebcbf195ad69f8510ee66cb8b00d31df2faeecd65c6aa0dccd7749",
+    "2023-01-19 02.15 30 Kroissants vs Can't Censor Ship/Map 2 (Dragon Shire).StormReplay": "08d30a6d4c0502cacecf7f3c831302a653126abb78c75ce90917f77a103beff3",
+    "archive_status.json": "505bc6b6902599c7b261e37af1d18d3cfa889da1c1ddd85e3cd019f602c4186e",
+    "liquipedia_maps.csv": "3d4378f990059ef98f35edc421b358152aa0a2504cfcb70627a7c1996989697f",
+    "liquipedia_sets.csv": "22d0bf0a69aaa6fc16a4e7912870868c6735aa0541bdaa1d8336a26a4a15735d",
+    "liquipedia_teams.csv": "5b1a9bd85af2f323b9937527be4a4c9d2676e3ff3e0f3450e78b7b16afc859dc",
+    "liquipedia_url.txt": "96980149b7b17aa7bf45c81f7a6d2ba8403ac525bb0d881b288dd983675ddbea",
+    "maps.csv": "3d4378f990059ef98f35edc421b358152aa0a2504cfcb70627a7c1996989697f",
+    "player_battletags.csv": "f2b8a2747090faa54303b036bc2a0d158f5efd8372ed4909746cfd7464ee6a41",
+    "replay_manifest.csv": "31784b0e3c7fabefa75e0a26e9e6bb180c7037ad1fda380df5e737d77b1f4539",
+    "sets.csv": "22d0bf0a69aaa6fc16a4e7912870868c6735aa0541bdaa1d8336a26a4a15735d",
+    "teams.csv": "5b1a9bd85af2f323b9937527be4a4c9d2676e3ff3e0f3450e78b7b16afc859dc"
+  },
+  "gates": {
+    "complete_replay_coverage": true,
+    "manifest_integrity": true,
+    "no_blocking_reviews": true,
+    "no_stale_overrides": true,
+    "only_approved_inferred_aliases_exported": true
+  },
+  "player_alias_rows": 15,
+  "replay_count": 4,
+  "status": {
+    "blockers": "",
+    "blocking_reviews": 0,
+    "expected_replays": 4,
+    "integrity_errors": 0,
+    "matched_replays": 4,
+    "missing_replays": 0,
+    "pending_alias_reviews": 0,
+    "stale_overrides": 0,
+    "status": "verified",
+    "total_map_rows": 4,
+    "tournament": "NGS Storm Division - Season 6 - Qualifier #5",
+    "unresolved_maps": 0,
+    "verified": "yes"
+  },
+  "tournament": "NGS Storm Division - Season 6 - Qualifier #5"
+}

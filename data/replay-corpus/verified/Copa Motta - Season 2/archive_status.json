@@ -1,0 +1,14 @@
+{
+  "archive_blockers": [],
+  "counts": {
+    "matched": 60
+  },
+  "expected_replays": 60,
+  "maps_owned_elsewhere": 0,
+  "matched_replays": 60,
+  "no_replay_expected": 0,
+  "status": "fully_archived",
+  "total_map_rows": 60,
+  "tournament": "Copa Motta - Season 2",
+  "unresolved_maps": 0
+}

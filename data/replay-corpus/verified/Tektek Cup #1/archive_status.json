@@ -1,0 +1,14 @@
+{
+  "archive_blockers": [],
+  "counts": {
+    "matched": 16
+  },
+  "expected_replays": 16,
+  "maps_owned_elsewhere": 0,
+  "matched_replays": 16,
+  "no_replay_expected": 0,
+  "status": "fully_archived",
+  "total_map_rows": 16,
+  "tournament": "Tektek Cup #1",
+  "unresolved_maps": 0
+}

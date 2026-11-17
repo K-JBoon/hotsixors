@@ -1,0 +1,26 @@
+set_id,date,team_1,team_2,team_1_score,team_2_score,winner,best_of,finished,notes,set_position_in_tournament,source_page
+ad61d664-d5ab-45ed-818b-87b77306d93f,2026-08-15 12:00 UTC,Team Gachi,Team Gumis,,,,3,,"Team Gachi substitution: Ziolo in, Gamerboy out",{{Stage|Group Stage}},Meta Dymy/4
+b9c20bf8-4276-4fa2-9008-e4db46674b33,2026-08-15 12:00 UTC,Team ViViQ,Team Voice,,,,3,,,{{Stage|Group Stage}},Meta Dymy/4
+d48414a7-259d-4b76-b70f-1e7190338e12,2026-08-15 13:30 UTC,Team Agumi,Team Paulinka,,,,3,,,{{Stage|Group Stage}},Meta Dymy/4
+8df3a307-5fb3-4dde-b42c-e6a3bae31e3b,2026-08-15 13:30 UTC,Team ViViQ,Team Gachi,,,,3,,"Team Gachi substitution: Ziolo in, Gamerboy out",{{Stage|Group Stage}},Meta Dymy/4
+09219c2f-680e-4960-acad-a12d0d9841d7,2026-08-15 15:00 UTC,Team Voice,Team Gumis,,,,3,,,{{Stage|Group Stage}},Meta Dymy/4
+9541d1fe-9626-4933-bfdf-722a0d5fad5a,2026-08-15 15:00 UTC,Team Paulinka,Team ViViQ,,,,3,,,{{Stage|Group Stage}},Meta Dymy/4
+0df74953-31e0-40a0-98e2-0ba06efe5daf,2026-08-15 16:30 UTC,Team Gumis,Team ViViQ,,,,3,,,{{Stage|Group Stage}},Meta Dymy/4
+eead3565-3906-4c5a-9cc1-6f89fed764d7,2026-08-15 16:30 UTC,Team Gachi,Team Agumi,,,,3,,"Team Gachi substitution: Ziolo in, Gamerboy out",{{Stage|Group Stage}},Meta Dymy/4
+bafa40eb-1462-4938-aa38-d0a012ee988c,2026-08-16 12:00 UTC,Team Voice,Team Paulinka,,,,3,,,{{Stage|Group Stage}},Meta Dymy/4
+43c0f33d-1bad-4657-840d-65823f539768,2026-08-16 12:00 UTC,Team Gumis,Team Agumi,,,,3,,,{{Stage|Group Stage}},Meta Dymy/4
+b2d629fb-b9a5-480f-b216-fff3bc41a70e,2026-08-16 13:30 UTC,Team Agumi,Team ViViQ,,,,3,,"Team ViViQ substitution: bibziuk in, ViViQ out",{{Stage|Group Stage}},Meta Dymy/4
+1767cc55-78de-45cd-872d-7442561d8524,2026-08-16 13:30 UTC,Team Gachi,Team Voice,,,,3,,,{{Stage|Group Stage}},Meta Dymy/4
+63d0e41c-911c-4aff-9c10-bb39ef38bc35,2026-08-16 15:00 UTC,Team Voice,Team Agumi,,,,3,,,{{Stage|Group Stage}},Meta Dymy/4
+dce0a9e0-1840-41e8-b134-32e8dc5b5f71,2026-08-16 15:00 UTC,Team Paulinka,Team Gachi,,,,3,,,{{Stage|Group Stage}},Meta Dymy/4
+9c30b16f-b108-4e84-b192-8d58120ec959,2026-08-16 16:30 UTC,Team Paulinka,Team Gumis,,,,3,,,{{Stage|Group Stage}},Meta Dymy/4
+be21dd25-5a77-4b2b-9634-8d1fbdd6c90e,2026-08-22 12:00 UTC,Team Agumi,Team ViViQ,,,,3,,,Upper Bracket Quarterfinals,Meta Dymy/4
+216f44ae-83b9-4835-a791-d899bbc2ead2,2026-08-22 12:00 UTC,Team Gachi,Team Paulinka,,,,3,,"Team Gachi substitution: Gumis in, Alvarus out; Team Gachi substitution: Chromys in, aryon70 out",{{Stage|Playoffs}},Meta Dymy/4
+d293a47b-1c28-40cf-9a02-ed0b814d5d87,2026-08-22 13:30 UTC,Team Gumis,Team ViViQ,,,,3,,,Upper Bracket Semifinals,Meta Dymy/4
+059ec8c7-0f56-4dc5-8491-b85024f888a0,2026-08-22 13:30 UTC,Team Voice,Team Gachi,,,,3,,"Team Voice substitution: HyGGe in, Aletis out; Team Gachi substitution: Chromys in, aryon70 out",{{Stage|Playoffs}},Meta Dymy/4
+671982dd-9d8f-4132-a948-1f6553f341a3,2026-08-23 12:00 UTC,Team Gumis,Team Gachi,,,,3,,"Team Gachi substitution: Chromys in, aryon70 out",Upper Bracket Final,Meta Dymy/4
+b475c081-4247-47af-a4d0-289139776fde,2026-08-22 15:00 UTC,Team Voice,Team Agumi,,,,3,,"Team Voice substitution: HyGGe in, Aletis out; Team Voice substitution: Sieciech in, Aletis out",Lower Bracket Quarterfinals,Meta Dymy/4
+e849f1d8-3a5b-4010-9acd-d605414b8c9d,2026-08-22 15:00 UTC,Team ViViQ,Team Paulinka,,,,3,,,{{Stage|Playoffs}},Meta Dymy/4
+6469d512-e993-430a-8df5-df9b3bdb1d83,2026-08-22 16:30 UTC,Team Agumi,Team ViViQ,,,,3,,,Lower Bracket Semifinals,Meta Dymy/4
+dd7e3910-5f0a-45d2-851b-d17a29dade21,2026-08-23 13:30 UTC,Team Gachi,Team Agumi,,,,3,,"Team Gachi substitution: Chromys in, aryon70 out",Lower Bracket Final,Meta Dymy/4
+7440d65d-5d9b-4d75-a539-3772f9327bae,2026-08-23 15:00 UTC,Team Gumis,Team Agumi,,,,5,,,Grand Final,Meta Dymy/4

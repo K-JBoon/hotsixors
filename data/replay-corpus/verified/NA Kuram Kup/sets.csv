@@ -1,0 +1,7 @@
+set_id,date,team_1,team_2,team_1_score,team_2_score,winner,best_of,finished,notes,set_position_in_tournament,source_page
+d6705f32-d242-46e3-9a7b-47eddedadc2b,2026-01-11 18:00 UTC,Team fancypants,Team funz,3,2,1,5,,,Upper Bracket Semifinals,NA Kuram Kup
+fba342cd-087e-4c83-9c52-f273b4ac3e47,2026-01-11 18:00 UTC,Team Roger,Team Kelsier,3,1,1,5,,,Participating Teams,NA Kuram Kup
+faa5b2c9-0a6b-47ce-8365-dc617871e3c3,2026-01-11 19:30 UTC,Team fancypants,Team Roger,,,,5,,,Upper Bracket Final,NA Kuram Kup
+f06ac8da-a1ff-49bf-a453-8e7eff32f718,2026-01-11 19:30 UTC,Team funz,Team Kelsier,0,3,2,5,,,Lower Bracket Semifinal,NA Kuram Kup
+72efb73e-0719-49f6-aebb-c0ac564b0d85,2026-01-11 21:00 UTC,Team Roger,Team Kelsier,,,,5,,,Lower Bracket Final,NA Kuram Kup
+2fbbf6c4-4a18-428e-9b6d-ceeb9a164565,2026-01-11 22:30 UTC,Team fancypants,Team Kelsier,,,,5,,,Grand Final,NA Kuram Kup

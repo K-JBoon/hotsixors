@@ -1,0 +1,19 @@
+set_id,date,team_1,team_2,team_1_score,team_2_score,winner,best_of,finished,notes,set_position_in_tournament,source_page
+8cd386dd-3e66-4f31-8e58-b9e6ccc0f407,,Bang Bush,bye,W,,1,,true,,Round 1,Heroes International/EU Qualifiers/2
+db711e37-9433-42a8-a057-e95bc42443c2,2022-09-03 12:00 UTC,Inting for Ruby,Drastic Measures,2,0,1,,true,{{player|Skynox|flag=fr}} subs-in for {{player|WarenOo|flag=fr}} on the series for Drastic Measures.,Round 1,Heroes International/EU Qualifiers/2
+fe8056f8-64ae-41b3-bf68-798bff6033c3,,bye,bye,,,,,true,,Participating Teams,Heroes International/EU Qualifiers/2
+0ac20a65-7998-4d91-8d79-685c04144b40,,bye,bye,,,,,true,,Participating Teams,Heroes International/EU Qualifiers/2
+ee7148b8-d005-4ffc-afcc-355c33392624,,bye,bye,,,,,true,,Participating Teams,Heroes International/EU Qualifiers/2
+353cd6a1-53f9-4967-804e-e05da6ee1bef,,bye,bye,,,,,true,,Participating Teams,Heroes International/EU Qualifiers/2
+0e6d0927-365b-4c6f-acb6-62a9327783b2,,bye,bye,,,,,true,,Participating Teams,Heroes International/EU Qualifiers/2
+0c0a5fd3-210a-44ea-b5d3-f09ac77f3020,,bye,bye,,,,,true,,Participating Teams,Heroes International/EU Qualifiers/2
+8f180fd3-7c36-43c3-ac41-f42e8d66db29,2022-09-03 13:15 UTC,Bang Bush,Inting for Ruby,2,0,1,,true,{{player|Tai|flag=uken}} subs-in for {{player|Svampgrotta|flag=se}} on the series for Bang Bush.,Round 2,Heroes International/EU Qualifiers/2
+a449e82a-faf8-45fd-9feb-44e773fa7ca5,2022-09-03 12:00 UTC,Jotunheim,Vinland Raiders,0,2,2,,true,{{player|Unforgiven|flag=rs}} subs-in for {{player|Galaxy|flag=uken}} on the series for Vinland Raiders.,Participating Teams,Heroes International/EU Qualifiers/2
+f612ddea-5ed4-4d6c-9e19-d8f57ed09813,2022-09-03 12:00 UTC,5 Shots Of Copium,Disgusting,2,0,1,,true,,Participating Teams,Heroes International/EU Qualifiers/2
+383bc094-a224-4f86-8f5d-774c825e2cbd,2022-09-03 12:00 UTC,3 Legged Cat,Kayak,2,0,1,,true,,Participating Teams,Heroes International/EU Qualifiers/2
+9664910e-3bed-45f3-9021-bd1cdc05f4bd,2022-09-03 14:15 UTC,Bang Bush,Vinland Raiders,2,0,1,,true,{{player|Tai|flag=uken}} subs-in for {{player|Svampgrotta|flag=se}} on the series for Bang Bush. {{player|Unforgiven|flag=rs}} subs-in for {{player|Galaxy|flag=uken}} on the series for Vinland Raiders.,Upper Bracket Semifinals,Heroes International/EU Qualifiers/2
+adceed3d-e954-4611-8881-6e3e08c58db1,2022-09-03 15:00 UTC,5 Shots Of Copium,3 Legged Cat,1,2,2,,true,,Participating Teams,Heroes International/EU Qualifiers/2
+0f3ba108-4886-43f2-a8b4-72afa225a763,2022-09-04 12:00 UTC,Bang Bush,3 Legged Cat,3,0,1,,true,,Upper Bracket Final,Heroes International/EU Qualifiers/2
+7a750d79-be24-4b9e-bb77-3e50798e3f30,2022-09-04 13:30 UTC,Vinland Raiders,5 Shots Of Copium,0,2,2,,true,,Lower Bracket Semifinal,Heroes International/EU Qualifiers/2
+4044adcf-9e99-41cc-9423-1d420adb65b5,2022-09-04 14:40 UTC,3 Legged Cat,5 Shots Of Copium,1,3,2,,true,,Lower Bracket Final,Heroes International/EU Qualifiers/2
+0d8cb725-f807-4482-8736-6923703f2a03,2022-09-04 17:00 UTC,Bang Bush,5 Shots Of Copium,3,0,1,,true,,Grand Final,Heroes International/EU Qualifiers/2

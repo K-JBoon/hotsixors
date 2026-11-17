@@ -1,0 +1,31 @@
+set_id,date,team_1,team_2,team_1_score,team_2_score,winner,best_of,finished,notes,set_position_in_tournament,source_page
+0ec9720d-cd61-4bbf-ad1f-129373811ace,2025-07-19 14:00 UTC,Low apm,Team Space,2,0,1,3,,,Upper Bracket Round 1,Khaldors Underdog Cup/2
+ccfcba71-b8ff-4ce4-9636-d201a09c0d11,2025-07-19 14:00 UTC,Hit The Core,Sigma M@ils,2,0,1,3,,,Upper Bracket Round 1,Khaldors Underdog Cup/2
+7b6f89cc-5809-4190-93cb-e11935d7cdd4,2025-07-19 17:00 UTC,UwU Fighters,CoB Antimeta,2,0,1,3,,,Upper Bracket Round 1,Khaldors Underdog Cup/2
+ec80a547-20ad-4e13-bb39-cf4022076998,2025-07-19 17:00 UTC,No Vision,Hopium Academy,2,0,1,3,,,Upper Bracket Round 1,Khaldors Underdog Cup/2
+2e1653fb-05e8-41db-99d7-063b15cbc77c,2025-07-19 15:00 UTC,Low apm,Hit The Core,0,2,2,3,,,Upper Bracket Round 2,Khaldors Underdog Cup/2
+6994f38d-cfcc-496d-9dc3-44802b09fcb0,2025-07-19 18:00 UTC,UwU Fighters,No Vision,2,0,1,3,,,Upper Bracket Round 2,Khaldors Underdog Cup/2
+32497185-8755-43db-b770-55e9ed7417e4,2025-07-19 16:00 UTC,Team Space,Sigma M@ils,0,2,2,3,,,Lower Bracket Round 1,Khaldors Underdog Cup/2
+99c7dbb6-43f3-4349-9b5a-e8df3e957298,2025-07-19 19:00 UTC,CoB Antimeta,Hopium Academy,2,0,1,3,,,Lower Bracket Round 1,Khaldors Underdog Cup/2
+f555c10f-e5b1-445b-9c6e-fcb3ca444268,2025-07-22 17:00 UTC,No Vision,Sigma M@ils,2,0,1,3,,,Lower Bracket Round 2,Khaldors Underdog Cup/2
+261257bb-318e-419f-bc28-f24a592bedbc,2025-07-22 18:00 UTC,Low apm,CoB Antimeta,2,0,1,3,,,Lower Bracket Round 2,Khaldors Underdog Cup/2
+7bfb4a87-b2e6-4ab4-8afe-7f940efc7d1f,2025-07-22 19:00 UTC,No Vision,Low apm,0,2,2,3,,,Lower Bracket Round 3,Khaldors Underdog Cup/2
+a709e61b-2b85-410f-9ba2-9a4c43805c36,2025-07-20 14:00 UTC,Munchies,The Wombat Factor,2,0,1,3,,,Upper Bracket Round 1,Khaldors Underdog Cup/2
+3a9cc879-dba3-4fc7-a802-53a6d54da746,2025-07-20 14:00 UTC,Handsome Human Commoners,FeelsAbzeerMan,1,2,2,3,,,Upper Bracket Round 1,Khaldors Underdog Cup/2
+9a69ab3a-7343-46f2-8fca-e71494ba2f3c,2025-07-20 17:00 UTC,KlubR,INAEqualis,2,0,1,3,,,Upper Bracket Round 1,Khaldors Underdog Cup/2
+d93a4012-e8d6-471c-838a-fb2b6a6c04dc,2025-07-20 17:00 UTC,KDAgents,Sloth Sanctuary,2,0,1,3,,,Upper Bracket Round 1,Khaldors Underdog Cup/2
+02796d40-f54d-4f2c-a37e-2c1aad13b41b,2025-07-20 15:00 UTC,Munchies,FeelsAbzeerMan,2,1,1,3,,,Upper Bracket Round 2,Khaldors Underdog Cup/2
+340b4ab6-c289-48d6-8a1e-be70d7422799,2025-07-20 18:00 UTC,KlubR,KDAgents,1,2,2,3,,,Upper Bracket Round 2,Khaldors Underdog Cup/2
+2e79ff1a-0e33-4c02-81c9-99df91441e5e,2025-07-20 16:00 UTC,The Wombat Factor,Handsome Human Commoners,0,2,2,3,,,Lower Bracket Round 1,Khaldors Underdog Cup/2
+643fa259-e495-48d6-980b-971634b6c6f2,2025-07-20 19:00 UTC,INAEqualis,Sloth Sanctuary,1,2,2,3,,,Lower Bracket Round 1,Khaldors Underdog Cup/2
+17e1fdc1-80c7-4848-8a33-1df6112a045b,2025-07-23 17:00 UTC,KlubR,Handsome Human Commoners,2,0,1,3,,,Lower Bracket Round 2,Khaldors Underdog Cup/2
+49d17954-ac8c-48b2-be90-deb0e420fba5,2025-07-23 18:00 UTC,FeelsAbzeerMan,Sloth Sanctuary,2,0,1,3,,,Lower Bracket Round 2,Khaldors Underdog Cup/2
+97114257-6252-4707-9ac7-469e8ef02152,2025-07-23 19:00 UTC,KlubR,FeelsAbzeerMan,1,2,2,3,,,Lower Bracket Round 3,Khaldors Underdog Cup/2
+17322034-8f13-49c6-a99d-bf09368f9797,2025-07-26 14:00 UTC,Munchies,Hit The Core,,,,5,,,Upper Bracket Semifinals,Khaldors Underdog Cup/2
+991c3839-46ab-41e5-a046-f5d537e5e879,2025-07-26 16:00 UTC,KDAgents,UwU Fighters,,,,5,,,{{Stage|Playoffs}},Khaldors Underdog Cup/2
+02e06dae-6ee5-44b4-ac37-f44b1fd928a6,2025-07-26 19:00 UTC,Munchies,UwU Fighters,,,,5,,,Upper Bracket Final,Khaldors Underdog Cup/2
+e6d926c7-552f-4096-9962-274e2097b255,2025-07-27 14:00 UTC,KDAgents,FeelsAbzeerMan,,,,3,,,Lower Bracket Quarterfinals,Khaldors Underdog Cup/2
+5715c502-4aad-4c40-a29c-0d0081bdeaa0,2025-07-26 19:00 UTC,Hit The Core,Low apm,,,,3,,,{{Stage|Playoffs}},Khaldors Underdog Cup/2
+eb9feef8-ae05-4c91-b29a-0d4ee3f77f90,2025-07-27 15:00 UTC,KDAgents,Low apm,,,,5,,,Lower Bracket Semifinal,Khaldors Underdog Cup/2
+20cfad17-545a-44b2-a37c-e62767a73860,2025-07-27 17:00 UTC,Munchies,KDAgents,,,,5,,,Lower Bracket Final,Khaldors Underdog Cup/2
+e5806e3a-9514-428a-ae17-fe535040250b,2025-07-27 19:00 UTC,UwU Fighters,KDAgents,,,,5,,,Grand Final,Khaldors Underdog Cup/2

@@ -1,0 +1,42 @@
+{
+  "files_sha256": {
+    "2021-09-15 FlippingMafia vs RossPierrDoll/Map 1 (Battlefield of Eternity).StormReplay": "900e6c963557a754e64c5e7792a421b3aee7654dac457b34a7aaa8943c88b89f",
+    "2021-09-15 FlippingMafia vs RossPierrDoll/Map 2 (Tomb of the Spider Queen).StormReplay": "999666d35195d9c8b329d822798a328f5a0389b48823eb862ae513c83a12a58d",
+    "2021-09-15 FlippingMafia vs RossPierrDoll/Map 3 (Towers of Doom).StormReplay": "3f4c3ecea5cb17ff0a2f2a3fcfbfe04dbfaf910b6c88aa113cffc1cbe4c911bc",
+    "archive_status.json": "8da93a5ad112a6d1e81fb90eb33aa1497e99d7b1535808aec4512594384a04e2",
+    "liquipedia_maps.csv": "9ef5ce323da3e8c7d43613691ca7c2b0f2e32a1d0e601c0885773c7a696ee4e1",
+    "liquipedia_sets.csv": "29e92860af586c3af484cb00ac7635d2b6e33005513969c28bfbaaa862354eca",
+    "liquipedia_teams.csv": "112a2bf84198557d11d64a87a1321e978bb087b07df2058792727e424e9f4b6b",
+    "liquipedia_url.txt": "cfb5cb245eab93e9e06731e89af18fe14adfadbf7dd8dc09aaa0fd82f510ddca",
+    "maps.csv": "7978a902cc2e42f73ed22cf7d2d124fb54187cec5c67552123db4d4875ecbf75",
+    "player_battletags.csv": "4046c4d7deb46dfe661876b130dc25b4e7173fa2b2922463fb37ca4e37600fea",
+    "replay_manifest.csv": "eef2f4e91cc861e77f524116877716d3c43fdf7abb003bd12c1af704e054fd4c",
+    "sets.csv": "2c898d7c8eb01b827b20ab8dd39bdc23fec83256a862c0e875dfb626d85b6688",
+    "teams.csv": "112a2bf84198557d11d64a87a1321e978bb087b07df2058792727e424e9f4b6b"
+  },
+  "gates": {
+    "complete_replay_coverage": true,
+    "manifest_integrity": true,
+    "no_blocking_reviews": true,
+    "no_stale_overrides": true,
+    "only_approved_inferred_aliases_exported": true
+  },
+  "player_alias_rows": 9,
+  "replay_count": 3,
+  "status": {
+    "blockers": "",
+    "blocking_reviews": 0,
+    "expected_replays": 3,
+    "integrity_errors": 0,
+    "matched_replays": 3,
+    "missing_replays": 0,
+    "pending_alias_reviews": 0,
+    "stale_overrides": 0,
+    "status": "verified",
+    "total_map_rows": 48,
+    "tournament": "META Madness #5 Qualifiers",
+    "unresolved_maps": 0,
+    "verified": "yes"
+  },
+  "tournament": "META Madness #5 Qualifiers"
+}

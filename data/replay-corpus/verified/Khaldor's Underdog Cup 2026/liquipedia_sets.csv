@@ -1,0 +1,23 @@
+set_id,date,team_1,team_2,team_1_score,team_2_score,winner,best_of,finished,notes,set_position_in_tournament,source_page
+b14c54fc-f42d-46db-a563-9fb653ccdfa0,2026-01-10 14:00 UTC,Munchies,AFK For Cocoa,2,0,1,3,,,Round 1,Khaldors Underdog Cup/3/Div 2-3
+bcae1305-bc0d-4004-9530-bc64c262d605,2026-01-10 15:00 UTC,KlubR,Late Game Kings,,,,3,,"KlubR substitution: Arkunnis in, ? out",{{Stage|Qualifying Round}},Khaldors Underdog Cup/3/Div 2-3
+3350c172-6724-4b42-8e7c-859edcd06008,2026-01-10 16:00 UTC,UwU Fighters,Always Late,,,,3,,"UwU Fighters substitution: Aletis in, ? out",{{Stage|Qualifying Round}},Khaldors Underdog Cup/3/Div 2-3
+480e8ad3-238c-4220-ba30-4c5c4cd8ea74,2026-01-10 17:00 UTC,KDAgents,Fabled Fanclub,2,0,1,3,,,{{Stage|Qualifying Round}},Khaldors Underdog Cup/3/Div 2-3
+03382a5b-1fc0-462a-95ca-7614027b7846,2026-01-11 14:00 UTC,Quack Team,Lachs Strikes Again,2,0,1,3,,,{{Stage|Qualifying Round}},Khaldors Underdog Cup/3/Div 2-3
+d2f46857-03f8-413b-9e6d-d82f4b4d5cea,2026-01-11 15:00 UTC,Ascendant,Sauna Tent,W,L,,3,,,{{Stage|Qualifying Round}},Khaldors Underdog Cup/3/Div 2-3
+1d922f32-2ab8-45de-9a1a-fade842cc23a,2026-01-11 16:00 UTC,Hit The Core,Pacas on Drugs,0,2,2,3,,,{{Stage|Qualifying Round}},Khaldors Underdog Cup/3/Div 2-3
+abdd27e6-d545-4e10-93de-e1b8e5f9e18c,2026-01-11 17:00 UTC,Team Cat Red,DeathlyVibe,2,0,1,3,,,{{Stage|Qualifying Round}},Khaldors Underdog Cup/3/Div 2-3
+f823a9d2-e0d6-4b51-87bc-ce6fbfccc306,2026-01-17 14:00 UTC,UwU Fighters,Ascendant,,,,3,,,Upper Bracket Quarterfinals,Khaldors Underdog Cup/3/Div 2-3
+23b0a1d7-3b48-4ef9-9f7a-be5a1bac380b,2026-01-17 15:00 UTC,KlubR,Team Cat Red,,,,3,,"KlubR substitution: Hajdunio in, ? out; KlubR substitution: Warnik in, ? out",{{Stage|Main Event}},Khaldors Underdog Cup/3/Div 2-3
+8b83c15f-59b7-41d2-8e5e-2bb3ff68d57c,2026-01-18 14:00 UTC,Munchies,Pacas on Drugs,,,,3,,,{{Stage|Main Event}},Khaldors Underdog Cup/3/Div 2-3
+23c7657b-8a01-421b-a07f-ba54eaf33bfc,2026-01-18 15:00 UTC,KDAgents,Quack Team,,,,3,,,{{Stage|Main Event}},Khaldors Underdog Cup/3/Div 2-3
+0ce51c7b-805a-4966-b1ec-b2db39bd50ca,2026-01-17 16:00 UTC,UwU Fighters,Team Cat Red,,,,3,,"UwU Fighters substitution: Hajdunio in, ? out",Upper Bracket Semifinals,Khaldors Underdog Cup/3/Div 2-3
+eace4754-adb5-49f0-9960-79a37054bc67,2026-01-18 16:00 UTC,Pacas on Drugs,KDAgents,,,,3,,,{{Stage|Main Event}},Khaldors Underdog Cup/3/Div 2-3
+df74b5b9-d4c5-44dd-a2a8-d742a8326f48,2026-01-25 14:00 UTC,Team Cat Red,KDAgents,,,,5,,,Upper Bracket Final,Khaldors Underdog Cup/3/Div 2-3
+4f21eba2-f0b8-4684-9a1f-87a7470bfed3,2026-01-17 17:00 UTC,Ascendant,KlubR,,,,3,,,Lower Bracket Round 1,Khaldors Underdog Cup/3/Div 2-3
+d2e89d72-5aaa-46a1-a3ca-358f525bd96e,2026-01-18 17:00 UTC,Munchies,Quack Team,,,,3,,,{{Stage|Main Event}},Khaldors Underdog Cup/3/Div 2-3
+201e6b32-f622-463a-9db5-2e5e4f243e1b,2026-01-24 15:00 UTC,Pacas on Drugs,Ascendant,,,,3,,"Pacas on Drugs substitution: sch4n in, ? out; Pacas on Drugs substitution: YIZzlFIZzl in, ? out",Lower Bracket Quarterfinals,Khaldors Underdog Cup/3/Div 2-3
+bad88f3d-6d54-444d-87e3-0731d9f189e8,2026-01-24 16:00 UTC,UwU Fighters,Munchies,,,,3,,"UwU Fighters substitution: Hajdunio in, ? out",{{Stage|Main Event}},Khaldors Underdog Cup/3/Div 2-3
+5803fcb3-973e-4939-b25f-d63fb7698d15,2026-01-24 17:00 UTC,Pacas on Drugs,UwU Fighters,,,,3,true,"Pacas on Drugs substitution: sch4n in, ? out; Pacas on Drugs substitution: YIZzlFIZzl in, ? out; UwU Fighters substitution: Hajdunio in, ? out",Lower Bracket Semifinal,Khaldors Underdog Cup/3/Div 2-3
+b2ab6423-07b1-445e-a4ff-48d984b75c2e,2026-01-25 16:00 UTC,Team Cat Red,UwU Fighters,,,,5,,,Lower Bracket Final,Khaldors Underdog Cup/3/Div 2-3
+66a77fca-ad4a-4d2e-94a3-c30348a51c75,2026-01-25 18:00 UTC,KDAgents,Team Cat Red,,,,5,,,Grand Final,Khaldors Underdog Cup/3/Div 2-3

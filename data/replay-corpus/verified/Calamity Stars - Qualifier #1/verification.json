@@ -1,0 +1,50 @@
+{
+  "files_sha256": {
+    "2023-09-16 18.00 Hairy guys 2.0 vs Paris Sem Grana/Map 1 (Battlefield of Eternity).StormReplay": "8db89a0c9765cdc4040e76a04ef61c4b0b4b151e23985fb74072d4a5fee0c6d0",
+    "2023-09-16 18.00 Hairy guys 2.0 vs Paris Sem Grana/Map 2 (Tomb of the Spider Queen).StormReplay": "dd3ba86e2bdbe9df9c379f4d462eda918230245673207b2a8142df5167df473b",
+    "2023-09-16 18.00 Hairy guys 2.0 vs Paris Sem Grana/Map 3 (Dragon Shire).StormReplay": "fc6d3f6daf3b3a60cc35f08dc156a19600bf80318012e37b9680b67cf180d7db",
+    "2023-09-16 18.00 STOMP Team vs Macacoletas/Map 1 (Dragon Shire).StormReplay": "b17baa2a3d63ad72b380f3ff2dc2c3ec8821ec2313c12f8a6e6eb28f2aee64bc",
+    "2023-09-16 18.00 STOMP Team vs Macacoletas/Map 2 (Cursed Hollow).StormReplay": "d354f876dbfde4eb3bfa9db4fe6b633fd67fbbd6f7452b7e608320e2a44b25af",
+    "2023-09-16 20.00 Hairy guys 2.0 vs Macacoletas/Map 1 (Infernal Shrines).StormReplay": "1efb6a8ff3a0c064525ce942d2d05805a32f8c4e3d8ddd90651953dcf940edbb",
+    "2023-09-16 20.00 Hairy guys 2.0 vs Macacoletas/Map 2 (Volskaya Foundry).StormReplay": "51d5680ac1510d12c1ceb24a9ec53826e70c41d46dac3ff0f493f642227f1330",
+    "2023-09-16 20.00 Hairy guys 2.0 vs Macacoletas/Map 3 (Tomb of the Spider Queen).StormReplay": "7b1d3219be3298e50b03d8d4cdffa1c2fcf7965cd1c70ac45ed83fc66c582b5e",
+    "2023-09-16 22.00 Macacoletas vs Paris Sem Grana/Map 1 (Dragon Shire).StormReplay": "890d0f520379d6a798931fe08111c1e7c6b1f9dff0d4ea957c4e51c5a3a73fd4",
+    "2023-09-16 22.40 Hairy guys 2.0 vs Paris Sem Grana/Map 1 (Battlefield of Eternity).StormReplay": "4a0c10d898017c7ae87b1eb1337db463538ee74999f37972ea6c9bad859cefd1",
+    "2023-09-16 22.40 Hairy guys 2.0 vs Paris Sem Grana/Map 2 (Garden of Terror).StormReplay": "305b08061990998305a301cef94d6adbfb68c67ace8f64726f6cfdff237aadb7",
+    "archive_status.json": "1c2d24f6d9f01143de8f23c85d3d6b75aea9dbc492b322ffbc8c5342bd8363e0",
+    "liquipedia_maps.csv": "fc9b409176bfb206dbc2ae44303b05f713837f84dcb92c9413d7092edb85e1d9",
+    "liquipedia_sets.csv": "049fd3ab0cd247e12f1e12ede6719623f353e81209811c4727e5e8ee1ba3149e",
+    "liquipedia_teams.csv": "9ea320eaa1967e0fc4ee979f3c575ef7fc326db4a3bfe4c4f0819a181aebaaf4",
+    "liquipedia_url.txt": "4c780d0c0162faaf5be82b83f5172bc5d8f1822a223a06d7ac8e96c16379bf0e",
+    "maps.csv": "fc9b409176bfb206dbc2ae44303b05f713837f84dcb92c9413d7092edb85e1d9",
+    "player_battletags.csv": "9de8ad9a53e118eadbec4b5a79861db87b99b4a981cf2e18d30316d22ddcc65e",
+    "replay_manifest.csv": "005edc4b5ec565664c1331af208e73a013575dbb1c72440fae31db90fb619071",
+    "sets.csv": "049fd3ab0cd247e12f1e12ede6719623f353e81209811c4727e5e8ee1ba3149e",
+    "teams.csv": "9ea320eaa1967e0fc4ee979f3c575ef7fc326db4a3bfe4c4f0819a181aebaaf4"
+  },
+  "gates": {
+    "complete_replay_coverage": true,
+    "manifest_integrity": true,
+    "no_blocking_reviews": true,
+    "no_stale_overrides": true,
+    "only_approved_inferred_aliases_exported": true
+  },
+  "player_alias_rows": 19,
+  "replay_count": 11,
+  "status": {
+    "blockers": "",
+    "blocking_reviews": 0,
+    "expected_replays": 11,
+    "integrity_errors": 0,
+    "matched_replays": 11,
+    "missing_replays": 0,
+    "pending_alias_reviews": 2,
+    "stale_overrides": 0,
+    "status": "verified",
+    "total_map_rows": 11,
+    "tournament": "Calamity Stars - Qualifier #1",
+    "unresolved_maps": 0,
+    "verified": "yes"
+  },
+  "tournament": "Calamity Stars - Qualifier #1"
+}

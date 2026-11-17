@@ -1,0 +1,14 @@
+{
+  "archive_blockers": [],
+  "counts": {
+    "matched": 8
+  },
+  "expected_replays": 8,
+  "maps_owned_elsewhere": 0,
+  "matched_replays": 8,
+  "no_replay_expected": 0,
+  "status": "fully_archived",
+  "total_map_rows": 8,
+  "tournament": "Calamity Stars - Qualifier #3",
+  "unresolved_maps": 0
+}

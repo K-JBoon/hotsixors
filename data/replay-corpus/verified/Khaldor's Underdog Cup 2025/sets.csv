@@ -1,0 +1,97 @@
+set_id,date,team_1,team_2,team_1_score,team_2_score,winner,best_of,finished,notes,set_position_in_tournament,source_page
+5f596d82-674b-4615-b956-fec9f218120f,2025-03-29 15:00 UTC,KDAgents,Jelly's Dancing Clowns,,,,3,,,Upper Bracket Semifinals,Khaldors Underdog Cup
+c5b34cb8-2693-4424-8afa-658f193b99b4,2025-03-29 16:00 UTC,SURGE ENERGY,Hit The Core,,,,,,,Group A,Khaldors Underdog Cup
+42cf7392-beeb-4ba9-93e6-6249cf6d35be,2025-03-29 17:00 UTC,KDAgents,SURGE ENERGY,,,,,,,Upper Bracket Final,Khaldors Underdog Cup
+b768068d-2455-4176-9bd2-d5a685e02e27,2025-03-29 18:00 UTC,Jelly's Dancing Clowns,Hit The Core,,,,,,"Hit The Core substitution: HeyKo in, Dwergman out",Lower Bracket Semifinal,Khaldors Underdog Cup
+6da4cf59-c6ee-4dd6-bbfc-846321220ffe,2025-03-29 19:00 UTC,SURGE ENERGY,Jelly's Dancing Clowns,,,,,,,Lower Bracket Final,Khaldors Underdog Cup
+3cd74d79-dd1b-44a6-b79b-75ffbe526f53,2025-03-30 14:00 UTC,KDCgents,SometimesYouJustWin,,,,3,,,Upper Bracket Semifinals,Khaldors Underdog Cup
+9bb6047b-410e-428d-9d2b-6890825ba1fc,2025-03-30 15:00 UTC,Low Apm,Team Cat Red,,,,,,,Group B,Khaldors Underdog Cup
+18b9cc81-1fb4-4d10-a4da-b24a41b91281,2025-03-30 16:00 UTC,SometimesYouJustWin,Low Apm,,,,,,,Upper Bracket Final,Khaldors Underdog Cup
+22918f54-d362-46cd-9318-3dc53e279df1,2025-03-30 17:00 UTC,KDCgents,Team Cat Red,,,,,,,Lower Bracket Semifinal,Khaldors Underdog Cup
+7570d77b-3a57-4d4c-acba-4b65f4d3e792,2025-03-30 18:00 UTC,Low Apm,KDCgents,,,,,,"Low Apm substitution: Arkunnis in, Mimikkyu out",Lower Bracket Final,Khaldors Underdog Cup
+4ec1ec4d-f4d0-4499-8cd5-5aeb472828a0,2025-04-05 14:00 UTC,KDAgents,KDCgents,,,,5,,,Upper Bracket Semifinals,Khaldors Underdog Cup
+119b3274-fb14-4a35-b88b-fd06cae86c9b,2025-04-05 16:00 UTC,SometimesYouJustWin,Jelly's Dancing Clowns,,,,,,"Jelly's Dancing Clowns substitution: Sasori in, Mementos out",{{Stage|Playoffs}},Khaldors Underdog Cup
+d014de5b-8b1b-49c1-a172-13d29a1e4e79,2025-04-06 14:00 UTC,KDAgents,SometimesYouJustWin,,,,,,,Upper Bracket Final,Khaldors Underdog Cup
+3efa7009-086d-4752-a2b3-3d8a6dd6273e,2025-04-05 18:00 UTC,KDCgents,Jelly's Dancing Clowns,,,,,,"KDCgents substitution: Werkmann in, Neptabyss out; KDCgents substitution: Akropolis in, Joey out; Jelly's Dancing Clowns substitution: Sasori in, Mementos out",Lower Bracket Semifinal,Khaldors Underdog Cup
+d2f21d1c-f7fd-4ced-a9e7-718c63e38b47,2025-04-06 16:00 UTC,KDAgents,KDCgents,,,,,,"KDCgents substitution: Werkmann in, Fiz out",Lower Bracket Final,Khaldors Underdog Cup
+bc753d65-39e1-4241-97d7-2cf65bdab5fc,2025-04-06 18:00 UTC,SometimesYouJustWin,KDAgents,,,,,,,Grand Final,Khaldors Underdog Cup
+aaaf4672-32be-4b9e-a10b-71781b0d2b12,2025-07-19 14:00 UTC,Low Apm,Team Space,2,0,1,3,,,Upper Bracket Round 1,Khaldors Underdog Cup/2
+5e646cea-ab83-4f82-b2f7-afe1fb5cffd6,2025-07-19 14:00 UTC,Hit The Core,Sigma M@ils,2,0,1,3,,,Upper Bracket Round 1,Khaldors Underdog Cup/2
+709f7b06-04da-43ac-9f07-d4d0eb79d164,2025-07-19 17:00 UTC,UwU Fighters,CoB Antimeta,2,0,1,3,,,Upper Bracket Round 1,Khaldors Underdog Cup/2
+ca8bdc4b-16f1-49fd-8c07-1032be22c453,2025-07-19 17:00 UTC,No Vision,Hopium Academy,2,0,1,3,,,Upper Bracket Round 1,Khaldors Underdog Cup/2
+d606eb82-39bd-47a5-a37a-27f7c004affd,2025-07-19 15:00 UTC,Low Apm,Hit The Core,0,2,2,3,,,Upper Bracket Round 2,Khaldors Underdog Cup/2
+19c6aa97-be22-479a-b039-7a2d70da4a2f,2025-07-19 18:00 UTC,UwU Fighters,No Vision,2,0,1,3,,,Upper Bracket Round 2,Khaldors Underdog Cup/2
+f4341a31-1698-46bf-8aae-49a38ecdfe5b,2025-07-19 16:00 UTC,Team Space,Sigma M@ils,0,2,2,3,,,Lower Bracket Round 1,Khaldors Underdog Cup/2
+5248a49c-dfd5-40b2-8ddd-24df0d6f052a,2025-07-19 19:00 UTC,CoB Antimeta,Hopium Academy,2,0,1,3,,,Lower Bracket Round 1,Khaldors Underdog Cup/2
+e0565e9b-da87-41de-bea3-474524888ec4,2025-07-22 17:00 UTC,No Vision,Sigma M@ils,2,0,1,3,,,Lower Bracket Round 2,Khaldors Underdog Cup/2
+6e66f7c9-caed-4333-a195-e02d1271a0e0,2025-07-22 18:00 UTC,Low Apm,CoB Antimeta,2,0,1,3,,,Lower Bracket Round 2,Khaldors Underdog Cup/2
+61139450-9637-4a10-81b2-f06eec9c79bd,2025-07-22 19:00 UTC,No Vision,Low Apm,0,2,2,3,,,Lower Bracket Round 3,Khaldors Underdog Cup/2
+94f5f899-2584-42b1-a90b-d9201e46310b,2025-07-20 14:00 UTC,Munchies,The Wombat Factor,2,0,1,3,,,Upper Bracket Round 1,Khaldors Underdog Cup/2
+d4e66c73-a1d0-45b4-9dcd-dae56703e950,2025-07-20 14:00 UTC,Handsome Human Commoners,FeelsAbzeerMan,1,2,2,3,,,Upper Bracket Round 1,Khaldors Underdog Cup/2
+2e1386d3-7699-49ef-83f0-f679b3306010,2025-07-20 17:00 UTC,KlubR,INAEqualis,2,0,1,3,,,Upper Bracket Round 1,Khaldors Underdog Cup/2
+ef422254-a897-4b98-8e1e-c87b28a03e8e,2025-07-20 17:00 UTC,KDAgents,Sloth Sanctuary,2,0,1,3,,,Upper Bracket Round 1,Khaldors Underdog Cup/2
+a18e82f5-cc4d-48b5-916f-e7fe61303cd7,2025-07-20 15:00 UTC,Munchies,FeelsAbzeerMan,2,1,1,3,,,Upper Bracket Round 2,Khaldors Underdog Cup/2
+c6f77750-fd2e-4960-bd39-457a3528e4df,2025-07-20 18:00 UTC,KlubR,KDAgents,1,2,2,3,,,Upper Bracket Round 2,Khaldors Underdog Cup/2
+51c33ea2-6130-4f0b-92ae-81ea5d6986c3,2025-07-20 16:00 UTC,The Wombat Factor,Handsome Human Commoners,0,2,2,3,,,Lower Bracket Round 1,Khaldors Underdog Cup/2
+1bbb5aca-554b-4322-8f53-0771ac61d665,2025-07-20 19:00 UTC,INAEqualis,Sloth Sanctuary,1,2,2,3,,,Lower Bracket Round 1,Khaldors Underdog Cup/2
+3f521680-93ee-4dab-863d-caaf168085a3,2025-07-23 17:00 UTC,KlubR,Handsome Human Commoners,2,0,1,3,,,Lower Bracket Round 2,Khaldors Underdog Cup/2
+f73e7d15-3f08-46ca-84e7-64c8a6563f57,2025-07-23 18:00 UTC,FeelsAbzeerMan,Sloth Sanctuary,2,0,1,3,,,Lower Bracket Round 2,Khaldors Underdog Cup/2
+987fd63f-aef2-43b0-a339-2a4c4fdd98c0,2025-07-23 19:00 UTC,KlubR,FeelsAbzeerMan,1,2,2,3,,,Lower Bracket Round 3,Khaldors Underdog Cup/2
+d587d34e-c2f3-4520-b614-b389797e0abf,2025-07-26 14:00 UTC,Munchies,Hit The Core,,,,5,,,Upper Bracket Semifinals,Khaldors Underdog Cup/2
+42c29c52-e8dd-447f-83b5-5449d2e71b2e,2025-07-26 16:00 UTC,KDAgents,UwU Fighters,,,,5,,,{{Stage|Playoffs}},Khaldors Underdog Cup/2
+cc599968-ebb1-4e44-9a27-5be9586c1b91,2025-07-26 19:00 UTC,Munchies,UwU Fighters,,,,5,,,Upper Bracket Final,Khaldors Underdog Cup/2
+731ac964-d070-4267-820a-d5d6f0e8fb26,2025-07-27 14:00 UTC,KDAgents,FeelsAbzeerMan,,,,3,,,Lower Bracket Quarterfinals,Khaldors Underdog Cup/2
+1f57bb92-fbc8-4611-8ee3-c4c72f10b47a,2025-07-26 19:00 UTC,Hit The Core,Low apm,,,,3,,,{{Stage|Playoffs}},Khaldors Underdog Cup/2
+ff6e020e-16bb-45b7-8dbe-365b6b0ec657,2025-07-27 15:00 UTC,KDAgents,Low apm,,,,5,,,Lower Bracket Semifinal,Khaldors Underdog Cup/2
+ede0815b-4883-40be-922f-b84fbbf2921f,2025-07-27 17:00 UTC,Munchies,KDAgents,,,,5,,,Lower Bracket Final,Khaldors Underdog Cup/2
+26a7cfb2-225c-4430-a3db-494d19adc99c,2025-07-27 19:00 UTC,UwU Fighters,KDAgents,,,,5,,,Grand Final,Khaldors Underdog Cup/2
+bb0a85e9-ad14-4164-b9da-537f7c5c1e13,2026-01-10 14:00 UTC,Munchies,AFK For Cocoa,2,0,1,3,,,Round 1,Khaldors Underdog Cup/3/Div 2-3
+20729a35-efda-4ae4-bef5-691bfd31a50a,2026-01-10 15:00 UTC,KlubR,Late Game Kings,,,,3,,"KlubR substitution: Arkunnis in, ? out",{{Stage|Qualifying Round}},Khaldors Underdog Cup/3/Div 2-3
+5385a2c3-d4e5-4cc4-84ba-5d870dd27fb0,2026-01-10 16:00 UTC,UwU Fighters,Always Late,,,,3,,"UwU Fighters substitution: Aletis in, ? out",{{Stage|Qualifying Round}},Khaldors Underdog Cup/3/Div 2-3
+a36444b3-d9ea-497a-9628-1186afbe3a44,2026-01-10 17:00 UTC,KDAgents,Fabled Fanclub,2,0,1,3,,,{{Stage|Qualifying Round}},Khaldors Underdog Cup/3/Div 2-3
+3afe8fe7-6b61-4ed3-8c20-610efaadc28c,2026-01-11 14:00 UTC,Quack Team,Lachs Strikes Again,2,0,1,3,,,{{Stage|Qualifying Round}},Khaldors Underdog Cup/3/Div 2-3
+42ba0900-5e85-45cc-b310-e23c2a084072,2026-01-11 15:00 UTC,Ascendant,Sauna Tent,W,L,,3,,,{{Stage|Qualifying Round}},Khaldors Underdog Cup/3/Div 2-3
+ce1f848a-9e89-4c93-af43-f7cd546d3d68,2026-01-11 16:00 UTC,Hit The Core,Pacas on Drugs,0,2,2,3,,,{{Stage|Qualifying Round}},Khaldors Underdog Cup/3/Div 2-3
+02845aee-b9b2-4e34-939f-bc4d2bb67203,2026-01-11 17:00 UTC,Team Cat Red,DeathlyVibe,2,0,1,3,,,{{Stage|Qualifying Round}},Khaldors Underdog Cup/3/Div 2-3
+c4ae44c4-4678-4cbd-b8ff-7d102fad72ce,2026-01-17 14:00 UTC,UwU Fighters,Ascendant,,,,3,,,Upper Bracket Quarterfinals,Khaldors Underdog Cup/3/Div 2-3
+2171b567-36b6-4219-a43f-94df68f767d4,2026-01-17 15:00 UTC,KlubR,Team Cat Red,,,,3,,"KlubR substitution: Hajdunio in, ? out; KlubR substitution: Warnik in, ? out",{{Stage|Main Event}},Khaldors Underdog Cup/3/Div 2-3
+b254d359-6ec5-4f43-8bd8-a90c8399702d,2026-01-18 14:00 UTC,Munchies,Pacas on Drugs,,,,3,,,{{Stage|Main Event}},Khaldors Underdog Cup/3/Div 2-3
+6ce5bbec-2450-4138-ad3d-c7b2079391e9,2026-01-18 15:00 UTC,KDAgents,Quack Team,,,,3,,,{{Stage|Main Event}},Khaldors Underdog Cup/3/Div 2-3
+d86b1985-9a4b-43fc-90b8-3026c81358fc,2026-01-17 16:00 UTC,UwU Fighters,Team Cat Red,,,,3,,"UwU Fighters substitution: Hajdunio in, ? out",Upper Bracket Semifinals,Khaldors Underdog Cup/3/Div 2-3
+5f884a60-9a01-4a26-9837-74566e47d097,2026-01-18 16:00 UTC,Pacas on Drugs,KDAgents,,,,3,,,{{Stage|Main Event}},Khaldors Underdog Cup/3/Div 2-3
+09605913-468b-48f3-9212-169587b8ca88,2026-01-25 14:00 UTC,Team Cat Red,KDAgents,,,,5,,,Upper Bracket Final,Khaldors Underdog Cup/3/Div 2-3
+ff62d150-bb02-451b-a983-0ea77cb4e700,2026-01-17 17:00 UTC,Ascendant,KlubR,,,,3,,,Lower Bracket Round 1,Khaldors Underdog Cup/3/Div 2-3
+a657fc54-0a20-482a-87b8-82e86bbca2c6,2026-01-18 17:00 UTC,Munchies,Quack Team,,,,3,,,{{Stage|Main Event}},Khaldors Underdog Cup/3/Div 2-3
+dc73104e-20a7-4313-8f70-b599da3d8807,2026-01-24 15:00 UTC,Pacas on Drugs,Ascendant,,,,3,,"Pacas on Drugs substitution: sch4n in, ? out; Pacas on Drugs substitution: YIZzlFIZzl in, ? out",Lower Bracket Quarterfinals,Khaldors Underdog Cup/3/Div 2-3
+707b8db9-6be7-4c8b-965b-30839cbab240,2026-01-24 16:00 UTC,UwU Fighters,Munchies,,,,3,,"UwU Fighters substitution: Hajdunio in, ? out",{{Stage|Main Event}},Khaldors Underdog Cup/3/Div 2-3
+7234b828-06b0-4bd8-83d6-338127c24def,2026-01-24 17:00 UTC,Pacas on Drugs,UwU Fighters,,,,3,true,"Pacas on Drugs substitution: sch4n in, ? out; Pacas on Drugs substitution: YIZzlFIZzl in, ? out; UwU Fighters substitution: Hajdunio in, ? out",Lower Bracket Semifinal,Khaldors Underdog Cup/3/Div 2-3
+f3ab6f54-0337-4f6f-a7bf-6f73501d3d21,2026-01-25 16:00 UTC,Team Cat Red,UwU Fighters,,,,5,,,Lower Bracket Final,Khaldors Underdog Cup/3/Div 2-3
+fd21ccec-a5cd-453a-8d3c-4e2b7486fd55,2026-01-25 18:00 UTC,KDAgents,Team Cat Red,,,,5,,,Grand Final,Khaldors Underdog Cup/3/Div 2-3
+c03cf3b5-af64-45f1-b1d0-e2cdb4e719b4,2025-11-01 15:00 UTC,Sloth Sanctuary,31apm,,,,3,,"Sloth Sanctuary substitution: LizzieRyan in, Narsha out",Upper Bracket Quarterfinals,Khaldors Underdog Cup/3/Div 4-5
+00d12508-f965-4325-94da-5333ecd607c8,2025-11-01 14:00 UTC,Fischers Fritz fischt frische Fische,Team Space,,,,3,,,Participating Teams,Khaldors Underdog Cup/3/Div 4-5
+11c12b51-d947-4e8f-9a76-a1e1a1dcde67,2025-11-02 14:00 UTC,Für Rum und Ähre,Donation Squad,,,,3,,,Participating Teams,Khaldors Underdog Cup/3/Div 4-5
+5618db35-8010-4a3d-8ca0-23d59d6fc3bd,2025-11-02 15:00 UTC,Big Click Energy,Nakkivene,,,,3,,,Participating Teams,Khaldors Underdog Cup/3/Div 4-5
+0132ab71-5ac9-4e13-b530-6f8d317a8169,2025-11-01 16:00 UTC,Sloth Sanctuary,Fischers Fritz fischt frische Fische,,,,3,,"Sloth Sanctuary substitution: LizzieRyan in, Narsha out",Upper Bracket Semifinals,Khaldors Underdog Cup/3/Div 4-5
+a2a17ef0-bcab-410b-a5aa-65984ced92a1,2025-11-02 16:00 UTC,Für Rum und Ähre,Nakkivene,,,,3,,,Participating Teams,Khaldors Underdog Cup/3/Div 4-5
+cc430bfb-2faf-4e0a-9d77-aea82e08c726,2025-11-09 14:00 UTC,Sloth Sanctuary,Für Rum und Ähre,,,,5,,,Upper Bracket Final,Khaldors Underdog Cup/3/Div 4-5
+3f530ae6-24a5-4531-bf90-31507437508c,2025-11-01 17:00 UTC,31apm,Team Space,,,,3,,,Lower Bracket Round 1,Khaldors Underdog Cup/3/Div 4-5
+80ee2918-5fc5-4d4d-9f54-97c6c5371d8f,2025-11-02 17:00 UTC,Donation Squad,Big Click Energy,,,,3,,,Participating Teams,Khaldors Underdog Cup/3/Div 4-5
+2b8430c7-fded-4333-ac3b-11c49f1a5a49,2025-11-08 15:00 UTC,Nakkivene,Team Space,,,,3,,,Lower Bracket Quarterfinals,Khaldors Underdog Cup/3/Div 4-5
+2cfb4259-f587-47e0-855f-ccc51abf3017,2025-11-08 16:00 UTC,Fischers Fritz fischt frische Fische,Big Click Energy,,,,3,,,Participating Teams,Khaldors Underdog Cup/3/Div 4-5
+91d0943c-5f6a-4f93-9ac9-8fcd77c94e88,2025-11-08 17:00 UTC,Nakkivene,Fischers Fritz fischt frische Fische,,,,3,,,Lower Bracket Semifinal,Khaldors Underdog Cup/3/Div 4-5
+5823ffc7-07a0-4e4c-86db-5cae38a1ec8d,2025-11-09 16:00 UTC,Sloth Sanctuary,Nakkivene,,,,5,,,Lower Bracket Final,Khaldors Underdog Cup/3/Div 4-5
+d6678f0d-0b05-49e8-92ec-7e1c17a2649a,2025-11-09 18:00 UTC,Für Rum und Ähre,Nakkivene,,,,5,,,Grand Final,Khaldors Underdog Cup/3/Div 4-5
+4703405b-51a9-490b-beea-3f64da970b57,2026-05-02 13:00 UTC,Blackhearts Boys,Team Space,,,,3,,,Upper Bracket Quarterfinals,Khaldors Underdog Cup/4/Div 5
+0ba28701-319e-484e-b4a8-7f5a5f582a5c,2026-05-02 14:00 UTC,Murloc Inquisition,Die Gummibärenbande,,,,3,,"Die Gummibärenbande substitution: Kjeldoran in, SgtJohnny out",Participating Teams,Khaldors Underdog Cup/4/Div 5
+de4afa13-da75-439a-bd1e-b5d48494e421,2026-05-03 13:00 UTC,Nous Pas Comprendre,FAT Bulbasaur,,,,3,,,Participating Teams,Khaldors Underdog Cup/4/Div 5
+3c7dcfe7-c606-4617-8dfa-252f6193b383,2026-05-03 14:00 UTC,To The Cho.. To The Gall,INAEqualis,,,,3,,"INAEqualis substitution: Lenus in, Elsyon out",Participating Teams,Khaldors Underdog Cup/4/Div 5
+6e4ce935-0dc2-4062-83f4-5b4a8bb32b49,2026-05-02 15:00 UTC,Blackhearts Boys,Murloc Inquisition,,,,3,,,Upper Bracket Semifinals,Khaldors Underdog Cup/4/Div 5
+ed3ce413-17e9-438e-bfaf-1cf51f1364d6,2026-05-03 15:00 UTC,Nous Pas Comprendre,To The Cho.. To The Gall,,,,3,,"Nous Pas Comprendre substitution: Hachmine3 in, Croissant out",Participating Teams,Khaldors Underdog Cup/4/Div 5
+5f2d75bb-48b4-4847-b692-473214418a6d,2026-05-10 13:00 UTC,Murloc Inquisition,To The Cho.. To The Gall,,,,5,,,Upper Bracket Final,Khaldors Underdog Cup/4/Div 5
+c0b7ce22-ea87-4d7f-9a51-69bd9e81c964,2026-05-02 16:00 UTC,Team Space,Die Gummibärenbande,,,,3,,"Team Space substitution: Kjeldoran in, TheLastGamer out",Lower Bracket Round 1,Khaldors Underdog Cup/4/Div 5
+8c2be875-0635-402e-bfd5-f2529a6b24f4,2026-05-03 15:00 UTC,FAT Bulbasaur,INAEqualis,,,,3,,,Participating Teams,Khaldors Underdog Cup/4/Div 5
+e739e36c-62a8-4417-9da1-d6acdc9b269b,2026-05-09 14:00 UTC,Nous Pas Comprendre,Die Gummibärenbande,,,,3,,"Die Gummibärenbande substitution: SackusTretus in, AliceWonder out",Lower Bracket Quarterfinals,Khaldors Underdog Cup/4/Div 5
+676585c8-b557-442c-ad0d-3f78e04bf40c,2026-05-09 15:00 UTC,Blackhearts Boys,INAEqualis,,,,3,,"Blackhearts Boys substitution: Bartender in, Franknfurter out; INAEqualis substitution: NotZap in, Sejra out; INAEqualis substitution: Ansatsusha in, Balghur out",Participating Teams,Khaldors Underdog Cup/4/Div 5
+28bdcf25-e5bc-4d0e-8456-f147382012d0,2026-05-09 16:00 UTC,Nous Pas Comprendre,INAEqualis,,,,3,,"INAEqualis substitution: NotZap in, Sejra out; INAEqualis substitution: Ansatsusha in, Balghur out",Lower Bracket Semifinal,Khaldors Underdog Cup/4/Div 5
+29428734-0b73-4c03-a7ad-2bc2a2146a6c,2026-05-10 15:00 UTC,Murloc Inquisition,Nous Pas Comprendre,,,,5,,,Lower Bracket Final,Khaldors Underdog Cup/4/Div 5
+6f418d2f-37d9-45c3-bcc7-7c8498d6c89c,2026-05-10 17:00 UTC,To The Cho.. To The Gall,Murloc Inquisition,,,,5,,,Grand Final,Khaldors Underdog Cup/4/Div 5

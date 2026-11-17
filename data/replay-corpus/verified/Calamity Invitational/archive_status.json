@@ -1,0 +1,15 @@
+{
+  "archive_blockers": [],
+  "counts": {
+    "matched": 25,
+    "no_replay_expected": 1
+  },
+  "expected_replays": 25,
+  "maps_owned_elsewhere": 0,
+  "matched_replays": 25,
+  "no_replay_expected": 1,
+  "status": "fully_archived",
+  "total_map_rows": 26,
+  "tournament": "Calamity Invitational",
+  "unresolved_maps": 0
+}

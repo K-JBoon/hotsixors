@@ -1,0 +1,14 @@
+{
+  "archive_blockers": [],
+  "counts": {
+    "matched": 13
+  },
+  "expected_replays": 13,
+  "maps_owned_elsewhere": 0,
+  "matched_replays": 13,
+  "no_replay_expected": 0,
+  "status": "fully_archived",
+  "total_map_rows": 13,
+  "tournament": "X-Cup Summer 2022 - Qualifier 3",
+  "unresolved_maps": 0
+}

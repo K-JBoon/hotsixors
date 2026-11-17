@@ -1,0 +1,47 @@
+{
+  "files_sha256": {
+    "2023-09-23 18.00 Grupinho vs Viboritos/Map 1 (Infernal Shrines).StormReplay": "8c6fe0faca85428f87c2009763933881f124482c21e4440fa894cfb87d26421b",
+    "2023-09-23 18.00 Grupinho vs Viboritos/Map 2 (Tomb of the Spider Queen).StormReplay": "378f0f222436e96491ec5a7f7e73354366a003b1b40b46ae61101985216e30c9",
+    "2023-09-23 19.15 Paris Sem Grana vs Viboritos/Map 1 (Infernal Shrines).StormReplay": "ed3bc46cda7fa469950246610c32b554ba86defeb2a10bd4613fdfdcd747e1bc",
+    "2023-09-23 19.15 Paris Sem Grana vs Viboritos/Map 2 (Tomb of the Spider Queen).StormReplay": "59308b267357026cffdb63a5ed47959cd8279c99249239427edd669212b2465e",
+    "2023-09-23 20.20 Viboritos vs Grupinho/Map 1 (Alterac Pass).StormReplay": "f41e44bb21e3643726de09dd6f76233d28bf1e6f2e85acea7e5ac356ab053640",
+    "2023-09-23 20.50 Paris Sem Grana vs Viboritos/Map 1 (Towers of Doom).StormReplay": "eb865f90f62bc5573b2fbb99047d238a0486e859623185ca51426ea0c1256a94",
+    "2023-09-23 20.50 Paris Sem Grana vs Viboritos/Map 2 (Battlefield of Eternity).StormReplay": "22db12fb8e2a91ba7180956bfa34d9279ecc6a2c700b93dc33ee201b77c7877c",
+    "2023-09-23 20.50 Paris Sem Grana vs Viboritos/Map 3 (Cursed Hollow).StormReplay": "e61741c460494034a9612a1324d6164e2033f4de72736143f0d34ba010af865f",
+    "archive_status.json": "8237afa09173e369b3e2dc7db24db09434e9351c6ade921609f2b7a6d0d99acc",
+    "liquipedia_maps.csv": "0822efcb4dac3eebd948f63f19c2c4390778e0575b230303822b0a06e285d333",
+    "liquipedia_sets.csv": "d260cd475cdec7448e4e7cf342e4e58a367b8f67916bc0aa25e727fc14a03a02",
+    "liquipedia_teams.csv": "00b3384dfbf5bde388be3aabfa82fe43d3c0e4568fe43de2a1bf23307d28ba2d",
+    "liquipedia_url.txt": "7977eba41c82af1e38c495df646b898fae9d478827321022a50743978ea38056",
+    "maps.csv": "0822efcb4dac3eebd948f63f19c2c4390778e0575b230303822b0a06e285d333",
+    "player_battletags.csv": "94be4ce0159f45a13d21061cb993d3e05a35e0c9017de5e3590b3a1a209fc986",
+    "replay_manifest.csv": "523c9b69751b95ae6b957b38d38a0f1caff20fa6a324740a13da1c9c1a24eac9",
+    "sets.csv": "d260cd475cdec7448e4e7cf342e4e58a367b8f67916bc0aa25e727fc14a03a02",
+    "teams.csv": "00b3384dfbf5bde388be3aabfa82fe43d3c0e4568fe43de2a1bf23307d28ba2d"
+  },
+  "gates": {
+    "complete_replay_coverage": true,
+    "manifest_integrity": true,
+    "no_blocking_reviews": true,
+    "no_stale_overrides": true,
+    "only_approved_inferred_aliases_exported": true
+  },
+  "player_alias_rows": 15,
+  "replay_count": 8,
+  "status": {
+    "blockers": "",
+    "blocking_reviews": 0,
+    "expected_replays": 8,
+    "integrity_errors": 0,
+    "matched_replays": 8,
+    "missing_replays": 0,
+    "pending_alias_reviews": 1,
+    "stale_overrides": 0,
+    "status": "verified",
+    "total_map_rows": 8,
+    "tournament": "Calamity Stars - Qualifier #3",
+    "unresolved_maps": 0,
+    "verified": "yes"
+  },
+  "tournament": "Calamity Stars - Qualifier #3"
+}

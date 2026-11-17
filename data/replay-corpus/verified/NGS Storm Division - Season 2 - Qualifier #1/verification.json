@@ -1,0 +1,50 @@
+{
+  "files_sha256": {
+    "2021-01-07 Chilly Mountain Academy vs Bronze6/Map 1 (Volskaya Foundry).StormReplay": "455b27dd3863443f862dc523870698fa9d1190600db195e74374924eda3de335",
+    "2021-01-07 Chilly Mountain Academy vs Bronze6/Map 2 (Tomb of the Spider Queen).StormReplay": "178188374fb4f739f7cf287c37d651a38c1fd893fc784756ee489556bcc5a79c",
+    "2021-01-07 Juan Direction vs WildHeart Omega/Map 1 (Infernal Shrines).StormReplay": "aa8065d78f6b2d5891376ccedd290f8b8edb08d0a19259ec00f16f5702c3b6be",
+    "2021-01-07 Juan Direction vs WildHeart Omega/Map 2 (Towers of Doom).StormReplay": "91b4ead864e9fa682a86ba8bc5553d6bcb9af4104e34926f5879b684595e78be",
+    "2021-01-08 Anti-Clown Association vs Chilly Mountain Academy/Map 1 (Tomb of the Spider Queen).StormReplay": "f5c42e09db3b8d205f529ed4becb7997c80f5af4ab1bff654a596da7f934f6de",
+    "2021-01-08 Anti-Clown Association vs Chilly Mountain Academy/Map 2 (Towers of Doom).StormReplay": "56c358fc5bd460de820f4466a2571e52f24bedf0cd954de7a36f12f8b0603506",
+    "2021-01-08 Anti-Clown Association vs Juan Direction/Map 1 (Dragon Shire).StormReplay": "5349be782179ee4f37c0e757c7b9bc005c2232d7e1b0f9eb91b9e94170fbc3a2",
+    "2021-01-08 Anti-Clown Association vs Juan Direction/Map 2 (Cursed Hollow).StormReplay": "b02f9f64dc3c036fb3dcd8ca26d29b903ae052da0381c135db372a63c624385b",
+    "2021-01-08 Anti-Clown Association vs Juan Direction/Map 3 (Infernal Shrines).StormReplay": "cdec48817958c0756897bd973fc8103ef02ec56ce0d9b147b414b09de2666b30",
+    "2021-01-08 WildHeart Alpha vs Chilly Mountain Academy/Map 1 (Tomb of the Spider Queen).StormReplay": "c31db059b5afd10d834d115bbdb2f4b13298c80b7174e03d0d4a6062112d76dc",
+    "2021-01-08 WildHeart Alpha vs Chilly Mountain Academy/Map 2 (Infernal Shrines).StormReplay": "286c7cb00975259b7c06c6fac8a8ec9471fe71675f7fca4c7e0a4f7a5c1a1e33",
+    "archive_status.json": "432199354d93f142bea9a75368e1abae9846737d7f7cef79457388812065ea6c",
+    "liquipedia_maps.csv": "2d9ee9a369c335e264a74e51043cd43cdb7f74797a780eb8f8747d8b8cdaa49e",
+    "liquipedia_sets.csv": "a72f4da06064ab34d880a84bf5231e90a73f2559ad080ed31a0136fccd8b0259",
+    "liquipedia_teams.csv": "145ecef95e4a4e07ea4cecd6bdbfdf2d004313ee87d3db4ecb3963771db1fc08",
+    "liquipedia_url.txt": "0e361c356da871db00d8112a8732f9fb219e09b79ec0b5a17f873d781394935d",
+    "maps.csv": "518694bdf903da602f4917b91c68f9dda3b56e9e17747952f6ff0296c8cff5ff",
+    "player_battletags.csv": "a5200821ffe1bd88a19f41793181f8f91384d30440f1e94fa9ae9cef59ccf031",
+    "replay_manifest.csv": "980dc9ada9be50e0165eb97b075f89b2b8d42eaa6dab251a19564630aec5bf93",
+    "sets.csv": "cf5e55d0ffe99321c3358e13d8f92c5299751cb8e36cb434349be038259e819e",
+    "teams.csv": "145ecef95e4a4e07ea4cecd6bdbfdf2d004313ee87d3db4ecb3963771db1fc08"
+  },
+  "gates": {
+    "complete_replay_coverage": true,
+    "manifest_integrity": true,
+    "no_blocking_reviews": true,
+    "no_stale_overrides": true,
+    "only_approved_inferred_aliases_exported": true
+  },
+  "player_alias_rows": 28,
+  "replay_count": 11,
+  "status": {
+    "blockers": "",
+    "blocking_reviews": 0,
+    "expected_replays": 11,
+    "integrity_errors": 0,
+    "matched_replays": 11,
+    "missing_replays": 0,
+    "pending_alias_reviews": 1,
+    "stale_overrides": 0,
+    "status": "verified",
+    "total_map_rows": 11,
+    "tournament": "NGS Storm Division - Season 2 - Qualifier #1",
+    "unresolved_maps": 0,
+    "verified": "yes"
+  },
+  "tournament": "NGS Storm Division - Season 2 - Qualifier #1"
+}

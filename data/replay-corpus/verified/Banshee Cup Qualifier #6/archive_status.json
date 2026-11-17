@@ -1,0 +1,15 @@
+{
+  "archive_blockers": [],
+  "counts": {
+    "matched": 23,
+    "no_replay_expected": 1
+  },
+  "expected_replays": 23,
+  "maps_owned_elsewhere": 0,
+  "matched_replays": 23,
+  "no_replay_expected": 1,
+  "status": "fully_archived",
+  "total_map_rows": 24,
+  "tournament": "Banshee Cup Qualifier #6",
+  "unresolved_maps": 0
+}

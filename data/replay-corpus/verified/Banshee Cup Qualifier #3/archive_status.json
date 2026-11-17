@@ -1,0 +1,14 @@
+{
+  "archive_blockers": [],
+  "counts": {
+    "matched": 30
+  },
+  "expected_replays": 30,
+  "maps_owned_elsewhere": 0,
+  "matched_replays": 30,
+  "no_replay_expected": 0,
+  "status": "fully_archived",
+  "total_map_rows": 30,
+  "tournament": "Banshee Cup Qualifier #3",
+  "unresolved_maps": 0
+}

@@ -1,0 +1,34 @@
+set_id,date,team_1,team_2,team_1_score,team_2_score,winner,best_of,finished,notes,set_position_in_tournament,source_page
+051bc622-c1e2-4684-89c3-2148789d380c,2025-05-03 14:00 UTC,ASH,Names Are Overrated,,,,3,,,Upper Bracket Quarterfinals,Heroes 10 EU Cup
+b7c5a219-0b08-426f-a4ba-2fd3c0d0130c,2025-05-03 14:00 UTC,3 Legged Cat,Team Cat Green,,,,,,,Group A,Heroes 10 EU Cup
+d291f3d2-ca52-4f00-8133-19ad6328e148,2025-05-03 15:30 UTC,Exodia Stack,ASH,,,,,,,Upper Bracket Semifinals,Heroes 10 EU Cup
+0bdea27e-b33b-4c03-bde4-ed881a443076,2025-05-03 16:30 UTC,RIP,3 Legged Cat,,,,,,,Group A,Heroes 10 EU Cup
+33608008-cf7c-456b-81cf-9dd4c9e1fa28,2025-05-04 14:00 UTC,Exodia Stack,RIP,,,,5,,,Upper Bracket Final,Heroes 10 EU Cup
+97403574-ee7a-4d54-b8b4-4e2ae1d4aac7,2025-05-03 18:30 UTC,3 Legged Cat,Names Are Overrated,,,,3,,,Lower Bracket Quarterfinals,Heroes 10 EU Cup
+c6eb6137-52b6-44c0-bf8a-6225713a884e,2025-05-03 18:30 UTC,ASH,Team Cat Green,,,,,,"Team Cat Green substitution: Autumn in, Guiltyspark out",Group A,Heroes 10 EU Cup
+d5c4e7ee-8c8d-4309-916c-a9aaebd89041,2025-05-04 16:35 UTC,3 Legged Cat,Team Cat Green,,,,5,,,Lower Bracket Semifinal,Heroes 10 EU Cup
+3004043e-0172-4594-9146-ac680f794a80,2025-05-04 18:00 UTC,Exodia Stack,3 Legged Cat,,,,,,"Exodia Stack substitution: Kure in, BadBenny out",Lower Bracket Final,Heroes 10 EU Cup
+d2161b6c-9d54-4ea0-ba00-357a3b7900bf,2025-05-10 14:00 UTC,Stack of DOOM,Madness,,,,3,,,Upper Bracket Quarterfinals,Heroes 10 EU Cup
+77049eed-d58d-4c02-ac78-4248180f9cbe,2025-05-10 14:00 UTC,DDX,SURGE ENERGY,,,,,,,Group B,Heroes 10 EU Cup
+cf9b1620-85f4-4a79-9b04-bb3b16100c5b,2025-05-10 15:00 UTC,RocketRaccoons,Stack of DOOM,,,,,,,Upper Bracket Semifinals,Heroes 10 EU Cup
+e54158e6-dc6d-4f42-af4a-5b394421991a,2025-05-10 16:10 UTC,SL Enjoyers,DDX,,,,,,,Group B,Heroes 10 EU Cup
+c4a868ed-6266-4ae9-9a58-6e829aa545b4,2025-05-11 14:00 UTC,RocketRaccoons,DDX,,,,5,,,Upper Bracket Final,Heroes 10 EU Cup
+89b47e7f-ef29-4c49-8747-c46d590a106c,2025-05-10 17:30 UTC,SL Enjoyers,Madness,,,,3,,,Lower Bracket Quarterfinals,Heroes 10 EU Cup
+31b56648-d351-4701-ad66-9571168d834f,2025-05-10 18:20 UTC,Stack of DOOM,SURGE ENERGY,,,,,,,Group B,Heroes 10 EU Cup
+6fa32c39-a5fd-491e-b108-98a0e138f124,2025-05-11 16:00 UTC,SL Enjoyers,Stack of DOOM,,,,5,,,Lower Bracket Semifinal,Heroes 10 EU Cup
+8c5d4353-cfb7-41dc-ac45-7c33a49e4a36,2025-05-11 17:45 UTC,DDX,SL Enjoyers,,,,,,,Lower Bracket Final,Heroes 10 EU Cup
+e148ec6a-a276-4f7e-a7d2-f4eb2b8c5be6,2025-05-17 16:00 UTC,3 Legged Cat,SURGE ENERGY,,,,5,,,Round 1,Heroes 10 EU Cup
+58675cfc-44f4-4c12-9d8d-0477b546b21e,"May 17, 2025",Stack of DOOM,ASH,W,FF,,,,ASH forfeited the match due to scheduling issues.,{{Stage|Last Chance Group}},Heroes 10 EU Cup
+a8af5d1c-51ac-4552-a573-cdaaadbc2fdd,2025-05-18 14:00 UTC,DDX,Names Are Overrated,,,,5,,"Names are Overrated substitution: Madron in, draigGoch out",{{Stage|Last Chance Group}},Heroes 10 EU Cup
+57015e35-56a3-4c87-a33c-e4ef8ab41be5,2025-05-18 16:30 UTC,Team Cat Green,Madness,,,,5,,,{{Stage|Last Chance Group}},Heroes 10 EU Cup
+9b9ec397-83d9-4045-b9a7-6c61c1f174d9,2025-05-17 17:35 UTC,3 Legged Cat,Stack of DOOM,,,,5,,"Stack of DOOM substitution: Kure in, XraYY out",Round 2,Heroes 10 EU Cup
+0d066f56-f30f-4447-8c94-4e379668965d,2025-05-18 18:15 UTC,DDX,Team Cat Green,,,,5,,,{{Stage|Last Chance Group}},Heroes 10 EU Cup
+90dfbf18-30ac-47d1-a243-485d1267b27e,2025-05-24 14:00 UTC,RIP,SL Enjoyers,,,,5,,,Upper Bracket Semifinals,Heroes 10 EU Cup
+67d0c3ea-e379-41d7-8b36-9fb43a37da16,2025-05-24 16:00 UTC,RocketRaccoons,Exodia Stack,,,,,,,{{Stage|Playoffs}},Heroes 10 EU Cup
+82c0669f-8562-428d-9cf4-f8f59e47eeec,2025-05-24 19:00 UTC,RIP,RocketRaccoons,,,,,,,Upper Bracket Final,Heroes 10 EU Cup
+ac8c66f8-e65e-4d67-98cb-03d9046b1562,2025-05-25 14:00 UTC,SL Enjoyers,Stack of DOOM,,,,,,,Lower Bracket Quarterfinals,Heroes 10 EU Cup
+658b3ee6-c6e6-4f22-a969-3e091755d6c9,2025-05-25 15:55 UTC,Exodia Stack,DDX,,,,,,,{{Stage|Playoffs}},Heroes 10 EU Cup
+1a26bd19-5b83-44a2-a5a8-71084b3abc95,2025-05-25 17:45 UTC,Stack of DOOM,Exodia Stack,,,,,,,Lower Bracket Semifinal,Heroes 10 EU Cup
+3ea1c519-73ab-41c1-b1c4-8fa08156c1f4,2025-05-31 15:10 UTC,RIP,Exodia Stack,,,,,,"RIP substitution: Breez in, Krankle out",Lower Bracket Final,Heroes 10 EU Cup
+324f799a-7fef-4a30-8914-1410ad00767a,2025-05-31 18:15 UTC,RocketRaccoons,Exodia Stack,,,,7,,RocketRaccoons has {{Abbr|FP|First Pick for Heroes on this map}} and Map Pick on Game 1 as an Upper Bracket team.,Grand Final,Heroes 10 EU Cup
+5fcf40dd-2daa-4100-b220-c6eeda93b0e0,2025-06-01 16:00 UTC,Exodia Stack,NA Roster,,,,7,,"Games 1, 3 and 5 are played on NA server. Games 2, 4, 6 and 7 are played on EU server.",{{Stage|EU vs NA Showmatch}},Heroes 10 EU Cup

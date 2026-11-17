@@ -1,0 +1,14 @@
+{
+  "archive_blockers": [],
+  "counts": {
+    "matched": 46
+  },
+  "expected_replays": 46,
+  "maps_owned_elsewhere": 0,
+  "matched_replays": 46,
+  "no_replay_expected": 0,
+  "status": "fully_archived",
+  "total_map_rows": 46,
+  "tournament": "EU Inhouse League Season 1",
+  "unresolved_maps": 0
+}

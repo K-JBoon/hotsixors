@@ -1,0 +1,52 @@
+{
+  "files_sha256": {
+    "2019-11-23 13.00 KiiKoo Combo vs Wheel of ORDAH/Map 1 (Battlefield of Eternity).StormReplay": "966c0b03ea017a2b6201844a1b4f309a24df4a53854b4330d18ccaa5d94fdcb0",
+    "2019-11-23 13.00 KiiKoo Combo vs Wheel of ORDAH/Map 2 (Infernal Shrines).StormReplay": "e85d84e0c2825464071667faeb2bdf01ba30eeeddc7dccb8bd9b873627cb4d87",
+    "2019-11-23 14.00 Feel the Heat vs Daementis/Map 1 (Tomb of the Spider Queen).StormReplay": "93201e80bf3fb7ddd8e153d8f41c2667a99688dc309ba15b7e908db0e9d830cf",
+    "2019-11-23 14.00 Feel the Heat vs Daementis/Map 2 (Alterac Pass).StormReplay": "17d8351e21a58a138378f597abd06c44adfa53408872c3cafd90e20995923f82",
+    "2019-11-23 14.00 pepeMLADY vs Lucky Play/Map 1 (Battlefield of Eternity).StormReplay": "4aeb37ca96e0b9f877bf0b37f3ee053c193e967725288fa2df9a5b172ed557d6",
+    "2019-11-23 14.00 pepeMLADY vs Lucky Play/Map 2 (Towers of Doom).StormReplay": "402ec8b5b7725256c7d5ed041279d99c45b97e764df154f57efbf37b774671d3",
+    "2019-11-24 12.00 KiiKoo Combo vs Disgusting/Map 1 (Infernal Shrines).StormReplay": "6f84da6a88f95ad2de21f910194d26908c0d39afbc79fce33c0a3885fb2bda86",
+    "2019-11-24 12.00 KiiKoo Combo vs Disgusting/Map 2 (Cursed Hollow).StormReplay": "2442d5220f948e5e9e353b1e3f1c8a5ce89a05dbdd5410fd7520df789e1df090",
+    "2019-11-24 13.00 Feel the Heat vs pepeMLADY/Map 1 (Battlefield of Eternity).StormReplay": "b4af1e8a54a6ff0388a75bdbaed7fe5e426be1567efc5ab26b24a24c3912b0e4",
+    "2019-11-24 13.00 Feel the Heat vs pepeMLADY/Map 2 (Dragon Shire).StormReplay": "03f8118307fd017a996527f06eef259e61ccd6de784a607c610b815689108ce6",
+    "2019-11-24 13.00 Feel the Heat vs pepeMLADY/Map 3 (Volskaya Foundry).StormReplay": "af6689cf1c7b7d0cbf72e71148d22214cec590b0e4e1989106bc8a5d7f91a9ec",
+    "2019-11-24 14.00 KiiKoo Combo vs Feel the Heat/Map 1 (Infernal Shrines).StormReplay": "759a6a54b03f122c0473f2bfdbd4a2f4d372a98c28e68b0c4a7ded5427eb7e5a",
+    "2019-11-24 14.00 KiiKoo Combo vs Feel the Heat/Map 2 (Garden of Terror).StormReplay": "4d149f7b035e671f6ef9e7271a1cbd46b56ae025237cb0afc3cff0edd91de2f4",
+    "archive_status.json": "a502febd07d41edd85b954149bae488d7831ca64b68ac713fa490ae77f0fd299",
+    "liquipedia_maps.csv": "e3719bbe93f09cc37a944eb09fa08da93058f2a51f43f0a6543765d03399d9ed",
+    "liquipedia_sets.csv": "7a5226bbe5ad4c1905cb27ed9430094ace70bc3558bfadb3c449cc3e2a86e649",
+    "liquipedia_teams.csv": "349592c569ea12ceaa59e29d31acd7e29eebd67b7c21b5e9926c936b046cf90c",
+    "liquipedia_url.txt": "38256a168cc58b60d79358144a2f6e7d03b45ee5526cefa17c5111eb3f526627",
+    "maps.csv": "a158d05e6fb64b11b348de486fdcb8d5113c168edf52f0a314763144f825609d",
+    "player_battletags.csv": "a27ae1f3a52770a57a591eeb2f698656b3d2c3958779e0c75a988b77b298278f",
+    "replay_manifest.csv": "4c90d05f6883f41b91661decf9be0639f75fdff7fdf16b66c5125304b20e2dd8",
+    "sets.csv": "7a5226bbe5ad4c1905cb27ed9430094ace70bc3558bfadb3c449cc3e2a86e649",
+    "teams.csv": "349592c569ea12ceaa59e29d31acd7e29eebd67b7c21b5e9926c936b046cf90c"
+  },
+  "gates": {
+    "complete_replay_coverage": true,
+    "manifest_integrity": true,
+    "no_blocking_reviews": true,
+    "no_stale_overrides": true,
+    "only_approved_inferred_aliases_exported": true
+  },
+  "player_alias_rows": 34,
+  "replay_count": 13,
+  "status": {
+    "blockers": "",
+    "blocking_reviews": 0,
+    "expected_replays": 13,
+    "integrity_errors": 0,
+    "matched_replays": 13,
+    "missing_replays": 0,
+    "pending_alias_reviews": 0,
+    "stale_overrides": 0,
+    "status": "verified",
+    "total_map_rows": 15,
+    "tournament": "Heroes Lounge Division S Season 2 Europe Qualifier 2",
+    "unresolved_maps": 0,
+    "verified": "yes"
+  },
+  "tournament": "Heroes Lounge Division S Season 2 Europe Qualifier 2"
+}

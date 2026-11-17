@@ -1,0 +1,174 @@
+map_id,set_id,date,team_1,team_2,map,team_1_heroes,team_2_heroes,team_1_bans,team_2_bans,notes,map_number_in_set,set_position_in_tournament,map_pick_team,map_winner
+a2df4079-3e64-4425-a0a4-0426becef810,ca8fba38-89f2-42b5-b820-cb4425d7b6fc,2021-11-26 14:00 UTC,WAH,tnc,Battlefield of Eternity,Li-Ming; Tracer; Tyrael; Lúcio; Chen,Yrel; Ana; Cassia; Blaze; Fenix,Mephisto; Brightwing; Diablo,Stukov; Valla; Malfurion,,1,Upper Bracket Quarterfinals,,1
+51ca6c27-6369-44cf-b392-32cfb6b7b532,ca8fba38-89f2-42b5-b820-cb4425d7b6fc,2021-11-26 14:00 UTC,WAH,tnc,Tomb of the Spider Queen,Falstad; Yrel; Stitches; Kerrigan; Uther,Blaze; Anduin; Hanzo; Anub'arak; Tychus,Mephisto; Stukov; Medivh,Junkrat; Valla; Lúcio,,2,Upper Bracket Quarterfinals,,1
+6d116341-d4c1-4ff7-a3b0-2164ea421aa1,057b0925-eaf2-41a0-a58c-2f09f8418e04,2021-11-26 15:30 UTC,Charming Tomcats,ifr,Tomb of the Spider Queen,Blaze; Sylvanas; Johanna; Whitemane; Falstad,Junkrat; Stukov; Leoric; Malthael; Maiev,Uther; Dehaka; Varian,Medivh; Mephisto; Brightwing,,1,{{HiddenSort|Bracket}},,2
+8ab01464-c8a9-4531-bc6d-2a48cdf784bd,057b0925-eaf2-41a0-a58c-2f09f8418e04,2021-11-26 15:30 UTC,Charming Tomcats,ifr,Infernal Shrines,Dehaka; Brightwing; Tychus; Anub'arak; Falstad,Blaze; Valla; Johanna; Ana; Auriel,Uther; Stukov; Hogger,Medivh; Junkrat; Diablo,,2,{{HiddenSort|Bracket}},,1
+5e771d77-9744-4db3-8b7d-59885f7f57c4,057b0925-eaf2-41a0-a58c-2f09f8418e04,2021-11-26 15:30 UTC,Charming Tomcats,ifr,Battlefield of Eternity,Dehaka; Anub'arak; Anduin; Greymane; Genji,Li-Ming; Ana; Blaze; Garrosh; Hanzo,Uther; Stukov; Diablo,Medivh; Lunara; Tracer,,3,{{HiddenSort|Bracket}},,1
+d9b067eb-a290-468f-80fe-284aa3848a43,a18a5510-8360-40d5-82bf-689bbb6d4390,2021-11-26 17:00 UTC,The Hardos,The Donuts,Infernal Shrines,Brightwing; Hanzo; Diablo; Tracer; Hogger,Johanna; Stukov; Leoric; Lunara; Mephisto,Zarya; Valla; Tychus,Lúcio; Junkrat; Falstad,,1,{{HiddenSort|Bracket}},,2
+87255e6b-ae9f-4c4d-8ddc-49d453bc4742,a18a5510-8360-40d5-82bf-689bbb6d4390,2021-11-26 17:00 UTC,The Hardos,The Donuts,Tomb of the Spider Queen,Stukov; Leoric; Mephisto; Muradin; Hanzo,Johanna; Lunara; Yrel; Chromie; Brightwing,Zarya; Valla; Ana,Lúcio; Junkrat; Anub'arak,,2,{{HiddenSort|Bracket}},,1
+631ed4d8-92ac-4bac-9b19-4395250f9222,a18a5510-8360-40d5-82bf-689bbb6d4390,2021-11-26 17:00 UTC,The Hardos,The Donuts,Sky Temple,Kharazim; Dehaka; Falstad; Tyrael; Genji,Anub'arak; Lunara; Uther; Zeratul; Blaze,Junkrat; Stukov; Yrel,Brightwing; Lúcio; Varian,,3,{{HiddenSort|Bracket}},,2
+43618dbf-3307-42b4-95de-a87a8cf166b5,fb28cf12-d3ae-46d8-afc4-f13a38b4a8fa,2021-11-26 18:30 UTC,GUNNARS ON,ORDAH,Infernal Shrines,Brightwing; Anub'arak; Leoric; Tychus; Mephisto,Dehaka; Valla; Malfurion; Auriel; Johanna,Junkrat; Hogger; Uther,Lunara; Stukov; Falstad,,1,{{HiddenSort|Bracket}},,1
+babd5a26-d481-4966-8d40-cfcbdd799809,fb28cf12-d3ae-46d8-afc4-f13a38b4a8fa,2021-11-26 18:30 UTC,GUNNARS ON,ORDAH,Cursed Hollow,Tracer; Diablo; Falstad; Anduin; Blaze,Yrel; Malfurion; Garrosh; Zeratul; Greymane,Junkrat; Dehaka; Uther,Stukov; Brightwing; Abathur,,2,{{HiddenSort|Bracket}},,1
+9167a4a3-9fbe-4458-a9e5-17bab955f10d,7b40ab3f-9bee-4851-bb04-684771eef157,2021-11-27 14:00 UTC,WAH,Charming Tomcats,Infernal Shrines,Valla; Uther; Maiev; Hogger; Lúcio,Dehaka; Sylvanas; Valeera; Blaze; Auriel,Medivh; Johanna; Anub'arak,Stukov; Junkrat; Leoric,,1,Upper Bracket Semifinals,,1
+6de067c4-7e9d-4ab1-8046-8913e672ed50,7b40ab3f-9bee-4851-bb04-684771eef157,2021-11-27 14:00 UTC,WAH,Charming Tomcats,Cursed Hollow,Diablo; Brightwing; E.T.C.; Falstad; Genji,Lunara; Tyrande; Anub'arak; Greymane; Leoric,Medivh; Dehaka; Gazlowe,Abathur; Uther; Kerrigan,,2,Upper Bracket Semifinals,,1
+b203b433-cfa4-466e-8361-56e3bb5403f8,7b40ab3f-9bee-4851-bb04-684771eef157,2021-11-27 14:00 UTC,WAH,Charming Tomcats,Braxis Holdout,Kel'Thuzad; Deckard; Mal'Ganis; Rexxar; Varian,Dehaka; Li-Ming; Johanna; Tracer; Anduin,Genji; Medivh; Lúcio,Stukov; Junkrat; Maiev,,3,Upper Bracket Semifinals,,1
+a201b083-daf2-4597-8034-7ef32d52ca8a,69c82734-32dc-415b-97f7-783a3e12c7a3,2021-11-27 16:00 UTC,The Donuts,GUNNARS ON,Towers of Doom,Valla; Stukov; Uther; Diablo; Leoric,Blaze; Anub'arak; Kharazim; Maiev; Tychus,Falstad; Dehaka; Mephisto,Junkrat; Zarya; Johanna,,1,{{HiddenSort|Bracket}},,1
+5f5d3a16-6199-4b72-b618-f5c86bdc5ab7,69c82734-32dc-415b-97f7-783a3e12c7a3,2021-11-27 16:00 UTC,The Donuts,GUNNARS ON,Battlefield of Eternity,Anub'arak; Lunara; Hogger; Brightwing; Maiev,Li-Ming; Anduin; Yrel; Zarya; Garrosh,Blaze; Valla; Tracer,Junkrat; Stukov; Dehaka,,2,{{HiddenSort|Bracket}},,1
+ed28cc63-5a80-4385-9c24-ba2f7e91a120,69c82734-32dc-415b-97f7-783a3e12c7a3,2021-11-27 16:00 UTC,The Donuts,GUNNARS ON,Infernal Shrines,Yrel; Johanna; Zeratul; Rehgar; Mephisto,Lunara; Brightwing; Leoric; Varian; Jaina,Blaze; Dehaka; Anub'arak,Stukov; Junkrat; Valla,,3,{{HiddenSort|Bracket}},,1
+de707221-fc24-47d9-8312-bc4376788aa1,7f02285b-fada-432f-a482-3d54a0980863,2021-11-28 14:00 UTC,WAH,The Donuts,Battlefield of Eternity,Li-Ming; Lúcio; Hogger; Tyrael; Genji,Lunara; Anub'arak; Yrel; Tracer; Malfurion,Zarya; Stukov; Brightwing,Blaze; Valla; Diablo,,1,Upper Bracket Final,,1
+6f2af06b-6614-444a-9ee5-405d51a2031e,7f02285b-fada-432f-a482-3d54a0980863,2021-11-28 14:00 UTC,WAH,The Donuts,Tomb of the Spider Queen,Valla; Blaze; Deckard; Tyrael; Kerrigan,Stukov; Johanna; Mephisto; Maiev; Leoric,Zarya; Uther; Hogger,Lúcio; Junkrat; Anub'arak,,2,Upper Bracket Final,,1
+7012f2f0-dfd4-4907-8aeb-381464845e24,7f02285b-fada-432f-a482-3d54a0980863,2021-11-28 14:00 UTC,WAH,The Donuts,Towers of Doom,Junkrat; Dehaka; Varian; Kharazim; Maiev,Brightwing; Zeratul; Blaze; Muradin; Lunara,Zarya; Stukov; Anub'arak,Lúcio; Uther; Diablo,,3,Upper Bracket Final,,1
+533a4d09-3480-46fe-9034-11786cbf96ec,8aacb063-41cc-4c83-b5a2-f7246264d878,2021-11-27 14:00 UTC,tnc,ifr,Infernal Shrines,,,,,,1,Lower Bracket Round 1,,1
+ab7514ff-d29f-4c84-923d-ed3f6d6787e3,8aacb063-41cc-4c83-b5a2-f7246264d878,2021-11-27 14:00 UTC,tnc,ifr,Battlefield of Eternity,,,,,,2,Lower Bracket Round 1,,1
+02c4ba76-981a-41d4-b2ae-8cbaf104340b,8aacb063-41cc-4c83-b5a2-f7246264d878,2021-11-27 14:00 UTC,tnc,ifr,Garden of Terror,,,,,,3,Lower Bracket Round 1,,2
+9b1310bb-dbef-472f-bbf2-a493645118c3,8aacb063-41cc-4c83-b5a2-f7246264d878,2021-11-27 14:00 UTC,tnc,ifr,Tomb of the Spider Queen,,,,,,4,Lower Bracket Round 1,,2
+73755e99-311b-408f-99b4-2c178901e31f,8aacb063-41cc-4c83-b5a2-f7246264d878,2021-11-27 14:00 UTC,tnc,ifr,Braxis Holdout,,,,,,5,Lower Bracket Round 1,,2
+72fbe92e-ec9d-4419-bdc3-fcccf6655001,8c86f43c-7b2f-4650-b13e-7dbe4d2d560f,2021-11-27 14:00 UTC,The Hardos,ORDAH,Battlefield of Eternity,,,,,,1,Lower Bracket Round 1,,1
+40fe7724-24f2-4d4b-8ec5-b7faf0726fab,8c86f43c-7b2f-4650-b13e-7dbe4d2d560f,2021-11-27 14:00 UTC,The Hardos,ORDAH,Tomb of the Spider Queen,,,,,,2,Lower Bracket Round 1,,1
+6af46b34-fb52-4c0b-b7cf-60be21cb563d,8c86f43c-7b2f-4650-b13e-7dbe4d2d560f,2021-11-27 14:00 UTC,The Hardos,ORDAH,Dragon Shire,,,,,,3,Lower Bracket Round 1,,1
+cc8a1f3c-8433-41bc-a555-9f7c1d11e9fc,6db5b23f-52e0-463c-9c55-80760f90fcbb,2021-11-27 20:00 UTC,GUNNARS ON,ifr,Cursed Hollow,Blaze; Uther; Maiev; Tyrael; Gul'dan,Stukov; Hogger; Lunara; Mei; Deathwing,Dehaka; Junkrat; Diablo,Falstad; Brightwing; Anub'arak,,1,Lower Bracket Quarterfinals,,1
+02aff387-4d3b-49e3-aeef-ce09ca4f6b33,6db5b23f-52e0-463c-9c55-80760f90fcbb,2021-11-27 20:00 UTC,GUNNARS ON,ifr,Infernal Shrines,Kerrigan; Blaze; Anduin; Muradin; Genji,Uther; Ana; Hogger; Valla; Dehaka,Stukov; Junkrat; Malthael,Mephisto; Brightwing; Lúcio,,2,Lower Bracket Quarterfinals,,1
+021595ca-f6c3-4f45-8360-f363d8d96439,6db5b23f-52e0-463c-9c55-80760f90fcbb,2021-11-27 20:00 UTC,GUNNARS ON,ifr,Tomb of the Spider Queen,Stukov; Valla; Zarya; Chen; Garrosh,Leoric; Tassadar; Malfurion; Maiev; Malthael,Uther; Junkrat; Ana,Gul'dan; Blaze; Anub'arak,,3,Lower Bracket Quarterfinals,,1
+5a1aa190-4b46-4228-9718-591617109a49,389944a7-e37e-4c27-82fd-b96d93448fd9,2021-11-27 18:00 UTC,Charming Tomcats,The Hardos,Battlefield of Eternity,Anub'arak; Medivh; Genji; Anduin; Malthael,Lúcio; Hanzo; Blaze; Thrall; Diablo,Stukov; Dehaka; Garrosh,Lunara; Li-Ming; Sonya,,1,{{HiddenSort|Bracket}},,2
+28c8f2e0-6d3e-4b36-847e-8069accf352b,389944a7-e37e-4c27-82fd-b96d93448fd9,2021-11-27 18:00 UTC,Charming Tomcats,The Hardos,Tomb of the Spider Queen,Dehaka; Medivh; Stitches; Kerrigan; Whitemane,Tychus; Lúcio; Chen; Anub'arak; Hanzo,Junkrat; Maiev; Blaze,Valla; Stukov; Sylvanas,,2,{{HiddenSort|Bracket}},,2
+21870f8d-7df1-4a68-bd51-457817b057c7,389944a7-e37e-4c27-82fd-b96d93448fd9,2021-11-27 18:00 UTC,Charming Tomcats,The Hardos,Dragon Shire,Uther; Varian; Valla; Leoric; Auriel,Stukov; Lunara; Hogger; Muradin; Tassadar,Junkrat; Lúcio; Anub'arak,Dehaka; Rexxar; Yrel,,3,{{HiddenSort|Bracket}},,2
+d93a7158-909d-4283-8019-4c16174f3558,b75df0e6-60c3-44ba-bc4e-e3cf21b5a7ea,2021-11-28 16:00 UTC,GUNNARS ON,The Hardos,Tomb of the Spider Queen,Valla; Anub'arak; Uther; Dehaka; Anduin,Stukov; Yrel; Lunara; Hanzo; Varian,Junkrat; Lúcio; Mephisto,Kerrigan; Maiev; Blaze,,1,Lower Bracket Semifinal,,2
+2be53874-7806-490b-8296-de958aa84c91,b75df0e6-60c3-44ba-bc4e-e3cf21b5a7ea,2021-11-28 16:00 UTC,GUNNARS ON,The Hardos,Battlefield of Eternity,Stukov; Anub'arak; Li-Ming; Falstad; Dehaka,Blaze; Hanzo; Sylvanas; Anduin; Diablo,Lúcio; Junkrat; Lunara,Zarya; Tracer; Yrel,,2,Lower Bracket Semifinal,,2
+b9a11cc1-63bd-40af-aaaf-10bb6b25f239,b75df0e6-60c3-44ba-bc4e-e3cf21b5a7ea,2021-11-28 16:00 UTC,GUNNARS ON,The Hardos,Towers of Doom,Stukov; Valla; Uther; Tlv; Diablo,Lunara; Blaze; Hanzo; Tyrande; Mei,Lúcio; Dehaka; Maiev,Junkrat; Tracer; Anub'arak,,3,Lower Bracket Semifinal,,1
+2d000cb7-3ab9-43aa-9ed8-c525bce300cf,b75df0e6-60c3-44ba-bc4e-e3cf21b5a7ea,2021-11-28 16:00 UTC,GUNNARS ON,The Hardos,Garden of Terror,Lunara; Varian; Deckard; Yrel; Maiev,Brightwing; Falstad; Hogger; Muradin; Hanzo,Lúcio; Junkrat; Diablo,Dehaka; Anub'arak; Stukov,,4,Lower Bracket Semifinal,,2
+87fe2528-3875-4706-b4eb-2d75ae0c0f91,66f81412-611d-4759-a247-994b2c7c349c,2021-11-28 18:00 UTC,The Donuts,The Hardos,Tomb of the Spider Queen,Junkrat; Yrel; Brightwing; Diablo; Kerrigan,Johanna; Lunara; Hanzo; Leoric; Ana,Lúcio; Blaze; Mephisto,Zarya; Stukov; Tracer,,1,Lower Bracket Final,,1
+e6afec6f-d904-4ffc-ac3b-1ae5f1946bfb,66f81412-611d-4759-a247-994b2c7c349c,2021-11-28 18:00 UTC,The Donuts,The Hardos,Infernal Shrines,Blaze; Lunara; Johanna; Brightwing; Sylvanas,Stukov; Dehaka; Tychus; Diablo; Cassia,Junkrat; Lúcio; Anub'arak,Zarya; Valla; Mephisto,,2,Lower Bracket Final,,2
+50f896e4-c5e0-4958-8ae2-ec42b2e25a42,66f81412-611d-4759-a247-994b2c7c349c,2021-11-28 18:00 UTC,The Donuts,The Hardos,Towers of Doom,Blaze; Lunara; Johanna; Brightwing; Sylvanas,Stukov; Dehaka; Tychus; Diablo; Cassia,Junkrat; Lúcio; Anub'arak,Zarya; Valla; Mephisto,,3,Lower Bracket Final,,1
+52c581cb-dedb-4bfe-bad8-c77ff5074c78,66f81412-611d-4759-a247-994b2c7c349c,2021-11-28 18:00 UTC,The Donuts,The Hardos,Sky Temple,Lunara; Brightwing; E.T.C.; Blaze; Zarya,Dehaka; Greymane; Muradin; Uther; Li-Ming,Lúcio; Stukov; Tlv,Zeratul; Anub'arak; Falstad,,4,Lower Bracket Final,,1
+6cb4db8f-0773-4607-b526-4a2ffad77539,f7fd0ccd-3ad7-4a1f-a360-32dc208dd852,2021-11-28 20:00 UTC,WAH,The Donuts,Infernal Shrines,Hogger; Brightwing; Falstad; Stitches; Maiev,Stukov; Blaze; Lunara; Anub'arak; Zeratul,Zarya; Junkrat; Johanna,Lúcio; Valla; Diablo,Winner bracket advantage of 1 game,1,Grand Final,,1
+5c1e5110-9158-4f29-b544-ef24a8eb98cd,f7fd0ccd-3ad7-4a1f-a360-32dc208dd852,2021-11-28 20:00 UTC,WAH,The Donuts,Battlefield of Eternity,Blaze; Lunara; Johanna; Brightwing; Sylvanas,Stukov; Dehaka; Tychus; Diablo; Cassia,Junkrat; Lúcio; Anub'arak,Zarya; Valla; Mephisto,Winner bracket advantage of 1 game,2,Grand Final,,1
+11372546-657e-4575-871c-78abb2095bff,f7fd0ccd-3ad7-4a1f-a360-32dc208dd852,2021-11-28 20:00 UTC,WAH,The Donuts,Tomb of the Spider Queen,Valla; Yrel; Uther; Ana; Malthael,Lúcio; Blaze; Xul; Diablo; Falstad,Zarya; Stukov; Mephisto,Maiev; Junkrat; Kerrigan,Winner bracket advantage of 1 game,3,Grand Final,,1
+ff68723d-90ac-4c7a-ace6-536592cc7881,2b2fd6f2-4955-433d-b18d-a9d6a40ff5f4,2021-10-10,The Hardos,hype,,,,,,,1,Round 1,,
+e0eb1b58-09e1-4746-9c5d-93ea0f330e9e,c35bfeca-7410-4a19-ae2e-e9fdb7137d22,2021-10-10,ifr,Charming Tomcats,,,,,,,1,Participating Teams,,
+2bc59265-6cc7-444f-9397-ec171bfb528f,d7c2841b-69ef-4930-83b4-8cb8b33f2d3e,2021-10-10,ORDAH,The Donuts,,,,,,,1,Participating Teams,,
+04b788e2-958a-4fe2-b206-07b1e94d33ac,6755e820-a50c-489d-bb6d-aa82f941e085,2021-10-10,monkaSTEER,Masters Clash Academy,,,,,,,1,Participating Teams,,
+0a74af98-402e-4efe-8f92-4362d7a9a045,fd4fda95-b0a9-423d-884f-fad5e56ef03d,2021-10-10,Wurst And Homies,Salato come il mare,,,,,,,1,Participating Teams,,
+055aa8c6-5af7-4e51-be7c-522bae372d99,fee7851b-0a0a-4d32-b7db-1e5c6dea1ebd,2021-10-10,Jag e bakis,Kalla Berget,,,,,,,1,Participating Teams,,
+8f66130e-0bb5-4e1f-91d4-d0a73abceacb,f845d48a-ebc7-486b-8936-f5602eaacde4,2021-10-10,The Hardos,ifr,,,,,,,1,Participating Teams,,
+9896b8b2-de50-487a-baaa-24fa7af03ead,d1adc404-f4b3-4e55-abe0-09f76aba8b72,2021-10-10,The Donuts,monkaSTEER,,,,,,,1,Participating Teams,,
+07de0546-d198-45f1-9694-7ca70885c72e,33da18c3-4bbf-4703-b805-e0eb4801c07f,2021-10-10,Wurst And Homies,Kalla Berget,,,,,,,1,Participating Teams,,
+0fc6eb71-4698-48bd-92ef-d6c6e8a5ef0d,33da18c3-4bbf-4703-b805-e0eb4801c07f,2021-10-10,Wurst And Homies,Kalla Berget,,,,,,,2,Participating Teams,,
+11254b09-7646-46ec-a44d-dc260527c3df,33da18c3-4bbf-4703-b805-e0eb4801c07f,2021-10-10,Wurst And Homies,Kalla Berget,,,,,,,3,Participating Teams,,
+2e4ba361-a113-4387-82f0-1d1787327e79,f402b3aa-7fe1-4830-895d-d2bb31eadb6e,2021-10-10,The Hardos,The Donuts,,,,,,,1,Participating Teams,,
+d001da53-37fd-49d7-9706-f71aa6ccb713,f402b3aa-7fe1-4830-895d-d2bb31eadb6e,2021-10-10,The Hardos,The Donuts,,,,,,,2,Participating Teams,,
+d682aa4c-79bc-4214-be95-06db379ff17f,f402b3aa-7fe1-4830-895d-d2bb31eadb6e,2021-10-10,The Hardos,The Donuts,,,,,,,3,Participating Teams,,
+a237751e-ac07-4961-8cee-c106880b18d5,0a5a900a-2018-451d-84e2-a93cfedf62a5,2021-10-10,Wurst And Homies,The Hardos,,,,,,,1,Grand Final,,
+dfe3adfe-8c32-4c4d-aff2-ede5ce57ce62,0a5a900a-2018-451d-84e2-a93cfedf62a5,2021-10-10,Wurst And Homies,The Hardos,,,,,,,2,Grand Final,,
+d6d59245-6415-443f-9c4d-576efe7f3f78,0a5a900a-2018-451d-84e2-a93cfedf62a5,2021-10-10,Wurst And Homies,The Hardos,,,,,,,3,Grand Final,,
+496fcda1-d952-4182-894e-9042267a675e,ac2205ed-cfd8-426d-831d-9233e909ea69,2021-11-10,ifr,Charming Tomcats,,,,,,,1,Participating Teams,,
+d86a98ea-fb0b-40b6-88f0-36d74668ab94,ac2205ed-cfd8-426d-831d-9233e909ea69,2021-11-10,ifr,Charming Tomcats,,,,,,,2,Participating Teams,,
+891a4998-3753-4aae-a5a5-dee1e3f8e760,ac2205ed-cfd8-426d-831d-9233e909ea69,2021-11-10,ifr,Charming Tomcats,,,,,,,3,Participating Teams,,
+105c9fef-380a-496e-a59f-a5101c6a2bf4,39c14700-77db-4906-ac6d-07bea8a314f4,2021-11-10,Wurst And Homies,ifr,,,,,,,1,Grand Final,,
+bfe5b507-86f8-4bda-8248-324e8e7012c5,39c14700-77db-4906-ac6d-07bea8a314f4,2021-11-10,Wurst And Homies,ifr,,,,,,,2,Grand Final,,
+ee02a2c9-44b0-49f3-8cd7-0c0e0b305732,b80c771e-ee66-46e5-a359-c752f7205277,2021-10-13,Masters Clash Academy,ORDAH,,,,,,,1,Participating Teams,,
+9edd5a87-9728-456b-ae0e-b1c9b2759164,dc4207ae-3474-43de-a89b-d7d180c0d173,2021-10-13,Salato come il mare,Charming Tomcats,,,,,,,1,Participating Teams,,
+8c264b57-2210-491f-b0f5-284718660a2d,b94cdc57-1f91-4f81-88ba-67736d01f5cb,2021-10-13,Corridor Comrades,Woodleague Clownfiesta,,,,,,,1,Participating Teams,,
+c901dc9f-f9b2-436d-87a7-2e0011566e4f,52b19c81-3645-4bdb-bb9c-55283bb4c81c,2021-10-13,Wurst And Homies,5subs,,,,,,,1,Participating Teams,,
+7189c2d6-356b-4e53-bbb0-b4a8182b9b52,90a09ffc-12d7-451d-81fa-87076e5fddb8,2021-10-13,ifr,Team Name Change,,,,,,,1,Participating Teams,,
+2de56d66-3228-4979-bd41-403accee3f5e,5b54f1a3-6263-4d95-b297-d6c047bc2a44,2021-10-13,GUNNARS ON,ORDAH,,,,,,,1,Participating Teams,,
+840e4d53-b5db-45d1-8c4c-2327e95934cd,e85b4f6e-b689-4858-ba85-0cf9cae02029,2021-10-13,Charming Tomcats,Corridor Comrades,,,,,,,1,Participating Teams,,
+e2dfa61a-a209-42a3-821d-aec0f8a2de2f,22339b8e-2882-40b2-8363-0174e024af4a,2021-10-13,Wurst And Homies,Team Name Change,,,,,,,1,Participating Teams,,
+586e31f9-f01c-4a98-87e2-9b42a6b05e55,22339b8e-2882-40b2-8363-0174e024af4a,2021-10-13,Wurst And Homies,Team Name Change,,,,,,,2,Participating Teams,,
+bfc6d3fd-da82-40e1-b16f-91fe1abf726b,e3ecede9-649b-48ab-aada-3392094d3b74,2021-10-13,GUNNARS ON,Charming Tomcats,,,,,,,1,Participating Teams,,
+b890771a-c4f4-48b2-86b8-cefb3f3eaddc,e3ecede9-649b-48ab-aada-3392094d3b74,2021-10-13,GUNNARS ON,Charming Tomcats,,,,,,,2,Participating Teams,,
+4acd10f9-c1b2-46a9-8f19-b485d02fdd9c,3db39773-6e4c-4b59-b5fe-edef8e028fef,2021-10-13,Team Name Change,GUNNARS ON,,,,,,,1,Grand Final,,
+e865c0d7-0f61-47e1-b441-e89a3cb170fc,3db39773-6e4c-4b59-b5fe-edef8e028fef,2021-10-13,Team Name Change,GUNNARS ON,,,,,,,2,Grand Final,,
+d1034d45-16a1-48f5-8018-6e74be5f77c3,210f4ca0-3e72-4336-a06f-7616f4549eb9,2021-10-17,Salato come il mare,ORDAH,,,,,,,1,Participating Teams,,
+6031f790-3ea7-4e3b-a1f9-d0ec951c7d8f,c1304579-6982-4dd8-a5b5-4066003e150f,2021-10-17,The Hardos,Masters Clash Academy,,,,,,,1,Participating Teams,,
+b3e655ff-2747-4169-ab71-10d117b0cfc6,ca326e6a-a901-4d25-8c49-47df9a47e803,2021-10-17,ifr,Corridor Comrades,,,,,,,1,Participating Teams,,
+9af57bfb-0864-482b-b1ce-7f916e26de5f,b15f2b7a-6776-4e40-b16e-84fa62fe7fc3,2021-10-17,Wurst And Homies,5subs,,,,,,,1,Participating Teams,,
+bf9397c5-cc1e-4600-9adb-c6c1beec5dad,17ac1a7b-0039-4e51-98de-4236f2e9b2a5,2021-10-17,Team Name Change,Charming Tomcats,,,,,,,1,Participating Teams,,
+9715c15e-8cdc-4082-9022-b06a57b6d4f2,f7a41792-3e85-4bdc-bbe0-a02679a20340,2021-10-17,GUNNARS ON,ORDAH,,,,,,,1,Participating Teams,,
+c7bee884-686f-49ec-9eea-1b02e551f3e4,68ad5698-fad8-4d51-b568-c0c9c06a1059,2021-10-17,The Hardos,ifr,,,,,,,1,Participating Teams,,
+d23704b9-6ef5-429a-b93e-85833f8fd25c,d5a49ebb-de1f-44e8-915b-e610e85157e2,2021-10-17,Wurst And Homies,Team Name Change,,,,,,,1,Participating Teams,,
+9b5d41c7-75f4-47b2-91da-05095b19fc06,d5a49ebb-de1f-44e8-915b-e610e85157e2,2021-10-17,Wurst And Homies,Team Name Change,,,,,,,2,Participating Teams,,
+34fc6ab0-bd15-4f50-9c85-0f6f86468843,5dbdef92-7e8a-4d61-809b-302e22176c3f,2021-10-17,GUNNARS ON,The Hardos,,,,,,,1,Participating Teams,,
+65e20c30-7260-4af6-9650-d8978cb76fa2,5dbdef92-7e8a-4d61-809b-302e22176c3f,2021-10-17,GUNNARS ON,The Hardos,,,,,,,2,Participating Teams,,
+1a6519a4-1cdd-4bb6-aa93-58baa34cd611,5dbdef92-7e8a-4d61-809b-302e22176c3f,2021-10-17,GUNNARS ON,The Hardos,,,,,,,3,Participating Teams,,
+e0dd8c31-6e2f-46fd-985f-44b3ff7ab4bb,5c896d10-8ec0-4a0e-a3c5-d15cd3a4709f,2021-10-17,Wurst And Homies,The Hardos,,,,,,,1,Grand Final,,
+d8a3e711-77ae-4c88-9b36-de4722aaa688,5c896d10-8ec0-4a0e-a3c5-d15cd3a4709f,2021-10-17,Wurst And Homies,The Hardos,,,,,,,2,Grand Final,,
+93cb7681-59e8-48bc-b505-0b659c89695b,a5f02e64-edfe-42c5-ba4e-8154222068fd,2021-10-17,Team Name Change,GUNNARS ON,,,,,,,1,Grand Final,,
+9f958cbe-948f-4136-aaf5-75af1909feb4,a5f02e64-edfe-42c5-ba4e-8154222068fd,2021-10-17,Team Name Change,GUNNARS ON,,,,,,,2,Grand Final,,
+02e1c7ee-2e09-4915-8f45-1c2c69b37a9d,68a3f1c9-3b2c-47c9-b2e4-a56e2efd6260,2021-10-20,Salato come il mare,Corridor Comrades,,,,,,,1,Round 1,,
+58c3b5c1-6ae4-4df7-b654-e4daac0136f1,fc55c13c-4c30-4d79-8afc-6b02dd39c21b,2021-10-20,Charming Tomcats,Masters Clash Academy,,,,,,,1,Round 1,,
+9ec5b60a-2a6f-444f-98c8-f6d8b69ce94a,f92b68d1-91bd-4fda-bbf0-0d45f6d3a3e3,2021-10-20,Wurst And Homies,Corridor Comrades,,,,,,,1,Participating Teams,,
+e76470a5-b88f-49b3-ab39-f79a97373123,47d61c67-a415-422b-9139-c2e5bdd68968,2021-10-20,Charming Tomcats,inting for ruby,,,,,,,1,Participating Teams,,
+1c666f34-712a-4bdb-bbd2-2c7010b0454b,e224c884-efb1-484a-a9d4-2bc8b50471ed,2021-10-20,The Hardos,ORDAH,,,,,,,1,Participating Teams,,
+744a5366-53e2-4383-905b-f15055841d15,07a5f187-bf4a-41f3-8aab-60eccd9f460a,2021-10-20,Team Name Change,5subs,,,,,,,1,Participating Teams,,
+112b85f8-1b33-48d4-9c88-ef8b18473c1e,a4549209-dd8f-4ae6-b104-600e48aa9c14,2021-10-20,Wurst And Homies,inting for ruby,,,,,,,1,Participating Teams,,
+2265ea32-2ef1-4ffd-b7d5-42671d3f26c5,a4549209-dd8f-4ae6-b104-600e48aa9c14,2021-10-20,Wurst And Homies,inting for ruby,,,,,,,2,Participating Teams,,
+98fb1038-0545-4e2f-ad74-0cb82f726504,a4549209-dd8f-4ae6-b104-600e48aa9c14,2021-10-20,Wurst And Homies,inting for ruby,,,,,,,3,Participating Teams,,
+48bcacb3-a74c-486b-953b-5f5ec0a93797,31995a3a-4cd8-4c2c-a35b-8092333ae3ca,2021-10-20,The Hardos,Team Name Change,,,,,,,1,Participating Teams,,
+dc55bba6-9c42-4805-8071-e74d505bbab1,31995a3a-4cd8-4c2c-a35b-8092333ae3ca,2021-10-20,The Hardos,Team Name Change,,,,,,,2,Participating Teams,,
+d7e6ea29-79df-4c74-bb3b-2fe49124b5ae,e87b68e7-5524-4f73-b011-3fc9b6b626ec,2021-10-20,Wurst And Homies,The Hardos,,,,,,,1,Grand Final,,
+b075a4bf-aaa4-4bbe-b697-bf7b20f54d23,e87b68e7-5524-4f73-b011-3fc9b6b626ec,2021-10-20,Wurst And Homies,The Hardos,,,,,,,2,Grand Final,,
+6abcba6e-2c46-45ba-b7da-e18e78d26fa8,b4289b30-5b18-4ee4-97ce-8fb9f99af633,2021-10-20,5subs,inting for ruby,,,,,,,1,Grand Final,,
+b76b532a-ee6e-4f8f-afcc-2e91f0f2eb33,b4289b30-5b18-4ee4-97ce-8fb9f99af633,2021-10-20,5subs,inting for ruby,,,,,,,2,Grand Final,,
+b2da3790-e40e-4507-bb1c-29afbfc700d3,b4289b30-5b18-4ee4-97ce-8fb9f99af633,2021-10-20,5subs,inting for ruby,,,,,,,3,Grand Final,,
+03c7966c-3e99-49a2-a045-3c4b361b4db2,df8df3b9-ecd8-4839-9d1a-dff0aba39341,2021-10-24,The Hardos,Masters Clash Academy,,,,,,,1,Round 1,,
+8d15eb11-f3e9-4a5e-8de6-70f9cf974ef3,45c0eaf8-8def-4b6a-9cb3-36c50506335e,2021-10-24,Corridor Comrades,The Donuts,,,,,,,1,Participating Teams,,
+ba9c4516-7b53-4a94-a0c6-7f4d706f84bd,46c246bc-0f6d-4b4f-af42-d1721ebe5901,2021-10-24,Wurst And Homies,Salato come il mare,,,,,,,1,Participating Teams,,
+cbce8149-b7e2-4452-b54f-8d7f35039e31,a5e17989-6906-499f-8e32-d11e33599900,2021-10-24,Charming Tomcats,5subs,,,,,,,1,Participating Teams,,
+9328863b-2e8b-40fb-9e78-f447dd19b8c1,ecc98ad3-11a8-4df9-8657-eb3b5b47ba33,2021-10-24,Masters Clash Academy,The Donuts,,,,,,,1,Participating Teams,,
+24a40fe9-57ff-4dae-a5ed-984a329e1a1d,6e92b22b-412a-47bc-a54d-7f9dc902b104,2021-10-24,ifr,ORDAH,,,,,,,1,Participating Teams,,
+766a79cf-6231-4dc2-945d-d614238fea08,5d2af3d6-023e-4967-8bc3-c27b2ebc6f40,2021-10-24,Wurst And Homies,Charming Tomcats,,,,,,,1,Participating Teams,,
+96ff2565-b468-4aec-be34-7d305805029e,5d2af3d6-023e-4967-8bc3-c27b2ebc6f40,2021-10-24,Wurst And Homies,Charming Tomcats,,,,,,,2,Participating Teams,,
+f91646cc-1803-4467-ac46-c0c61e946bbb,1f48a167-939c-4840-9aee-c3ae79bfcd87,2021-10-24,The Donuts,ORDAH,,,,,,,1,Participating Teams,,
+8df50876-22af-408b-92ce-22ae5522988b,1f48a167-939c-4840-9aee-c3ae79bfcd87,2021-10-24,The Donuts,ORDAH,,,,,,,2,Participating Teams,,
+25f6c2b9-2f15-4270-af8e-a3339e88566b,d1472106-253e-48f3-95d4-be2b2f1ed838,2021-10-24,Wurst And Homies,The Donuts,,,,,,,1,Grand Final,,
+10fb6917-a2dd-47d8-8e8b-35e02dd6b6d8,d1472106-253e-48f3-95d4-be2b2f1ed838,2021-10-24,Wurst And Homies,The Donuts,,,,,,,2,Grand Final,,
+eb797493-2488-46a9-8d2e-985eb1d3ab47,d1472106-253e-48f3-95d4-be2b2f1ed838,2021-10-24,Wurst And Homies,The Donuts,,,,,,,3,Grand Final,,
+f63f9f08-2d76-4662-9efb-94ec3fa62a3b,23fddb61-1467-4b01-9ef5-e6cb316d53f6,2021-10-24,Charming Tomcats,ORDAH,,,,,,,1,Grand Final,,
+ed7b061f-0fcb-41f3-8ba4-9343ef564097,23fddb61-1467-4b01-9ef5-e6cb316d53f6,2021-10-24,Charming Tomcats,ORDAH,,,,,,,2,Grand Final,,
+598368f0-1d65-4236-9888-116720b1b9f1,4ee3ab94-7e77-440c-84e4-311adcfb57a1,2021-10-27,5subs,Masters Clash Academy,,,,,,,1,Round 1,,
+764de1f4-a8cd-44cb-bf4f-d058f06b7f1b,fe52cbda-4ba9-49fe-b3fd-6a0c53ce63a4,2021-10-27,ORDAH,Salato come il mare,,,,,,,1,Round 1,,
+dbfdec2b-67df-44c9-a745-49888dba44fe,46aae925-c251-4218-9009-389167ba9a70,2021-10-27,Wurst And Homies,Corridor Comrades,,,,,,,1,Participating Teams,,
+38f72fe8-edca-4da7-b501-a62c66ffcc4f,f6d15a66-1c2e-4e90-9aa0-407bea760080,2021-10-27,ifr,The Donuts,,,,,,,1,Participating Teams,,
+c5bbffba-efef-46f3-af3a-96a86ed42686,7cc9d666-5831-4479-a803-119286dbe4c8,2021-10-27,GUNNARS ON,Masters Clash Academy,,,,,,,1,Participating Teams,,
+a1d68fbf-2597-4619-ab58-4466d44124a9,eb55fdec-c01b-4339-9938-aef9e6957985,2021-10-27,Team Name Change,Salato come il mare,,,,,,,1,Participating Teams,,
+0022f60d-3e2a-4822-915a-1f0d05a4b061,98363625-d3c6-43ce-9614-d140d3e0ecbd,2021-10-27,Wurst And Homies,The Donuts,,,,,,,1,Participating Teams,,
+6280d53b-c40b-4d66-b8f3-9d8a70981d8e,98363625-d3c6-43ce-9614-d140d3e0ecbd,2021-10-27,Wurst And Homies,The Donuts,,,,,,,2,Participating Teams,,
+fa06f92c-0046-4324-8b69-4de345d5571d,98363625-d3c6-43ce-9614-d140d3e0ecbd,2021-10-27,Wurst And Homies,The Donuts,,,,,,,3,Participating Teams,,
+246ce4d4-e12d-4b5f-b086-d7ef7c651f06,e5cdca57-0cfe-4dd4-8095-fb55e09149a0,2021-10-27,GUNNARS ON,Team Name Change,,,,,,,1,Participating Teams,,
+99bb7e00-b325-46fa-a5a7-19778e2fb866,e5cdca57-0cfe-4dd4-8095-fb55e09149a0,2021-10-27,GUNNARS ON,Team Name Change,,,,,,,2,Participating Teams,,
+194fabe3-be8b-4b73-afa0-a377bab680e0,1e166c50-2a67-46c2-bac4-a8b31253fd34,2021-10-27,Wurst And Homies,GUNNARS ON,,,,,,,1,Grand Final,,
+fa128fbe-1415-476f-9c89-08918b6bdc23,1e166c50-2a67-46c2-bac4-a8b31253fd34,2021-10-27,Wurst And Homies,GUNNARS ON,,,,,,,2,Grand Final,,
+bdbc70d6-a868-45fc-9a0f-6587eac9144c,476dfff4-a024-4315-b128-eef617391c3f,2021-10-31,Masters Clash Academy,Corridor Comrades,,,,,,,1,Round 1,,
+fcd62a98-5dac-4ca7-b1e2-cc098c130a15,80918b55-6213-4332-82e5-5ce3e0c73e42,2021-10-31,GUNNARS ON,Corridor Comrades,,,,,,,1,Round 1,,
+f658c783-5ff5-4aef-a091-cbfc6e3cfcce,c66245da-2377-4aeb-987f-bd44d396b06e,2021-10-31,Charming Tomcats,ifr,,,,,,,1,Participating Teams,,
+a791e96e-e76d-467f-97b7-237fd16b0f6c,d9d322a8-de93-42b8-a0a4-b6f48f50b460,2021-10-31,The Hardos,5subs,,,,,,,1,Participating Teams,,
+71b81fea-4383-49e3-9fd4-cdb6fad9a0aa,e50d3adb-f005-4000-b1d8-14d2cd484394,2021-10-31,The Donuts,ORDAH,,,,,,,1,Participating Teams,,
+0f04e0c3-70e8-4cee-bd92-9aad4b9ed379,dd10a46b-a795-48a9-aba0-056fc8e1ab20,2021-10-31,GUNNARS ON,Charming Tomcats,,,,,,,1,Participating Teams,,
+ced492a4-462e-4488-aab7-48941a2a7c9d,dd10a46b-a795-48a9-aba0-056fc8e1ab20,2021-10-31,GUNNARS ON,Charming Tomcats,,,,,,,2,Participating Teams,,
+39f4014b-2126-40b6-96e1-73467dbcbaa5,93a7cb9f-0fe3-4bed-ad06-4d05a09d7a1c,2021-10-31,The Hardos,ORDAH,,,,,,,1,Participating Teams,,
+cbbd7d4e-75ab-4eef-aa4d-2dd722c533a1,93a7cb9f-0fe3-4bed-ad06-4d05a09d7a1c,2021-10-31,The Hardos,ORDAH,,,,,,,2,Participating Teams,,
+f1c52716-8be7-4cad-a8bb-04707feac340,46c50d9c-1d47-40f7-a97d-4622439209f6,2021-10-31,GUNNARS ON,The Hardos,,,,,,,1,Grand Final,,
+168eabe2-1041-483a-9a05-9b79de384ea6,46c50d9c-1d47-40f7-a97d-4622439209f6,2021-10-31,GUNNARS ON,The Hardos,,,,,,,2,Grand Final,,
+4c938a1f-9f06-4be3-8e50-49347c7c7a8a,6efbbccf-e8a2-4083-8d95-2d74b51d0d20,2021-11-03,5subs,Masters Clash Academy,,,,,,,1,Round 1,,
+ec2b375e-3263-4eeb-b4ca-63f5478a4b6b,480092ef-3fb7-4a39-8458-91ed1ef103bd,2021-11-03,Wurst And Homies,Masters Clash Academy,,,,,,,1,Round 1,,
+0ff04eb3-d0e2-40d5-abde-8a171462d701,224710bd-1d92-42a8-9ace-309a07aefa29,2021-11-03,Team Name Change,Charming Tomcats,,,,,,,1,Participating Teams,,
+00c7de09-ecfb-4b0e-8cd0-3fc288c835da,3703b8eb-4706-43a4-89e3-3c1a16b66308,2021-11-03,GUNNARS ON,ifr,,,,,,,1,Participating Teams,,
+96a23ed7-c0a0-469a-929f-46a7b303b21e,d2d41230-88e7-434a-894c-d594d1e3df5c,2021-11-03,The Donuts,ORDAH,,,,,,,1,Participating Teams,,
+104afdd3-95b0-42bf-ac75-dd4d7480c11a,10460a73-7615-48e5-843f-bccc56b52457,2021-11-03,Wurst And Homies,Charming Tomcats,,,,,,,1,Participating Teams,,
+91f53907-ceac-4ba3-a7ca-83d7b7f00eab,10460a73-7615-48e5-843f-bccc56b52457,2021-11-03,Wurst And Homies,Charming Tomcats,,,,,,,2,Participating Teams,,
+162dd826-3937-4dd4-870f-05373e96f477,78932c2b-c007-40cd-84c5-2da55715cdbc,2021-11-03,ifr,The Donuts,,,,,,,1,Participating Teams,,
+ccf8ea18-8f68-496c-b2b3-912d827daddd,78932c2b-c007-40cd-84c5-2da55715cdbc,2021-11-03,ifr,The Donuts,,,,,,,2,Participating Teams,,
+ec204e1c-a28c-4d20-9f54-0b60e1b0d8a0,78932c2b-c007-40cd-84c5-2da55715cdbc,2021-11-03,ifr,The Donuts,,,,,,,3,Participating Teams,,
+eddc6f58-a319-426a-863a-6dad5ef7bb2c,cb3bc704-f478-4b76-b825-8aae23a8e2e7,2021-11-07,GUNNARS ON,Masters Clash Academy,,,,,,,1,Participating Teams,,
+f0c5d531-0c54-4841-8b30-8f2c77bb1a56,d66e8e12-08e8-408d-add4-96bf4741edb2,2021-11-07,ifr,tnc,,,,,,,1,Participating Teams,,
+15b4f393-21c7-4c02-a622-33a6db9b9e9d,ebbd0495-42eb-4a56-a69d-20326aa1c614,2021-11-07,The Hardos,5subs,,,,,,,1,Participating Teams,,
+f37dcf77-7dd9-41bf-ba4c-93e30cd13a59,a3121809-50df-4e87-a069-88329a2e7b9b,2021-11-07,Charming Tomcats,ORDAH,,,,,,,1,Participating Teams,,
+d0d0f237-1e2b-4d92-9a88-78210012f536,74f5dd1b-dbdb-4f8c-b0b5-f172a2c95899,2021-11-07,GUNNARS ON,tnc,,,,,,,1,Participating Teams,,
+740e67f2-dba5-445e-a98b-cd4acd5c8169,74f5dd1b-dbdb-4f8c-b0b5-f172a2c95899,2021-11-07,GUNNARS ON,tnc,,,,,,,2,Participating Teams,,
+5830f4c3-bf18-4db4-9978-bd7020e9f4fe,e859c5f1-f35f-49f4-850d-1e0cae699229,2021-11-07,The Hardos,ORDAH,,,,,,,1,Participating Teams,,
+ca66ad0e-1699-4d36-a29b-71eea9b42b07,e859c5f1-f35f-49f4-850d-1e0cae699229,2021-11-07,The Hardos,ORDAH,,,,,,,2,Participating Teams,,
+1eb5ae0c-97e9-40e3-a1a1-2665dedd129f,9d1b7515-eb7e-467d-a62b-d78d8149d43d,2021-11-07,GUNNARS ON,The Hardos,,,,,,,1,Grand Final,,
+f1540494-79b0-4402-aa4b-95a59ed5d8f2,9d1b7515-eb7e-467d-a62b-d78d8149d43d,2021-11-07,GUNNARS ON,The Hardos,,,,,,,2,Grand Final,,
+5b072a1a-b149-4bab-b904-4ffaa6d098e8,dfb8aeae-3d2c-40f0-ac35-d820f47e9c08,2021-11-07,tnc,ORDAH,,,,,,,1,Grand Final,,
+befc517e-5a51-4727-86cd-cca40a42e596,dfb8aeae-3d2c-40f0-ac35-d820f47e9c08,2021-11-07,tnc,ORDAH,,,,,,,2,Grand Final,,
+478fc653-409d-49af-9006-cc476280e8bb,dfb8aeae-3d2c-40f0-ac35-d820f47e9c08,2021-11-07,tnc,ORDAH,,,,,,,3,Grand Final,,

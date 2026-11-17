@@ -1,0 +1,14 @@
+{
+  "archive_blockers": [],
+  "counts": {
+    "matched": 68
+  },
+  "expected_replays": 68,
+  "maps_owned_elsewhere": 0,
+  "matched_replays": 68,
+  "no_replay_expected": 0,
+  "status": "fully_archived",
+  "total_map_rows": 68,
+  "tournament": "Raven Court Inhouse League",
+  "unresolved_maps": 0
+}

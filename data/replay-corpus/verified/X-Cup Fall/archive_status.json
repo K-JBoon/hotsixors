@@ -1,0 +1,15 @@
+{
+  "archive_blockers": [],
+  "counts": {
+    "matched": 44,
+    "owned_elsewhere": 129
+  },
+  "expected_replays": 44,
+  "maps_owned_elsewhere": 129,
+  "matched_replays": 44,
+  "no_replay_expected": 0,
+  "status": "fully_archived",
+  "total_map_rows": 173,
+  "tournament": "X-Cup Fall",
+  "unresolved_maps": 0
+}

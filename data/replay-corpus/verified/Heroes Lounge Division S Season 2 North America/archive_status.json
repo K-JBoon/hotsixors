@@ -1,0 +1,15 @@
+{
+  "archive_blockers": [],
+  "counts": {
+    "matched": 138,
+    "owned_elsewhere": 61
+  },
+  "expected_replays": 138,
+  "maps_owned_elsewhere": 61,
+  "matched_replays": 138,
+  "no_replay_expected": 0,
+  "status": "fully_archived",
+  "total_map_rows": 199,
+  "tournament": "Heroes Lounge Division S Season 2 North America",
+  "unresolved_maps": 0
+}

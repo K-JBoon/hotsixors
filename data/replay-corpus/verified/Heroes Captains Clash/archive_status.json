@@ -1,0 +1,14 @@
+{
+  "archive_blockers": [],
+  "counts": {
+    "matched": 69
+  },
+  "expected_replays": 69,
+  "maps_owned_elsewhere": 0,
+  "matched_replays": 69,
+  "no_replay_expected": 0,
+  "status": "fully_archived",
+  "total_map_rows": 69,
+  "tournament": "Heroes Captains Clash",
+  "unresolved_maps": 0
+}

@@ -1,0 +1,52 @@
+{
+  "files_sha256": {
+    "2022-06-26 12.00 3 Legged Cat vs The Bunker Crew/Map 1 (Battlefield of Eternity).StormReplay": "7775ddc6a7ab975a26fdb935b64a01ed9f3cf4db7947476e5018bc8bc40d9681",
+    "2022-06-26 12.00 ArthasStroitHram vs Inting for Ruby/Map 1 (Cursed Hollow).StormReplay": "f600b05907633593c57c13b31f05104caac8c78f1efcf5dcd95ade57723419a5",
+    "2022-06-26 12.00 Chilly Mountain vs Kayak/Map 1 (Braxis Holdout).StormReplay": "83a9abbf69c4c635f344fe7755bad0255514dc725b7503ad9845bc4d3180a98c",
+    "2022-06-26 12.00 Reanimate vs Disgusting/Map 1 (Battlefield of Eternity).StormReplay": "84d3d5caabcf39213cc243f1ebd076d56cd2990f9a394f30051468b5c8897391",
+    "2022-06-26 12.45 3 Legged Cat vs Disgusting/Map 1 (Battlefield of Eternity).StormReplay": "ff9084265debbd78393249e3c769a85b1975370eb4591d76a662cd4474b4d2ed",
+    "2022-06-26 12.45 3 Legged Cat vs Disgusting/Map 2 (Towers of Doom).StormReplay": "c3b029e805f07cc00bac5ff8798641036324b239707fee427a527793993c3c15",
+    "2022-06-26 14.00 Chilly Mountain vs ArthasStroitHram/Map 1 (Battlefield of Eternity).StormReplay": "818679db2dc85084934db4a51ced377a7e1f102e97bd6ed2235a1887b60482d7",
+    "2022-06-26 14.00 Chilly Mountain vs ArthasStroitHram/Map 2 (Cursed Hollow).StormReplay": "71373aee6f9dd6fce19ad7dc90056c91de7aff9436734724e7d1115982075398",
+    "2022-06-26 14.00 Chilly Mountain vs ArthasStroitHram/Map 3 (Garden of Terror).StormReplay": "1173b76792960cd217540c359ab8d3e4cdd57c3c04a284cd01f0f9b303f04fc5",
+    "2022-06-26 15.15 3 Legged Cat vs Chilly Mountain/Map 1 (Battlefield of Eternity).StormReplay": "223d4df6bed59d31bb010080ef201667494e36985907c4d9c0d436ea9efaf22f",
+    "2022-06-26 15.15 3 Legged Cat vs Chilly Mountain/Map 2 (Infernal Shrines).StormReplay": "0f57f457659ed1da27db5b01f54a32b94b74b11b315bc1d3c890a5f4f7215c27",
+    "2022-06-26 15.15 Disgusting vs ArthasStroitHram/Map 1 (Dragon Shire).StormReplay": "7a5376007c1b7f893dc92c8d08633df1f40c894bfd44863465e9d718c9af9fe8",
+    "2022-06-26 15.15 Disgusting vs ArthasStroitHram/Map 2 (Tomb of the Spider Queen).StormReplay": "ab8ef6a318a0d572cc09263c65179a594672781fe8e8b94ecbc748a290c43a73",
+    "archive_status.json": "685d85041bdff69af3e97e89365658c69a42e2b40d6b18d24704b9af6b4b642d",
+    "liquipedia_maps.csv": "0be3d4532e1ece8520ae67035381dce2d5936e622b76cddf96eb396e0ff7aebd",
+    "liquipedia_sets.csv": "e4ee82974021cf64e584efa5b364e818f62e6f4a9eda40f1582727ab3b99cf76",
+    "liquipedia_teams.csv": "45308467abe7bce79b40c7ec360e7d9968732aaca0429fb585358c2cd5844e64",
+    "liquipedia_url.txt": "2e9c3ef6a12dc8eed9b836d8cde821d33bc2248fdaaea3e34b550b4b9246e976",
+    "maps.csv": "2a9f6c67f4b6fd489fb91ff4289377928c013134796a2ece5bb503b585a7674d",
+    "player_battletags.csv": "bd7821d04aac61eb01bf732ce622e46a0c94c6c674c4837032f30b138b9c88bd",
+    "replay_manifest.csv": "9d5fb51ac72b690d90fd0f81d0b3b48d43dd236708e585ee6df77db597db72b7",
+    "sets.csv": "e4ee82974021cf64e584efa5b364e818f62e6f4a9eda40f1582727ab3b99cf76",
+    "teams.csv": "45308467abe7bce79b40c7ec360e7d9968732aaca0429fb585358c2cd5844e64"
+  },
+  "gates": {
+    "complete_replay_coverage": true,
+    "manifest_integrity": true,
+    "no_blocking_reviews": true,
+    "no_stale_overrides": true,
+    "only_approved_inferred_aliases_exported": true
+  },
+  "player_alias_rows": 39,
+  "replay_count": 13,
+  "status": {
+    "blockers": "",
+    "blocking_reviews": 0,
+    "expected_replays": 13,
+    "integrity_errors": 0,
+    "matched_replays": 13,
+    "missing_replays": 0,
+    "pending_alias_reviews": 0,
+    "stale_overrides": 0,
+    "status": "verified",
+    "total_map_rows": 13,
+    "tournament": "X-Cup Summer 2022 - Qualifier 3",
+    "unresolved_maps": 0,
+    "verified": "yes"
+  },
+  "tournament": "X-Cup Summer 2022 - Qualifier 3"
+}

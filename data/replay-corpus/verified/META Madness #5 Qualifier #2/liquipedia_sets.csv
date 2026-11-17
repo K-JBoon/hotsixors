@@ -1,0 +1,5 @@
+set_id,date,team_1,team_2,team_1_score,team_2_score,winner,best_of,finished,notes,set_position_in_tournament,source_page
+21f75740-0fb3-465e-ab3f-6ccd46e0cd23,2021-09-10,RossPierrDoll,rqg,0,2,2,,true,,Participating Teams,META Madness/5/Qualifiers/2
+cfa2dec4-29fe-463d-996c-1357d29c8bfa,2021-09-10,ifr,Chilly Mountain,1,2,2,,true,,Participating Teams,META Madness/5/Qualifiers/2
+7b6f558b-9622-4d6a-9ce8-fdf2b317e61b,2021-09-10,rqg,Chilly Mountain,2,0,1,,true,,Grand Final,META Madness/5/Qualifiers/2
+0575c731-74b6-44db-807c-ed689db22bf1,2021-09-10,RossPierrDoll,ifr,2,1,1,,true,,Grand Final,META Madness/5/Qualifiers/2

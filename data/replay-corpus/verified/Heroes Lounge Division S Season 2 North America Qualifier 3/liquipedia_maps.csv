@@ -1,0 +1,9 @@
+map_id,set_id,date,team_1,team_2,map,team_1_heroes,team_2_heroes,team_1_bans,team_2_bans,notes,map_number_in_set,set_position_in_tournament,map_pick_team,map_winner
+aa778b8e-a1d5-4cfc-8956-5ea769538e22,09334fab-800a-4076-a76e-3d84ed245a9d,2019-12-07,broken alliance,tee tee w,,,,,,,1,Participating teams,,
+faf6b010-22cf-41cf-ad39-959b7c0f0053,09334fab-800a-4076-a76e-3d84ed245a9d,2019-12-07,broken alliance,tee tee w,,,,,,,2,Participating teams,,
+619424a0-e6ac-4c61-8ca2-cb880719011e,a8ffa987-2980-4fee-8e3c-28bc15e0d050,2019-12-07,regen,broken alliance,,,,,,,1,Participating teams,,
+c0b7a078-8a1c-4d4d-9580-5a6d97c5bd59,a8ffa987-2980-4fee-8e3c-28bc15e0d050,2019-12-07,regen,broken alliance,,,,,,,2,Participating teams,,
+567c3767-3547-49b5-8985-8ceb6e4a6221,cc941f6c-a9f8-4356-adb7-e44f8b6ef402,2019-12-07,rewind,teamnut,,,,,,,1,Participating teams,,
+4592d818-807b-48e2-b9f0-2e02bf4709dc,cc941f6c-a9f8-4356-adb7-e44f8b6ef402,2019-12-07,rewind,teamnut,,,,,,,2,Participating teams,,
+eb211fc4-a324-4150-bbae-195f08b24449,54059bce-3c34-4ff0-9534-2beb0e6c46c5,2019-12-07,regen,rewind,,,,,,,1,Grand Final,,
+2d66af28-dc09-4bea-a122-b43b36249b0d,54059bce-3c34-4ff0-9534-2beb0e6c46c5,2019-12-07,regen,rewind,,,,,,,2,Grand Final,,

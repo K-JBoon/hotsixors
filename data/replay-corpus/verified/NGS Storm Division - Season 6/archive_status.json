@@ -1,0 +1,15 @@
+{
+  "archive_blockers": [],
+  "counts": {
+    "matched": 99,
+    "owned_elsewhere": 47
+  },
+  "expected_replays": 99,
+  "maps_owned_elsewhere": 47,
+  "matched_replays": 99,
+  "no_replay_expected": 0,
+  "status": "fully_archived",
+  "total_map_rows": 146,
+  "tournament": "NGS Storm Division - Season 6",
+  "unresolved_maps": 0
+}

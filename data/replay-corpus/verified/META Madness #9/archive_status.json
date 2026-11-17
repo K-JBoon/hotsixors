@@ -1,0 +1,14 @@
+{
+  "archive_blockers": [],
+  "counts": {
+    "matched": 104
+  },
+  "expected_replays": 104,
+  "maps_owned_elsewhere": 0,
+  "matched_replays": 104,
+  "no_replay_expected": 0,
+  "status": "fully_archived",
+  "total_map_rows": 104,
+  "tournament": "META Madness #9",
+  "unresolved_maps": 0
+}
