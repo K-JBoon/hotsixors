@@ -7,7 +7,7 @@ import { buildTables } from './tables.js';
 import {
   STAT_COLUMNS, available, facets, gameList, tournamentReport, tournamentTable, heroReport, mapReport, heroTable, mapTable, playerReport, playerTable, teamReport, teamTable,
 } from './reports.js';
-import { LIQUIPEDIA_ICON, escapeHtml, fmt, heroCell, heroName, loadHeroes, renderTable, renderTalentTiers, tiles, wilson, winRateCell } from './view.js';
+import { LIQUIPEDIA_ICON, MISSING_ICON, deltaCell, escapeHtml, fmt, heroCell, heroName, loadHeroes, renderTable, renderTalentTiers, tiles, wilson, winRateCell } from './view.js';
 
 const root = document.querySelector('[data-stats-root]');
 const view = root.querySelector('[data-view]');
@@ -23,29 +23,34 @@ const watchHref = (g) => {
 const DOWNLOAD_ICON = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>';
 const gameActions = (g) => `<div class="stats-actions"><a class="btn btn--sm" href="${watchHref(g)}">Watch</a><a class="btn btn--sm" href="${replayBase}/${g.id}.StormReplay" download="${g.id}.StormReplay" title="Download replay" aria-label="Download replay">${DOWNLOAD_ICON}</a></div>`;
 
-const FILTER_KEYS = ['scope', 'tournament', 'player', 'mode', 'map', 'patch', 'from', 'to', 'min'];
 const mine = root.dataset.source === 'personal';
+const FILTER_KEYS = ['scope', 'strict', 'tournament', 'player', 'mode', 'map', 'patch', 'from', 'to', 'min', 'per', 'rank', 'show'];
+const DEFAULTS = { scope: 'tournament', strict: '1', per: 'game', rank: 'confidence', show: mine ? 'all' : 'draft' };
+const SORT_KEYS = ['sort', 'dir'];
 const TABS = ['heroes', 'maps', 'players', 'teams', 'tournaments', 'games'];
 
 const MULTI_KEYS = new Set(['tournament', 'player', 'mode', 'map', 'patch']);
 
 const readFilters = () => {
   const q = new URLSearchParams(location.search);
-  const filters = Object.fromEntries(FILTER_KEYS.map((k) => [k, MULTI_KEYS.has(k) ? q.getAll(k) : q.get(k) ?? (k === 'scope' ? 'tournament' : '')]));
+  const filters = Object.fromEntries(FILTER_KEYS.map((k) => [k, MULTI_KEYS.has(k) ? q.getAll(k) : q.get(k) ?? DEFAULTS[k] ?? '']));
   return mine ? { ...filters, scope: 'all', tournament: [] } : { ...filters, player: [], mode: [] };
 };
 
 const toQuery = (filters) => {
   const q = new URLSearchParams();
   for (const [k, v] of Object.entries(filters)) {
-    if (k === 'scope' && (mine || v === 'tournament')) continue;
+    if (v === DEFAULTS[k] || (k === 'scope' && mine)) continue;
     for (const item of asList(v)) q.append(k, item);
   }
   return q;
 };
 
 function writeFilters(filters) {
-  const search = toQuery(filters).toString();
+  const current = new URLSearchParams(location.search);
+  const q = toQuery(filters);
+  for (const k of SORT_KEYS) if (current.has(k)) q.set(k, current.get(k));
+  const search = q.toString();
   history.replaceState(null, '', `${location.pathname}${search ? `?${search}` : ''}${location.hash}`);
 }
 
@@ -68,15 +73,58 @@ function minGames(rows, filters, count = (r) => r.games) {
 
 const link = (hash, label) => `<a href="${escapeHtml(hash)}">${escapeHtml(label)}</a>`;
 const hash = (kind, id) => `#${kind}/${encodeURIComponent(id)}`;
-const statCols = STAT_COLUMNS.map((s) => ({
-  key: s.id, label: s.label, num: true, format: s.id === 'kills' || s.id === 'deaths' || s.id === 'assists' ? fmt.num : fmt.big,
-}));
+const COUNT_STATS = new Set(['kills', 'deaths', 'assists']);
+const statCols = (filters) => {
+  const perMin = filters.per === 'min';
+  return STAT_COLUMNS.map((s) => {
+    if (s.per) return { key: s.id, label: s.label, title: 'Takedowns per death', num: true, format: fmt.num };
+    const format = COUNT_STATS.has(s.id) ? (perMin ? fmt.num2 : fmt.num) : perMin ? fmt.int : fmt.big;
+    return { key: s.id, label: perMin ? `${s.label}/min` : s.label, num: true, format };
+  });
+};
+
+const urlSort = (sortKey, sortDir = -1) => {
+  const q = new URLSearchParams(location.search);
+  return {
+    sortKey: q.get('sort') ?? sortKey,
+    sortDir: q.has('sort') ? (q.get('dir') === 'asc' ? 1 : -1) : sortDir,
+    onSort: (key, dir) => {
+      const next = new URLSearchParams(location.search);
+      next.set('sort', key);
+      next.set('dir', dir > 0 ? 'asc' : 'desc');
+      history.replaceState(null, '', `${location.pathname}?${next}${location.hash}`);
+    },
+  };
+};
 const gamesCol = { key: 'games', label: 'Games', num: true, format: fmt.int };
-const winCol = { key: 'winRate', label: 'Win', num: true, sort: (r) => (r.winRate == null ? null : wilson(r.winRate, r.games)[0]), html: (r) => winRateCell(r.winRate, r.games) };
+const winCol = (filters) => ({
+  key: 'winRate',
+  label: 'Win',
+  num: true,
+  ...(filters.rank === 'raw' ? {} : { title: 'Sorted by 95% confidence bound', sort: (r, dir) => (r.winRate == null ? null : wilson(r.winRate, r.games)[dir > 0 ? 1 : 0]) }),
+  html: (r) => winRateCell(r.winRate, r.games),
+});
 const pickCols = [
   { key: 'pickRate', label: 'Pick', num: true, format: fmt.pct },
-  ...(mine ? [] : [{ key: 'banRate', label: 'Ban', num: true, format: fmt.pct }, { key: 'presence', label: 'Presence', num: true, format: fmt.pct }]),
+  ...(mine ? [] : [
+    { key: 'banRate', label: 'Ban', num: true, format: fmt.pct },
+    { key: 'presence', label: 'Presence', title: 'Pick + ban', num: true, format: fmt.pct },
+    { key: 'earlyBanRate', label: 'Early ban', title: 'Banned in first phase', num: true, format: fmt.pct },
+    { key: 'pickNumber', label: 'Pick #', title: 'Average pick position', num: true, format: fmt.num, sort: (r) => (r.pickNumber == null ? null : -r.pickNumber) },
+  ]),
 ];
+/** Draft and score columns of hero tables, per the `show` setting. */
+const heroMetricCols = (filters) => [
+  ...(filters.show === 'stats' ? [] : pickCols),
+  ...(filters.show === 'draft' ? [] : statCols(filters)),
+];
+
+/** renderTable with Min. games applied to tables that show a games column. */
+function statsTable(el, filters, opts) {
+  if (!opts.columns.includes(gamesCol)) return renderTable(el, opts);
+  const { rows, empty } = minGames(opts.rows, filters);
+  return renderTable(el, { ...opts, rows, empty: empty ?? opts.empty });
+}
 
 function section(title, id) {
   const heading = title ? `<h2 class="stats-section__title">${escapeHtml(title)}</h2>` : '';
@@ -211,20 +259,55 @@ function renderPhases(el, phases) {
   })));
 }
 
+/** Win rate minus `base(row)`, colored when the interval excludes it. */
+const deltaCol = (label, title, base) => ({
+  key: 'delta',
+  label,
+  title,
+  num: true,
+  sort: (x) => (x.winRate == null || base(x) == null ? null : x.winRate - base(x)),
+  html: (x) => deltaCell(x.winRate, base(x), x.games),
+});
+
+const patchRank = (patch) => patch.split('.').reduce((n, part) => n * 1000 + Number(part), 0);
+
+/** Hero tables for `report.allies` and `report.enemies`, against `base` win rate. */
+function companionTables(el, filters, heroes, report, base, whose) {
+  for (const [id, rows, label] of [['allies', report.allies, 'Teammate'], ['enemies', report.enemies, 'Opponent']]) {
+    statsTable(part(el, id), filters, {
+      columns: [
+        { key: 'hero', label, sort: (x) => heroName(heroes, x.hero), html: (x) => heroCell(heroes, x.hero, hash('hero', x.hero)) },
+        gamesCol, winCol(filters),
+        deltaCol(`vs ${whose}`, `Win rate minus ${whose} win rate`, () => base),
+      ],
+      rows,
+      sortKey: 'games',
+      pageSize: 10,
+    });
+  }
+}
+
+const lengthLabel = (x) => (x.to == null ? `${x.from / 60}+ min` : x.from ? `${x.from / 60}–${x.to / 60} min` : `Under ${x.to / 60} min`);
+function lengthTable(el, filters, rows) {
+  statsTable(el, filters, {
+    columns: [{ key: 'from', label: 'Length', sort: (x) => -x.from, html: lengthLabel }, gamesCol, winCol(filters)],
+    rows,
+    sortKey: 'from',
+    pageSize: Infinity,
+  });
+}
+
 const VIEWS = {
   async heroes(stats, filters, heroes, arg, el) {
     el.innerHTML = section(null, 'table');
-    const { rows, empty } = minGames(await heroTable(stats, filters), filters);
-    renderTable(part(el, 'table'), {
+    statsTable(part(el, 'table'), filters, {
       columns: [
         { key: 'hero', label: 'Hero', sort: (r) => heroName(heroes, r.hero), html: (r) => heroCell(heroes, r.hero, hash('hero', r.hero)) },
-        gamesCol, winCol,
-        ...pickCols,
-        ...statCols,
+        gamesCol, winCol(filters),
+        ...heroMetricCols(filters),
       ],
-      rows,
-      empty,
-      sortKey: mine ? 'games' : 'presence',
+      rows: await heroTable(stats, filters),
+      ...urlSort(mine ? 'games' : 'presence'),
       pageSize: Infinity,
     });
   },
@@ -235,37 +318,73 @@ const VIEWS = {
     el.innerHTML = `
       <header class="stats-detail">${heroCell(heroes, slug, `/heroes/${slug}/`)}</header>
       ${row(
-        tiles([['Games', fmt.int(s.games)], ['Win rate', winRateCell(s.winRate, s.games)], ['Pick rate', fmt.pct(s.pickRate)], ...(mine ? [] : [['Ban rate', fmt.pct(s.banRate)], ['Presence', fmt.pct(s.presence)]])]),
+        tiles([
+          ['Games', fmt.int(s.games)], ['Win rate', winRateCell(s.winRate, s.games)], ['Pick rate', fmt.pct(s.pickRate)],
+          ...(mine ? [] : [['Ban rate', fmt.pct(s.banRate)], ['Presence', fmt.pct(s.presence)], ['Early ban', fmt.pct(s.earlyBanRate)], ['Avg pick #', fmt.num(s.pickNumber)]]),
+        ]),
         section('Maps', 'maps'),
       )}
-      ${section('Talents', 'talents')}${section('Players', 'players')}${section('Games', 'games')}`;
-    renderTalentTiers(part(el, 'talents'), talents, report.talents);
-    renderTable(part(el, 'maps'), { columns: [{ key: 'map', label: 'Map', html: (x) => link(hash('map', x.map), x.map) }, gamesCol, winCol], rows: report.maps, sortKey: 'games' });
-    renderTable(part(el, 'players'), {
+      ${section('Talents', 'talents')}${section('Builds', 'builds')}
+      ${row(section('With', 'allies'), section('Against', 'enemies'))}
+      ${row(section('Patches', 'patches'), section('Game length', 'lengths'))}
+      ${section('Players', 'players')}${section('Games', 'games')}`;
+    renderTalentTiers(part(el, 'talents'), talents, report.talents, true);
+    companionTables(el, filters, heroes, report, s.winRate, 'hero');
+    lengthTable(part(el, 'lengths'), filters, report.lengths);
+    statsTable(part(el, 'patches'), filters, {
+      columns: [
+        { key: 'patch', label: 'Patch', sort: (x) => patchRank(x.patch) },
+        gamesCol, winCol(filters),
+        { key: 'pickRate', label: 'Pick', num: true, format: fmt.pct },
+      ],
+      rows: report.patches,
+      sortKey: 'patch',
+      pageSize: 10,
+    });
+    const talentIcon = (id) => {
+      const t = talents[id];
+      return t
+        ? `<a href="/heroes/${escapeHtml(t.hero)}/#talent-${escapeHtml(id)}" title="${escapeHtml(t.name)}"><img class="stats-portrait" src="/images/abilitytalents/${escapeHtml(t.icon)}" alt="${escapeHtml(t.name)}" loading="lazy"></a>`
+        : `<span title="${escapeHtml(id)}">${MISSING_ICON}</span>`;
+    };
+    statsTable(part(el, 'builds'), filters, {
+      columns: [
+        { key: 'talents', label: 'Build', title: 'Levels 1 to 16', sort: (b) => b.talents.join(), html: (b) => `<div class="stats-build">${b.talents.map(talentIcon).join('')}</div>` },
+        gamesCol, winCol(filters),
+        deltaCol('vs hero', 'Win rate minus hero win rate in games through level 16', () => report.buildWinRate),
+      ],
+      rows: report.builds,
+      sortKey: 'games',
+      pageSize: 20,
+      split: 10,
+      empty: 'No builds through level 16 under these filters.',
+    });
+    statsTable(part(el, 'maps'), filters, { columns: [{ key: 'map', label: 'Map', html: (x) => link(hash('map', x.map), x.map) }, gamesCol, winCol(filters)], rows: report.maps, sortKey: 'games', split: 8 });
+    statsTable(part(el, 'players'), filters, {
       columns: [
         { key: 'battletag', label: 'Player', html: (r) => link(hash('player', r.player), r.battletag ?? r.player) },
-        gamesCol, winCol, ...statCols,
+        gamesCol, winCol(filters), ...statCols(filters),
       ],
-      ...minGames(report.players, filters),
+      rows: report.players,
       sortKey: 'games',
       pageSize: 10,
     });
-    renderTable(part(el, 'games'), gameRows(report.games, heroes));
+    statsTable(part(el, 'games'), filters, gameRows(report.games, heroes));
   },
 
   async maps(stats, filters, heroes, arg, el) {
     el.innerHTML = section(null, 'table');
-    renderTable(part(el, 'table'), {
+    statsTable(part(el, 'table'), filters, {
       columns: [
         { key: 'map', label: 'Map', html: (r) => link(hash('map', r.map), r.map) },
         gamesCol,
         { key: 'duration', label: 'Avg length', num: true, format: fmt.dur },
-        ...(asList(filters.player).length ? [winCol] : []),
-        { key: 'firstPickWinRate', label: 'First pick win', num: true, format: fmt.pct },
-        { key: 'leftWinRate', label: 'Left side win', num: true, format: fmt.pct },
+        ...(asList(filters.player).length ? [winCol(filters)] : []),
+        { key: 'firstPickWinRate', label: 'First pick win', num: true, html: (r) => winRateCell(r.firstPickWinRate, r.firstPickGames) },
+        { key: 'leftWinRate', label: 'Left side win', num: true, html: (r) => winRateCell(r.leftWinRate, r.sideGames) },
       ],
       rows: await mapTable(stats, filters),
-      sortKey: 'games',
+      ...urlSort('games'),
     });
   },
 
@@ -281,39 +400,39 @@ const VIEWS = {
         ['Games', fmt.int(s.games)],
         ['Avg length', fmt.dur(s.duration)],
         ...(s.winRate !== undefined ? [['Win rate', winRateCell(s.winRate, s.games)]] : []),
-        ['First pick win', fmt.pct(s.firstPickWinRate)],
-        ['Left side win', fmt.pct(s.leftWinRate)],
+        ['First pick win', winRateCell(s.firstPickWinRate, s.firstPickGames)],
+        ['Left side win', winRateCell(s.leftWinRate, s.sideGames)],
       ])}
       ${section('Heroes', 'heroes')}${section('Games', 'games')}`;
-    renderTable(part(el, 'heroes'), {
+    statsTable(part(el, 'heroes'), filters, {
       columns: [
         { key: 'hero', label: 'Hero', sort: (x) => heroName(heroes, x.hero), html: (x) => heroCell(heroes, x.hero, hash('hero', x.hero)) },
-        gamesCol, winCol,
-        ...pickCols,
-        ...statCols,
+        gamesCol, winCol(filters),
+        deltaCol('vs all maps', 'Win rate minus all-map win rate', (x) => x.baseWinRate),
+        ...heroMetricCols(filters),
       ],
       rows: r.heroes,
       sortKey: 'games',
       pageSize: 10,
     });
-    renderTable(part(el, 'games'), gameRows(r.games, heroes));
+    statsTable(part(el, 'games'), filters, gameRows(r.games, heroes));
   },
 
   async players(stats, filters, heroes, arg, el) {
     el.innerHTML = section(null, 'table');
-    renderTable(part(el, 'table'), {
+    statsTable(part(el, 'table'), filters, {
       columns: [
         { key: 'battletag', label: 'Player', html: (r) => link(hash('player', r.player), r.battletag ?? r.player) },
         { key: 'team', label: 'Team', html: (r) => (r.team ? link(hash('team', r.team), r.team) : '–') },
-        gamesCol, winCol,
+        gamesCol, winCol(filters),
         { key: 'heroes', label: 'Heroes', num: true, format: fmt.int },
         { key: 'topHero', label: 'Most played', sort: (r) => heroName(heroes, r.topHero), html: (r) => heroCell(heroes, r.topHero, hash('hero', r.topHero)) },
-        ...statCols.slice(0, 4),
+        ...statCols(filters).slice(0, 4),
         { key: 'lastPlayed', label: 'Last game', format: fmt.date },
       ],
-      ...minGames(await playerTable(stats, filters), filters),
+      rows: await playerTable(stats, filters),
       search: { placeholder: 'Player or team', text: (r) => `${r.battletag ?? r.player} ${r.team ?? ''}` },
-      sortKey: 'games',
+      ...urlSort('games'),
       pageSize: 10,
     });
   },
@@ -328,35 +447,43 @@ const VIEWS = {
     el.innerHTML = `
       <header class="stats-detail"><h2>${escapeHtml(r.summary.battletag ?? id)}</h2></header>
       ${row(
-        tiles([['Games', fmt.int(r.summary.games)], ['Win rate', winRateCell(r.summary.winRate, r.summary.games)], ['Events played in', fmt.int(r.summary.events)], ['Signature heroes', `<div class="stats-lineup">${heroIcons(heroes, signature)}</div>`]]),
-        section('Teams', 'teams'),
+        tiles([
+          ['Games', fmt.int(r.summary.games)], ['Win rate', winRateCell(r.summary.winRate, r.summary.games)],
+          ...(mine ? [] : [['Events played in', fmt.int(r.summary.events)]]),
+          ['Signature heroes', `<div class="stats-lineup">${heroIcons(heroes, signature)}</div>`],
+        ]),
+        ...(mine ? [] : [section('Teams', 'teams')]),
         section('Maps', 'maps'),
       )}
-      ${section('Heroes', 'heroes')}${section('Games', 'games')}`;
-    renderTable(part(el, 'heroes'), {
-      columns: [{ key: 'hero', label: 'Hero', sort: (x) => heroName(heroes, x.hero), html: (x) => heroCell(heroes, x.hero, hash('hero', x.hero)) }, gamesCol, winCol, ...statCols],
+      ${section('Heroes', 'heroes')}
+      ${row(section('With', 'allies'), section('Against', 'enemies'), section('Game length', 'lengths'))}
+      ${section('Games', 'games')}`;
+    companionTables(el, filters, heroes, r, r.summary.winRate, 'player');
+    lengthTable(part(el, 'lengths'), filters, r.lengths);
+    statsTable(part(el, 'heroes'), filters, {
+      columns: [{ key: 'hero', label: 'Hero', sort: (x) => heroName(heroes, x.hero), html: (x) => heroCell(heroes, x.hero, hash('hero', x.hero)) }, gamesCol, winCol(filters), ...statCols(filters)],
       rows: r.heroes,
       sortKey: 'games',
       pageSize: 10,
     });
-    renderTable(part(el, 'teams'), { columns: [{ key: 'team', label: 'Team', html: (x) => link(hash('team', x.team), x.team) }, gamesCol, winCol], rows: r.teams, sortKey: 'games', empty: 'No tournament games.' });
-    renderTable(part(el, 'maps'), { columns: [{ key: 'map', label: 'Map', html: (x) => link(hash('map', x.map), x.map) }, gamesCol, winCol], rows: r.maps, sortKey: 'games' });
-    renderTable(part(el, 'games'), gameRows(r.games, heroes));
+    if (!mine) statsTable(part(el, 'teams'), filters, { columns: [{ key: 'team', label: 'Team', html: (x) => link(hash('team', x.team), x.team) }, gamesCol, winCol(filters)], rows: r.teams, sortKey: 'games', empty: 'No tournament games.' });
+    statsTable(part(el, 'maps'), filters, { columns: [{ key: 'map', label: 'Map', html: (x) => link(hash('map', x.map), x.map) }, gamesCol, winCol(filters)], rows: r.maps, sortKey: 'games', split: 8 });
+    statsTable(part(el, 'games'), filters, gameRows(r.games, heroes));
   },
 
   async teams(stats, filters, heroes, arg, el) {
     el.innerHTML = section(null, 'table');
-    renderTable(part(el, 'table'), {
+    statsTable(part(el, 'table'), filters, {
       columns: [
         { key: 'team', label: 'Team', html: (r) => link(hash('team', r.team), r.team) },
-        gamesCol, winCol,
+        gamesCol, winCol(filters),
         { key: 'players', label: 'Players', num: true, format: fmt.int },
         { key: 'tournaments', label: 'Events', num: true, format: fmt.int },
         { key: 'lastPlayed', label: 'Last game', format: fmt.date },
       ],
-      ...minGames(await teamTable(stats, filters), filters),
+      rows: await teamTable(stats, filters),
       search: { placeholder: 'Team', text: (r) => r.team },
-      sortKey: 'games',
+      ...urlSort('games'),
     });
   },
 
@@ -364,24 +491,25 @@ const VIEWS = {
     const r = await teamReport(stats, name, filters);
     el.innerHTML = `<header class="stats-detail"><h2>${escapeHtml(name)}</h2></header>
       ${section('Roster', 'roster')}${row(section('Heroes picked', 'heroes'), section('Bans', 'bans'), section('Maps', 'maps'))}${section('Games', 'games')}`;
-    renderTable(part(el, 'roster'), {
+    statsTable(part(el, 'roster'), filters, {
       columns: [
         { key: 'battletag', label: 'Player', html: (x) => link(hash('player', x.player), x.battletag ?? x.player) },
-        gamesCol, winCol,
+        gamesCol, winCol(filters),
         { key: 'topHero', label: 'Most played', html: (x) => heroCell(heroes, x.topHero, hash('hero', x.topHero)) },
       ],
       rows: r.roster,
       sortKey: 'games',
+      split: 8,
     });
-    renderTable(part(el, 'heroes'), { columns: [{ key: 'hero', label: 'Hero', html: (x) => heroCell(heroes, x.hero, hash('hero', x.hero)) }, gamesCol, winCol], rows: r.heroes, sortKey: 'games', pageSize: 10 });
-    renderTable(part(el, 'bans'), { columns: [{ key: 'hero', label: 'Hero', html: (x) => heroCell(heroes, x.hero, hash('hero', x.hero)) }, { key: 'bans', label: 'Bans', num: true, format: fmt.int }], rows: r.bans, sortKey: 'bans', pageSize: 10, empty: 'No bans recorded.' });
-    renderTable(part(el, 'maps'), { columns: [{ key: 'map', label: 'Map', html: (x) => link(hash('map', x.map), x.map) }, gamesCol, winCol], rows: r.maps, sortKey: 'games' });
-    renderTable(part(el, 'games'), gameRows(r.games, heroes));
+    statsTable(part(el, 'heroes'), filters, { columns: [{ key: 'hero', label: 'Hero', html: (x) => heroCell(heroes, x.hero, hash('hero', x.hero)) }, gamesCol, winCol(filters)], rows: r.heroes, sortKey: 'games', pageSize: 10 });
+    statsTable(part(el, 'bans'), filters, { columns: [{ key: 'hero', label: 'Hero', html: (x) => heroCell(heroes, x.hero, hash('hero', x.hero)) }, { key: 'bans', label: 'Bans', num: true, format: fmt.int }], rows: r.bans, sortKey: 'bans', pageSize: 10, empty: 'No bans recorded.' });
+    statsTable(part(el, 'maps'), filters, { columns: [{ key: 'map', label: 'Map', html: (x) => link(hash('map', x.map), x.map) }, gamesCol, winCol(filters)], rows: r.maps, sortKey: 'games', split: 8 });
+    statsTable(part(el, 'games'), filters, gameRows(r.games, heroes));
   },
 
   async tournaments(stats, filters, heroes, arg, el) {
     el.innerHTML = section(null, 'table');
-    renderTable(part(el, 'table'), {
+    statsTable(part(el, 'table'), filters, {
       columns: [
         { key: 'name', label: 'Tournament', html: (t) => link(hash('tournament', t.name), t.name) },
         gamesCol,
@@ -391,7 +519,7 @@ const VIEWS = {
       ],
       rows: await tournamentTable(stats, filters),
       search: { placeholder: 'Tournament', text: (t) => t.name },
-      sortKey: 'last',
+      ...urlSort('last'),
     });
   },
 
@@ -407,30 +535,31 @@ const VIEWS = {
       )}
       <div class="stats-phases" data-part="rounds"></div>${section('Heroes', 'heroes')}${section('Games', 'games')}`;
     renderPhases(part(el, 'rounds'), r.phases);
-    renderTable(part(el, 'teams'), { columns: [{ key: 'team', label: 'Team', html: (x) => link(hash('team', x.team), x.team) }, gamesCol, winCol], rows: r.teams, sortKey: 'games', pageSize: 10 });
-    renderTable(part(el, 'maps'), {
+    statsTable(part(el, 'teams'), filters, { columns: [{ key: 'team', label: 'Team', html: (x) => link(hash('team', x.team), x.team) }, gamesCol, winCol(filters)], rows: r.teams, sortKey: 'games', pageSize: 10 });
+    statsTable(part(el, 'maps'), filters, {
       columns: [{ key: 'map', label: 'Map', html: (x) => link(hash('map', x.map), x.map) }, gamesCol, { key: 'duration', label: 'Avg length', num: true, format: fmt.dur }],
       rows: r.maps,
       sortKey: 'games',
+      split: 8,
     });
-    renderTable(part(el, 'heroes'), {
+    statsTable(part(el, 'heroes'), filters, {
       columns: [
         { key: 'hero', label: 'Hero', sort: (x) => heroName(heroes, x.hero), html: (x) => heroCell(heroes, x.hero, hash('hero', x.hero)) },
-        gamesCol, winCol,
-        ...pickCols,
-        ...statCols,
+        gamesCol, winCol(filters),
+        ...heroMetricCols(filters),
       ],
       rows: r.heroes,
       sortKey: 'games',
       pageSize: 10,
     });
-    renderTable(part(el, 'games'), { ...gameRows(r.games, heroes), sortDir: 1 });
+    statsTable(part(el, 'games'), filters, { ...gameRows(r.games, heroes), sortDir: 1 });
   },
 
   async games(stats, filters, heroes, arg, el) {
     el.innerHTML = section(null, 'table');
-    renderTable(part(el, 'table'), {
+    statsTable(part(el, 'table'), filters, {
       ...gameRows(await gameList(stats, filters), heroes),
+      ...urlSort('date'),
       search: {
         placeholder: 'Event, map, team or hero',
         text: (g) => [g.tournament, g.stage, g.mode, g.map, g.team0, g.team1, ...g.heroes.flat().map((h) => heroName(heroes, h))].join(' '),
@@ -532,7 +661,15 @@ function bindFilters(stats, heroes) {
     if (currentFacets) fillFilters(stats, currentFacets, readFilters());
     render(stats, heroes);
   });
-  window.addEventListener('hashchange', () => render(stats, heroes));
+  window.addEventListener('hashchange', () => {
+    const q = new URLSearchParams(location.search);
+    if (SORT_KEYS.some((k) => q.has(k))) {
+      SORT_KEYS.forEach((k) => q.delete(k));
+      history.replaceState(null, '', `${location.pathname}${q.size ? `?${q}` : ''}${location.hash}`);
+    }
+    window.scrollTo(0, 0);
+    render(stats, heroes);
+  });
 }
 
 async function competitive(heroes) {
@@ -692,6 +829,7 @@ async function myReplays(heroes) {
     syncFrom(files);
   });
   mineEls('clear').forEach((el) => el.addEventListener('click', async () => {
+    if (!confirm('Forget all parsed replays on this device? The replay files stay, but a new sync parses them again.')) return;
     await Promise.all([clearSummaries(), ...['folder', 'lastSync'].map(deleteSetting)]);
     setText('status', '');
     await showFolder();

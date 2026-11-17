@@ -20,7 +20,6 @@
      data-replay-base="{{ config.extra.nexus_assets }}/replays"
      data-worker-url="{{ get_url(path=bundles['stats/parse-worker.js']) }}">
   <h1>{{ page.title }}</h1>
-  <p class="stats-status" data-stats-status></p>
 {% if not personal %}
   <p class="stats-note">This data is sourced from the {% if config.extra.replay_source %}<a href="{{ config.extra.replay_source }}" rel="noopener">community replay archive</a>{% else %}community replay archive{% endif %} that BrbSoaking maintains.</p>
   <aside class="stats-cta">
@@ -35,7 +34,12 @@
     <p class="stats-drop__or">or</p>
     <p><button class="btn btn--primary stats-drop__btn" type="button" data-mine-pick>Choose folder</button></p>
     <p class="stats-drop__note">Parsed in your browser and stored on this device. Replays are not uploaded.</p>
-    <p class="stats-drop__note">Windows: <code>Documents\Heroes of the Storm\Accounts\&lt;id&gt;\&lt;region-id&gt;\Replays\Multiplayer</code></p>
+    <dl class="stats-drop__paths">
+      <dt>Windows</dt>
+      <dd><code>Documents\Heroes of the Storm\Accounts\&lt;id&gt;\&lt;region-id&gt;\Replays\Multiplayer</code></dd>
+      <dt>Linux</dt>
+      <dd><code>&lt;wine-prefix&gt;/drive_c/users/&lt;user&gt;/Documents/Heroes of the Storm/Accounts/&lt;id&gt;/&lt;region-id&gt;/Replays/Multiplayer</code></dd>
+    </dl>
     <progress class="stats-mine__progress" data-mine-progress hidden></progress>
     <p data-mine-status></p>
   </div>
@@ -59,12 +63,39 @@
     <div class="stats-filters__field"><span id="filter-player">Player</span><div data-multi="player" aria-labelledby="filter-player"></div></div>
     <div class="stats-filters__field"><span id="filter-mode">Mode</span><div data-multi="mode" aria-labelledby="filter-mode"></div></div>
     {% endif %}
+    <div class="stats-filters__field"><span id="filter-strict">Games</span>
+      <div class="segmented" role="radiogroup" aria-labelledby="filter-strict">
+        <label class="segmented__btn" title="Standard battlegrounds with draft data"><input type="radio" name="strict" value="1" checked> Strict</label>
+        <label class="segmented__btn"><input type="radio" name="strict" value="0"> All</label>
+      </div>
+    </div>
     <div class="stats-filters__field"><span id="filter-map">Map</span><div data-multi="map" aria-labelledby="filter-map"></div></div>
     <div class="stats-filters__field"><span id="filter-patch">Patch</span><div data-multi="patch" aria-labelledby="filter-patch"></div></div>
     <label>From <input class="input" type="date" name="from"></label>
     <label>To <input class="input" type="date" name="to"></label>
-    <label>Min. games <input class="input stats-filters__min" type="number" name="min" min="1" placeholder="any"></label>
-    <button class="btn stats-filters__reset" type="reset">Reset</button>
+    <div class="stats-filters__view">
+      <label>Min. games <input class="input stats-filters__min" type="number" name="min" min="1" placeholder="any"></label>
+      {% if not personal %}<div class="stats-filters__field"><span id="filter-show">Hero columns</span>
+        <div class="segmented" role="radiogroup" aria-labelledby="filter-show">
+          <label class="segmented__btn"><input type="radio" name="show" value="draft" checked> Draft</label>
+          <label class="segmented__btn"><input type="radio" name="show" value="stats"> Stats</label>
+          <label class="segmented__btn"><input type="radio" name="show" value="all"> All</label>
+        </div>
+      </div>{% endif %}
+      <div class="stats-filters__field"><span id="filter-per">Stats</span>
+        <div class="segmented" role="radiogroup" aria-labelledby="filter-per">
+          <label class="segmented__btn"><input type="radio" name="per" value="game" checked> Per game</label>
+          <label class="segmented__btn"><input type="radio" name="per" value="min"> Per minute</label>
+        </div>
+      </div>
+      <div class="stats-filters__field"><span id="filter-rank">Sort win rate</span>
+        <div class="segmented" role="radiogroup" aria-labelledby="filter-rank">
+          <label class="segmented__btn" title="Sorted by 95% confidence bound"><input type="radio" name="rank" value="confidence" checked> By confidence</label>
+          <label class="segmented__btn"><input type="radio" name="rank" value="raw"> Raw</label>
+        </div>
+      </div>
+      <button class="btn stats-filters__reset" type="reset">Reset</button>
+    </div>
   </form>
 
   <nav class="stats-tabs" aria-label="Stats views">
@@ -79,6 +110,7 @@
   </nav>
 
   <div class="stats-view" data-view aria-live="polite"></div>
+  <p class="stats-status" data-stats-status></p>
 
 </div>
 {% set battlegrounds = get_section(path="battlegrounds/_index.md") %}

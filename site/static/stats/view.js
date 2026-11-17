@@ -8,6 +8,8 @@ export { escapeHtml };
 export const fmt = {
   int: (v) => (v == null ? '–' : Math.round(v).toLocaleString('en-US')),
   num: (v) => (v == null ? '–' : v.toLocaleString('en-US', { maximumFractionDigits: 1 })),
+  num2: (v) => (v == null ? '–' : v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })),
+  delta: (v) => (v == null ? '–' : `${v > 0 ? '+' : v < 0 ? '−' : ''}${Math.abs(v * 100).toFixed(1)} pp`),
   big: (v) => (v == null ? '–' : v >= 10000 ? `${(v / 1000).toFixed(1)}k` : Math.round(v).toLocaleString('en-US')),
   pct: (v) => (v == null ? '–' : `${(v * 100).toFixed(1)}%`),
   dur: (s) => (s == null ? '–' : `${Math.floor(Math.round(s) / 60)}:${String(Math.round(s) % 60).padStart(2, '0')}`),
@@ -33,12 +35,24 @@ export function wilson(rate, n, z = 1.96) {
   return [mid - half, mid + half];
 }
 
+/** Colored when the interval excludes `base`. */
+export function deltaCell(v, base, games) {
+  if (v == null || base == null) return '–';
+  const [lo, hi] = wilson(v, games);
+  const tone = lo > base ? ' is-high' : hi < base ? ' is-low' : '';
+  return `<span class="stats-wr${tone}" title="Win rate minus ${fmt.pct(base)}">${fmt.delta(v - base)}</span>`;
+}
+
+/** Win rates the interval bar spans, 50% in the middle. */
+const WR_AXIS = [0.2, 0.8];
+
 /** Colored only when the interval excludes 50%. */
 export function winRateCell(v, games) {
   if (v == null) return '–';
   const [lo, hi] = wilson(v, games);
   const tone = lo > 0.5 ? ' is-high' : hi < 0.5 ? ' is-low' : '';
-  return `<span class="stats-wr${tone}" title="95% interval ${fmt.pct(lo)}–${fmt.pct(hi)}">${fmt.pct(v)}</span>`;
+  const at = (x) => `${(Math.min(Math.max((x - WR_AXIS[0]) / (WR_AXIS[1] - WR_AXIS[0]), 0), 1) * 100).toFixed(1)}%`;
+  return `<span class="stats-wr${tone}" title="95% interval ${fmt.pct(lo)}–${fmt.pct(hi)}" style="--lo: ${at(lo)}; --hi: ${at(hi)}">${fmt.pct(v)}</span>`;
 }
 
 const thin = (n) => typeof n === 'number' && n < THIN_GAMES;
@@ -63,18 +77,21 @@ export function heroCell(heroes, slug, href = null) {
 
 export const heroName = (heroes, slug) => heroes.get(slug)?.name ?? slug;
 
+export const MISSING_ICON = '<span class="stats-portrait stats-portrait--missing" aria-hidden="true">?</span>';
+
 const TIER_LEVELS = [1, 4, 7, 10, 13, 16, 20];
 const splitId = (id) => id.replace(/([a-z])([A-Z])/g, '$1 $2');
 
 /**
  * Talent picks as one table, a row group per tier, most picked first.
  * `rows` are heroReport talents: `{ tier, talent, picks, pickRate, winRate }`.
+ * `delta` adds a column against `tierWinRate`, the hero's win rate in games that reached the tier.
  */
-export function renderTalentTiers(container, talents, rows) {
+export function renderTalentTiers(container, talents, rows, delta = false) {
   const tiers = Map.groupBy(rows, (r) => r.tier);
   const talentCell = (r) => {
     const t = talents[r.talent];
-    if (!t) return `<span class="stats-hero" title="Not in the current game data"><span>${escapeHtml(splitId(r.talent))}</span></span>`;
+    if (!t) return `<span class="stats-hero" title="Not in the current game data">${MISSING_ICON}<span>${escapeHtml(splitId(r.talent))}</span></span>`;
     const img = `<img class="stats-portrait" src="/images/abilitytalents/${escapeHtml(t.icon)}" alt="" loading="lazy">`;
     return `<span class="stats-hero"><a href="/heroes/${escapeHtml(t.hero)}/#talent-${escapeHtml(r.talent)}">${img}<span>${escapeHtml(t.name)}</span></a></span>`;
   };
@@ -84,12 +101,13 @@ export function renderTalentTiers(container, talents, rows) {
     return `<tbody>${list.map((r, i) => `<tr${thin(r.picks) ? ' class="is-thin"' : ''}>${i ? '' : level}
       <td>${talentCell(r)}</td>
       <td class="num">${fmt.pct(r.pickRate)}</td>
-      <td class="num">${winRateCell(r.winRate, r.picks)}</td>
+      <td class="num">${winRateCell(r.winRate, r.picks)}</td>${delta ? `
+      <td class="num">${deltaCell(r.winRate, r.tierWinRate, r.picks)}</td>` : ''}
       <td class="num">${fmt.int(r.picks)}</td></tr>`).join('')}</tbody>`;
   };
   container.innerHTML = rows.length
     ? `<div class="table-wrap"><table class="table stats-table stats-talents">
-        <thead><tr><th scope="col">Level</th><th scope="col">Talent</th><th scope="col" class="num">Picked</th><th scope="col" class="num">Win</th><th scope="col" class="num">Games</th></tr></thead>
+        <thead><tr><th scope="col">Level</th><th scope="col">Talent</th><th scope="col" class="num">Picked</th><th scope="col" class="num">Win</th>${delta ? '<th scope="col" class="num" title="Win rate minus hero win rate at this level">vs hero</th>' : ''}<th scope="col" class="num">Games</th></tr></thead>
         ${[...tiers.keys()].sort((a, b) => a - b).map(group).join('')}
       </table></div>`
     : '<p class="stats-note">No games match these filters.</p>';
@@ -111,15 +129,16 @@ document.addEventListener('keydown', (e) => {
 });
 
 /**
- * Sortable table. `columns`: `{ key, label, html(row) | format, num, shrink, sort }`;
+ * Sortable table. `columns`: `{ key, label, title, html(row) | format, num, shrink, sort(row, dir) }`;
  * `shrink` sizes the column to its content. Rows with `games` under THIN_GAMES are dimmed.
  * Clicking a header re-sorts in place. Rows beyond `pageSize` go to further pages.
  * `search: { placeholder, text(row) }` adds a filter box when rows span several pages or a query is active;
  * typing anywhere on the page fills it. The query survives re-renders until the hash changes.
+ * `onSort(key, dir)` runs after a header click.
  */
-export function renderTable(container, { columns, rows, sortKey, sortDir = -1, pageSize = 20, empty, search }) {
+export function renderTable(container, { columns, rows, sortKey, sortDir = -1, pageSize = 20, split = Infinity, empty, search, onSort }) {
   empty ??= 'No games match these filters.';
-  let key = sortKey ?? columns[0].key;
+  let key = columns.some((c) => c.key === sortKey) ? sortKey : columns[0].key;
   let dir = sortDir;
   let page = 0;
   let fullHeight = 0;
@@ -153,7 +172,7 @@ export function renderTable(container, { columns, rows, sortKey, sortDir = -1, p
     activeSearch = { input, setQuery };
   }
   const cell = (c, r) => (c.html ? c.html(r) : c.format ? c.format(r[c.key]) : escapeHtml(r[c.key] ?? '–'));
-  const sortValue = (c, r) => (c.sort ? c.sort(r) : r[c.key]);
+  const sortValue = (c, r) => (c.sort ? c.sort(r, dir) : r[c.key]);
   const cls = (c) => [c.num && 'num', c.shrink && 'shrink'].filter(Boolean).join(' ');
 
   const draw = () => {
@@ -169,17 +188,19 @@ export function renderTable(container, { columns, rows, sortKey, sortDir = -1, p
     const head = columns
       .map((c) => {
         const sort = c.key === key ? (dir > 0 ? 'ascending' : 'descending') : 'none';
-        return `<th scope="col" class="${cls(c)}" aria-sort="${sort}"><button type="button" data-sort="${c.key}">${escapeHtml(c.label)}</button></th>`;
+        return `<th scope="col" class="${cls(c)}" aria-sort="${sort}"><button type="button" data-sort="${c.key}"${c.title ? ` title="${escapeHtml(c.title)}"` : ''}>${escapeHtml(c.label)}</button></th>`;
       })
       .join('');
     const size = Number.isFinite(pageSize) ? pageSize : Math.max(sorted.length, 1);
     const pages = Math.max(1, Math.ceil(sorted.length / size));
     page = Math.min(page, pages - 1);
     const start = page * size;
-    const body = sorted
+    const trs = sorted
       .slice(start, start + size)
-      .map((r) => `<tr${thin(r.games) ? ' class="is-thin"' : ''}>${columns.map((c) => `<td class="${cls(c)}">${cell(c, r)}</td>`).join('')}</tr>`)
-      .join('');
+      .map((r) => `<tr${thin(r.games) ? ' class="is-thin"' : ''}>${columns.map((c) => `<td class="${cls(c)}">${cell(c, r)}</td>`).join('')}</tr>`);
+    const half = Math.ceil(trs.length / 2);
+    const bodies = trs.length > split ? [trs.slice(0, half), trs.slice(half)] : [trs];
+    const table = (body) => `<div class="table-wrap"><table class="table stats-table"><thead><tr>${head}</tr></thead><tbody>${body.join('')}</tbody></table></div>`;
     const pager = pages > 1
       ? `<nav class="stats-pager" aria-label="Table pages">
           <button class="btn btn--sm" type="button" data-page="${page - 1}"${page === 0 ? ' disabled' : ''}>Previous</button>
@@ -188,7 +209,7 @@ export function renderTable(container, { columns, rows, sortKey, sortDir = -1, p
         </nav>`
       : '';
     target.innerHTML = sorted.length
-      ? `<div class="table-wrap"><table class="table stats-table"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>${pager}`
+      ? `${bodies.length > 1 ? `<div class="stats-split">${bodies.map(table).join('')}</div>` : table(trs)}${pager}`
       : `<p class="stats-note">${escapeHtml(rows.length ? 'No rows match that search.' : empty)}</p>`;
     const wrap = target.querySelector('.table-wrap');
     if (wrap && pages > 1) {
@@ -211,6 +232,7 @@ export function renderTable(container, { columns, rows, sortKey, sortDir = -1, p
     const next = button.dataset.sort;
     dir = next === key ? -dir : -1;
     key = next;
+    onSort?.(key, dir);
     draw();
   };
   draw();

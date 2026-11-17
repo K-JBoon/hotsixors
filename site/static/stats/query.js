@@ -77,7 +77,7 @@ export function memoryStats(tables, meta) {
 }
 
 /** Columns a filter reads, so callers can fetch them with the rest. */
-export const FILTER_COLUMNS = ['tournament', 'map', 'patch', 'date', 'game_mode'];
+export const FILTER_COLUMNS = ['tournament', 'map', 'patch', 'date', 'game_mode', 'strict'];
 
 /** Filter value as a list: arrays pass through, empty values become []. */
 export const asList = (v) => (Array.isArray(v) ? v.filter(Boolean) : v ? [v] : []);
@@ -90,11 +90,12 @@ const minorOf = (patch) => patch?.split('.').slice(0, 2).join('.');
  * single value too. A two-part patch such as `2.55` matches every 2.55.x.
  * `player` applies only to tables that have a player column.
  */
-export function rowFilter(cols, { scope = 'tournament', tournament, map, patch, mode: gameMode, player, from, to } = {}) {
+export function rowFilter(cols, { scope = 'tournament', tournament, map, patch, mode: gameMode, player, from, to, strict } = {}) {
   const set = (v) => (asList(v).length ? new Set(asList(v)) : null);
   const [tournaments, maps, patches, modes, players] = [tournament, map, patch, gameMode, player].map(set);
   return (i) =>
     (scope !== 'tournament' || cols.tournament[i] != null) &&
+    (strict !== '1' || cols.strict[i]) &&
     (!modes || modes.has(cols.game_mode[i])) &&
     (!players || !cols.player || players.has(cols.player[i])) &&
     (!tournaments || tournaments.has(cols.tournament[i])) &&
@@ -106,6 +107,8 @@ export function rowFilter(cols, { scope = 'tournament', tournament, map, patch, 
 
 /** Measures: `{ init(), add(state, i), done(state) }` over column arrays. */
 export const count = () => ({ init: () => 0, add: (s) => s + 1, done: (s) => s });
+/** Rows where `col` is not null. */
+export const present = (col) => ({ init: () => 0, add: (s, i) => (col[i] == null ? s : s + 1), done: (s) => s });
 export const sum = (col) => ({ init: () => 0, add: (s, i) => s + (Number(col[i]) || 0), done: (s) => s });
 export const mean = (col) => ({
   init: () => [0, 0],
@@ -121,6 +124,12 @@ export const distinct = (col) => ({
   init: () => new Set(),
   add: (s, i) => (col[i] == null ? s : s.add(col[i])),
   done: (s) => s.size,
+});
+/** `scale` × sum(num) / sum(den). */
+export const ratio = (num, den, scale = 1) => ({
+  init: () => [0, 0],
+  add: (s, i) => (num[i] == null || den[i] == null ? s : [s[0] + Number(num[i]), s[1] + Number(den[i])]),
+  done: ([n, d]) => (d ? (n / d) * scale : null),
 });
 /** Most frequent value of `col` in the group. */
 export const mode = (col) => ({

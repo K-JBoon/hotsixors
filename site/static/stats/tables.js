@@ -3,6 +3,11 @@
 // queries need a single table. Shared by gen-replay-stats and the browser.
 
 const TALENT_TIERS = 7;
+const STANDARD_MAPS = new Set([
+  'Alterac Pass', 'Battlefield of Eternity', "Blackheart's Bay", 'Braxis Holdout', 'Cursed Hollow', 'Dragon Shire',
+  'Garden of Terror', 'Garden of Terror Classic', 'Hanamura Temple', 'Haunted Mines', 'Infernal Shrines', 'Sky Temple',
+  'Tomb of the Spider Queen', 'Towers of Doom', 'Volskaya Foundry', 'Warhead Junction',
+]);
 const SCORE_PREFIX = 'score_';
 const INT32_MAX = 2 ** 31 - 1;
 /** Profile, event and award flags: no use as per-game stats. */
@@ -51,7 +56,7 @@ export function buildTables(summaries, resolve, eventOf = () => null) {
   const scoreColumns = [...scoreTypes.keys()].sort();
 
   const common = {
-    game_id: 'STRING', date: 'STRING', patch: 'STRING', build: 'INT32', game_mode: 'STRING', map: 'STRING', tournament: 'STRING',
+    game_id: 'STRING', date: 'STRING', patch: 'STRING', build: 'INT32', game_mode: 'STRING', map: 'STRING', tournament: 'STRING', strict: 'BOOLEAN',
   };
   const games = tableBuilder({
     ...common, duration_s: 'INT32', winner: 'INT32', first_pick: 'INT32', stage: 'STRING', set_id: 'STRING',
@@ -76,6 +81,7 @@ export function buildTables(summaries, resolve, eventOf = () => null) {
     const base = {
       game_id: s.id, date: s.date, patch: patchOf(s.version), build: s.build, game_mode: s.gameMode ?? null,
       map: map?.name ?? s.mapTitle, tournament: event?.tournament ?? null,
+      strict: STANDARD_MAPS.has(map?.name) && s.draft.some((d) => d.kind === 'pick'),
     };
 
     games.push({
