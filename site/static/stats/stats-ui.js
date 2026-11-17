@@ -10,6 +10,7 @@ import { tableNames } from './builder/join.js';
 import { builderForm, columnValues } from './builder/form.js';
 import { runQuery } from './builder/run.js';
 import { EXAMPLES } from './builder/examples.js';
+import { SCORE_LABELS } from './builder/docs.js';
 import { renderResult } from './builder/render.js';
 import {
   STAT_COLUMNS, available, facets, gameList, tournamentReport, tournamentTable, heroReport, mapReport, heroTable, mapTable, playerReport, playerTable, teamReport, teamTable,
@@ -395,8 +396,6 @@ const queryResult = async (stats, text) => {
   }
 };
 
-const STAT_LABELS = new Map(STAT_COLUMNS.filter((s) => !s.per).map((s) => [s.col, s.label]));
-
 const parsed = (text) => {
   try {
     return parseQuery(text);
@@ -504,7 +503,7 @@ const VIEWS = {
       names,
       values: (table, col) => columnValues(stats, table, col),
       label: (col, v) => (col === 'hero' ? heroName(heroes, v) : String(v)),
-      columnLabel: (col) => STAT_LABELS.get(col) ?? col,
+      columnLabel: (col) => SCORE_LABELS.get(col) ?? col,
       onChange: (source) => {
         last = { ...(parsed(input.value) ?? last), ...source };
         const text = printQuery(last);
