@@ -35,8 +35,11 @@ function mirrorFreeWins(cols) {
   return cols.win.map((w, i) => (sides.get(key(i)) === 3 ? null : w));
 }
 
-/** Heroes beside and against the `isOwn` row of each game. Games with two own rows are skipped. */
-function companions(cols, isOwn) {
+/**
+ * Heroes beside and against the `isOwn` row of each game, one row per hero:
+ * `{ hero, withGames, withWinRate, vsGames, vsWinRate }`. Games with two own rows are skipped.
+ */
+function matchups(cols, isOwn) {
   const own = new Map();
   for (let i = 0; i < cols.length; i++) if (isOwn(i)) own.set(cols.game_id[i], own.has(cols.game_id[i]) ? null : i);
   const ownWin = cols.game_id.map((g) => (own.get(g) == null ? null : cols.win[own.get(g)]));
@@ -47,8 +50,14 @@ function companions(cols, isOwn) {
     },
     key: (i) => cols.hero[i],
     measures: { games: count(), winRate: rate(ownWin) },
-  }).map((r) => ({ hero: r.key, ...r }));
-  return { allies: side(true), enemies: side(false) };
+  });
+  const rows = new Map();
+  const add = (list, games, winRate) => {
+    for (const r of list) rows.set(r.key, { ...(rows.get(r.key) ?? { hero: r.key }), [games]: r.games, [winRate]: r.winRate });
+  };
+  add(side(true), 'withGames', 'withWinRate');
+  add(side(false), 'vsGames', 'vsWinRate');
+  return [...rows.values()];
 }
 
 const LENGTH_BUCKETS = [0, 15 * 60, 20 * 60, 25 * 60];
@@ -181,7 +190,7 @@ export async function heroReport(stats, hero, filters) {
     talents,
     builds,
     buildWinRate: winRateWhere(fullBuild),
-    ...companions(cols, where),
+    matchups: matchups(cols, where),
     players: aggregate(cols.length, {
       where,
       key: (i) => cols.player[i],
@@ -244,7 +253,7 @@ export async function playerReport(stats, player, { player: _, ...filters }) {
       key: () => player,
       measures: { battletag: latest(cols.battletag, cols.date), games: count(), winRate: rate(cols.win), events: distinct(cols.tournament), ...statMeasures(cols, filters) },
     })[0] ?? null,
-    ...companions(cols, where),
+    matchups: matchups(cols, where),
     lengths: byLength(cols, where, cols.win),
     heroes: aggregate(cols.length, { where, key: (i) => cols.hero[i], measures: { games: count(), winRate: rate(cols.win), ...statMeasures(cols, filters) } })
       .map((r) => ({ hero: r.key, ...r })),
@@ -276,14 +285,15 @@ export async function teamReport(stats, team, filters) {
   const { cols, where: inScope } = await playerRows(stats, ['team_name', 'player', 'battletag', 'hero', 'map'], scoped);
   const where = (i) => cols.team_name[i] === team && inScope(i);
   const [bans, games] = await Promise.all([teamBans(stats, team, scoped), gameList(stats, scoped, (g) => g.team0 === team || g.team1 === team)]);
+  const picked = aggregate(cols.length, { where, key: (i) => cols.hero[i], measures: { games: count(), winRate: rate(cols.win) } });
+  const heroes = new Map(picked.map((r) => [r.key, { hero: r.key, games: r.games, winRate: r.winRate, bans: 0 }]));
+  for (const r of bans) heroes.set(r.hero, { ...(heroes.get(r.hero) ?? { hero: r.hero, games: 0, winRate: null }), bans: r.bans });
   return {
     roster: aggregate(cols.length, { where, key: (i) => cols.player[i], measures: { battletag: latest(cols.battletag, cols.date), games: count(), winRate: rate(cols.win), topHero: mode(cols.hero) } })
       .map((r) => ({ player: r.key, ...r })),
-    heroes: aggregate(cols.length, { where, key: (i) => cols.hero[i], measures: { games: count(), winRate: rate(cols.win) } })
-      .map((r) => ({ hero: r.key, ...r })),
+    heroes: [...heroes.values()],
     maps: aggregate(cols.length, { where, key: (i) => cols.map[i], measures: { games: distinct(cols.game_id), winRate: rate(cols.win) } })
       .map((r) => ({ map: r.key, ...r })),
-    bans,
     games,
   };
 }
@@ -319,7 +329,28 @@ export async function mapReport(stats, name, { map: _, ...filters }) {
   const scoped = { ...filters, map: [name] };
   const [[summary = null], heroes, overall, games] = await Promise.all([mapTable(stats, scoped), heroTable(stats, scoped), heroTable(stats, filters), gameList(stats, scoped)]);
   const base = new Map(overall.map((h) => [h.hero, h.winRate]));
-  return { summary, heroes: heroes.map((h) => ({ ...h, baseWinRate: base.get(h.hero) ?? null })), games };
+  return {
+    summary,
+    heroes: heroes.map((h) => ({ ...h, baseWinRate: base.get(h.hero) ?? null })),
+    lengths: gameGroups(games, (g) => lengthBucket(g.duration))
+      .map((r) => ({ from: r.key, to: LENGTH_BUCKETS[LENGTH_BUCKETS.indexOf(r.key) + 1] ?? null, ...r }))
+      .sort((a, b) => a.from - b.from),
+    patches: gameGroups(games, (g) => g.patch).map((r) => ({ patch: r.key, ...r })),
+    games,
+  };
+}
+
+function gameGroups(games, keyOf) {
+  const groups = Map.groupBy(games.filter((g) => keyOf(g) != null), keyOf);
+  return [...groups].map(([key, gs]) => {
+    const durations = gs.map((g) => g.duration).filter((d) => d != null);
+    return {
+      key,
+      games: gs.length,
+      share: gs.length / games.length,
+      duration: durations.length ? durations.reduce((a, b) => a + b, 0) / durations.length : null,
+    };
+  });
 }
 
 /** The tournament filter is ignored: the report is about `name`. */

@@ -132,13 +132,13 @@ document.addEventListener('keydown', (e) => {
 
 /**
  * Sortable table. `columns`: `{ key, label, title, html(row) | format, num, shrink, sort(row, dir) }`;
- * `shrink` sizes the column to its content. Rows with `games` under THIN_GAMES are dimmed.
+ * `shrink` sizes the column to its content. Rows whose `count` is under THIN_GAMES are dimmed.
  * Clicking a header re-sorts in place. Rows beyond `pageSize` go to further pages.
  * `search: { placeholder, text(row) }` adds a filter box when rows span several pages or a query is active;
  * typing anywhere on the page fills it. The query survives re-renders until the hash changes.
  * `onSort(key, dir)` runs after a header click.
  */
-export function renderTable(container, { columns, rows, sortKey, sortDir = -1, pageSize = 20, split = Infinity, empty, search, onSort }) {
+export function renderTable(container, { columns, rows, sortKey, sortDir = -1, pageSize = 20, split = Infinity, empty, search, onSort, count = (r) => r.games }) {
   empty ??= 'No games match these filters.';
   let key = columns.some((c) => c.key === sortKey) ? sortKey : columns[0].key;
   let dir = sortDir;
@@ -197,10 +197,10 @@ export function renderTable(container, { columns, rows, sortKey, sortDir = -1, p
     const pages = Math.max(1, Math.ceil(sorted.length / size));
     page = Math.min(page, pages - 1);
     const start = page * size;
-    const dim = thinOf(sorted.map((r) => r.games));
+    const dim = thinOf(sorted.map(count));
     const trs = sorted
       .slice(start, start + size)
-      .map((r) => `<tr${dim(r.games) ? ' class="is-thin"' : ''}>${columns.map((c) => `<td class="${cls(c)}">${cell(c, r)}</td>`).join('')}</tr>`);
+      .map((r) => `<tr${dim(count(r)) ? ' class="is-thin"' : ''}>${columns.map((c) => `<td class="${cls(c)}">${cell(c, r)}</td>`).join('')}</tr>`);
     const half = Math.ceil(trs.length / 2);
     const bodies = trs.length > split ? [trs.slice(0, half), trs.slice(half)] : [trs];
     const table = (body) => `<div class="table-wrap"><table class="table stats-table"><thead><tr>${head}</tr></thead><tbody>${body.join('')}</tbody></table></div>`;

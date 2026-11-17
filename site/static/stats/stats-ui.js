@@ -108,12 +108,12 @@ const urlSort = (sortKey, sortDir = -1) => {
   };
 };
 const gamesCol = { key: 'games', label: 'Games', num: true, format: fmt.int };
-const winCol = (filters) => ({
-  key: 'winRate',
+const winCol = (filters, key = 'winRate', games = 'games') => ({
+  key,
   label: 'Win',
   num: true,
-  ...(filters.rank === 'raw' ? {} : { title: 'Sorted by 95% confidence bound', sort: (r, dir) => (r.winRate == null ? null : wilson(r.winRate, r.games)[dir > 0 ? 1 : 0]) }),
-  html: (r) => winRateCell(r.winRate, r.games),
+  ...(filters.rank === 'raw' ? {} : { title: 'Sorted by 95% confidence bound', sort: (r, dir) => (r[key] == null ? null : wilson(r[key], r[games])[dir > 0 ? 1 : 0]) }),
+  html: (r) => winRateCell(r[key], r[games]),
 });
 const pickCols = [
   { key: 'pickRate', label: 'Pick', num: true, format: fmt.pct },
@@ -141,8 +141,62 @@ function section(title, id) {
   const heading = title ? `<h2 class="stats-section__title">${escapeHtml(title)}</h2>` : '';
   return `<section class="stats-section">${heading}<div data-part="${id}"></div></section>`;
 }
-const row = (...sections) => `<div class="stats-row">${sections.join('')}</div>`;
 const part = (el, id) => el.querySelector(`[data-part="${id}"]`);
+
+/**
+ * Detail page body. `band` sections span the page above the columns; `rail` sections sit beside the
+ * content under the tiles; `either` sections join them while the rail stays shorter than the content.
+ * Call balanceRail once the tables are drawn.
+ */
+function detailPage(header, tileHtml, sections) {
+  const item = (s, i) => {
+    const attrs = s.place === 'band' ? `data-place="band"` : `data-place="${s.place}" style="order: ${i + 1}"`;
+    if (s.phases) return `<div class="stats-phases" data-part="${s.id}" ${attrs}></div>`;
+    return `<section class="stats-section" ${attrs}><h2 class="stats-section__title">${escapeHtml(s.title)}</h2><div data-part="${s.id}"></div></section>`;
+  };
+  const at = (pred) => sections.map((s, i) => (pred(s) ? item(s, i) : '')).join('');
+  return `<div class="stats-layout">${header}${at((s) => s.place === 'band')}<div class="stats-layout__cols">
+    <aside class="stats-rail"><section class="stats-section stats-overview"><h2 class="stats-section__title">Overview</h2>${tileHtml}</section>${at((s) => s.place === 'rail')}</aside>
+    <div class="stats-content">${at((s) => s.place === 'main' || s.place === 'either')}</div>
+  </div></div>`;
+}
+
+let railObserver = null;
+
+/** Moves `either` sections into the rail while it fits, then context sections out until the rail is no taller than the content. */
+function balanceRail(el) {
+  const cols = el.querySelector('.stats-layout__cols');
+  if (!cols) return;
+  const [rail, content] = cols.children;
+  const order = (node) => Number(node.style.order) || 0;
+  const place = (parent, node) => parent.insertBefore(node, [...parent.children].find((c) => c !== node && order(c) > order(node)) ?? null);
+  const taller = () => rail.offsetHeight > content.offsetHeight;
+  let width = 0;
+  const fit = () => {
+    if (cols.offsetWidth === width) return;
+    width = cols.offsetWidth;
+    for (const node of cols.querySelectorAll('[data-place]')) place(node.dataset.place === 'rail' ? rail : content, node);
+    rail.classList.remove('is-sticky');
+    if (getComputedStyle(rail).display === 'contents') return;
+    const either = [...content.querySelectorAll(':scope > [data-place="either"]')].sort((a, b) => a.offsetHeight - b.offsetHeight);
+    for (const node of either) {
+      place(rail, node);
+      if (taller()) {
+        place(content, node);
+        break;
+      }
+    }
+    const context = [...rail.querySelectorAll(':scope > [data-place]')].sort((a, b) => b.offsetHeight - a.offsetHeight);
+    for (const node of context) {
+      if (!taller()) break;
+      place(content, node);
+    }
+    rail.classList.toggle('is-sticky', !taller() && rail.offsetHeight < window.innerHeight);
+  };
+  railObserver?.disconnect();
+  railObserver = new ResizeObserver(fit);
+  railObserver.observe(cols);
+}
 
 const heroIcons = (heroes, list) =>
   list.map((h) => heroCell(heroes, h, hash('hero', h)).replace('stats-hero', 'stats-hero stats-hero--icon')).join('');
@@ -270,32 +324,35 @@ function renderPhases(el, phases) {
   })));
 }
 
-/** Win rate minus `base(row)`, colored when the interval excludes it. */
-const deltaCol = (label, title, base) => ({
-  key: 'delta',
+/** `rate` minus `base(row)`, colored when the interval excludes it. */
+const deltaCol = (label, title, base, rate = 'winRate', games = 'games') => ({
+  key: `${rate}Delta`,
   label,
   title,
   num: true,
-  sort: (x) => (x.winRate == null || base(x) == null ? null : x.winRate - base(x)),
-  html: (x) => deltaCell(x.winRate, base(x), x.games),
+  sort: (x) => (x[rate] == null || base(x) == null ? null : x[rate] - base(x)),
+  html: (x) => deltaCell(x[rate], base(x), x[games]),
 });
 
 const patchRank = (patch) => patch.split('.').reduce((n, part) => n * 1000 + Number(part), 0);
 
-/** Hero tables for `report.allies` and `report.enemies`, against `base` win rate. */
-function companionTables(el, filters, heroes, report, base, whose) {
-  for (const [id, rows, label] of [['allies', report.allies, 'Teammate'], ['enemies', report.enemies, 'Opponent']]) {
-    statsTable(part(el, id), filters, {
-      columns: [
-        { key: 'hero', label, sort: (x) => heroName(heroes, x.hero), html: (x) => heroCell(heroes, x.hero, hash('hero', x.hero)) },
-        gamesCol, winCol(filters),
-        deltaCol(`vs ${whose}`, `Win rate minus ${whose} win rate`, () => base),
-      ],
-      rows,
-      sortKey: 'games',
-      pageSize: 10,
-    });
-  }
+/** Heroes beside and against the subject, each win rate against `base`. */
+function matchupTable(el, filters, heroes, rows, base, whose) {
+  statsTable(el, filters, {
+    columns: [
+      { key: 'hero', label: 'Hero', sort: (x) => heroName(heroes, x.hero), html: (x) => heroCell(heroes, x.hero, hash('hero', x.hero)) },
+      { key: 'withGames', label: 'With', title: 'Games on the same team', num: true, format: fmt.int },
+      winCol(filters, 'withWinRate', 'withGames'),
+      deltaCol(`vs ${whose}`, `Win rate with this hero minus ${whose} win rate`, () => base, 'withWinRate', 'withGames'),
+      { key: 'vsGames', label: 'Against', title: 'Games on the other team', num: true, format: fmt.int },
+      winCol(filters, 'vsWinRate', 'vsGames'),
+      deltaCol(`vs ${whose}`, `Win rate against this hero minus ${whose} win rate`, () => base, 'vsWinRate', 'vsGames'),
+    ],
+    rows,
+    sortKey: 'withGames',
+    pageSize: 10,
+    count: (x) => (x.withGames ?? 0) + (x.vsGames ?? 0),
+  });
 }
 
 const lengthLabel = (x) => (x.to == null ? `${x.from / 60}+ min` : x.from ? `${x.from / 60}–${x.to / 60} min` : `Under ${x.to / 60} min`);
@@ -326,21 +383,25 @@ const VIEWS = {
   async hero(stats, filters, heroes, slug, el) {
     const [report, talents] = await Promise.all([heroReport(stats, slug, filters), stats.json('talents')]);
     const s = report.summary;
-    el.innerHTML = `
-      <header class="stats-detail">${heroCell(heroes, slug, `/heroes/${slug}/`)}</header>
-      ${row(
-        tiles([
-          ['Games', fmt.int(s.games)], ['Win rate', winRateCell(s.winRate, s.games)], ['Pick rate', fmt.pct(s.pickRate)],
-          ...(mine ? [] : [['Ban rate', fmt.pct(s.banRate)], ['Presence', fmt.pct(s.presence)], ['Early ban', fmt.pct(s.earlyBanRate)], ['Avg pick #', fmt.num(s.pickNumber)]]),
-        ]),
-        section('Maps', 'maps'),
-      )}
-      ${section('Talents', 'talents')}${section('Builds', 'builds')}
-      ${row(section('With', 'allies'), section('Against', 'enemies'))}
-      ${row(section('Patches', 'patches'), section('Game length', 'lengths'))}
-      ${section('Players', 'players')}${section('Games', 'games')}`;
+    el.innerHTML = detailPage(
+      `<header class="stats-detail">${heroCell(heroes, slug, `/heroes/${slug}/`)}</header>`,
+      tiles([
+        ['Games', fmt.int(s.games)], ['Win rate', winRateCell(s.winRate, s.games)], ['Pick rate', fmt.pct(s.pickRate)],
+        ...(mine ? [] : [['Ban rate', fmt.pct(s.banRate)], ['Presence', fmt.pct(s.presence)], ['Early ban', fmt.pct(s.earlyBanRate)], ['Avg pick #', fmt.num(s.pickNumber)]]),
+      ]),
+      [
+        { title: 'Maps', id: 'maps', place: 'rail' },
+        { title: 'Talents', id: 'talents', place: 'main' },
+        { title: 'Builds', id: 'builds', place: 'main' },
+        { title: 'Matchups', id: 'matchups', place: 'main' },
+        { title: 'Patches', id: 'patches', place: 'rail' },
+        { title: 'Game length', id: 'lengths', place: 'rail' },
+        { title: 'Players', id: 'players', place: 'main' },
+        { title: 'Games', id: 'games', place: 'main' },
+      ],
+    );
     renderTalentTiers(part(el, 'talents'), talents, report.talents, true);
-    companionTables(el, filters, heroes, report, s.winRate, 'hero');
+    matchupTable(part(el, 'matchups'), filters, heroes, report.matchups, s.winRate, 'hero');
     lengthTable(part(el, 'lengths'), filters, report.lengths);
     statsTable(part(el, 'patches'), filters, {
       columns: [
@@ -370,7 +431,7 @@ const VIEWS = {
       split: 10,
       empty: 'No builds through level 16 under these filters.',
     });
-    statsTable(part(el, 'maps'), filters, { columns: [{ key: 'map', label: 'Map', html: (x) => link(hash('map', x.map), x.map) }, gamesCol, winCol(filters)], rows: report.maps, sortKey: 'games', split: 8 });
+    statsTable(part(el, 'maps'), filters, { columns: [{ key: 'map', label: 'Map', html: (x) => link(hash('map', x.map), x.map) }, gamesCol, winCol(filters)], rows: report.maps, sortKey: 'games' });
     statsTable(part(el, 'players'), filters, {
       columns: [
         { key: 'battletag', label: 'Player', html: (r) => link(hash('player', r.player), r.battletag ?? r.player) },
@@ -381,6 +442,7 @@ const VIEWS = {
       pageSize: 10,
     });
     statsTable(part(el, 'games'), filters, gameRows(report.games, heroes));
+    balanceRail(el);
   },
 
   async maps(stats, filters, heroes, arg, el) {
@@ -406,15 +468,42 @@ const VIEWS = {
       return;
     }
     const s = r.summary;
-    el.innerHTML = `<header class="stats-detail"><h2>${escapeHtml(name)}</h2></header>
-      ${tiles([
+    el.innerHTML = detailPage(
+      `<header class="stats-detail"><h2>${escapeHtml(name)}</h2></header>`,
+      tiles([
         ['Games', fmt.int(s.games)],
         ['Avg length', fmt.dur(s.duration)],
         ...(s.winRate !== undefined ? [['Win rate', winRateCell(s.winRate, s.games)]] : []),
         ['First pick win', winRateCell(s.firstPickWinRate, s.firstPickGames)],
         ['Left side win', winRateCell(s.leftWinRate, s.sideGames)],
-      ])}
-      ${section('Heroes', 'heroes')}${section('Games', 'games')}`;
+      ]),
+      [
+        { title: 'Patches', id: 'patches', place: 'rail' },
+        { title: 'Game length', id: 'lengths', place: 'rail' },
+        { title: 'Heroes', id: 'heroes', place: 'main' },
+        { title: 'Games', id: 'games', place: 'main' },
+      ],
+    );
+    statsTable(part(el, 'patches'), filters, {
+      columns: [
+        { key: 'patch', label: 'Patch', sort: (x) => patchRank(x.patch) },
+        gamesCol,
+        { key: 'duration', label: 'Avg length', num: true, format: fmt.dur },
+      ],
+      rows: r.patches,
+      sortKey: 'patch',
+      pageSize: 10,
+    });
+    statsTable(part(el, 'lengths'), filters, {
+      columns: [
+        { key: 'from', label: 'Length', sort: (x) => -x.from, html: lengthLabel },
+        gamesCol,
+        { key: 'share', label: 'Share', num: true, format: fmt.pct },
+      ],
+      rows: r.lengths,
+      sortKey: 'from',
+      pageSize: Infinity,
+    });
     statsTable(part(el, 'heroes'), filters, {
       columns: [
         { key: 'hero', label: 'Hero', sort: (x) => heroName(heroes, x.hero), html: (x) => heroCell(heroes, x.hero, hash('hero', x.hero)) },
@@ -427,6 +516,7 @@ const VIEWS = {
       pageSize: 10,
     });
     statsTable(part(el, 'games'), filters, gameRows(r.games, heroes));
+    balanceRail(el);
   },
 
   async players(stats, filters, heroes, arg, el) {
@@ -455,21 +545,23 @@ const VIEWS = {
       return;
     }
     const signature = [...r.heroes].sort((a, b) => b.games - a.games).slice(0, 5).map((x) => x.hero);
-    el.innerHTML = `
-      <header class="stats-detail"><h2>${escapeHtml(r.summary.battletag ?? id)}</h2></header>
-      ${row(
-        tiles([
-          ['Games', fmt.int(r.summary.games)], ['Win rate', winRateCell(r.summary.winRate, r.summary.games)],
-          ...(mine ? [] : [['Events played in', fmt.int(r.summary.events)]]),
-          ['Signature heroes', `<div class="stats-lineup">${heroIcons(heroes, signature)}</div>`],
-        ]),
-        ...(mine ? [] : [section('Teams', 'teams')]),
-        section('Maps', 'maps'),
-      )}
-      ${section('Heroes', 'heroes')}
-      ${row(section('With', 'allies'), section('Against', 'enemies'), section('Game length', 'lengths'))}
-      ${section('Games', 'games')}`;
-    companionTables(el, filters, heroes, r, r.summary.winRate, 'player');
+    el.innerHTML = detailPage(
+      `<header class="stats-detail"><h2>${escapeHtml(r.summary.battletag ?? id)}</h2></header>`,
+      tiles([
+        ['Games', fmt.int(r.summary.games)], ['Win rate', winRateCell(r.summary.winRate, r.summary.games)],
+        ...(mine ? [] : [['Events played in', fmt.int(r.summary.events)]]),
+        ['Signature heroes', `<div class="stats-lineup">${heroIcons(heroes, signature)}</div>`],
+      ]),
+      [
+        ...(mine ? [] : [{ title: 'Teams', id: 'teams', place: 'rail' }]),
+        { title: 'Maps', id: 'maps', place: 'rail' },
+        { title: 'Heroes', id: 'heroes', place: 'main' },
+        { title: 'Matchups', id: 'matchups', place: 'main' },
+        { title: 'Game length', id: 'lengths', place: 'rail' },
+        { title: 'Games', id: 'games', place: 'main' },
+      ],
+    );
+    matchupTable(part(el, 'matchups'), filters, heroes, r.matchups, r.summary.winRate, 'player');
     lengthTable(part(el, 'lengths'), filters, r.lengths);
     statsTable(part(el, 'heroes'), filters, {
       columns: [{ key: 'hero', label: 'Hero', sort: (x) => heroName(heroes, x.hero), html: (x) => heroCell(heroes, x.hero, hash('hero', x.hero)) }, gamesCol, winCol(filters), ...statCols(filters)],
@@ -478,8 +570,9 @@ const VIEWS = {
       pageSize: 10,
     });
     if (!mine) statsTable(part(el, 'teams'), filters, { columns: [{ key: 'team', label: 'Team', html: (x) => link(hash('team', x.team), x.team) }, gamesCol, winCol(filters)], rows: r.teams, sortKey: 'games', empty: 'No tournament games.' });
-    statsTable(part(el, 'maps'), filters, { columns: [{ key: 'map', label: 'Map', html: (x) => link(hash('map', x.map), x.map) }, gamesCol, winCol(filters)], rows: r.maps, sortKey: 'games', split: 8 });
+    statsTable(part(el, 'maps'), filters, { columns: [{ key: 'map', label: 'Map', html: (x) => link(hash('map', x.map), x.map) }, gamesCol, winCol(filters)], rows: r.maps, sortKey: 'games' });
     statsTable(part(el, 'games'), filters, gameRows(r.games, heroes));
+    balanceRail(el);
   },
 
   async teams(stats, filters, heroes, arg, el) {
@@ -500,8 +593,22 @@ const VIEWS = {
 
   async team(stats, filters, heroes, name, el) {
     const r = await teamReport(stats, name, filters);
-    el.innerHTML = `<header class="stats-detail"><h2>${escapeHtml(name)}</h2></header>
-      ${section('Roster', 'roster')}${row(section('Heroes picked', 'heroes'), section('Bans', 'bans'), section('Maps', 'maps'))}${section('Games', 'games')}`;
+    const decided = r.games.filter((g) => winnerOf(g) != null);
+    const won = decided.filter((g) => winnerOf(g) === name).length;
+    el.innerHTML = detailPage(
+      `<header class="stats-detail"><h2>${escapeHtml(name)}</h2></header>`,
+      tiles([
+        ['Games', fmt.int(r.games.length)],
+        ['Win rate', winRateCell(decided.length ? won / decided.length : null, decided.length)],
+        ['Players', fmt.int(r.roster.length)],
+      ]),
+      [
+        { title: 'Roster', id: 'roster', place: 'main' },
+        { title: 'Heroes', id: 'heroes', place: 'either' },
+        { title: 'Maps', id: 'maps', place: 'rail' },
+        { title: 'Games', id: 'games', place: 'main' },
+      ],
+    );
     statsTable(part(el, 'roster'), filters, {
       columns: [
         { key: 'battletag', label: 'Player', html: (x) => link(hash('player', x.player), x.battletag ?? x.player) },
@@ -510,12 +617,20 @@ const VIEWS = {
       ],
       rows: r.roster,
       sortKey: 'games',
-      split: 8,
     });
-    statsTable(part(el, 'heroes'), filters, { columns: [{ key: 'hero', label: 'Hero', html: (x) => heroCell(heroes, x.hero, hash('hero', x.hero)) }, gamesCol, winCol(filters)], rows: r.heroes, sortKey: 'games', pageSize: 10 });
-    statsTable(part(el, 'bans'), filters, { columns: [{ key: 'hero', label: 'Hero', html: (x) => heroCell(heroes, x.hero, hash('hero', x.hero)) }, { key: 'bans', label: 'Bans', num: true, format: fmt.int }], rows: r.bans, sortKey: 'bans', pageSize: 10, empty: 'No bans recorded.' });
-    statsTable(part(el, 'maps'), filters, { columns: [{ key: 'map', label: 'Map', html: (x) => link(hash('map', x.map), x.map) }, gamesCol, winCol(filters)], rows: r.maps, sortKey: 'games', split: 8 });
+    statsTable(part(el, 'heroes'), filters, {
+      columns: [
+        { key: 'hero', label: 'Hero', sort: (x) => heroName(heroes, x.hero), html: (x) => heroCell(heroes, x.hero, hash('hero', x.hero)) },
+        gamesCol, winCol(filters),
+        { key: 'bans', label: 'Bans', num: true, format: fmt.int },
+      ],
+      rows: r.heroes,
+      sortKey: 'games',
+      pageSize: 10,
+    });
+    statsTable(part(el, 'maps'), filters, { columns: [{ key: 'map', label: 'Map', html: (x) => link(hash('map', x.map), x.map) }, gamesCol, winCol(filters)], rows: r.maps, sortKey: 'games' });
     statsTable(part(el, 'games'), filters, gameRows(r.games, heroes));
+    balanceRail(el);
   },
 
   async tournaments(stats, filters, heroes, arg, el) {
@@ -538,20 +653,23 @@ const VIEWS = {
     const r = await tournamentReport(stats, name, filters);
     const { info, summary: s } = r;
     const page = info?.url ? `<a class="stats-liquipedia" href="${escapeHtml(info.url)}" target="_blank" rel="noopener" title="Liquipedia" aria-label="Liquipedia">${LIQUIPEDIA_ICON}</a>` : '';
-    el.innerHTML = `<header class="stats-detail"><h2>${escapeHtml(name)}</h2>${page}</header>
-      ${row(
-        tiles([['Games', fmt.int(s.games)], ['Teams', fmt.int(s.teams)], ['Players', fmt.int(s.players)], ['Avg length', s.duration == null ? '–' : fmt.dur(s.duration)]]),
-        section('Teams', 'teams'),
-        section('Maps', 'maps'),
-      )}
-      <div class="stats-phases" data-part="rounds"></div>${section('Heroes', 'heroes')}${section('Games', 'games')}`;
+    el.innerHTML = detailPage(
+      `<header class="stats-detail"><h2>${escapeHtml(name)}</h2>${page}</header>`,
+      tiles([['Games', fmt.int(s.games)], ['Teams', fmt.int(s.teams)], ['Players', fmt.int(s.players)], ['Avg length', s.duration == null ? '–' : fmt.dur(s.duration)]]),
+      [
+        { title: 'Teams', id: 'teams', place: 'rail' },
+        { title: 'Maps', id: 'maps', place: 'rail' },
+        { id: 'rounds', place: 'band', phases: true },
+        { title: 'Heroes', id: 'heroes', place: 'main' },
+        { title: 'Games', id: 'games', place: 'main' },
+      ],
+    );
     renderPhases(part(el, 'rounds'), r.phases);
     statsTable(part(el, 'teams'), filters, { columns: [{ key: 'team', label: 'Team', html: (x) => link(hash('team', x.team), x.team) }, gamesCol, winCol(filters)], rows: r.teams, sortKey: 'games', pageSize: 10 });
     statsTable(part(el, 'maps'), filters, {
       columns: [{ key: 'map', label: 'Map', html: (x) => link(hash('map', x.map), x.map) }, gamesCol, { key: 'duration', label: 'Avg length', num: true, format: fmt.dur }],
       rows: r.maps,
       sortKey: 'games',
-      split: 8,
     });
     statsTable(part(el, 'heroes'), filters, {
       columns: [
@@ -564,6 +682,7 @@ const VIEWS = {
       pageSize: 10,
     });
     statsTable(part(el, 'games'), filters, { ...gameRows(r.games, heroes), sortDir: 1 });
+    balanceRail(el);
   },
 
   async games(stats, filters, heroes, arg, el) {
