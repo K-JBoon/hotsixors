@@ -48,6 +48,7 @@
   cursor: pointer;
 }
 .multi__button.is-set { border-color: var(--gold-line); color: var(--accent-gold); }
+.multi__button:disabled { cursor: progress; opacity: 0.6; }
 .multi__panel {
   position: absolute;
   inset-block-start: calc(100% + 0.25rem);

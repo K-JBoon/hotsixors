@@ -23,7 +23,12 @@ function tableBuilder(schema) {
   };
 }
 
-const patchOf = (version) => version?.split('.').slice(0, 3).join('.') ?? null;
+/** Patch 0.13 replays store the minor as major (13.2.0 = 0.13.2). */
+function patchOf(version) {
+  if (!version) return null;
+  const [major, minor, revision] = version.split('.').map(Number);
+  return major > 2 ? `0.${major}.${minor}` : `${major}.${minor}.${revision}`;
+}
 
 export function skipReason(s) {
   if (s.error) return s.error;

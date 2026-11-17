@@ -31,9 +31,16 @@ const TABS = ['heroes', 'maps', 'players', 'teams', 'tournaments', 'games'];
 
 const MULTI_KEYS = new Set(['tournament', 'player', 'mode', 'map', 'patch']);
 
+const ALL_PATCHES = 'all';
+const minorOf = (patch) => patch.split('.').slice(0, 2).join('.');
+const recentMinors = (patches, n = 3) => [...new Set(patches.map(minorOf))].slice(0, n);
+let defaultPatches = [];
+const isDefaultPatch = (v) => v.length === defaultPatches.length && v.every((p) => defaultPatches.includes(p));
+
 const readFilters = () => {
   const q = new URLSearchParams(location.search);
   const filters = Object.fromEntries(FILTER_KEYS.map((k) => [k, MULTI_KEYS.has(k) ? q.getAll(k) : q.get(k) ?? DEFAULTS[k] ?? '']));
+  filters.patch = q.has('patch') ? filters.patch.filter((p) => p !== ALL_PATCHES) : defaultPatches;
   return mine ? { ...filters, scope: 'all', tournament: [] } : { ...filters, player: [], mode: [] };
 };
 
@@ -41,6 +48,10 @@ const toQuery = (filters) => {
   const q = new URLSearchParams();
   for (const [k, v] of Object.entries(filters)) {
     if (v === DEFAULTS[k] || (k === 'scope' && mine)) continue;
+    if (k === 'patch') {
+      if (!isDefaultPatch(v)) for (const p of v.length ? v : [ALL_PATCHES]) q.append(k, p);
+      continue;
+    }
     for (const item of asList(v)) q.append(k, item);
   }
   return q;
@@ -569,21 +580,16 @@ const VIEWS = {
 };
 
 
-const minorGroups = (patches) =>
-  Object.fromEntries([...new Set(patches.map((p) => p.split('.').slice(0, 2).join('.')))].map((m) => [m, `${m}.x`]));
+const minorGroups = (patches) => Object.fromEntries([...new Set(patches.map(minorOf))].map((m) => [m, `${m}.x`]));
 
-const pickers = new Map();
-const picker = (name, opts) => {
-  const el = form.querySelector(`[data-multi="${name}"]`);
-  if (!el) return null;
-  if (!pickers.has(name)) pickers.set(name, multiSelect(el, opts));
-  return pickers.get(name);
-};
+const PICKER_OPTS = { player: { allLabel: 'Everyone' } };
+const pickers = new Map(
+  [...form.querySelectorAll('[data-multi]')].map((el) => [el.dataset.multi, multiSelect(el, PICKER_OPTS[el.dataset.multi])]),
+);
+const picker = (name) => pickers.get(name);
 
 let currentFacets = null;
 let fillToken = 0;
-
-const minorOf = (patch) => patch.split('.').slice(0, 2).join('.');
 
 /** Options with data under the other filters; picked values stay listed. */
 async function fillFilters(stats, f, filters) {
@@ -596,14 +602,15 @@ async function fillFilters(stats, f, filters) {
   picker('tournament')?.setOptions(plain('tournament', f.tournaments.map((t) => t.name)), filters.tournament);
   picker('mode')?.setOptions(plain('mode', f.modes), filters.mode);
   picker('map')?.setOptions(plain('map', f.maps), filters.map);
-  picker('player', { allLabel: 'Everyone' })?.setOptions(
+  picker('player')?.setOptions(
     f.people.filter((p) => shown('player', p.key)).map((p) => ({ value: p.key, label: `${p.battletag ?? p.key} (${p.games})` })),
     filters.player,
   );
   const patches = f.patches.filter((p) => shown('patch', p, minorOf(p)));
-  picker('patch', { groups: minorGroups(f.patches) })?.setOptions(
+  picker('patch')?.setOptions(
     patches.map((p) => ({ value: p, label: p, group: minorOf(p) })),
     filters.patch,
+    minorGroups(f.patches),
   );
   for (const k of FILTER_KEYS) {
     const el = form.elements[k];
@@ -674,7 +681,9 @@ function bindFilters(stats, heroes) {
 
 async function competitive(heroes) {
   const stats = await openStats(root.dataset.statsBase);
-  await fillFilters(stats, await facets(stats), readFilters());
+  const f = await facets(stats);
+  defaultPatches = recentMinors(f.patches);
+  await fillFilters(stats, f, readFilters());
   return stats;
 }
 
@@ -710,8 +719,9 @@ async function myReplays(heroes) {
       root.classList.remove('is-loading');
       return;
     }
-    const filters = readFilters();
     const f = await facets(stats, { people: true });
+    defaultPatches = recentMinors(f.patches);
+    const filters = readFilters();
     if (!filters.player.length && f.people[0] && !new URLSearchParams(location.search).has('player')) {
       filters.player = [f.people[0].key];
       writeFilters(filters);

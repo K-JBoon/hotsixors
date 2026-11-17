@@ -8,7 +8,8 @@ const SEARCH_FROM = 12;
 
 /**
  * `el` holds `data-multi="<name>"`. `setOptions(options, selected)` takes
- * `[{ value, label, group? }]`; `groups` maps a group value to its label.
+ * `[{ value, label, group? }]` and an optional `groups`, which maps a group
+ * value to its label. The button stays disabled until the first call.
  */
 export function multiSelect(el, { allLabel = 'All', groups = {} } = {}) {
   const name = el.dataset.multi;
@@ -33,6 +34,7 @@ export function multiSelect(el, { allLabel = 'All', groups = {} } = {}) {
     button.setAttribute('aria-labelledby', el.getAttribute('aria-labelledby'));
     el.removeAttribute('aria-labelledby');
   }
+  button.disabled = true;
   let options = [];
   let selected = new Set();
 
@@ -125,11 +127,14 @@ export function multiSelect(el, { allLabel = 'All', groups = {} } = {}) {
       button.focus();
     }
   });
+  sync(false);
 
   return {
-    setOptions(next, picked = []) {
-      const same = next.length === options.length && next.every((o, i) => o.value === options[i].value && o.label === options[i].label);
+    setOptions(next, picked = [], nextGroups = groups) {
+      const same = JSON.stringify(nextGroups) === JSON.stringify(groups) && next.length === options.length && next.every((o, i) => o.value === options[i].value && o.label === options[i].label);
+      button.disabled = false;
       options = next;
+      groups = nextGroups;
       selected = new Set(picked);
       if (same) return sync(false);
       search.hidden = options.length < SEARCH_FROM;

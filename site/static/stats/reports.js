@@ -399,17 +399,20 @@ export async function gameList(stats, filters, keep = () => true) {
 
 /** Filter choices present in the data. `people` lists players, which costs two string columns. */
 export async function facets(stats, { people: listPeople = false } = {}) {
-  const cols = await stats.columns('games', FILTER_COLUMNS);
+  const cols = await stats.columns('games', [...FILTER_COLUMNS, 'build']);
   const values = (col) => [...new Set(cols[col].filter((v) => v != null))];
   const players = listPeople ? await stats.columns('players', ['player', 'battletag', 'date']) : null;
   const people = !players ? [] : aggregate(players.length, {
     key: (i) => players.player[i],
     measures: { games: count(), battletag: latest(players.battletag, players.date) },
   }).sort((a, b) => b.games - a.games);
-  const patchOrder = (a, b) => b.localeCompare(a, undefined, { numeric: true });
+  const latestBuild = cols.patch.reduce((acc, p, i) => {
+    if (p != null) acc[p] = Math.max(acc[p] ?? 0, cols.build[i] ?? 0);
+    return acc;
+  }, {});
   return {
     maps: values('map').sort(),
-    patches: values('patch').sort(patchOrder),
+    patches: values('patch').sort((a, b) => latestBuild[b] - latestBuild[a]),
     modes: values('game_mode').sort(),
     /** Map name → game modes it was played in, to narrow the map list by mode. */
     mapModes: cols.map.reduce((acc, m, i) => {
