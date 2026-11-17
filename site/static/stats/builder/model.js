@@ -112,6 +112,7 @@ const measureErrors = (column, where) => {
     if (!spec) return [error(`${path}.kind`, `unknown measure ${m?.kind}`)];
     const wrapper = WRAPPERS.includes(m.kind);
     if (wrapper && wrapped) return [error(`${path}.kind`, `${m.kind} cannot sit inside share or delta`)];
+    if (wrapper && m.where?.length) return [error(`${path}.where`, `where belongs inside ${m.kind}`)];
     const args = m.args ?? [];
     const [min, max] = arity(spec.params);
     if (args.length < min || args.length > max)

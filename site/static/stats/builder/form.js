@@ -171,7 +171,7 @@ const formMeasure = (m) => {
   const wrap = WRAPPERS.includes(m.kind) ? m.kind : null;
   const inner = wrap ? m.args?.[0] : m;
   if (!KINDS.includes(inner?.kind)) return null;
-  return { name: m.name, wrap, kind: inner.kind, args: formArgs(inner), where: formRows(inner.where ?? []), outer: wrap ? (m.where ?? []) : [] };
+  return { name: m.name, wrap, kind: inner.kind, args: formArgs(inner), where: formRows(inner.where ?? []) };
 };
 
 const keyOf = (of) => (of == null ? '' : `m${of}-`);
@@ -344,7 +344,7 @@ export function builderForm(el, { names, values, label = (col, v) => printed(v),
       rows: rows.filter((c) => columns.includes(c.col)),
       group: [...new Set(group)].filter((g) => columns.includes(g)).slice(0, MAX_GROUPS),
       measures: measures
-        .filter((m) => [...argColumns(m), ...m.outer.map((c) => c.col)].every((c) => columns.includes(c)))
+        .filter((m) => argColumns(m).every((c) => columns.includes(c)))
         .map((m) => ({ ...m, where: m.where.filter((c) => columns.includes(c.col)) })),
     });
   };
@@ -373,7 +373,7 @@ export function builderForm(el, { names, values, label = (col, v) => printed(v),
   const typedMeasure = async (m) => {
     const [args, where] = await Promise.all([Promise.all(m.args.map(typedArg(m))), typedRows(m.where)]);
     const inner = fn(m.kind, trimArgs(args), where);
-    return measure(m.name, m.wrap ? fn(m.wrap, [inner], m.outer) : inner);
+    return measure(m.name, m.wrap ? fn(m.wrap, [inner]) : inner);
   };
 
   const emit = async () => {
@@ -417,7 +417,7 @@ export function builderForm(el, { names, values, label = (col, v) => printed(v),
       state = withRows((rows) => [...rows, clause(col, '=', '')]);
     } else if (add === 'measure') {
       const name = autoName('count', current.measures.map((m) => m.name));
-      state = { ...current, measures: [...current.measures, { name, wrap: null, kind: 'count', args: [], where: [], outer: [] }] };
+      state = { ...current, measures: [...current.measures, { name, wrap: null, kind: 'count', args: [], where: [] }] };
     } else if (remove != null) {
       state = withRows((rows) => rows.filter((_, j) => j !== Number(remove)));
     } else {
