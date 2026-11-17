@@ -4,6 +4,7 @@ import {
   MAX_GROUPS,
   MEASURES,
   OPS,
+  VIEWS,
   WRAPPERS,
   clause,
   fn,
@@ -75,15 +76,32 @@ const columnOption = (columnLabel) => (ref, selected) => {
 
 const printed = (v) => (v == null ? 'null' : String(v));
 
-const fromField = (from) =>
-  `<div class="stats-filters__field"><span id="qb-from">Table</span><div class="segmented" role="radiogroup" aria-labelledby="qb-from">${Object.keys(
-    BASES,
-  )
-    .map(
-      (b) =>
-        `<label class="segmented__btn"><input type="radio" name="from" value="${b}"${b === from ? ' checked' : ''}> ${b}</label>`,
-    )
-    .join('')}</div></div>`;
+const radios = (name, values, checked, aria) =>
+  `<div class="segmented" role="radiogroup" ${aria}>${values
+    .map((v) => `<label class="segmented__btn"><input type="radio" name="${name}" value="${v}"${v === checked ? ' checked' : ''}> ${v}</label>`)
+    .join('')}</div>`;
+
+const radioField = (name, label, values, checked) =>
+  `<div class="stats-filters__field"><span id="qb-${name}">${label}</span>${radios(name, values, checked, `aria-labelledby="qb-${name}"`)}</div>`;
+
+const DIRS = ['desc', 'asc'];
+
+const sortField = (keys, sort, colOption, group) =>
+  `<div class="stats-filters__field"><span id="qb-sort">Sort</span><div class="stats-query__clause"><select class="input" name="sort" aria-labelledby="qb-sort">${option(
+    '',
+    'None',
+    !sort,
+  )}${keys.map((k) => (group.includes(k) ? colOption(k, k === sort?.by) : option(k, k, k === sort?.by))).join('')}</select>${radios(
+    'dir',
+    DIRS,
+    sort?.dir ?? 'desc',
+    'aria-label="Direction"',
+  )}</div></div>`;
+
+const limitField = (limit) =>
+  `<div class="stats-filters__field"><span id="qb-limit">Limit</span><input class="input stats-filters__min" aria-labelledby="qb-limit" type="number" min="1" name="limit" value="${
+    limit ?? ''
+  }" placeholder="All"></div>`;
 
 const joinField = () =>
   `<div class="stats-filters__field"><span id="qb-joins">Join</span><div data-multi="joins" aria-labelledby="qb-joins"></div></div>`;
@@ -107,6 +125,14 @@ const TOPS = [...KINDS, ...WRAPPERS];
 const topOf = (m) => m.wrap ?? m.kind;
 
 const NAME = /^[A-Za-z_]\w*$/;
+
+const named = (m, i, all) => NAME.test(m.name) && all.findIndex((o) => o.name === m.name) === i;
+
+const sortKeys = ({ measures, group }) => [...measures.filter(named).map((m) => m.name), ...group];
+
+const pruneSort = (s) => ({ ...s, sort: s.sort && sortKeys(s).includes(s.sort.by) ? s.sort : null });
+
+const readLimit = (raw) => (raw.trim() === '' ? null : Number(raw));
 
 const autoName = (kind, taken) =>
   [kind, ...Array.from({ length: taken.length + 1 }, (_, n) => `${kind}${n + 2}`)].find((n) => !taken.includes(n));
@@ -196,13 +222,13 @@ const measureRow = (columns, colOption) => (m, i) =>
     .join('')}`;
 
 /**
- * Form for the base table, joins, where clauses, group-by columns and measures
- * of a query. `show(q)` draws it; edits call `onChange({ from, joins, where, group, measures })`.
+ * Form for every part of a query. `show(q)` draws it; edits call
+ * `onChange({ from, joins, where, group, measures, sort, limit, view })`.
  * Where rows without a value and measures without a valid unique name stay in
  * the form only. `values(table, col)` resolves to `columnValues`.
  */
 export function builderForm(el, { names, values, label = (col, v) => printed(v), columnLabel = (col) => col, onChange }) {
-  let state = { from: 'players', joins: [], rows: [], group: [], measures: [] };
+  let state = { from: 'players', joins: [], rows: [], group: [], measures: [], sort: null, limit: null, view: 'table' };
   const colOption = columnOption(columnLabel);
   const valuesOf = (ref) => {
     const { join, col } = splitColumn(ref);
@@ -242,11 +268,16 @@ export function builderForm(el, { names, values, label = (col, v) => printed(v),
 
   const draw = () => {
     const columns = columnsOf(names, state.from, state.joins);
-    el.innerHTML = `${fromField(state.from)}${joinField()}${groupField(columns, state.group, colOption)}${state.rows
+    el.innerHTML = `${radioField('from', 'Table', Object.keys(BASES), state.from)}${joinField()}${groupField(columns, state.group, colOption)}${state.rows
       .map(clauseRow(columns, colOption))
       .join('')}<button class="btn stats-query__btn" type="button" data-add="where">+ Where</button><div class="stats-filters__field stats-query__measures"><span>Measure</span>${state.measures
       .map(measureRow(columns, colOption))
-      .join('')}<button class="btn stats-query__btn" type="button" data-add="measure">+ Measure</button></div>`;
+      .join('')}<button class="btn stats-query__btn" type="button" data-add="measure">+ Measure</button></div>${sortField(
+      sortKeys(state),
+      state.sort,
+      colOption,
+      state.group,
+    )}${limitField(state.limit)}${radioField('view', 'View', VIEWS, state.view)}`;
     multiSelect(el.querySelector('[data-multi="joins"]'), { allLabel: 'None' }).setOptions(
       BASES[state.from].map((j) => ({ value: j, label: j })),
       state.joins,
@@ -288,13 +319,26 @@ export function builderForm(el, { names, values, label = (col, v) => printed(v),
     const rows = readRows(data, state.rows, null);
     const group = groupSlots(state.group).map((_, i) => String(data.get(`g${i}`) ?? '')).filter(Boolean);
     const joins = data.getAll('joins').map(String);
-    return { from, joins, rows, group, measures: readMeasures(data, columnsOf(names, from, joins)) };
+    const measures = readMeasures(data, columnsOf(names, from, joins));
+    const by = String(data.get('sort') ?? '');
+    const at = state.measures.findIndex((m) => m.name === by);
+    return {
+      from,
+      joins,
+      rows,
+      group,
+      measures,
+      sort: by ? { by: at < 0 ? by : measures[at].name, dir: String(data.get('dir') ?? 'desc') } : null,
+      limit: readLimit(String(data.get('limit') ?? '')),
+      view: String(data.get('view') ?? state.view),
+    };
   };
 
-  const normalize = ({ from, joins, rows, group, measures }) => {
+  const normalize = ({ from, joins, rows, group, measures, ...rest }) => {
     const allowed = joins.filter((j) => BASES[from].includes(j));
     const columns = columnsOf(names, from, allowed);
-    return {
+    return pruneSort({
+      ...rest,
       from,
       joins: allowed,
       rows: rows.filter((c) => columns.includes(c.col)),
@@ -302,14 +346,14 @@ export function builderForm(el, { names, values, label = (col, v) => printed(v),
       measures: measures
         .filter((m) => [...argColumns(m), ...m.outer.map((c) => c.col)].every((c) => columns.includes(c)))
         .map((m) => ({ ...m, where: m.where.filter((c) => columns.includes(c.col)) })),
-    };
+    });
   };
 
   const rowsShape = (rows) => rows.map((c) => [c.col, c.op]);
 
   const measureShape = (m) => [m.wrap, m.kind, argColumns(m), rowsShape(m.where)];
 
-  const shape = (s) => JSON.stringify([s.from, s.joins, rowsShape(s.rows), s.group, s.measures.map(measureShape)]);
+  const shape = (s) => JSON.stringify([s.from, s.joins, rowsShape(s.rows), s.group, s.measures.map(measureShape), sortKeys(s)]);
 
   const typed = (c) =>
     valuesOf(c.col).then(({ type }) => ({
@@ -332,15 +376,16 @@ export function builderForm(el, { names, values, label = (col, v) => printed(v),
     return measure(m.name, m.wrap ? fn(m.wrap, [inner], m.outer) : inner);
   };
 
-  const named = (m, i, all) => NAME.test(m.name) && all.findIndex((o) => o.name === m.name) === i;
-
   const emit = async () => {
     const snapshot = state;
     const [where, measures] = await Promise.all([
       typedRows(snapshot.rows),
       Promise.all(snapshot.measures.filter(named).map(typedMeasure)),
     ]);
-    if (snapshot === state) onChange({ from: state.from, joins: state.joins, where, group: state.group, measures });
+    if (snapshot === state) {
+      const { from, joins, group, sort, limit, view } = state;
+      onChange({ from, joins, where, group, measures, sort, limit, view });
+    }
   };
 
   const update = (next) => {
@@ -376,7 +421,7 @@ export function builderForm(el, { names, values, label = (col, v) => printed(v),
     } else if (remove != null) {
       state = withRows((rows) => rows.filter((_, j) => j !== Number(remove)));
     } else {
-      state = { ...current, measures: current.measures.filter((_, j) => j !== Number(removeMeasure)) };
+      state = pruneSort({ ...current, measures: current.measures.filter((_, j) => j !== Number(removeMeasure)) });
     }
     draw();
     if (add !== 'where') emit();
@@ -390,6 +435,9 @@ export function builderForm(el, { names, values, label = (col, v) => printed(v),
         rows: formRows(q.where),
         group: q.group,
         measures: q.measures.map(formMeasure).filter(Boolean),
+        sort: q.sort,
+        limit: q.limit,
+        view: q.view,
       });
       draw();
     },
