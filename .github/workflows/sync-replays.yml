@@ -1,0 +1,63 @@
+name: Sync replay corpus
+
+on:
+  schedule:
+    - cron: '30 4 * * 1'
+  workflow_dispatch:
+    inputs:
+      replays:
+        description: 'Replays to copy this run (a count, or "all")'
+        default: '3000'
+      force:
+        description: 'Refetch every tournament folder'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-replays
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Sync from Proton Drive
+        env:
+          R2_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: npm run sync:replays -- --replays "${{ inputs.replays || '3000' }}" ${{ inputs.force && '--force' || '' }}
+
+      - name: Commit tournament metadata
+        run: |
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+          git add -A data/replay-corpus
+          if git diff --cached --quiet; then
+            echo "No tournament metadata changes."
+            exit 0
+          fi
+          git commit -m "chore: sync replay corpus metadata"
+          for i in 1 2 3 4 5; do
+            if git pull --rebase --autostash origin "$GITHUB_REF_NAME" &&
+               git push origin "HEAD:$GITHUB_REF_NAME"; then
+              exit 0
+            fi
+            git rebase --abort || true
+            sleep $((RANDOM % 10 + 5))
+          done
+          exit 1

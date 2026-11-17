@@ -16,3 +16,7 @@ role_colors = { Warrior = "#1a6bbf", Assassin = "#bf1a1a", Support = "#1abf6b", 
 # hundreds of megabytes and tens of thousands of files, which a static host
 # will not take. Empty means "same origin", which is what a local build wants.
 nexus_assets = "https://nexus.epixors.com"
+# Replay stats tables published by scripts/gen-replay-stats.ts.
+replay_stats = "https://nexus.epixors.com/stats/v1"
+# Public Proton Drive share that scripts/sync-replay-corpus.ts reads.
+replay_source = "https://drive.proton.me/urls/AX9D6QMNJW#APe4NwRJ8VwP"

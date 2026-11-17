@@ -1,7 +1,7 @@
 import * as path from "node:path";
 import { readFile } from "node:fs/promises";
 
-const REPO_ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), "../..");
+export const REPO_ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), "../..");
 
 // scripts/extract-gamedata.ts writes this root in HeroesDataParser's layout.
 export const DATA_ROOT = process.env.HOTS_DATA_ROOT
@@ -19,6 +19,7 @@ export const DEPOTCACHE_DIR = path.join(GAMEDATA_DIR, "core.stormmod/base.stormd
 export const HEROPROTOCOL_VERSIONS = path.join(REPO_ROOT, "submodules/heroprotocol/heroprotocol/versions");
 export const ABILLINK_STORE = path.join(REPO_ROOT, "data/replay-abillinks");
 export const CASC_PORTRAITS_DIR = path.join(REPO_ROOT, "data/casc-portraits");
+export const REPLAY_CORPUS_DIR = path.join(REPO_ROOT, "data/replay-corpus");
 export const SITE_CONTENT = path.join(REPO_ROOT, "site/content");
 export const SITE_CONTENT_HEROES = path.join(REPO_ROOT, "site/content/heroes");
 export const SITE_CONTENT_BATTLEGROUNDS = path.join(REPO_ROOT, "site/content/battlegrounds");

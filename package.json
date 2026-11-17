@@ -22,16 +22,23 @@
     "test": "tsx --test tests/*.test.ts",
     "bundle": "tsx scripts/bundle-client.ts",
     "build:prune-sources": "tsx scripts/prune-bundled-sources.ts",
-    "gen:og-card": "tsx scripts/gen-og-card.ts"
+    "gen:og-card": "tsx scripts/gen-og-card.ts",
+    "sync:replays": "node --conditions=browser --import tsx scripts/sync-replay-corpus.ts",
+    "gen:replay-stats": "tsx scripts/gen-replay-stats.ts"
   },
   "devDependencies": {
+    "@protontech/crypto": "^2.2.0",
+    "@protontech/drive-sdk": "^0.23.0",
     "@types/node": "^22.0.0",
+    "aws4fetch": "^1.0.20",
     "esbuild": "^0.28.2",
+    "hyparquet": "^1.33.0",
+    "hyparquet-writer": "^0.18.0",
     "puppeteer": "^25.9.0",
     "saxes": "^6.0.0",
     "subset-font": "^2.7.0",
     "three": "^0.185.1",
-    "tsx": "^4.19.2",
+    "tsx": "^4.23.15",
     "typescript": "^5.7.3"
   }
 }
