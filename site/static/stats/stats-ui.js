@@ -7,7 +7,7 @@ import { buildTables } from './tables.js';
 import {
   STAT_COLUMNS, available, facets, gameList, tournamentReport, tournamentTable, heroReport, mapReport, heroTable, mapTable, playerReport, playerTable, teamReport, teamTable,
 } from './reports.js';
-import { LIQUIPEDIA_ICON, escapeHtml, fmt, heroCell, heroName, loadHeroes, renderTable, renderTalentTiers, tiles, winRateCell } from './view.js';
+import { LIQUIPEDIA_ICON, escapeHtml, fmt, heroCell, heroName, loadHeroes, renderTable, renderTalentTiers, tiles, wilson, winRateCell } from './view.js';
 
 const root = document.querySelector('[data-stats-root]');
 const view = root.querySelector('[data-view]');
@@ -72,14 +72,15 @@ const statCols = STAT_COLUMNS.map((s) => ({
   key: s.id, label: s.label, num: true, format: s.id === 'kills' || s.id === 'deaths' || s.id === 'assists' ? fmt.num : fmt.big,
 }));
 const gamesCol = { key: 'games', label: 'Games', num: true, format: fmt.int };
-const winCol = { key: 'winRate', label: 'Win', num: true, html: (r) => winRateCell(r.winRate, r.games) };
+const winCol = { key: 'winRate', label: 'Win', num: true, sort: (r) => (r.winRate == null ? null : wilson(r.winRate, r.games)[0]), html: (r) => winRateCell(r.winRate, r.games) };
 const pickCols = [
   { key: 'pickRate', label: 'Pick', num: true, format: fmt.pct },
-  ...(mine ? [] : [{ key: 'banRate', label: 'Ban', num: true, format: fmt.pct }]),
+  ...(mine ? [] : [{ key: 'banRate', label: 'Ban', num: true, format: fmt.pct }, { key: 'presence', label: 'Presence', num: true, format: fmt.pct }]),
 ];
 
 function section(title, id) {
-  return `<section class="stats-section"><h2 class="stats-section__title">${escapeHtml(title)}</h2><div data-part="${id}"></div></section>`;
+  const heading = title ? `<h2 class="stats-section__title">${escapeHtml(title)}</h2>` : '';
+  return `<section class="stats-section">${heading}<div data-part="${id}"></div></section>`;
 }
 const row = (...sections) => `<div class="stats-row">${sections.join('')}</div>`;
 const part = (el, id) => el.querySelector(`[data-part="${id}"]`);
@@ -212,7 +213,7 @@ function renderPhases(el, phases) {
 
 const VIEWS = {
   async heroes(stats, filters, heroes, arg, el) {
-    el.innerHTML = section('Heroes', 'table');
+    el.innerHTML = section(null, 'table');
     const { rows, empty } = minGames(await heroTable(stats, filters), filters);
     renderTable(part(el, 'table'), {
       columns: [
@@ -223,7 +224,7 @@ const VIEWS = {
       ],
       rows,
       empty,
-      sortKey: 'games',
+      sortKey: mine ? 'games' : 'presence',
       pageSize: Infinity,
     });
   },
@@ -234,7 +235,7 @@ const VIEWS = {
     el.innerHTML = `
       <header class="stats-detail">${heroCell(heroes, slug, `/heroes/${slug}/`)}</header>
       ${row(
-        tiles([['Games', fmt.int(s.games)], ['Win rate', winRateCell(s.winRate, s.games)], ['Pick rate', fmt.pct(s.pickRate)], ...(mine ? [] : [['Ban rate', fmt.pct(s.banRate)]])]),
+        tiles([['Games', fmt.int(s.games)], ['Win rate', winRateCell(s.winRate, s.games)], ['Pick rate', fmt.pct(s.pickRate)], ...(mine ? [] : [['Ban rate', fmt.pct(s.banRate)], ['Presence', fmt.pct(s.presence)]])]),
         section('Maps', 'maps'),
       )}
       ${section('Talents', 'talents')}${section('Players', 'players')}${section('Games', 'games')}`;
@@ -253,7 +254,7 @@ const VIEWS = {
   },
 
   async maps(stats, filters, heroes, arg, el) {
-    el.innerHTML = section('Maps', 'table');
+    el.innerHTML = section(null, 'table');
     renderTable(part(el, 'table'), {
       columns: [
         { key: 'map', label: 'Map', html: (r) => link(hash('map', r.map), r.map) },
@@ -299,7 +300,7 @@ const VIEWS = {
   },
 
   async players(stats, filters, heroes, arg, el) {
-    el.innerHTML = section('Players', 'table');
+    el.innerHTML = section(null, 'table');
     renderTable(part(el, 'table'), {
       columns: [
         { key: 'battletag', label: 'Player', html: (r) => link(hash('player', r.player), r.battletag ?? r.player) },
@@ -344,7 +345,7 @@ const VIEWS = {
   },
 
   async teams(stats, filters, heroes, arg, el) {
-    el.innerHTML = section('Teams', 'table');
+    el.innerHTML = section(null, 'table');
     renderTable(part(el, 'table'), {
       columns: [
         { key: 'team', label: 'Team', html: (r) => link(hash('team', r.team), r.team) },
@@ -379,7 +380,7 @@ const VIEWS = {
   },
 
   async tournaments(stats, filters, heroes, arg, el) {
-    el.innerHTML = section('Tournaments', 'table');
+    el.innerHTML = section(null, 'table');
     renderTable(part(el, 'table'), {
       columns: [
         { key: 'name', label: 'Tournament', html: (t) => link(hash('tournament', t.name), t.name) },
@@ -427,7 +428,7 @@ const VIEWS = {
   },
 
   async games(stats, filters, heroes, arg, el) {
-    el.innerHTML = section('Games', 'table');
+    el.innerHTML = section(null, 'table');
     renderTable(part(el, 'table'), {
       ...gameRows(await gameList(stats, filters), heroes),
       search: {

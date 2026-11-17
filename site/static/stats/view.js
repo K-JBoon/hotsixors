@@ -21,12 +21,27 @@ export const fmt = {
   },
 };
 
-/** Win rates read faster with a hint of their direction. */
+/** Rows under this many games are dimmed. */
+export const THIN_GAMES = 10;
+
+/** 95% Wilson score interval for `rate` over `n` trials. */
+export function wilson(rate, n, z = 1.96) {
+  if (rate == null || !n) return [0, 1];
+  const z2 = z * z;
+  const mid = (rate + z2 / (2 * n)) / (1 + z2 / n);
+  const half = (z / (1 + z2 / n)) * Math.sqrt((rate * (1 - rate)) / n + z2 / (4 * n * n));
+  return [mid - half, mid + half];
+}
+
+/** Colored only when the interval excludes 50%. */
 export function winRateCell(v, games) {
   if (v == null) return '–';
-  const tone = games < 5 ? '' : v >= 0.55 ? ' is-high' : v <= 0.45 ? ' is-low' : '';
-  return `<span class="stats-wr${tone}">${fmt.pct(v)}</span>`;
+  const [lo, hi] = wilson(v, games);
+  const tone = lo > 0.5 ? ' is-high' : hi < 0.5 ? ' is-low' : '';
+  return `<span class="stats-wr${tone}" title="95% interval ${fmt.pct(lo)}–${fmt.pct(hi)}">${fmt.pct(v)}</span>`;
 }
+
+const thin = (n) => typeof n === 'number' && n < THIN_GAMES;
 
 let heroIndex = null;
 /** Hero slug → `{ name, portrait }` from the draft tool's data. */
@@ -66,7 +81,7 @@ export function renderTalentTiers(container, talents, rows) {
   const group = (tier) => {
     const list = tiers.get(tier).sort((a, b) => b.picks - a.picks);
     const level = `<th scope="rowgroup" rowspan="${list.length}" class="stats-talents__level"><span class="talent-tier__num">${TIER_LEVELS[tier - 1] ?? tier}</span></th>`;
-    return `<tbody>${list.map((r, i) => `<tr>${i ? '' : level}
+    return `<tbody>${list.map((r, i) => `<tr${thin(r.picks) ? ' class="is-thin"' : ''}>${i ? '' : level}
       <td>${talentCell(r)}</td>
       <td class="num">${fmt.pct(r.pickRate)}</td>
       <td class="num">${winRateCell(r.winRate, r.picks)}</td>
@@ -97,7 +112,7 @@ document.addEventListener('keydown', (e) => {
 
 /**
  * Sortable table. `columns`: `{ key, label, html(row) | format, num, shrink, sort }`;
- * `shrink` sizes the column to its content.
+ * `shrink` sizes the column to its content. Rows with `games` under THIN_GAMES are dimmed.
  * Clicking a header re-sorts in place. Rows beyond `pageSize` go to further pages.
  * `search: { placeholder, text(row) }` adds a filter box when rows span several pages or a query is active;
  * typing anywhere on the page fills it. The query survives re-renders until the hash changes.
@@ -163,7 +178,7 @@ export function renderTable(container, { columns, rows, sortKey, sortDir = -1, p
     const start = page * size;
     const body = sorted
       .slice(start, start + size)
-      .map((r) => `<tr>${columns.map((c) => `<td class="${cls(c)}">${cell(c, r)}</td>`).join('')}</tr>`)
+      .map((r) => `<tr${thin(r.games) ? ' class="is-thin"' : ''}>${columns.map((c) => `<td class="${cls(c)}">${cell(c, r)}</td>`).join('')}</tr>`)
       .join('');
     const pager = pages > 1
       ? `<nav class="stats-pager" aria-label="Table pages">

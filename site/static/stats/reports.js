@@ -46,17 +46,23 @@ async function banCounts(stats, filters) {
 
 const banRate = (bans, hero) => (bans.games ? (bans.byHero.get(hero) ?? 0) / bans.games : null);
 
+/** Presence: pick rate plus ban rate, the share of drafts the hero affects. */
+const withPresence = (r) => ({ ...r, presence: r.pickRate == null || r.banRate == null ? null : r.pickRate + r.banRate });
+
 export async function heroTable(stats, filters) {
   const [{ cols, where }, games, bans] = await Promise.all([
     playerRows(stats, ['hero', ...statCols()], filters),
     gameCount(stats, filters),
     banCounts(stats, filters),
   ]);
-  return aggregate(cols.length, {
+  const picked = aggregate(cols.length, {
     where,
     key: (i) => cols.hero[i],
     measures: { games: count(), winRate: rate(cols.win), ...statMeasures(cols) },
-  }).map((r) => ({
+  });
+  const pickedHeroes = new Set(picked.map((r) => r.key));
+  const bannedOnly = [...bans.byHero.keys()].filter((h) => !pickedHeroes.has(h)).map((h) => ({ key: h, games: 0, winRate: null }));
+  return [...picked, ...bannedOnly].map((r) => withPresence({
     hero: r.key,
     ...r,
     pickRate: games ? r.games / games : null,
@@ -90,11 +96,11 @@ export async function heroReport(stats, hero, filters) {
   );
 
   return {
-    summary: {
+    summary: withPresence({
       ...summary,
       pickRate: games ? summary.games / games : null,
       banRate: banRate(bans, hero),
-    },
+    }),
     maps: aggregate(cols.length, { where, key: (i) => cols.map[i], measures: { games: count(), winRate: rate(cols.win) } })
       .map((r) => ({ map: r.key, ...r })),
     talents,
