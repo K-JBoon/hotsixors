@@ -26,7 +26,24 @@ const tableBox = (table, cols) => {
   </div>`;
 };
 
-/** Static schema reference for the Query tab rail; `names` is the tableNames output. */
+const current = (node, on) => {
+  node.classList.toggle('is-active', on);
+  if (on) node.setAttribute('aria-current', 'true');
+  else node.removeAttribute('aria-current');
+};
+
+const markRail = (el) => ({ from, joins }) => {
+  el.querySelectorAll('[data-table]').forEach((box) => {
+    const base = box.dataset.table === from;
+    current(box, base);
+    box.querySelectorAll('[data-join]').forEach((item) => {
+      current(item, base && joins.includes(item.dataset.join));
+      item.classList.toggle('is-thin', !base);
+    });
+  });
+};
+
+/** Schema reference for the Query tab rail; `names` is the tableNames output. Returns `mark(query)`. */
 export function schemaRail(el, names) {
   el.innerHTML = ORDER.map((t) => tableBox(t, names[t] ?? [])).join('');
   el.addEventListener('click', (e) => {
@@ -36,4 +53,5 @@ export function schemaRail(el, names) {
     box.querySelector('details').open = true;
     box.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
   });
+  return markRail(el);
 }

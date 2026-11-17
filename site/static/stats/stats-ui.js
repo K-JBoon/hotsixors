@@ -460,14 +460,19 @@ const VIEWS = {
         fail(String(e?.message ?? e));
       }
     };
-    let last = parsed(queryText) ?? query();
+    let last;
     let form;
     const names = await tableNames(stats);
-    schemaRail(part(el, 'schema'), names);
+    const mark = schemaRail(part(el, 'schema'), names);
+    const setLast = (q) => {
+      last = q;
+      mark(q);
+    };
+    setLast(parsed(queryText) ?? query());
     const sync = () => {
       const q = parsed(input.value);
       if (!q || validateQuery(q, names).length || printQuery(q) === printQuery(last)) return;
-      last = q;
+      setLast(q);
       form.show(q);
     };
     input.addEventListener('input', fit);
@@ -507,7 +512,7 @@ const VIEWS = {
       label: (col, v) => (col === 'hero' ? heroName(heroes, v) : String(v)),
       columnLabel: (col) => SCORE_LABELS.get(col) ?? col,
       onChange: (source) => {
-        last = { ...(parsed(input.value) ?? last), ...source };
+        setLast({ ...(parsed(input.value) ?? last), ...source });
         const text = printQuery(last);
         if (text === input.value) return;
         input.value = queryText = text;

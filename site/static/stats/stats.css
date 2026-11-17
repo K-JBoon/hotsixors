@@ -299,6 +299,9 @@
 .stats-query__cols dd { margin: 0; color: var(--text-muted); }
 .stats-query__joins { display: grid; gap: var(--space-2xs); margin: 0; padding: 0; list-style: none; }
 .stats-query__joins .stats-note { display: block; font-size: inherit; }
+.stats-query__table.is-active { border-color: var(--gold-line); }
+.stats-query__table.is-active > details > summary > code, .stats-query__joins .is-active > code { color: var(--accent-gold); }
+.stats-query__joins .is-thin { opacity: 0.5; }
 .stats-query__saved button { padding: var(--space-3xs) var(--space-xs); background: none; border: 0; color: inherit; font: inherit; cursor: pointer; }
 .stats-query__saved button + button { padding-inline-start: 0; opacity: 0.6; }
 .stats-query__saved button + button:hover { opacity: 1; }
