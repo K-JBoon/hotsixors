@@ -278,7 +278,11 @@
 .stats-query__bar { display: flex; flex-wrap: wrap; gap: var(--space-xs); align-items: center; margin-block-end: var(--space-xs); }
 .stats-query__list { display: contents; }
 .stats-query__saved { padding: 0; }
-.stats-query__form { margin-block-end: var(--space-xs); }
+.stats-query__form { display: grid; grid-template-columns: fit-content(52rem) minmax(16rem, 1fr); align-items: stretch; margin-block-end: var(--space-xs); }
+.stats-query__controls { display: flex; flex-wrap: wrap; align-items: end; align-content: start; gap: var(--space-sm); }
+.stats-query__editor { display: flex; flex-direction: column; gap: var(--space-3xs); }
+.stats-filters .stats-query__text { flex: 1; block-size: auto; padding-block: var(--space-xs); line-height: 1.4; }
+@media (max-width: 900px) { .stats-query__form { grid-template-columns: minmax(0, 1fr); } }
 .stats-query__clause { display: flex; gap: var(--space-3xs); align-items: end; }
 .stats-query__clause select:first-child, .stats-query__group select { inline-size: 12rem; }
 .stats-query__btn { block-size: 2.25rem; }

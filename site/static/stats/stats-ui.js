@@ -424,11 +424,12 @@ const VIEWS = {
   async query(stats, filters, heroes, text, el) {
     if (text) queryText = text;
     else history.replaceState(null, '', queryHash(queryText));
-    el.innerHTML = `<section class="stats-section"><div class="stats-query__bar" data-part="examples"></div><div class="stats-query__bar"><input class="input" data-name placeholder="Name" aria-label="Name"><button class="btn" type="button" data-save>Save</button><span class="stats-query__list" data-part="saved"></span></div><form class="stats-filters stats-query__form" data-part="builder"></form><textarea class="input stats-query__text" rows="4" spellcheck="false" aria-label="Query"></textarea><div data-part="out"></div></section>`;
+    el.innerHTML = `<section class="stats-section"><div class="stats-query__bar" data-part="examples"></div><div class="stats-query__bar"><input class="input" data-name placeholder="Name" aria-label="Name"><button class="btn" type="button" data-save>Save</button><span class="stats-query__list" data-part="saved"></span></div><div class="stats-filters stats-query__form"><form class="stats-query__controls" data-part="builder"></form><div class="stats-query__editor"><textarea class="input stats-query__text" rows="4" spellcheck="false" aria-label="Query"></textarea><div data-part="note"></div></div></div><div data-part="out"></div></section>`;
     const input = el.querySelector('textarea');
     const fit = () => (input.rows = Math.max(4, input.value.split('\n').length));
     const name = el.querySelector('[data-name]');
     const out = part(el, 'out');
+    const note = part(el, 'note');
     const savedEl = part(el, 'saved');
     const examplesEl = part(el, 'examples');
     let saved = await loadSaved();
@@ -447,8 +448,12 @@ const VIEWS = {
       const t = ++token;
       const { q, result, error } = await queryResult(stats, input.value);
       if (t !== token) return;
-      const fail = (message) => (out.innerHTML = `<p class="stats-note stats-query__error">${escapeHtml(message)}</p>`);
+      const fail = (message) => {
+        out.innerHTML = '';
+        note.innerHTML = `<p class="stats-note stats-query__error">${escapeHtml(message)}</p>`;
+      };
       if (error) return fail(error);
+      note.innerHTML = '';
       try {
         renderResult(out, result, q, heroes);
       } catch (e) {
