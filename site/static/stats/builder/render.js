@@ -68,6 +68,10 @@ const groupText = (heroes, group) => (r) =>
 
 const table = (el, { rows }, q, heroes) => {
   const columns = [...q.group.map(groupColumn(heroes)), ...q.measures.map(measureColumn)];
+  if (!columns.length) {
+    el.innerHTML = '<p class="stats-note">No columns.</p>';
+    return;
+  }
   renderTable(el, {
     columns,
     rows,

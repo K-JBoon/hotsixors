@@ -442,8 +442,13 @@ const VIEWS = {
       const t = ++token;
       const { q, result, error } = await queryResult(stats, input.value);
       if (t !== token) return;
-      if (error) out.innerHTML = `<p class="stats-note stats-query__error">${escapeHtml(error)}</p>`;
-      else renderResult(out, result, q, heroes);
+      const fail = (message) => (out.innerHTML = `<p class="stats-note stats-query__error">${escapeHtml(message)}</p>`);
+      if (error) return fail(error);
+      try {
+        renderResult(out, result, q, heroes);
+      } catch (e) {
+        fail(String(e?.message ?? e));
+      }
     };
     input.addEventListener('input', debounce(() => {
       queryText = input.value;
