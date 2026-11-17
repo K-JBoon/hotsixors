@@ -1,6 +1,6 @@
 import { MISSING_ICON, escapeHtml, fmt, heroCell, heroName, heroPortrait, renderTable, thinOf, wilson, winRateCell } from '../view.js';
-import { barChart, lineChart, scatterChart } from '../charts.js';
-import { splitColumn } from './model.js';
+import { barChart, heatmapChart, lineChart, scatterChart } from '../charts.js';
+import { MEASURES, splitColumn } from './model.js';
 import { valueOf } from './run.js';
 import { printCall } from './text.js';
 
@@ -217,7 +217,56 @@ const scatter = (el, result, q, heroes) => {
   scatterChart(el, { points, x: axisOf(mx, fx), y: axisOf(my, fy) });
 };
 
-const VIEWS = { table, bar, line, scatter };
+/** Cell sample size: a `count` measure when present, else `m`'s own `n`; `share` of an unsized measure has none. */
+const cellSize = (m, measures) => {
+  if (measures.some((x) => x.kind === 'count')) return sampleSize(measures);
+  if (m.kind === 'share' && !MEASURES[m.args[0].kind].sized) return () => undefined;
+  return (r) => r[m.name]?.n;
+};
+
+const axisValues = (rows, ref, sort, heroes) => {
+  const values = [...new Set(rows.map((r) => r[ref]))];
+  if (sort) return values;
+  const key = groupColumn(heroes)(ref).sort;
+  return values.sort((a, b) => ascending(key({ [ref]: a }), key({ [ref]: b })));
+};
+
+const heatmap = (el, result, q, heroes) => {
+  const [m] = q.measures;
+  if (!m || TEXT_MEASURES.includes(m.kind)) return table(el, result, q, heroes);
+  const { rows } = result;
+  if (!rows.length) return noRows(el);
+  const [a, b] = q.group.map((ref) => [ref, axisValues(rows, ref, q.sort, heroes)]);
+  const [[rRef, rs], [cRef, cs]] = a[1].length >= b[1].length ? [a, b] : [b, a];
+  const size = cellSize(m, q.measures);
+  const dim = thinOf(rows.map(size));
+  const format = measureFormat(m);
+  const name = groupText(heroes, q.group);
+  const at = new Map([...Map.groupBy(rows, (r) => r[rRef])].map(([k, rs]) => [k, new Map(rs.map((r) => [r[cRef], r]))]));
+  const cell = (rv, cv) => {
+    const r = at.get(rv).get(cv);
+    const v = r && valueOf(r[m.name]);
+    if (v == null) return null;
+    const n = size(r);
+    return { value: v, title: `${name(r) || '–'}: ${format(v)}${n == null ? '' : `, n=${fmt.int(n)}`}`, thin: dim(n) };
+  };
+  const label = (ref) => {
+    const html = groupColumn(heroes)(ref).html;
+    const title = groupName(heroes, ref);
+    return (v) => ({ label: html({ [ref]: v }), title: title(v) });
+  };
+  heatmapChart(el, {
+    rows: rs.map(label(rRef)),
+    cols: cs.map(label(cRef)),
+    cells: rs.map((rv) => cs.map((cv) => cell(rv, cv))),
+    head: [escapeHtml(`${rRef} / ${cRef}`), measureHead(m)],
+    format,
+    ref: refOf(m),
+    minStep: minStepOf(m),
+  });
+};
+
+const VIEWS = { table, bar, line, scatter, heatmap };
 
 /** Draws a `runQuery` result in `el` per `q.view`; views without a renderer fall back to the table. */
 export const renderResult = (el, result, q, heroes) => (VIEWS[q.view] ?? table)(el, result, q, heroes);

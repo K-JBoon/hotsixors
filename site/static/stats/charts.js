@@ -178,3 +178,49 @@ export function scatterChart(el, { points, x: xAxis, y: yAxis }) {
     <div class="stats-chart__head num">${xAxis.head}</div>
   </div>`;
 }
+
+const ramp = (ref, mid) =>
+  ref == null
+    ? { color: (t) => `color-mix(in srgb, var(--accent-blue) ${pct(clamp01(t))}, var(--bg-card))`, key: 'var(--bg-card), var(--accent-blue)' }
+    : {
+        color: (t) => {
+          const k = t < mid ? (mid - t) / (mid || 1) : (t - mid) / (1 - mid || 1);
+          return `color-mix(in srgb, var(${t < mid ? '--danger' : '--success-light'}) ${pct(clamp01(k))}, var(--bg-card))`;
+        },
+        key: `var(--danger), var(--bg-card) ${pct(mid)}, var(--success-light)`,
+      };
+
+const heatDomain = (values, ref) => {
+  if (ref == null) return extent(values);
+  const span = Math.max(...values.map((v) => Math.abs(v - ref)), 0) || 1;
+  return [ref - span, ref + span];
+};
+
+/**
+ * Grid of `rows` x `cols` cells colored by value; diverging around `ref` when given.
+ * `rows`, `cols`: `{ label, title? }`, `label` HTML. `cells[i][j]`: `{ value, title, thin? } | null`.
+ * The color domain covers non-thin cells when any exist; others clamp.
+ */
+export function heatmapChart(el, { rows, cols, cells, head, format, ref = null, minStep = 0 }) {
+  const all = cells.flat().filter((c) => c?.value != null);
+  const solid = all.filter((c) => !c.thin);
+  const { domain, ticks } = niceTicks(heatDomain((solid.length ? solid : all).map((c) => c.value), ref), 4, minStep);
+  const at = linear(domain);
+  const { color, key } = ramp(ref, ref == null ? 0 : at(ref));
+  const rects = cells.flatMap((row, i) =>
+    row.flatMap((c, j) =>
+      c?.value == null
+        ? []
+        : [`<rect class="stats-chart__cell${c.thin ? ' is-thin' : ''}" x="${pct(j / cols.length)}" y="${pct(i / rows.length)}" width="${pct(1 / cols.length)}" height="${pct(1 / rows.length)}" style="fill: ${color(at(c.value))}"><title>${escapeHtml(c.title)}</title></rect>`],
+    ),
+  );
+  const title = (t) => (t ? ` title="${escapeHtml(t)}"` : '');
+  el.innerHTML = `<div class="stats-chart stats-chart--heatmap" style="--rows: ${rows.length}; --cols: ${cols.length}">
+    <div class="stats-chart__head">${head[1]}</div>
+    <div class="stats-chart__key"><div class="stats-chart__scale" style="background: linear-gradient(90deg, ${key})"></div>${axis(at, ticks, format)}</div>
+    <div class="stats-chart__head">${head[0]}</div>
+    <div class="stats-chart__cols">${cols.map((c) => `<div${title(c.title)}>${c.label}</div>`).join('')}</div>
+    <svg class="stats-chart__plot">${rects.join('')}</svg>
+    ${rows.map((r) => `<div class="stats-chart__label"${title(r.title)}>${r.label}</div>`).join('')}
+  </div>`;
+}
