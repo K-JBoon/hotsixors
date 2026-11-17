@@ -98,10 +98,14 @@ const columnErrors = ({ from, joins }, names) => (ref, path) => {
   return names[tableOf(from, join)]?.includes(col) ? [] : [error(path, `unknown column ${ref}`)];
 };
 
+const unquotedPatch = ({ col, value }) =>
+  typeof col === 'string' && splitColumn(col).col === 'patch' && [value].flat().some((v) => typeof v === 'number');
+
 const whereErrors = (column) => (clauses, path) =>
   clauses.flatMap((c, i) => [
     ...column(c.col, `${path}.${i}.col`),
     ...(OPS.includes(c.op) ? [] : [error(`${path}.${i}.op`, `unknown operator ${c.op}`)]),
+    ...(unquotedPatch(c) ? [error(`${path}.${i}.value`, 'quote patch values')] : []),
   ]);
 
 const arity = (params) => [params.filter((p) => !p.endsWith('?')).length, params.length];
