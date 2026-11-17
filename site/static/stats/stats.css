@@ -284,7 +284,8 @@
 .stats-query__btn { block-size: 2.25rem; }
 .stats-query__name { inline-size: 8rem; }
 .stats-query__measures { flex-basis: 100%; justify-items: start; }
-.stats-query__measures select:not(:first-of-type) { inline-size: 12rem; }
+.stats-query__measures [data-measure] select:not(:first-of-type) { inline-size: 12rem; }
+.stats-query__measures [data-clause] { margin-inline-start: calc(8rem + var(--space-3xs)); }
 .stats-query__saved button { padding: var(--space-3xs) var(--space-xs); background: none; border: 0; color: inherit; font: inherit; cursor: pointer; }
 .stats-query__saved button + button { padding-inline-start: 0; opacity: 0.6; }
 .stats-query__saved button + button:hover { opacity: 1; }
