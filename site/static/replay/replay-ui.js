@@ -4,6 +4,7 @@ import { buildPositionTimeline } from './analyze/timeline.js';
 import { buildVisionGrid } from './vision.js';
 import { buildWalkGrid, routeUnitsThroughTerrain } from './pathing.js';
 import { buildLanePaths, routeUnitsAlongLanes } from './lanes.js';
+import { findMap } from './map-lookup.js';
 import { marchUnits } from './march.js';
 import { loadSummons } from './summons.js';
 import { heroMeta, hearthLinkSet, movementLinkSet, normalizeName, resolveLink } from './ui/abilities.js';
@@ -76,23 +77,6 @@ async function fetchAbilLinkIndex(build) {
   const pick = older.length ? older[older.length - 1] : index.builds[0];
   return fetchJson(`/replay/abillinks/${pick}.json`, {});
 }
-// A replay names its map in the recorder's language, so fall back to the map's
-// content hash and then to its other localized names.
-function findMap(mapsData, model) {
-  if (!mapsData) return null;
-  const hashes = new Set(model.mapHashes || []);
-  for (const entry of Object.values(mapsData)) {
-    if (entry.hash && hashes.has(entry.hash)) return entry;
-  }
-  if (mapsData[model.map]) return mapsData[model.map];
-  const want = normalizeName(model.map || '');
-  if (!want) return null;
-  for (const entry of Object.values(mapsData)) {
-    if ((entry.names || []).some((n) => normalizeName(n) === want)) return entry;
-  }
-  return null;
-}
-
 function viewRect(model, mapMeta) {
   if (mapMeta) {
     const c = mapMeta.camera || { left: 0, bottom: 0, right: mapMeta.mapWidth, top: mapMeta.mapHeight };
@@ -185,6 +169,7 @@ function refreshLibrary() {
 function resetToIdle() {
   setState(null);
   library.activeId = null;
+  dropZone.classList.remove('is-remote');
   root.replaceChildren(dropZone);
   refreshLibrary();
 }
@@ -246,7 +231,7 @@ function buildViewer(model, { draftData, shortcodeData, mapsData, footprints, ab
     }
   }
 
-  const mapMeta = findMap(mapsData, model);
+  const mapMeta = findMap(mapsData, model.map, model.mapHashes);
   for (const s of model.structures) {
     const index = footprints && footprints.units ? footprints.units[s.type] : undefined;
     s.shape = index === undefined ? null : footprints.shapes[index];
@@ -381,6 +366,7 @@ function renderShell() {
 				.map(
 					(team, ti) => `
 				<div class="replay-team-block">
+					${teamNames[ti] ? `<div class="replay-team-name" style="color:${TEAM_COLORS[ti]}">${escapeHtml(teamNames[ti])}</div>` : ''}
 					<div class="replay-team" style="--team-color:${TEAM_COLORS[ti]}">
 					${team
 						.map(
@@ -737,7 +723,15 @@ window.addEventListener('drop', (e) => {
   handleFiles(e.dataTransfer?.files);
 });
 window.addEventListener('dragend', endDrag);
-const replayUrls = new URLSearchParams(location.search).getAll('url');
+const query = new URLSearchParams(location.search);
+const replayUrls = query.getAll('url');
+const teamNames = replayUrls.length === 1 ? [query.get('team0'), query.get('team1')] : [];
+if (replayUrls.length) {
+  dropZone.classList.add('is-remote');
+  root.dataset.state = 'loading';
+  dropStatus.hidden = false;
+  dropStatus.innerHTML = `<p data-downloading>Downloading ${replayUrls.length === 1 ? 'replay' : `${replayUrls.length} replays`}…</p>`;
+}
 for (const replayUrl of replayUrls) {
   fetch(replayUrl)
     .then((r) => {
@@ -746,6 +740,8 @@ for (const replayUrl of replayUrls) {
     })
     .then((b) => handleFiles([new File([b], replayUrl.split('/').pop())]))
     .catch((err) => {
+      dropZone.classList.remove('is-remote');
+      dropStatus.querySelector('[data-downloading]')?.remove();
       dropStatus.hidden = false;
       dropStatus.insertAdjacentHTML('beforeend', `<p class="replay-drop__note">${escapeHtml(String(err))}</p>`);
     });
