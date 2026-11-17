@@ -1,14 +1,25 @@
 export const EXAMPLES = [
   {
     name: 'Win rate vs. presence',
-    text: 'from draft group hero measure presence = share(count() where kind in ["pick", "ban"]), win = rate(win) where kind = "pick" view scatter',
+    text: `SELECT hero,
+       share(count() FILTER (WHERE kind IN ('pick', 'ban'))) AS presence,
+       rate(win) FILTER (WHERE kind = 'pick') AS win
+FROM draft
+GROUP BY hero
+VIEW scatter`,
   },
   {
     name: 'Hero by map',
-    text: 'from players group hero, map measure win = delta(rate(win)), games = count() view heatmap',
+    text: `SELECT hero, map, delta(rate(win)) AS win, count() AS games
+FROM players
+GROUP BY hero, map
+VIEW heatmap`,
   },
   {
     name: 'Matchups',
-    text: 'from players join opponent group hero, opponent.hero measure win = delta(rate(win)), games = count() view heatmap',
+    text: `SELECT hero, opponent.hero, delta(rate(win)) AS win, count() AS games
+FROM players JOIN opponent
+GROUP BY hero, opponent.hero
+VIEW heatmap`,
   },
 ];

@@ -1,11 +1,15 @@
-import { OPS, MEASURES, query, clause, fn, measure } from './model.js';
+import { OPS, query, clause, fn, measure, paramType } from './model.js';
 
 const TOKEN =
-  /\s+|(?<str>"(?:[^"\\]|\\.)*")|(?<num>-?\d[\w.]*)|(?<name>[A-Za-z_][\w]*(?:\.[A-Za-z_]\w*)*)|(?<op>!=|<=|>=|[=<>(),[\]])/y;
+  /\s+|(?<str>'(?:[^']|'')*')|(?<ident>"(?:[^"]|"")*")|(?<num>-?\d[\w.]*)|(?<name>[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*)|(?<op>!=|<>|<=|>=|[=<>(),])/y;
 
-const ESCAPES = { n: '\n', t: '\t' };
+const KEYWORDS = new Set(
+  'select from join where group by order limit view as filter and in asc desc true false null'.split(' '),
+);
 
-const unquote = (s) => s.slice(1, -1).replace(/\\(.)/gs, (_, c) => ESCAPES[c] ?? c);
+const LITERALS = { true: true, false: false, null: null };
+
+const unquote = (s) => s.slice(1, -1).replaceAll(s[0].repeat(2), s[0]);
 
 const position = (text, at) => {
   const lines = text.slice(0, at).split('\n');
@@ -23,7 +27,7 @@ const tokenize = (text) => {
   while (TOKEN.lastIndex < text.length) {
     const at = TOKEN.lastIndex;
     const m = TOKEN.exec(text);
-    if (!m) throw parseError(text, at, text[at] === '"' ? 'unterminated string' : `unexpected character ${text[at]}`);
+    if (!m) throw parseError(text, at, `'"`.includes(text[at]) ? 'unterminated quote' : `unexpected character ${text[at]}`);
     const [type, raw] = Object.entries(m.groups).find(([, v]) => v != null) ?? [];
     if (type === 'num' && !Number.isFinite(Number(raw))) throw parseError(text, at, `invalid number ${raw}`);
     if (type) tokens.push({ type, raw, at });
@@ -31,30 +35,47 @@ const tokenize = (text) => {
   return [...tokens, { type: 'end', raw: 'end of text', at: text.length }];
 };
 
-const LITERALS = { true: true, false: false, null: null };
+const keywordOf = (t) => (t.type === 'name' && KEYWORDS.has(t.raw.toLowerCase()) ? t.raw.toLowerCase() : null);
+
+const isIdent = (t) => t.type === 'ident' || (t.type === 'name' && !keywordOf(t));
+
+const OP_ALIASES = { '<>': '!=' };
 
 /**
- * Clauses in fixed order, each optional:
- * `from T join J, ... where C and ... group G, ... measure n = M, ... sort k asc|desc limit N view V`.
- * `M` is `kind(arg, ...)` with an optional trailing `where C and ...`; an arg is a column, literal or nested `M`.
- * Values are `"strings"` (`\"`, `\\`, `\n` escapes), numbers, `true`, `false`, `null`, bare words, or `[v, ...]` after `in`.
- * Throws an Error with `line`, `column` and `reason`.
+ * `SELECT item, ... FROM t JOIN j, ... WHERE c AND ... GROUP BY col, ... ORDER BY k ASC|DESC LIMIT n VIEW v`.
+ * Every clause is optional; keywords ignore case. An item is a group-by column or `call AS name`.
+ * Group-by columns in SELECT must equal GROUP BY. A call is `kind(arg, ...)` with an optional `FILTER (WHERE c AND ...)`.
+ * Values are `'strings'` (`''` escapes a quote), numbers, `TRUE`, `FALSE`, `NULL`, or `(v, ...)` after `IN`.
+ * `"quoted"` names escape keywords and other characters. Throws an Error with `line`, `column` and `reason`.
  */
 export const parseQuery = (text) => {
   const tokens = tokenize(text);
   let i = 0;
-  const peek = () => tokens[i];
+  const peek = (k = 0) => tokens[i + k];
   const next = () => tokens[i++];
-  const fail = (message) => {
-    throw parseError(text, peek().at, message);
+  const fail = (message, at = peek().at) => {
+    throw parseError(text, at, message);
   };
-  const is = (raw, t = peek()) => t.raw === raw;
+  const is = (raw, t = peek()) => (KEYWORDS.has(raw) ? keywordOf(t) === raw : t.type === 'op' && t.raw === raw);
   const accept = (raw) => is(raw) && Boolean(next());
-  const expect = (raw) => accept(raw) || fail(`expected ${raw}, got ${peek().raw}`);
-  const name = (what) => (peek().type === 'name' ? next().raw : fail(`expected ${what}, got ${peek().raw}`));
+  const shown = (raw) => (KEYWORDS.has(raw) ? raw.toUpperCase() : raw);
+  const expect = (raw) => accept(raw) || fail(`expected ${shown(raw)}, got ${peek().raw}`);
+  const identifier = (what) => {
+    const t = peek();
+    if (!isIdent(t)) return fail(`expected ${what}, got ${t.raw}`);
+    next();
+    return t.type === 'ident' ? unquote(t.raw) : t.raw;
+  };
   const list = (item) => {
     const items = [item()];
     while (accept(',')) items.push(item());
+    return items;
+  };
+  const parens = (item) => {
+    expect('(');
+    if (accept(')')) return [];
+    const items = list(item);
+    expect(')');
     return items;
   };
 
@@ -62,24 +83,20 @@ export const parseQuery = (text) => {
     const t = peek();
     if (t.type === 'str') return unquote(next().raw);
     if (t.type === 'num') return Number(next().raw);
-    if (t.type === 'name') return next().raw in LITERALS ? LITERALS[t.raw] : t.raw;
+    const k = keywordOf(t);
+    if (k && k in LITERALS) return next() && LITERALS[k];
+    if (t.type === 'ident') return fail(`strings take single quotes, got ${t.raw}`);
+    if (isIdent(t)) return fail(`unquoted value ${t.raw}`);
     return fail(`expected a value, got ${t.raw}`);
   };
 
-  const values = () => {
-    expect('[');
-    if (accept(']')) return [];
-    const items = list(value);
-    expect(']');
-    return items;
-  };
-
   const condition = () => {
-    const col = name('a column');
-    const op = peek();
-    if (!OPS.includes(op.raw)) fail(`expected an operator, got ${op.raw}`);
+    const col = identifier('a column');
+    const t = peek();
+    const op = OP_ALIASES[t.raw] ?? keywordOf(t) ?? t.raw;
+    if (!OPS.includes(op)) fail(`expected an operator, got ${t.raw}`);
     next();
-    return clause(col, op.raw, op.raw === 'in' ? values() : value());
+    return clause(col, op, op === 'in' ? parens(value) : value());
   };
 
   const conditions = () => {
@@ -88,86 +105,121 @@ export const parseQuery = (text) => {
     return out;
   };
 
-  const call = () => {
-    const kind = name('a measure');
-    expect('(');
-    const args = is(')') ? [] : list(argument);
-    expect(')');
-    return fn(kind, args, accept('where') ? conditions() : []);
+  const startsCall = () => peek().type === 'name' && !keywordOf(peek()) && is('(', peek(1));
+
+  const argument = (kind, n) => {
+    if (startsCall()) return call();
+    const type = paramType(kind, n);
+    if (type === 'col') return identifier('a column');
+    if (type === 'measure') return fail(`expected a measure, got ${peek().raw}`);
+    return type || !isIdent(peek()) ? value() : identifier('a column');
   };
 
-  const argument = () => (peek().type === 'name' && is('(', tokens[i + 1]) ? call() : value());
+  const call = () => {
+    const kind = startsCall() ? next().raw : fail(`expected a measure, got ${peek().raw}`);
+    expect('(');
+    const args = [];
+    if (!accept(')')) {
+      args.push(argument(kind, 0));
+      while (accept(',')) args.push(argument(kind, args.length));
+      expect(')');
+    }
+    if (!accept('filter')) return fn(kind, args);
+    expect('(');
+    expect('where');
+    const where = conditions();
+    expect(')');
+    return fn(kind, args, where);
+  };
 
-  const named = () => {
-    const n = name('a measure name');
-    expect('=');
-    return measure(n, call());
+  const item = () => {
+    const at = peek().at;
+    if (isIdent(peek()) && !startsCall()) return { col: identifier('a column'), at };
+    if (!startsCall()) return fail(`expected a column or measure, got ${peek().raw}`);
+    const m = call();
+    expect('as');
+    return { measure: measure(identifier('a measure name'), m) };
+  };
+
+  const joins = () => {
+    const out = list(() => identifier('a join'));
+    while (accept('join')) out.push(...list(() => identifier('a join')));
+    return out;
   };
 
   const sort = () => {
-    const by = name('a sort key');
-    if (accept('asc')) return { by, dir: 'asc' };
-    accept('desc');
-    return { by, dir: 'desc' };
+    const by = identifier('a sort key');
+    return { by, dir: accept('asc') ? 'asc' : (accept('desc'), 'desc') };
   };
 
-  const limit = () => {
-    const t = peek();
-    return t.type === 'num' ? Number(next().raw) : fail(`expected a number, got ${t.raw}`);
-  };
+  const limit = () => (peek().type === 'num' ? Number(next().raw) : fail(`expected a number, got ${peek().raw}`));
+
+  const after = (word, parse) => () => (expect(word), parse());
 
   const CLAUSES = [
-    ['from', 'from', () => name('a base table')],
-    ['join', 'joins', () => list(() => name('a join'))],
+    ['select', 'select', () => list(item)],
+    ['from', 'from', () => identifier('a base table')],
+    ['join', 'joins', joins],
     ['where', 'where', conditions],
-    ['group', 'group', () => list(() => name('a column'))],
-    ['measure', 'measures', () => list(named)],
-    ['sort', 'sort', sort],
+    ['group', 'group', after('by', () => list(() => identifier('a column')))],
+    ['order', 'sort', after('by', sort)],
     ['limit', 'limit', limit],
-    ['view', 'view', () => name('a view')],
+    ['view', 'view', () => identifier('a view')],
   ];
 
   const parts = {};
   for (const [keyword, key, parse] of CLAUSES) if (accept(keyword)) parts[key] = parse();
   if (peek().type !== 'end') {
-    const known = CLAUSES.some(([k]) => is(k));
-    fail(known ? `${peek().raw} is out of order or repeated` : `unexpected ${peek().raw}`);
+    const k = keywordOf(peek());
+    fail(CLAUSES.some(([c]) => c === k) ? `${k.toUpperCase()} is out of order or repeated` : `unexpected ${peek().raw}`);
   }
-  return query(parts);
+
+  const { select = [], ...rest } = parts;
+  const cols = select.filter((s) => 'col' in s);
+  const group = rest.group ?? [];
+  const stray = cols.find((c) => !group.includes(c.col));
+  if (stray) fail(`${stray.col} is not in GROUP BY`, stray.at);
+  if (cols.length && cols.map((c) => c.col).join('\0') !== group.join('\0')) fail('SELECT columns must match GROUP BY', cols[0].at);
+  return query({ ...rest, measures: select.filter((s) => s.measure).map((s) => s.measure) });
 };
 
 const WORD = /^[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*$/;
 
-const quote = (s) => `"${s.replace(/[\\"\n\t]/g, (c) => ({ '\n': '\\n', '\t': '\\t' })[c] ?? `\\${c}`)}"`;
+const ident = (s) => (WORD.test(s) && !KEYWORDS.has(s.toLowerCase()) ? s : `"${String(s).replaceAll('"', '""')}"`);
 
-const printValue = (v) => (typeof v === 'string' ? quote(v) : String(v));
-
-const printWord = (v) => (typeof v === 'string' && WORD.test(v) && !(v in LITERALS) ? v : printValue(v));
+const printValue = (v) =>
+  typeof v === 'string' ? `'${v.replaceAll("'", "''")}'` : v == null || typeof v === 'boolean' ? String(v).toUpperCase() : String(v);
 
 const printConditions = (clauses) =>
   clauses
-    .map(({ col, op, value }) => `${col} ${op} ${op === 'in' ? `[${value.map(printValue).join(', ')}]` : printValue(value)}`)
-    .join(' and ');
+    .map(({ col, op, value }) => `${ident(col)} ${op === 'in' ? `IN (${value.map(printValue).join(', ')})` : `${op} ${printValue(value)}`}`)
+    .join(' AND ');
 
 export const printCall = ({ kind, args = [], where = [] }) => {
-  const params = MEASURES[kind]?.params ?? [];
   const arg = (a, i) =>
-    a !== null && typeof a === 'object' ? printCall(a) : params[i]?.startsWith('col') ? printWord(a) : printValue(a);
-  const filter = where.length ? ` where ${printConditions(where)}` : '';
+    a !== null && typeof a === 'object' ? printCall(a) : paramType(kind, i) === 'col' ? ident(a) : printValue(a);
+  const filter = where.length ? ` FILTER (WHERE ${printConditions(where)})` : '';
   return `${kind}(${args.map(arg).join(', ')})${filter}`;
 };
 
-/** Inverse of `parseQuery`, on one line. Strings in values are always quoted; empty clauses are left out. */
+const SELECT_WIDTH = 80;
+
+const printSelect = (items) => {
+  const line = `SELECT ${items.join(', ')}`;
+  return line.length <= SELECT_WIDTH ? line : `SELECT ${items.join(',\n       ')}`;
+};
+
+/** Inverse of `parseQuery`, one clause per line. Empty clauses and `VIEW table` are left out. */
 export const printQuery = (q) =>
   [
-    `from ${q.from}`,
-    q.joins.length && `join ${q.joins.join(', ')}`,
-    q.where.length && `where ${printConditions(q.where)}`,
-    q.group.length && `group ${q.group.join(', ')}`,
-    q.measures.length && `measure ${q.measures.map(({ name, ...m }) => `${name} = ${printCall(m)}`).join(', ')}`,
-    q.sort && `sort ${q.sort.by}${q.sort.dir ? ` ${q.sort.dir}` : ''}`,
-    q.limit != null && `limit ${q.limit}`,
-    `view ${q.view}`,
+    (q.group.length || q.measures.length) &&
+      printSelect([...q.group.map(ident), ...q.measures.map(({ name, ...m }) => `${printCall(m)} AS ${ident(name)}`)]),
+    `FROM ${ident(q.from)}${q.joins.map((j) => ` JOIN ${ident(j)}`).join('')}`,
+    q.where.length && `WHERE ${printConditions(q.where)}`,
+    q.group.length && `GROUP BY ${q.group.map(ident).join(', ')}`,
+    q.sort && `ORDER BY ${ident(q.sort.by)} ${(q.sort.dir ?? 'desc').toUpperCase()}`,
+    q.limit != null && `LIMIT ${q.limit}`,
+    q.view !== 'table' && `VIEW ${ident(q.view)}`,
   ]
     .filter(Boolean)
-    .join(' ');
+    .join('\n');

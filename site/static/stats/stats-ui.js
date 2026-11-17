@@ -380,7 +380,11 @@ function lengthTable(el, filters, rows) {
   });
 }
 
-let queryText = 'from players group hero measure games = count(), win = rate(win) sort games desc limit 20';
+let queryText = `SELECT hero, count() AS games, rate(win) AS win
+FROM players
+GROUP BY hero
+ORDER BY games DESC
+LIMIT 20`;
 const queryHash = (text) => `#query/${encodeURIComponent(text)}`;
 const queryResult = async (stats, text) => {
   try {
@@ -422,6 +426,7 @@ const VIEWS = {
     else history.replaceState(null, '', queryHash(queryText));
     el.innerHTML = `<section class="stats-section"><div class="stats-query__bar" data-part="examples"></div><div class="stats-query__bar"><input class="input" data-name placeholder="Name" aria-label="Name"><button class="btn" type="button" data-save>Save</button><span class="stats-query__list" data-part="saved"></span></div><form class="stats-filters stats-query__form" data-part="builder"></form><textarea class="input stats-query__text" rows="4" spellcheck="false" aria-label="Query"></textarea><div data-part="out"></div></section>`;
     const input = el.querySelector('textarea');
+    const fit = () => (input.rows = Math.max(4, input.value.split('\n').length));
     const name = el.querySelector('[data-name]');
     const out = part(el, 'out');
     const savedEl = part(el, 'saved');
@@ -459,6 +464,7 @@ const VIEWS = {
       last = q;
       form.show(q);
     };
+    input.addEventListener('input', fit);
     input.addEventListener('input', debounce(() => {
       queryText = input.value;
       history.replaceState(null, '', queryHash(queryText));
@@ -467,6 +473,7 @@ const VIEWS = {
       run();
     }, 300));
     input.value = queryText;
+    fit();
     name.value = [...saved, ...EXAMPLES].find((s) => s.text === queryText)?.name ?? '';
     showSaved();
     el.querySelector('[data-save]').addEventListener('click', save);
@@ -474,6 +481,7 @@ const VIEWS = {
     const open = (s) => {
       if (!s) return;
       input.value = queryText = s.text;
+      fit();
       name.value = s.name;
       history.replaceState(null, '', queryHash(queryText));
       showSaved();
@@ -497,6 +505,7 @@ const VIEWS = {
         const text = printQuery(last);
         if (text === input.value) return;
         input.value = queryText = text;
+        fit();
         history.replaceState(null, '', queryHash(queryText));
         showSaved();
         run();
