@@ -82,7 +82,7 @@ export const FILTER_COLUMNS = ['tournament', 'map', 'patch', 'date', 'game_mode'
 /** Filter value as a list: arrays pass through, empty values become []. */
 export const asList = (v) => (Array.isArray(v) ? v.filter(Boolean) : v ? [v] : []);
 
-const minorOf = (patch) => patch?.split('.').slice(0, 2).join('.');
+export const minorOf = (patch) => patch?.split('.').slice(0, 2).join('.');
 
 /**
  * Row predicate over common dimensions. `scope` is `tournament` (Liquipedia
