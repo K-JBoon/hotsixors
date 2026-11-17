@@ -87,6 +87,13 @@
       #}
       <a class="nav-link" href="{{ get_url(path='@/battlegrounds/_index.md') }}">Battlegrounds</a>
       <a class="nav-link" href="{{ get_url(path='@/replay.md') }}">Replay Viewer</a>
+      <details class="nav-dropdown" data-nav-dropdown>
+        <summary class="nav-link nav-dropdown__trigger">Stats</summary>
+        <div class="nav-dropdown__menu">
+          <a class="nav-dropdown__item" href="{{ get_url(path='@/stats.md') }}">Competitive</a>
+          <a class="nav-dropdown__item" href="{{ get_url(path='@/stats-personal.md') }}">Personal</a>
+        </div>
+      </details>
       <a class="nav-link" href="{{ get_url(path='library') }}">Library</a>
       <a class="nav-link" href="{{ get_url(path='about') }}">About</a>
       <details class="nav-dropdown" data-nav-dropdown>

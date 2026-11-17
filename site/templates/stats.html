@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}{% if page.extra.source == "personal" %}Heroes of the Storm Personal Replay Stats{% else %}Heroes of the Storm Competitive Stats{% endif %} | {{ config.title }}{% endblock title %}
+
+{% block head %}
+  {% set bundles = load_data(path="data/bundles.json") %}
+  <link rel="stylesheet" href="{{ get_url(path=bundles['stats/stats.css']) }}">
+  {% if config.extra.nexus_assets %}<link rel="preconnect" href="{{ config.extra.nexus_assets }}" crossorigin>{% endif %}
+{% endblock head %}
+
+{% block main_class %} stats-main-area{% endblock main_class %}
+
+{% block content %}
+{% set bundles = load_data(path="data/bundles.json") %}
+{% set local_stats = load_data(path="static/stats/data/meta.json", required=false) %}
+{% set personal = page.extra.source == "personal" %}
+<div class="stats-page{% if personal %} is-loading{% endif %}" data-stats-root
+     data-source="{% if personal %}personal{% endif %}"
+     data-stats-base="{% if local_stats %}/stats/data{% else %}{{ config.extra.replay_stats }}{% endif %}"
+     data-replay-base="{{ config.extra.nexus_assets }}/replays"
+     data-worker-url="{{ get_url(path=bundles['stats/parse-worker.js']) }}">
+  <h1>{{ page.title }}</h1>
+  <p class="stats-status" data-stats-status></p>
+{% if not personal %}
+  <p class="stats-note">This data is sourced from the {% if config.extra.replay_source %}<a href="{{ config.extra.replay_source }}" rel="noopener">community replay archive</a>{% else %}community replay archive{% endif %} that BrbSoaking maintains.</p>
+  <aside class="stats-cta">
+    <p class="stats-cta__title">Are you a competitive player?</p>
+    <p>Message <a href="https://discordapp.com/users/123462450153521156" rel="noopener"><code>errorb0t</code></a> on Discord and send over your replay folder from time to time. Scrim and tournament replays make these stats better.</p>
+  </aside>
+{% endif %}
+{% if personal %}
+  <input type="file" webkitdirectory multiple hidden data-mine-input>
+  <div class="stats-drop" data-mine-drop>
+    <p class="stats-drop__title"><strong>Drop your replay folder here</strong></p>
+    <p class="stats-drop__or">or</p>
+    <p><button class="btn btn--primary stats-drop__btn" type="button" data-mine-pick>Choose folder</button></p>
+    <p class="stats-drop__note">Parsed in your browser and stored on this device. Replays are not uploaded.</p>
+    <p class="stats-drop__note">Windows: <code>Documents\Heroes of the Storm\Accounts\&lt;id&gt;\&lt;region-id&gt;\Replays\Multiplayer</code></p>
+    <progress class="stats-mine__progress" data-mine-progress hidden></progress>
+    <p data-mine-status></p>
+  </div>
+  <div class="stats-mine" data-mine-bar>
+    <button class="btn btn--sm btn--primary" type="button" data-mine-sync>Sync</button>
+    <button class="btn btn--sm" type="button" data-mine-pick>Change folder</button>
+    <button class="btn btn--sm" type="button" data-mine-clear>Forget my replays</button>
+    <progress class="stats-mine__progress" data-mine-progress hidden></progress>
+    <span data-mine-status></span>
+    <span class="stats-mine__folder" data-mine-folder hidden></span>
+  </div>
+{% endif %}
+
+  <form class="stats-filters" data-filters>
+    {% if not personal %}<div class="segmented" role="radiogroup" aria-label="Games">
+      <label class="segmented__btn"><input type="radio" name="scope" value="tournament" checked> Tournaments</label>
+      <label class="segmented__btn"><input type="radio" name="scope" value="all"> All custom games</label>
+    </div>
+    <div class="stats-filters__field"><span id="filter-tournament">Tournament</span><div data-multi="tournament" aria-labelledby="filter-tournament"></div></div>
+    {% else %}
+    <div class="stats-filters__field"><span id="filter-player">Player</span><div data-multi="player" aria-labelledby="filter-player"></div></div>
+    <div class="stats-filters__field"><span id="filter-mode">Mode</span><div data-multi="mode" aria-labelledby="filter-mode"></div></div>
+    {% endif %}
+    <div class="stats-filters__field"><span id="filter-map">Map</span><div data-multi="map" aria-labelledby="filter-map"></div></div>
+    <div class="stats-filters__field"><span id="filter-patch">Patch</span><div data-multi="patch" aria-labelledby="filter-patch"></div></div>
+    <label>From <input class="input" type="date" name="from"></label>
+    <label>To <input class="input" type="date" name="to"></label>
+    <label>Min. games <input class="input stats-filters__min" type="number" name="min" min="1" placeholder="any"></label>
+    <button class="btn stats-filters__reset" type="reset">Reset</button>
+  </form>
+
+  <nav class="stats-tabs" aria-label="Stats views">
+    <a class="stats-tab" data-tab="heroes" href="#heroes">Heroes</a>
+    <a class="stats-tab" data-tab="maps" href="#maps">Maps</a>
+    <a class="stats-tab" data-tab="players" href="#players">Players</a>
+    {% if not personal %}
+    <a class="stats-tab" data-tab="teams" href="#teams">Teams</a>
+    <a class="stats-tab" data-tab="tournaments" href="#tournaments">Tournaments</a>
+    {% endif %}
+    <a class="stats-tab" data-tab="games" href="#games">Games</a>
+  </nav>
+
+  <div class="stats-view" data-view aria-live="polite"></div>
+
+</div>
+{% set battlegrounds = get_section(path="battlegrounds/_index.md") %}
+<script type="application/json" data-map-images>{
+{%- for bg in battlegrounds.pages %}{% if bg.extra.loading_screen -%}
+  {%- set img = resize_image(path='images/battlegrounds/' ~ bg.extra.battleground_slug ~ '.png', width=384, height=56, op="fill", format="webp", quality=82) -%}
+  {{ bg.title | json_encode() | safe }}: {{ img.url | json_encode() | safe }},
+{%- endif %}{% endfor -%}
+"": ""}</script>
+{% endblock content %}
+
+{% block scripts %}
+{% set bundles = load_data(path="data/bundles.json") %}
+<script type="module" src="{{ get_url(path=bundles['stats/stats-ui.js']) }}"></script>
+{% endblock scripts %}

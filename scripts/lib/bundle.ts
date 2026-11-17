@@ -9,7 +9,7 @@ const MANIFEST = path.join(SITE_DATA, "bundles.json");
 const SOURCES = path.join(SITE_DATA, "bundle-sources.json");
 
 /** Entry scripts the templates load, by their path under site/static. */
-const MODULE_ENTRIES = ["hotsixors.js", "replay/replay-ui.js", "draft/draft.js"];
+const MODULE_ENTRIES = ["hotsixors.js", "replay/replay-ui.js", "draft/draft.js", "stats/stats-ui.js", "stats/parse-worker.js"];
 const CLASSIC_ENTRIES = ["level-slider.js", "underdog-calc.js"];
 
 /** Sheets under site/css, published as `<name>.css`. */
@@ -19,6 +19,7 @@ const SITE_ENTRIES = ["main.css", "gamedata.css"];
 const STYLE_ENTRIES = [
   "replay/replay.css",
   "draft/draft.css",
+  "stats/stats.css",
   "lost-in-the-nexus/viewer.css",
   "lost-in-the-nexus/nexus-game.css",
 ];
