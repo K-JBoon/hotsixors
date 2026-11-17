@@ -56,7 +56,7 @@ export function winRateCell(v, games) {
 }
 
 const thin = (n) => typeof n === 'number' && n < THIN_GAMES;
-const thinOf = (counts) => (counts.every(thin) ? () => false : thin);
+export const thinOf = (counts) => (counts.every(thin) ? () => false : thin);
 
 let heroIndex = null;
 /** Hero slug → `{ name, portrait }` from the draft tool's data. */
@@ -68,10 +68,14 @@ export function loadHeroes() {
   return heroIndex;
 }
 
-export function heroCell(heroes, slug, href = null) {
+export const heroPortrait = (heroes, slug) => {
   const h = heroes.get(slug);
-  const name = h ? h.name : slug;
-  const img = h ? `<img class="stats-portrait" src="/images/heroportraits/${escapeHtml(h.portrait)}" alt="" loading="lazy">` : '';
+  return h ? `<img class="stats-portrait" src="/images/heroportraits/${escapeHtml(h.portrait)}" alt="" loading="lazy">` : '';
+};
+
+export function heroCell(heroes, slug, href = null) {
+  const name = heroName(heroes, slug);
+  const img = heroPortrait(heroes, slug);
   const label = `${img}<span>${escapeHtml(name)}</span>`;
   return `<span class="stats-hero">${href ? `<a href="${escapeHtml(href)}">${label}</a>` : label}</span>`;
 }

@@ -4,6 +4,9 @@ import { clearSummaries, deleteSetting, loadSetting, loadSummaries, persistStora
 import { canPickFolder, droppedReplays, folderDiff, hasReadPermission, requestReadPermission, scanReplays, uniqueGames } from './my-replays.js';
 import { loadSiteResolver } from './resolve.js';
 import { buildTables } from './tables.js';
+import { parseQuery } from './builder/text.js';
+import { runQuery } from './builder/run.js';
+import { renderResult } from './builder/render.js';
 import {
   STAT_COLUMNS, available, facets, gameList, tournamentReport, tournamentTable, heroReport, mapReport, heroTable, mapTable, playerReport, playerTable, teamReport, teamTable,
 } from './reports.js';
@@ -27,7 +30,7 @@ const mine = root.dataset.source === 'personal';
 const FILTER_KEYS = ['scope', 'strict', 'tournament', 'player', 'mode', 'map', 'patch', 'from', 'to', 'min', 'per', 'rank', 'show'];
 const DEFAULTS = { scope: 'tournament', strict: '1', per: 'game', rank: 'confidence', show: mine ? 'all' : 'draft' };
 const SORT_KEYS = ['sort', 'dir'];
-const TABS = ['heroes', 'maps', 'players', 'teams', 'tournaments', 'games'];
+const TABS = ['heroes', 'maps', 'players', 'teams', 'tournaments', 'games', 'query'];
 
 const MULTI_KEYS = new Set(['tournament', 'player', 'mode', 'map', 'patch']);
 
@@ -65,9 +68,17 @@ function writeFilters(filters) {
   history.replaceState(null, '', `${location.pathname}${search ? `?${search}` : ''}${location.hash}`);
 }
 
+const decode = (s) => {
+  try {
+    return decodeURIComponent(s);
+  } catch {
+    return s;
+  }
+};
+
 const route = () => {
   const [tab, ...rest] = location.hash.slice(1).split('/');
-  return { tab: TABS.includes(tab) || ['hero', 'map', 'player', 'team', 'tournament'].includes(tab) ? tab : 'heroes', arg: decodeURIComponent(rest.join('/')) };
+  return { tab: TABS.includes(tab) || ['hero', 'map', 'player', 'team', 'tournament'].includes(tab) ? tab : 'heroes', arg: decode(rest.join('/')) };
 };
 
 
@@ -365,7 +376,49 @@ function lengthTable(el, filters, rows) {
   });
 }
 
+let queryText = 'from players group hero measure games = count(), win = rate(win) sort games desc limit 20';
+const queryHash = (text) => `#query/${encodeURIComponent(text)}`;
+const queryResult = async (stats, text) => {
+  try {
+    const q = parseQuery(text);
+    return { q, result: await runQuery(stats, q) };
+  } catch (error) {
+    return { error: String(error?.message ?? error) };
+  }
+};
+
+const debounce = (f, ms) => {
+  let timer;
+  return () => {
+    clearTimeout(timer);
+    timer = setTimeout(f, ms);
+  };
+};
+
 const VIEWS = {
+  async query(stats, filters, heroes, text, el) {
+    if (text) queryText = text;
+    else history.replaceState(null, '', queryHash(queryText));
+    el.innerHTML = `<section class="stats-section"><textarea class="input stats-query__text" rows="4" spellcheck="false" aria-label="Query"></textarea><div data-part="out"></div></section>`;
+    const input = el.querySelector('textarea');
+    const out = part(el, 'out');
+    input.value = queryText;
+    let token = 0;
+    const run = async () => {
+      const t = ++token;
+      const { q, result, error } = await queryResult(stats, input.value);
+      if (t !== token) return;
+      if (error) out.innerHTML = `<p class="stats-note stats-query__error">${escapeHtml(error)}</p>`;
+      else renderResult(out, result, q, heroes);
+    };
+    input.addEventListener('input', debounce(() => {
+      queryText = input.value;
+      history.replaceState(null, '', queryHash(queryText));
+      run();
+    }, 300));
+    await run();
+  },
+
   async heroes(stats, filters, heroes, arg, el) {
     el.innerHTML = section(null, 'table');
     statsTable(part(el, 'table'), filters, {
@@ -758,6 +811,7 @@ async function render(stats, heroes) {
     if (active) a.setAttribute('aria-current', 'page');
     else a.removeAttribute('aria-current');
   }
+  form.hidden = tab === 'query';
   view.setAttribute('aria-busy', 'true');
   view.style.minHeight = `${view.offsetHeight}px`;
   const el = document.createElement('div');
@@ -773,19 +827,19 @@ async function render(stats, heroes) {
   view.removeAttribute('aria-busy');
 }
 
-function bindFilters(stats, heroes) {
+function bindFilters(current, heroes) {
   form.addEventListener('change', () => {
     const data = new FormData(form);
     const filters = Object.fromEntries(FILTER_KEYS.map((k) => [k, MULTI_KEYS.has(k) ? data.getAll(k).map(String) : String(data.get(k) ?? '')]));
     writeFilters(filters);
-    if (currentFacets) fillFilters(stats, currentFacets, readFilters());
-    render(stats, heroes);
+    if (currentFacets) fillFilters(current(), currentFacets, readFilters());
+    render(current(), heroes);
   });
   form.addEventListener('reset', (e) => {
     e.preventDefault();
     writeFilters({});
-    if (currentFacets) fillFilters(stats, currentFacets, readFilters());
-    render(stats, heroes);
+    if (currentFacets) fillFilters(current(), currentFacets, readFilters());
+    render(current(), heroes);
   });
   window.addEventListener('hashchange', () => {
     const q = new URLSearchParams(location.search);
@@ -794,7 +848,7 @@ function bindFilters(stats, heroes) {
       history.replaceState(null, '', `${location.pathname}${q.size ? `?${q}` : ''}${location.hash}`);
     }
     window.scrollTo(0, 0);
-    render(stats, heroes);
+    render(current(), heroes);
   });
 }
 
@@ -847,7 +901,7 @@ async function myReplays(heroes) {
     }
     await fillFilters(stats, f, filters);
     if (!bound) {
-      bindFilters({ columns: (...a) => stats.columns(...a), names: (...a) => stats.names(...a), json: (n) => stats.json(n), get meta() { return stats.meta; } }, heroes);
+      bindFilters(() => stats, heroes);
       bound = true;
     }
     await render(stats, heroes);
@@ -1003,7 +1057,7 @@ async function main() {
       return;
     }
     const stats = await competitive(heroes);
-    bindFilters(stats, heroes);
+    bindFilters(() => stats, heroes);
     await render(stats, heroes);
     status.textContent = '';
   } catch (error) {

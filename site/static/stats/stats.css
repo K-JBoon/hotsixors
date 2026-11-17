@@ -273,6 +273,9 @@
 .stats-mine__progress { inline-size: 12rem; }
 .stats-page [hidden] { display: none !important; }
 
+.stats-query__text { inline-size: 100%; box-sizing: border-box; resize: vertical; font-family: monospace; }
+.stats-query__error { white-space: pre-line; }
+
 .stats-page.is-empty :is(.stats-filters, .stats-tabs, .stats-view, [data-mine-bar]) { display: none; }
 .stats-page:not(.is-empty) .stats-drop { display: none; }
 .stats-page.is-loading :is(.stats-filters, .stats-tabs, .stats-view, [data-mine-bar]) { display: none; }
@@ -332,3 +335,43 @@ body.is-dragging-file .stats-page:not(.is-empty)::after {
 .stats-table .shrink { inline-size: 1%; white-space: nowrap; }
 .stats-build { display: flex; gap: 3px; }
 .stats-build .stats-portrait { width: 1.75rem; height: 1.75rem; }
+
+.stats-chart { container-type: inline-size; display: grid; grid-template-columns: max-content minmax(8rem, 1fr) max-content; grid-template-rows: auto; grid-auto-rows: 2rem; column-gap: var(--space-sm); align-items: center; font-size: var(--text-sm); }
+.stats-chart__head { color: var(--text-muted); font-size: var(--text-xs); text-transform: uppercase; letter-spacing: 0.06em; padding-block-end: var(--space-2xs); }
+.stats-chart__label { grid-column: 1; }
+.stats-chart__value { grid-column: 3; }
+.stats-chart .num { text-align: end; font-variant-numeric: tabular-nums; }
+.stats-chart .is-thin { opacity: 0.7; }
+.stats-chart .stats-portrait { width: 1.5rem; height: 1.5rem; }
+.stats-chart svg { display: block; inline-size: 100%; overflow: visible; }
+.stats-chart__axis { grid-column: 2; block-size: 1.5em; fill: var(--text-muted); font-size: var(--text-xs); }
+.stats-chart__plot { grid-column: 2; grid-row: 2 / span var(--rows); block-size: 100%; stroke-width: 1; }
+.stats-chart__grid { stroke: var(--hairline); }
+.stats-chart__zero { stroke: var(--border-dim); }
+.stats-chart__ref { stroke: var(--border-gold); stroke-dasharray: 4 3; }
+.stats-chart__bar { fill: var(--blue-strong); }
+.stats-chart__whisker { --whisker: var(--text-primary); stroke: var(--whisker); stroke-width: 2; }
+.stats-chart__whisker.is-high { --whisker: var(--success-light); }
+.stats-chart__whisker.is-low { --whisker: var(--danger); }
+.stats-chart--line, .stats-chart--scatter { grid-template-columns: minmax(0, 1fr); grid-auto-rows: auto; padding-inline-start: 4.5rem; }
+.stats-chart--line .stats-chart__plot { grid-column: 1; grid-row: auto; block-size: 16rem; }
+.stats-chart--line .stats-chart__axis, .stats-chart--scatter .stats-chart__axis { grid-column: 1; }
+.stats-chart__area { position: relative; isolation: isolate; block-size: 28rem; container-type: size; }
+.stats-chart__area .stats-chart__plot { position: absolute; inset: 0; z-index: -2; }
+.stats-chart__dot { position: absolute; left: calc(var(--x) * 100%); top: calc(var(--y) * 100%); translate: -50% -50%; display: grid; }
+.stats-chart__dot:is(:hover, :focus-visible) { z-index: 1; }
+.stats-chart__dot .stats-chart__whisker { position: absolute; z-index: -1; background: var(--whisker); opacity: 0.4; }
+.stats-chart__dot:is(:hover, :focus-visible) .stats-chart__whisker { opacity: 1; }
+.stats-chart__whisker--x { inset-block-start: calc(50% - 1px); block-size: 2px; inset-inline-start: calc(50% + (var(--lo) - var(--x)) * 100cqw); inline-size: calc((var(--hi) - var(--lo)) * 100cqw); }
+.stats-chart__whisker--y { inset-inline-start: calc(50% - 1px); inline-size: 2px; inset-block-start: calc(50% + (var(--lo) - var(--y)) * 100cqh); block-size: calc((var(--hi) - var(--lo)) * 100cqh); }
+.stats-chart--scatter .stats-chart__head.num { padding-block: var(--space-2xs) 0; }
+.stats-chart__pip { inline-size: 0.5rem; block-size: 0.5rem; border-radius: 50%; background: var(--accent-blue); }
+.stats-chart__tick { fill: var(--text-muted); font-size: var(--text-xs); }
+.stats-chart__line { stroke: var(--series); stroke-width: 2; }
+.stats-chart__point { fill: var(--series); }
+.stats-chart__legend { display: flex; flex-wrap: wrap; gap: var(--space-3xs); margin-inline-start: -4.5rem; padding-block-start: var(--space-sm); }
+.stats-chart__legend .stats-portrait { width: 1rem; height: 1rem; }
+.stats-chart__swatch { inline-size: 0.75rem; block-size: 3px; border-radius: var(--radius-pill); background: var(--series); }
+@container (max-width: 36rem) {
+  .stats-chart__axis text:nth-child(even) { display: none; }
+}
