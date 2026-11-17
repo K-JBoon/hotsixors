@@ -9,6 +9,7 @@ import {
   clause,
   fn,
   measure,
+  nameClash,
   paramType,
   splitColumn,
   tableOf,
@@ -126,9 +127,9 @@ const topOf = (m) => m.wrap ?? m.kind;
 
 const NAME = /^[A-Za-z_]\w*$/;
 
-const named = (m, i, all) => NAME.test(m.name) && all.findIndex((o) => o.name === m.name) === i;
+const namedIn = (s) => s.measures.filter((m, i) => NAME.test(m.name) && !nameClash(s, i));
 
-const sortKeys = ({ measures, group }) => [...measures.filter(named).map((m) => m.name), ...group];
+const sortKeys = (s) => [...namedIn(s).map((m) => m.name), ...s.group];
 
 const pruneSort = (s) => ({ ...s, sort: s.sort && sortKeys(s).includes(s.sort.by) ? s.sort : null });
 
@@ -380,7 +381,7 @@ export function builderForm(el, { names, values, label = (col, v) => printed(v),
     const snapshot = state;
     const [where, measures] = await Promise.all([
       typedRows(snapshot.rows),
-      Promise.all(snapshot.measures.filter(named).map(typedMeasure)),
+      Promise.all(namedIn(snapshot).map(typedMeasure)),
     ]);
     if (snapshot === state) {
       const { from, joins, group, sort, limit, view } = state;

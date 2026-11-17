@@ -134,6 +134,22 @@ const measureErrors = (column, where) => {
   return (m, path) => check(m, path, false);
 };
 
+const RESERVED_NAMES = ['key'];
+
+/** Why measure `i` cannot use its name, else null. */
+export const nameClash = ({ measures, group }, i) => {
+  const { name } = measures[i];
+  if (RESERVED_NAMES.includes(name)) return `${name} is a reserved name`;
+  if (group.includes(name)) return `${name} is a group-by column`;
+  return measures.findIndex((m) => m.name === name) < i ? `duplicate measure ${name}` : null;
+};
+
+const nameErrors = (q) =>
+  q.measures.flatMap((_, i) => {
+    const message = nameClash(q, i);
+    return message ? [error(`measures.${i}.name`, message)] : [];
+  });
+
 const VIEW_SHAPES = {
   scatter: (q) => (q.measures.length < 2 ? 'scatter needs two measures' : null),
   heatmap: (q) => (q.group.length !== 2 ? 'heatmap needs two group-by columns' : null),
@@ -170,6 +186,7 @@ export const validateQuery = (q, names) => {
     ...(q.group.length > MAX_GROUPS ? [error('group', `at most ${MAX_GROUPS} group-by columns`)] : []),
     ...q.group.flatMap((g, i) => column(g, `group.${i}`)),
     ...q.measures.flatMap((m, i) => measure(m, `measures.${i}`)),
+    ...nameErrors(q),
     ...viewErrors(q),
     ...sortErrors(q),
     ...limitErrors(q),
