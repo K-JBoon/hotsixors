@@ -73,12 +73,16 @@ const statCols = STAT_COLUMNS.map((s) => ({
 }));
 const gamesCol = { key: 'games', label: 'Games', num: true, format: fmt.int };
 const winCol = { key: 'winRate', label: 'Win', num: true, html: (r) => winRateCell(r.winRate, r.games) };
+const pickCols = [
+  { key: 'pickRate', label: 'Pick', num: true, format: fmt.pct },
+  ...(mine ? [] : [{ key: 'banRate', label: 'Ban', num: true, format: fmt.pct }]),
+];
 
 function section(title, id) {
   return `<section class="stats-section"><h2 class="stats-section__title">${escapeHtml(title)}</h2><div data-part="${id}"></div></section>`;
 }
 const row = (...sections) => `<div class="stats-row">${sections.join('')}</div>`;
-const part = (id) => view.querySelector(`[data-part="${id}"]`);
+const part = (el, id) => el.querySelector(`[data-part="${id}"]`);
 
 const heroIcons = (heroes, list) =>
   list.map((h) => heroCell(heroes, h, hash('hero', h)).replace('stats-hero', 'stats-hero stats-hero--icon')).join('');
@@ -194,7 +198,7 @@ function renderPhases(el, phases) {
     return `${open ? `<section class="stats-section"><h2 class="stats-section__title">${escapeHtml(p.name)}</h2>` : ''}${body(p, i)}${close ? '</section>' : ''}`;
   }).join('');
   phases.forEach((p, i) => p.edges && drawEdges(el.querySelector(`[data-bracket="${i}"]`), p.edges));
-  phases.forEach((p, i) => p.groups?.forEach((g, j) => renderTable(part(`standings-${i}-${j}`), {
+  phases.forEach((p, i) => p.groups?.forEach((g, j) => renderTable(part(el, `standings-${i}-${j}`), {
     columns: [
       { key: 'team', label: 'Team', html: (x) => link(hash('team', x.team), x.team) },
       { key: 'won', label: 'Series', num: true, html: (x) => `${x.won}–${x.lost}` },
@@ -207,15 +211,14 @@ function renderPhases(el, phases) {
 }
 
 const VIEWS = {
-  async heroes(stats, filters, heroes) {
-    view.innerHTML = section('Heroes', 'table');
+  async heroes(stats, filters, heroes, arg, el) {
+    el.innerHTML = section('Heroes', 'table');
     const { rows, empty } = minGames(await heroTable(stats, filters), filters);
-    renderTable(part('table'), {
+    renderTable(part(el, 'table'), {
       columns: [
         { key: 'hero', label: 'Hero', sort: (r) => heroName(heroes, r.hero), html: (r) => heroCell(heroes, r.hero, hash('hero', r.hero)) },
         gamesCol, winCol,
-        { key: 'pickRate', label: 'Pick', num: true, format: fmt.pct },
-        { key: 'banRate', label: 'Ban', num: true, format: fmt.pct },
+        ...pickCols,
         ...statCols,
       ],
       rows,
@@ -225,19 +228,19 @@ const VIEWS = {
     });
   },
 
-  async hero(stats, filters, heroes, slug) {
+  async hero(stats, filters, heroes, slug, el) {
     const [report, talents] = await Promise.all([heroReport(stats, slug, filters), stats.json('talents')]);
     const s = report.summary;
-    view.innerHTML = `
+    el.innerHTML = `
       <header class="stats-detail">${heroCell(heroes, slug, `/heroes/${slug}/`)}</header>
       ${row(
-        tiles([['Games', fmt.int(s.games)], ['Win rate', winRateCell(s.winRate, s.games)], ['Pick rate', fmt.pct(s.pickRate)], ['Ban rate', fmt.pct(s.banRate)]]),
+        tiles([['Games', fmt.int(s.games)], ['Win rate', winRateCell(s.winRate, s.games)], ['Pick rate', fmt.pct(s.pickRate)], ...(mine ? [] : [['Ban rate', fmt.pct(s.banRate)]])]),
         section('Maps', 'maps'),
       )}
       ${section('Talents', 'talents')}${section('Players', 'players')}${section('Games', 'games')}`;
-    renderTalentTiers(part('talents'), talents, report.talents);
-    renderTable(part('maps'), { columns: [{ key: 'map', label: 'Map', html: (x) => link(hash('map', x.map), x.map) }, gamesCol, winCol], rows: report.maps, sortKey: 'games' });
-    renderTable(part('players'), {
+    renderTalentTiers(part(el, 'talents'), talents, report.talents);
+    renderTable(part(el, 'maps'), { columns: [{ key: 'map', label: 'Map', html: (x) => link(hash('map', x.map), x.map) }, gamesCol, winCol], rows: report.maps, sortKey: 'games' });
+    renderTable(part(el, 'players'), {
       columns: [
         { key: 'battletag', label: 'Player', html: (r) => link(hash('player', r.player), r.battletag ?? r.player) },
         gamesCol, winCol, ...statCols,
@@ -246,12 +249,12 @@ const VIEWS = {
       sortKey: 'games',
       pageSize: 10,
     });
-    renderTable(part('games'), gameRows(report.games, heroes));
+    renderTable(part(el, 'games'), gameRows(report.games, heroes));
   },
 
-  async maps(stats, filters) {
-    view.innerHTML = section('Maps', 'table');
-    renderTable(part('table'), {
+  async maps(stats, filters, heroes, arg, el) {
+    el.innerHTML = section('Maps', 'table');
+    renderTable(part(el, 'table'), {
       columns: [
         { key: 'map', label: 'Map', html: (r) => link(hash('map', r.map), r.map) },
         gamesCol,
@@ -265,14 +268,14 @@ const VIEWS = {
     });
   },
 
-  async map(stats, filters, heroes, name) {
+  async map(stats, filters, heroes, name, el) {
     const r = await mapReport(stats, name, filters);
     if (!r.summary) {
-      view.innerHTML = '<p class="stats-note">This map has no games under these filters.</p>';
+      el.innerHTML = '<p class="stats-note">This map has no games under these filters.</p>';
       return;
     }
     const s = r.summary;
-    view.innerHTML = `<header class="stats-detail"><h2>${escapeHtml(name)}</h2></header>
+    el.innerHTML = `<header class="stats-detail"><h2>${escapeHtml(name)}</h2></header>
       ${tiles([
         ['Games', fmt.int(s.games)],
         ['Avg length', fmt.dur(s.duration)],
@@ -281,24 +284,23 @@ const VIEWS = {
         ['Left side win', fmt.pct(s.leftWinRate)],
       ])}
       ${section('Heroes', 'heroes')}${section('Games', 'games')}`;
-    renderTable(part('heroes'), {
+    renderTable(part(el, 'heroes'), {
       columns: [
         { key: 'hero', label: 'Hero', sort: (x) => heroName(heroes, x.hero), html: (x) => heroCell(heroes, x.hero, hash('hero', x.hero)) },
         gamesCol, winCol,
-        { key: 'pickRate', label: 'Pick', num: true, format: fmt.pct },
-        { key: 'banRate', label: 'Ban', num: true, format: fmt.pct },
+        ...pickCols,
         ...statCols,
       ],
       rows: r.heroes,
       sortKey: 'games',
       pageSize: 10,
     });
-    renderTable(part('games'), gameRows(r.games, heroes));
+    renderTable(part(el, 'games'), gameRows(r.games, heroes));
   },
 
-  async players(stats, filters, heroes) {
-    view.innerHTML = section('Players', 'table');
-    renderTable(part('table'), {
+  async players(stats, filters, heroes, arg, el) {
+    el.innerHTML = section('Players', 'table');
+    renderTable(part(el, 'table'), {
       columns: [
         { key: 'battletag', label: 'Player', html: (r) => link(hash('player', r.player), r.battletag ?? r.player) },
         { key: 'team', label: 'Team', html: (r) => (r.team ? link(hash('team', r.team), r.team) : '–') },
@@ -315,14 +317,14 @@ const VIEWS = {
     });
   },
 
-  async player(stats, filters, heroes, id) {
+  async player(stats, filters, heroes, id, el) {
     const r = await playerReport(stats, id, filters);
     if (!r.summary) {
-      view.innerHTML = '<p class="stats-note">This player has no games under these filters.</p>';
+      el.innerHTML = '<p class="stats-note">This player has no games under these filters.</p>';
       return;
     }
     const signature = [...r.heroes].sort((a, b) => b.games - a.games).slice(0, 5).map((x) => x.hero);
-    view.innerHTML = `
+    el.innerHTML = `
       <header class="stats-detail"><h2>${escapeHtml(r.summary.battletag ?? id)}</h2></header>
       ${row(
         tiles([['Games', fmt.int(r.summary.games)], ['Win rate', winRateCell(r.summary.winRate, r.summary.games)], ['Events played in', fmt.int(r.summary.events)], ['Signature heroes', `<div class="stats-lineup">${heroIcons(heroes, signature)}</div>`]]),
@@ -330,20 +332,20 @@ const VIEWS = {
         section('Maps', 'maps'),
       )}
       ${section('Heroes', 'heroes')}${section('Games', 'games')}`;
-    renderTable(part('heroes'), {
+    renderTable(part(el, 'heroes'), {
       columns: [{ key: 'hero', label: 'Hero', sort: (x) => heroName(heroes, x.hero), html: (x) => heroCell(heroes, x.hero, hash('hero', x.hero)) }, gamesCol, winCol, ...statCols],
       rows: r.heroes,
       sortKey: 'games',
       pageSize: 10,
     });
-    renderTable(part('teams'), { columns: [{ key: 'team', label: 'Team', html: (x) => link(hash('team', x.team), x.team) }, gamesCol, winCol], rows: r.teams, sortKey: 'games', empty: 'No tournament games.' });
-    renderTable(part('maps'), { columns: [{ key: 'map', label: 'Map', html: (x) => link(hash('map', x.map), x.map) }, gamesCol, winCol], rows: r.maps, sortKey: 'games' });
-    renderTable(part('games'), gameRows(r.games, heroes));
+    renderTable(part(el, 'teams'), { columns: [{ key: 'team', label: 'Team', html: (x) => link(hash('team', x.team), x.team) }, gamesCol, winCol], rows: r.teams, sortKey: 'games', empty: 'No tournament games.' });
+    renderTable(part(el, 'maps'), { columns: [{ key: 'map', label: 'Map', html: (x) => link(hash('map', x.map), x.map) }, gamesCol, winCol], rows: r.maps, sortKey: 'games' });
+    renderTable(part(el, 'games'), gameRows(r.games, heroes));
   },
 
-  async teams(stats, filters) {
-    view.innerHTML = section('Teams', 'table');
-    renderTable(part('table'), {
+  async teams(stats, filters, heroes, arg, el) {
+    el.innerHTML = section('Teams', 'table');
+    renderTable(part(el, 'table'), {
       columns: [
         { key: 'team', label: 'Team', html: (r) => link(hash('team', r.team), r.team) },
         gamesCol, winCol,
@@ -357,11 +359,11 @@ const VIEWS = {
     });
   },
 
-  async team(stats, filters, heroes, name) {
+  async team(stats, filters, heroes, name, el) {
     const r = await teamReport(stats, name, filters);
-    view.innerHTML = `<header class="stats-detail"><h2>${escapeHtml(name)}</h2></header>
+    el.innerHTML = `<header class="stats-detail"><h2>${escapeHtml(name)}</h2></header>
       ${section('Roster', 'roster')}${row(section('Heroes picked', 'heroes'), section('Bans', 'bans'), section('Maps', 'maps'))}${section('Games', 'games')}`;
-    renderTable(part('roster'), {
+    renderTable(part(el, 'roster'), {
       columns: [
         { key: 'battletag', label: 'Player', html: (x) => link(hash('player', x.player), x.battletag ?? x.player) },
         gamesCol, winCol,
@@ -370,15 +372,15 @@ const VIEWS = {
       rows: r.roster,
       sortKey: 'games',
     });
-    renderTable(part('heroes'), { columns: [{ key: 'hero', label: 'Hero', html: (x) => heroCell(heroes, x.hero, hash('hero', x.hero)) }, gamesCol, winCol], rows: r.heroes, sortKey: 'games', pageSize: 10 });
-    renderTable(part('bans'), { columns: [{ key: 'hero', label: 'Hero', html: (x) => heroCell(heroes, x.hero, hash('hero', x.hero)) }, { key: 'bans', label: 'Bans', num: true, format: fmt.int }], rows: r.bans, sortKey: 'bans', pageSize: 10, empty: 'No bans recorded.' });
-    renderTable(part('maps'), { columns: [{ key: 'map', label: 'Map', html: (x) => link(hash('map', x.map), x.map) }, gamesCol, winCol], rows: r.maps, sortKey: 'games' });
-    renderTable(part('games'), gameRows(r.games, heroes));
+    renderTable(part(el, 'heroes'), { columns: [{ key: 'hero', label: 'Hero', html: (x) => heroCell(heroes, x.hero, hash('hero', x.hero)) }, gamesCol, winCol], rows: r.heroes, sortKey: 'games', pageSize: 10 });
+    renderTable(part(el, 'bans'), { columns: [{ key: 'hero', label: 'Hero', html: (x) => heroCell(heroes, x.hero, hash('hero', x.hero)) }, { key: 'bans', label: 'Bans', num: true, format: fmt.int }], rows: r.bans, sortKey: 'bans', pageSize: 10, empty: 'No bans recorded.' });
+    renderTable(part(el, 'maps'), { columns: [{ key: 'map', label: 'Map', html: (x) => link(hash('map', x.map), x.map) }, gamesCol, winCol], rows: r.maps, sortKey: 'games' });
+    renderTable(part(el, 'games'), gameRows(r.games, heroes));
   },
 
-  async tournaments(stats, filters) {
-    view.innerHTML = section('Tournaments', 'table');
-    renderTable(part('table'), {
+  async tournaments(stats, filters, heroes, arg, el) {
+    el.innerHTML = section('Tournaments', 'table');
+    renderTable(part(el, 'table'), {
       columns: [
         { key: 'name', label: 'Tournament', html: (t) => link(hash('tournament', t.name), t.name) },
         gamesCol,
@@ -392,42 +394,41 @@ const VIEWS = {
     });
   },
 
-  async tournament(stats, filters, heroes, name) {
+  async tournament(stats, filters, heroes, name, el) {
     const r = await tournamentReport(stats, name, filters);
     const { info, summary: s } = r;
     const page = info?.url ? `<a class="stats-liquipedia" href="${escapeHtml(info.url)}" target="_blank" rel="noopener" title="Liquipedia" aria-label="Liquipedia">${LIQUIPEDIA_ICON}</a>` : '';
-    view.innerHTML = `<header class="stats-detail"><h2>${escapeHtml(name)}</h2>${page}</header>
+    el.innerHTML = `<header class="stats-detail"><h2>${escapeHtml(name)}</h2>${page}</header>
       ${row(
         tiles([['Games', fmt.int(s.games)], ['Teams', fmt.int(s.teams)], ['Players', fmt.int(s.players)], ['Avg length', s.duration == null ? '–' : fmt.dur(s.duration)]]),
         section('Teams', 'teams'),
         section('Maps', 'maps'),
       )}
       <div class="stats-phases" data-part="rounds"></div>${section('Heroes', 'heroes')}${section('Games', 'games')}`;
-    renderPhases(part('rounds'), r.phases);
-    renderTable(part('teams'), { columns: [{ key: 'team', label: 'Team', html: (x) => link(hash('team', x.team), x.team) }, gamesCol, winCol], rows: r.teams, sortKey: 'games', pageSize: 10 });
-    renderTable(part('maps'), {
+    renderPhases(part(el, 'rounds'), r.phases);
+    renderTable(part(el, 'teams'), { columns: [{ key: 'team', label: 'Team', html: (x) => link(hash('team', x.team), x.team) }, gamesCol, winCol], rows: r.teams, sortKey: 'games', pageSize: 10 });
+    renderTable(part(el, 'maps'), {
       columns: [{ key: 'map', label: 'Map', html: (x) => link(hash('map', x.map), x.map) }, gamesCol, { key: 'duration', label: 'Avg length', num: true, format: fmt.dur }],
       rows: r.maps,
       sortKey: 'games',
     });
-    renderTable(part('heroes'), {
+    renderTable(part(el, 'heroes'), {
       columns: [
         { key: 'hero', label: 'Hero', sort: (x) => heroName(heroes, x.hero), html: (x) => heroCell(heroes, x.hero, hash('hero', x.hero)) },
         gamesCol, winCol,
-        { key: 'pickRate', label: 'Pick', num: true, format: fmt.pct },
-        { key: 'banRate', label: 'Ban', num: true, format: fmt.pct },
+        ...pickCols,
         ...statCols,
       ],
       rows: r.heroes,
       sortKey: 'games',
       pageSize: 10,
     });
-    renderTable(part('games'), { ...gameRows(r.games, heroes), sortDir: 1 });
+    renderTable(part(el, 'games'), { ...gameRows(r.games, heroes), sortDir: 1 });
   },
 
-  async games(stats, filters, heroes) {
-    view.innerHTML = section('Games', 'table');
-    renderTable(part('table'), {
+  async games(stats, filters, heroes, arg, el) {
+    el.innerHTML = section('Games', 'table');
+    renderTable(part(el, 'table'), {
       ...gameRows(await gameList(stats, filters), heroes),
       search: {
         placeholder: 'Event, map, team or hero',
@@ -485,7 +486,10 @@ async function fillFilters(stats, f, filters) {
 
 const PARENT_TAB = { hero: 'heroes', map: 'maps', player: 'players', team: 'teams', tournament: 'tournaments' };
 
+let renderToken = 0;
+
 async function render(stats, heroes) {
+  const token = ++renderToken;
   const filters = readFilters();
   const { tab, arg } = route();
   if (mine && (tab === 'teams' || tab === 'team' || tab === 'tournaments' || tab === 'tournament')) {
@@ -499,11 +503,17 @@ async function render(stats, heroes) {
     else a.removeAttribute('aria-current');
   }
   view.setAttribute('aria-busy', 'true');
+  view.style.minHeight = `${view.offsetHeight}px`;
+  const el = document.createElement('div');
+  el.className = 'stats-view__body';
+  view.replaceChildren(el);
   try {
-    await VIEWS[tab](stats, filters, heroes, arg);
+    await VIEWS[tab](stats, filters, heroes, arg, el);
   } catch (error) {
-    view.innerHTML = `<p class="stats-note">Could not build this view: ${escapeHtml(String(error?.message ?? error))}</p>`;
+    el.innerHTML = `<p class="stats-note">Could not build this view: ${escapeHtml(String(error?.message ?? error))}</p>`;
   }
+  if (token !== renderToken) return;
+  view.style.minHeight = '';
   view.removeAttribute('aria-busy');
 }
 
@@ -530,6 +540,7 @@ async function competitive(heroes) {
   return stats;
 }
 
+const CHECK_INTERVAL_MS = 60_000;
 const mineEls = (name) => [...root.querySelectorAll(`[data-mine-${name}]`)];
 const setText = (name, text) => mineEls(name).forEach((el) => (el.textContent = text));
 
@@ -621,7 +632,7 @@ async function myReplays(heroes) {
     await scan(source, { prune: Boolean(handle) });
     await saveSetting('lastSync', new Date().toISOString());
     mineEls('folder')[0].hidden = true;
-    await check();
+    await check({ force: true });
   };
 
   const setSyncState = (label, pending) => mineEls('sync').forEach((el) => {
@@ -629,9 +640,11 @@ async function myReplays(heroes) {
     el.classList.toggle('btn--primary', pending);
   });
   let checking = false;
-  const check = async () => {
-    if (checking || scanning) return;
+  let lastCheck = 0;
+  const check = async ({ force = false } = {}) => {
+    if (checking || scanning || (!force && Date.now() - lastCheck < CHECK_INTERVAL_MS)) return;
     checking = true;
+    lastCheck = Date.now();
     try {
       const handle = await loadSetting('folder').catch(() => null);
       if (!handle || !(await hasReadPermission(handle))) {
@@ -650,7 +663,7 @@ async function myReplays(heroes) {
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') check();
   });
-  window.addEventListener('focus', check);
+  window.addEventListener('focus', () => check());
   const pickFolder = async () => {
     if (!canPickFolder()) {
       mineEls('input')[0].click();
@@ -710,11 +723,11 @@ async function myReplays(heroes) {
 
   await Promise.all([show(await loadSummaries()), showFolder()]);
   await sync(false);
-  check();
+  check({ force: true });
 }
 
 async function main() {
-  if (mine) status.textContent = 'Loading stats…';
+  status.textContent = 'Loading stats…';
   try {
     const heroes = await loadHeroes();
     if (mine) {
@@ -724,6 +737,7 @@ async function main() {
     const stats = await competitive(heroes);
     bindFilters(stats, heroes);
     await render(stats, heroes);
+    status.textContent = '';
   } catch (error) {
     root.classList.replace('is-loading', 'is-empty');
     status.textContent = `Could not load stats: ${error?.message ?? error}`;

@@ -84,9 +84,18 @@ async function summarize(r2: R2Bucket, id: string): Promise<Summary> {
   }
 }
 
-function toParquet(table: Table): Uint8Array {
+// Rows repeat per game, so a spread sample sees only unique values and the writer skips the dictionary.
+const DICTIONARY_COLUMNS = new Set(["game_id", "date"]);
+
+function toParquet(table: Table, repeated: boolean): Uint8Array {
   return new Uint8Array(parquetWriteBuffer({
-    columnData: table.map((c) => ({ name: c.name, type: c.type as never, data: c.data as never })),
+    columnData: table.map((c) => ({
+      name: c.name,
+      type: c.type as never,
+      data: c.data as never,
+      ...(repeated && DICTIONARY_COLUMNS.has(c.name) ? { encoding: "RLE_DICTIONARY" as const } : {}),
+      ...(c.type === "INT32" && c.name.startsWith("score_") ? { encoding: "DELTA_BINARY_PACKED" as const } : {}),
+    })),
     rowGroupSize: 50_000,
   }));
 }
@@ -155,7 +164,7 @@ async function main(): Promise<void> {
 
   const files: Record<string, { key: string; bytes: Uint8Array }> = {};
   for (const name of ["games", "players", "draft"] as const) {
-    const bytes = toParquet(tables[name] as Table);
+    const bytes = toParquet(tables[name] as Table, name !== "games");
     files[name] = { key: `${name}.${hashOf(bytes)}.parquet`, bytes };
     console.log(`tables: ${files[name].key} ${(bytes.length / 1e6).toFixed(1)} MB`);
   }

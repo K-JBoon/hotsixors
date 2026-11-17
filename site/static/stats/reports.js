@@ -25,21 +25,26 @@ async function playerRows(stats, extra, filters) {
   return { cols, where: rowFilter(cols, filters) };
 }
 
+/** Games in scope; with a player filter, only games those players played. */
 async function gameCount(stats, filters) {
+  if (asList(filters.player).length) {
+    const { cols, where } = await playerRows(stats, [], filters);
+    return total(cols.length, where, distinct(cols.game_id));
+  }
   const cols = await stats.columns('games', ['game_id', ...FILTER_COLUMNS]);
   return total(cols.length, rowFilter(cols, filters), count());
 }
 
-async function banCounts(stats, filters, key = 'hero') {
-  const cols = await stats.columns('draft', ['game_id', 'kind', key, ...FILTER_COLUMNS]);
+/** Bans per hero, and the drafted games (any ban) to rate them against. */
+async function banCounts(stats, filters) {
+  const cols = await stats.columns('draft', ['game_id', 'kind', 'hero', ...FILTER_COLUMNS]);
   const inScope = rowFilter(cols, filters);
-  const rows = aggregate(cols.length, {
-    where: (i) => cols.kind[i] === 'ban' && inScope(i),
-    key: (i) => cols[key][i],
-    measures: { bans: distinct(cols.game_id) },
-  });
-  return new Map(rows.map((r) => [r.key, r.bans]));
+  const where = (i) => cols.kind[i] === 'ban' && inScope(i);
+  const rows = aggregate(cols.length, { where, key: (i) => cols.hero[i], measures: { bans: distinct(cols.game_id) } });
+  return { byHero: new Map(rows.map((r) => [r.key, r.bans])), games: total(cols.length, where, distinct(cols.game_id)) };
 }
+
+const banRate = (bans, hero) => (bans.games ? (bans.byHero.get(hero) ?? 0) / bans.games : null);
 
 export async function heroTable(stats, filters) {
   const [{ cols, where }, games, bans] = await Promise.all([
@@ -55,7 +60,7 @@ export async function heroTable(stats, filters) {
     hero: r.key,
     ...r,
     pickRate: games ? r.games / games : null,
-    banRate: games ? (bans.get(r.key) ?? 0) / games : null,
+    banRate: banRate(bans, r.key),
   }));
 }
 
@@ -88,7 +93,7 @@ export async function heroReport(stats, hero, filters) {
     summary: {
       ...summary,
       pickRate: games ? summary.games / games : null,
-      banRate: games ? (bans.get(hero) ?? 0) / games : null,
+      banRate: banRate(bans, hero),
     },
     maps: aggregate(cols.length, { where, key: (i) => cols.map[i], measures: { games: count(), winRate: rate(cols.win) } })
       .map((r) => ({ map: r.key, ...r })),
@@ -109,8 +114,10 @@ export async function mapTable(stats, filters) {
   const ownWin = own
     ? new Map(aggregate(own.cols.length, { where: own.where, key: (i) => own.cols.map[i], measures: { games: count(), winRate: rate(own.cols.win) } }).map((r) => [r.key, r]))
     : null;
+  const ownGames = own && new Set(own.cols.game_id.filter((_, i) => own.where(i)));
+  const inScope = rowFilter(cols, filters);
   return aggregate(cols.length, {
-    where: rowFilter(cols, filters),
+    where: ownGames ? (i) => ownGames.has(cols.game_id[i]) && inScope(i) : inScope,
     key: (i) => cols.map[i],
     measures: {
       games: count(),

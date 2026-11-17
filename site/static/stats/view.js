@@ -10,7 +10,7 @@ export const fmt = {
   num: (v) => (v == null ? '–' : v.toLocaleString('en-US', { maximumFractionDigits: 1 })),
   big: (v) => (v == null ? '–' : v >= 10000 ? `${(v / 1000).toFixed(1)}k` : Math.round(v).toLocaleString('en-US')),
   pct: (v) => (v == null ? '–' : `${(v * 100).toFixed(1)}%`),
-  dur: (s) => (s == null ? '–' : `${Math.floor(s / 60)}:${String(Math.round(s % 60)).padStart(2, '0')}`),
+  dur: (s) => (s == null ? '–' : `${Math.floor(Math.round(s) / 60)}:${String(Math.round(s) % 60).padStart(2, '0')}`),
   date: (iso) => (iso ? iso.slice(0, 10) : '–'),
   ago: (iso) => {
     const minutes = Math.round((Date.now() - Date.parse(iso)) / 60000);

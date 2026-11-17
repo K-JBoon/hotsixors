@@ -120,6 +120,7 @@
 
 .stats-view { display: grid; align-content: start; gap: var(--space-sm); min-height: 12rem; }
 .stats-view[aria-busy=true] { opacity: 0.6; }
+.stats-view__body { display: contents; }
 .stats-section { display: grid; gap: var(--space-xs); }
 .stats-section__title { font-size: var(--text-lg); margin: 0; }
 .stats-section .select-search { margin-bottom: var(--space-xs); }

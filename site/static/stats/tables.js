@@ -4,6 +4,9 @@
 
 const TALENT_TIERS = 7;
 const SCORE_PREFIX = 'score_';
+const INT32_MAX = 2 ** 31 - 1;
+/** Profile, event and award flags: no use as per-game stats. */
+const DROPPED_SCORE = /^(Plays|Wins|TeamWins|LunarNewYear|Starcraft|Pachimari|KilledTreasureGoblin|MetaExperience|LessThan|EndOfMatchAward(?!MVPBoolean))/;
 
 function tableBuilder(schema) {
   const columns = Object.entries(schema).map(([name, type]) => ({ name, type, data: [] }));
@@ -35,9 +38,17 @@ export function buildTables(summaries, resolve, eventOf = () => null) {
     if (reason) skipped.push({ id: s.id, reason });
     return !reason;
   });
-  const scoreKeys = new Set();
-  for (const s of usable) for (const p of s.players) for (const key of Object.keys(p.score)) scoreKeys.add(key);
-  const scoreColumns = [...scoreKeys].sort();
+  const scoreTypes = new Map();
+  for (const s of usable) {
+    for (const p of s.players) {
+      for (const [key, v] of Object.entries(p.score)) {
+        if (DROPPED_SCORE.test(key)) continue;
+        if (!scoreTypes.has(key)) scoreTypes.set(key, 'INT32');
+        if (!Number.isInteger(v) || Math.abs(v) > INT32_MAX) scoreTypes.set(key, 'DOUBLE');
+      }
+    }
+  }
+  const scoreColumns = [...scoreTypes.keys()].sort();
 
   const common = {
     game_id: 'STRING', date: 'STRING', patch: 'STRING', build: 'INT32', game_mode: 'STRING', map: 'STRING', tournament: 'STRING',
@@ -50,7 +61,7 @@ export function buildTables(summaries, resolve, eventOf = () => null) {
     ...common, team: 'INT32', slot: 'INT32', player: 'STRING', battletag: 'STRING', name: 'STRING', hero: 'STRING',
     win: 'BOOLEAN', team_name: 'STRING', opponent: 'STRING', duration_s: 'INT32',
     ...Object.fromEntries(Array.from({ length: TALENT_TIERS }, (_, i) => [`talent${i + 1}`, 'STRING'])),
-    ...Object.fromEntries(scoreColumns.map((k) => [SCORE_PREFIX + k, 'DOUBLE'])),
+    ...Object.fromEntries(scoreColumns.map((k) => [SCORE_PREFIX + k, scoreTypes.get(k)])),
   });
   const draft = tableBuilder({
     ...common, order: 'INT32', kind: 'STRING', team: 'INT32', hero: 'STRING', win: 'BOOLEAN', team_name: 'STRING',
@@ -77,7 +88,7 @@ export function buildTables(summaries, resolve, eventOf = () => null) {
         hero: heroOf(p) ?? p.heroName, win: p.win, team_name: teamNames[p.team], opponent: teamNames[1 - p.team],
         duration_s: s.durationS,
         ...Object.fromEntries(p.talents.slice(0, TALENT_TIERS).map((id, i) => [`talent${i + 1}`, id])),
-        ...Object.fromEntries(Object.entries(p.score).map(([k, v]) => [SCORE_PREFIX + k, v])),
+        ...Object.fromEntries(scoreColumns.map((k) => [SCORE_PREFIX + k, p.score[k]])),
       });
     }
     s.draft.forEach((d, order) => {
