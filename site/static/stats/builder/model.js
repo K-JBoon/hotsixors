@@ -55,9 +55,10 @@ export const splitColumn = (ref) => {
 
 export const tableOf = (from, join) => (join ? JOINS[join] : from);
 
-const paramType = (kind, i) => MEASURES[kind]?.params[i]?.replace('?', '');
+export const paramType = (kind, i) => MEASURES[kind]?.params[i]?.replace('?', '');
 
-const measureColumns = (m) => [
+/** Column refs one measure reads, its where clauses included. */
+export const measureColumns = (m) => [
   ...(m.args ?? []).flatMap((a, i) => {
     const type = paramType(m.kind, i);
     return type === 'col' ? [a] : type === 'measure' ? measureColumns(a) : [];

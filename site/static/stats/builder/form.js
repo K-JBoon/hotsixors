@@ -1,4 +1,19 @@
-import { BASES, JOINS, MAX_GROUPS, OPS, clause, splitColumn, tableOf } from './model.js';
+import {
+  BASES,
+  JOINS,
+  MAX_GROUPS,
+  MEASURES,
+  OPS,
+  WRAPPERS,
+  clause,
+  fn,
+  measure,
+  measureColumns,
+  paramType,
+  splitColumn,
+  tableOf,
+} from './model.js';
+import { printCall } from './text.js';
 import { minorOf } from '../query.js';
 import { multiSelect } from '../multi-select.js';
 import { escapeHtml } from '../view.js';
@@ -87,6 +102,72 @@ const groupField = (columns, group, colOption) =>
     )
     .join('')}</div></div>`;
 
+const KINDS = Object.keys(MEASURES).filter((k) => !WRAPPERS.includes(k));
+
+const NAME = /^[A-Za-z_]\w*$/;
+
+const autoName = (kind, taken) =>
+  [kind, ...Array.from({ length: taken.length + 1 }, (_, n) => `${kind}${n + 2}`)].find((n) => !taken.includes(n));
+
+const isAuto = (name, kind) => new RegExp(`^${kind}\\d*$`).test(name);
+
+const columnBefore = (kind, args, j) => args.slice(0, j).findLast((_, k) => paramType(kind, k) === 'col');
+
+const retypeMeasure = (columns, taken) => (prev, next) => {
+  if (prev.kind === next.kind)
+    return {
+      ...next,
+      args: next.args.map((a, j) =>
+        paramType(next.kind, j) === 'value' && columnBefore(next.kind, next.args, j) !== columnBefore(prev.kind, prev.args, j) ? '' : a,
+      ),
+    };
+  const cols = next.args.filter((_, j) => paramType(prev.kind, j) === 'col');
+  return {
+    ...next,
+    name: isAuto(next.name, prev.kind) ? autoName(next.kind, taken) : next.name,
+    args: MEASURES[next.kind].params.map((_, j) => {
+      const type = paramType(next.kind, j);
+      if (type === paramType(prev.kind, j)) return next.args[j];
+      return type === 'col' ? (cols[0] ?? columns[0]) : '';
+    }),
+  };
+};
+
+const formArgs = (m) =>
+  MEASURES[m.kind].params.map((_, j) => {
+    const a = m.args?.[j];
+    const type = paramType(m.kind, j);
+    return type === 'col' || type === 'measure' ? a : a === undefined ? '' : printed(a);
+  });
+
+const trimArgs = (args) => args.slice(0, args.findLastIndex((a) => a !== undefined) + 1);
+
+const argControl = (columns, colOption, m, i) => (a, j) => {
+  const type = paramType(m.kind, j);
+  const at = `ma${i}.${j}`;
+  const placeholder = MEASURES[m.kind].params[j].endsWith('?') ? { value: 'true', number: '1' }[type] : '';
+  if (type === 'col') {
+    const cols = columns.includes(a) ? columns : [a, ...columns];
+    return `<select class="input" name="${at}" aria-label="Column">${cols.map((col) => colOption(col, col === a)).join('')}</select>`;
+  }
+  if (type === 'value')
+    return `<input class="input" name="${at}" value="${escapeHtml(a)}" placeholder="${placeholder}" list="qb-mlist-${i}-${j}" aria-label="Value" autocomplete="off"><datalist id="qb-mlist-${i}-${j}"></datalist>`;
+  if (type === 'number')
+    return `<input class="input stats-filters__min" type="number" name="${at}" value="${escapeHtml(a)}" placeholder="${placeholder}" aria-label="Scale">`;
+  return `<input class="input" value="${escapeHtml(printCall(a))}" aria-label="Measure" disabled>`;
+};
+
+const measureRow = (columns, colOption) => (m, i) => {
+  const kinds = KINDS.includes(m.kind) ? KINDS : [m.kind, ...KINDS];
+  return `<div class="stats-query__clause" data-measure="${i}"><input class="input stats-query__name" name="mn${i}" value="${escapeHtml(
+    m.name,
+  )}" aria-label="Name" autocomplete="off" spellcheck="false"><select class="input" name="mk${i}" aria-label="Measure">${kinds
+    .map((k) => option(k, k, k === m.kind))
+    .join('')}</select>${m.args
+    .map(argControl(columns, colOption, m, i))
+    .join('')}<button class="btn stats-query__btn" type="button" data-remove-measure="${i}" aria-label="Remove">×</button></div>`;
+};
+
 const valueControl = (c, i) =>
   c.op === 'in'
     ? `<div data-multi="w${i}" aria-label="Values"></div>`
@@ -102,29 +183,35 @@ const clauseRow = (columns, colOption) => (c, i) => {
 };
 
 /**
- * Form for the base table, joins, where clauses and group-by columns of a
- * query. `show(q)` draws it; edits call `onChange({ from, joins, where, group })`.
- * Rows without a value stay in the form only. `values(table, col)` resolves to
- * `columnValues`.
+ * Form for the base table, joins, where clauses, group-by columns and measures
+ * of a query. `show(q)` draws it; edits call `onChange({ from, joins, where, group, measures })`.
+ * Where rows without a value and measures without a valid unique name stay in
+ * the form only. `values(table, col)` resolves to `columnValues`.
  */
 export function builderForm(el, { names, values, label = (col, v) => printed(v), columnLabel = (col) => col, onChange }) {
-  let state = { from: 'players', joins: [], rows: [], group: [] };
+  let state = { from: 'players', joins: [], rows: [], group: [], measures: [] };
   const colOption = columnOption(columnLabel);
   const valuesOf = (ref) => {
     const { join, col } = splitColumn(ref);
     return values(tableOf(state.from, join), col);
   };
 
+  const optionsOf = (ref) =>
+    valuesOf(ref).then(({ values: list }) => {
+      const { col } = splitColumn(ref);
+      return { list, col, opts: list.map((v) => ({ value: printed(v), label: label(col, v) })) };
+    });
+
+  const fillList = (id, ref) =>
+    optionsOf(ref).then(({ opts }) => {
+      el.querySelector(`#${id}`).innerHTML = opts.map((o) => option(o.value, o.label)).join('');
+    });
+
   const fillValues = (c, i) => {
-    const picker = c.op === 'in' ? multiSelect(el.querySelector(`[data-multi="w${i}"]`), { allLabel: 'Pick' }) : null;
-    picker?.setOptions(c.value.map((v) => ({ value: v, label: v })), c.value);
-    return valuesOf(c.col).then(({ values: list }) => {
-      const { col } = splitColumn(c.col);
-      const opts = list.map((v) => ({ value: printed(v), label: label(col, v) }));
-      if (!picker) {
-        el.querySelector(`#qb-list-${i}`).innerHTML = opts.map((o) => option(o.value, o.label)).join('');
-        return;
-      }
+    if (c.op !== 'in') return fillList(`qb-list-${i}`, c.col);
+    const picker = multiSelect(el.querySelector(`[data-multi="w${i}"]`), { allLabel: 'Pick' });
+    picker.setOptions(c.value.map((v) => ({ value: v, label: v })), c.value);
+    return optionsOf(c.col).then(({ list, col, opts }) => {
       const minors = col === 'patch' && list.length;
       picker.setOptions(
         minors ? opts.map((o) => ({ ...o, group: minorOf(o.value) })) : opts,
@@ -134,16 +221,34 @@ export function builderForm(el, { names, values, label = (col, v) => printed(v),
     });
   };
 
+  const fillMeasure = (m, i) =>
+    m.args.forEach((_, j) => paramType(m.kind, j) === 'value' && fillList(`qb-mlist-${i}-${j}`, columnBefore(m.kind, m.args, j)));
+
   const draw = () => {
     const columns = columnsOf(names, state.from, state.joins);
     el.innerHTML = `${fromField(state.from)}${joinField()}${groupField(columns, state.group, colOption)}${state.rows
       .map(clauseRow(columns, colOption))
-      .join('')}<button class="btn stats-query__btn" type="button" data-add>+ Where</button>`;
+      .join('')}<button class="btn stats-query__btn" type="button" data-add="where">+ Where</button><div class="stats-filters__field stats-query__measures"><span>Measure</span>${state.measures
+      .map(measureRow(columns, colOption))
+      .join('')}<button class="btn stats-query__btn" type="button" data-add="measure">+ Measure</button></div>`;
     multiSelect(el.querySelector('[data-multi="joins"]'), { allLabel: 'None' }).setOptions(
       BASES[state.from].map((j) => ({ value: j, label: j })),
       state.joins,
     );
     state.rows.forEach(fillValues);
+    state.measures.forEach(fillMeasure);
+  };
+
+  const readMeasures = (data, columns) => {
+    const read = state.measures.map((prev, i) => ({
+      ...prev,
+      name: String(data.get(`mn${i}`) ?? '').trim(),
+      kind: String(data.get(`mk${i}`) ?? prev.kind),
+      args: prev.args.map((a, j) => (paramType(prev.kind, j) === 'measure' ? a : String(data.get(`ma${i}.${j}`) ?? ''))),
+    }));
+    return read.map((next, i) =>
+      retypeMeasure(columns, read.filter((_, k) => k !== i).map((m) => m.name))(state.measures[i], next),
+    );
   };
 
   const read = () => {
@@ -154,10 +259,11 @@ export function builderForm(el, { names, values, label = (col, v) => printed(v),
       return retype(prev, clause(String(data.get(`c${i}`)), String(data.get(`o${i}`)), raw));
     });
     const group = groupSlots(state.group).map((_, i) => String(data.get(`g${i}`) ?? '')).filter(Boolean);
-    return { from, joins: data.getAll('joins').map(String), rows, group };
+    const joins = data.getAll('joins').map(String);
+    return { from, joins, rows, group, measures: readMeasures(data, columnsOf(names, from, joins)) };
   };
 
-  const normalize = ({ from, joins, rows, group }) => {
+  const normalize = ({ from, joins, rows, group, measures }) => {
     const allowed = joins.filter((j) => BASES[from].includes(j));
     const columns = columnsOf(names, from, allowed);
     return {
@@ -165,10 +271,14 @@ export function builderForm(el, { names, values, label = (col, v) => printed(v),
       joins: allowed,
       rows: rows.filter((c) => columns.includes(c.col)),
       group: [...new Set(group)].filter((g) => columns.includes(g)).slice(0, MAX_GROUPS),
+      measures: measures.filter((m) => MEASURES[m.kind] && measureColumns(m).every((c) => columns.includes(c))),
     };
   };
 
-  const shape = (s) => JSON.stringify([s.from, s.joins, s.rows.map((c) => [c.col, c.op]), s.group]);
+  const measureShape = (m) => [m.kind, m.args.filter((_, j) => paramType(m.kind, j) === 'col')];
+
+  const shape = (s) =>
+    JSON.stringify([s.from, s.joins, s.rows.map((c) => [c.col, c.op]), s.group, s.measures.map(measureShape)]);
 
   const typed = (c) =>
     valuesOf(c.col).then(({ type }) => ({
@@ -176,10 +286,24 @@ export function builderForm(el, { names, values, label = (col, v) => printed(v),
       value: c.op === 'in' ? c.value.map((v) => coerce(type, v)) : coerce(type, c.value),
     }));
 
+  const typedArg = (m) => (a, j) => {
+    const type = paramType(m.kind, j);
+    if (type === 'number') return a.trim() === '' ? undefined : Number(a);
+    if (type !== 'value') return a;
+    return a.trim() === '' ? undefined : valuesOf(columnBefore(m.kind, m.args, j)).then(({ type: t }) => coerce(t, a));
+  };
+
+  const typedMeasure = async (m) => measure(m.name, fn(m.kind, trimArgs(await Promise.all(m.args.map(typedArg(m)))), m.where));
+
+  const named = (m, i, all) => NAME.test(m.name) && all.findIndex((o) => o.name === m.name) === i;
+
   const emit = async () => {
     const snapshot = state;
-    const where = await Promise.all(snapshot.rows.filter(complete).map(typed));
-    if (snapshot === state) onChange({ from: state.from, joins: state.joins, where, group: state.group });
+    const [where, measures] = await Promise.all([
+      Promise.all(snapshot.rows.filter(complete).map(typed)),
+      Promise.all(snapshot.measures.filter(named).map(typedMeasure)),
+    ]);
+    if (snapshot === state) onChange({ from: state.from, joins: state.joins, where, group: state.group, measures });
   };
 
   const update = (next) => {
@@ -198,19 +322,23 @@ export function builderForm(el, { names, values, label = (col, v) => printed(v),
   });
   el.addEventListener('submit', (e) => e.preventDefault());
   el.addEventListener('click', (e) => {
-    const btn = e.target.closest('[data-add], [data-remove]');
+    const btn = e.target.closest('[data-add], [data-remove], [data-remove-measure]');
     if (!btn) return;
     const current = read();
-    if (btn.dataset.add != null) {
+    const { add, remove, removeMeasure } = btn.dataset;
+    if (add === 'where') {
       const col = columnsOf(names, current.from, current.joins)[0];
       state = { ...current, rows: [...current.rows, clause(col, '=', '')] };
-      draw();
-      return;
+    } else if (add === 'measure') {
+      const name = autoName('count', current.measures.map((m) => m.name));
+      state = { ...current, measures: [...current.measures, { name, kind: 'count', args: [], where: [] }] };
+    } else if (remove != null) {
+      state = { ...current, rows: current.rows.filter((_, j) => j !== Number(remove)) };
+    } else {
+      state = { ...current, measures: current.measures.filter((_, j) => j !== Number(removeMeasure)) };
     }
-    const i = Number(btn.dataset.remove);
-    state = { ...current, rows: current.rows.filter((_, j) => j !== i) };
     draw();
-    emit();
+    if (add !== 'where') emit();
   });
 
   return {
@@ -220,6 +348,9 @@ export function builderForm(el, { names, values, label = (col, v) => printed(v),
         joins: q.joins,
         rows: q.where.map((c) => ({ ...c, value: c.op === 'in' ? c.value.map(printed) : printed(c.value) })),
         group: q.group,
+        measures: q.measures
+          .filter((m) => MEASURES[m.kind])
+          .map((m) => ({ name: m.name, kind: m.kind, args: formArgs(m), where: m.where ?? [] })),
       });
       draw();
     },
