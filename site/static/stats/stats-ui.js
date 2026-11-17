@@ -391,6 +391,8 @@ const queryResult = async (stats, text) => {
   }
 };
 
+const STAT_LABELS = new Map(STAT_COLUMNS.filter((s) => !s.per).map((s) => [s.col, s.label]));
+
 const parsed = (text) => {
   try {
     return parseQuery(text);
@@ -474,6 +476,7 @@ const VIEWS = {
       names: await tableNames(stats),
       values: (table, col) => columnValues(stats, table, col),
       label: (col, v) => (col === 'hero' ? heroName(heroes, v) : String(v)),
+      columnLabel: (col) => STAT_LABELS.get(col) ?? col,
       onChange: (source) => {
         last = { ...(parsed(input.value) ?? last), ...source };
         const text = printQuery(last);

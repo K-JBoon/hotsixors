@@ -1,4 +1,4 @@
-import { BASES, JOINS, OPS, clause, splitColumn, tableOf } from './model.js';
+import { BASES, JOINS, MAX_GROUPS, OPS, clause, splitColumn, tableOf } from './model.js';
 import { minorOf } from '../query.js';
 import { multiSelect } from '../multi-select.js';
 import { escapeHtml } from '../view.js';
@@ -55,6 +55,11 @@ const retype = (prev, next) => {
 const option = (value, label, selected) =>
   `<option value="${escapeHtml(value)}"${selected ? ' selected' : ''}>${escapeHtml(label)}</option>`;
 
+const columnOption = (columnLabel) => (ref, selected) => {
+  const { join, col } = splitColumn(ref);
+  return option(ref, join ? `${join}.${columnLabel(col)}` : columnLabel(col), selected);
+};
+
 const printed = (v) => (v == null ? 'null' : String(v));
 
 const fromField = (from) =>
@@ -70,27 +75,41 @@ const fromField = (from) =>
 const joinField = () =>
   `<div class="stats-filters__field"><span id="qb-joins">Join</span><div data-multi="joins" aria-labelledby="qb-joins"></div></div>`;
 
+const groupSlots = (group) => (group.length < MAX_GROUPS ? [...group, ''] : group);
+
+const groupField = (columns, group, colOption) =>
+  `<div class="stats-filters__field"><span id="qb-group">Group</span><div class="stats-query__clause stats-query__group">${groupSlots(group)
+    .map(
+      (g, i) =>
+        `<select class="input" name="g${i}" aria-labelledby="qb-group">${option('', 'None', !g)}${columns
+          .map((col) => colOption(col, col === g))
+          .join('')}</select>`,
+    )
+    .join('')}</div></div>`;
+
 const valueControl = (c, i) =>
   c.op === 'in'
     ? `<div data-multi="w${i}" aria-label="Values"></div>`
     : `<input class="input" name="w${i}" value="${escapeHtml(c.value === '' ? '' : printed(c.value))}" list="qb-list-${i}" aria-label="Value" autocomplete="off"><datalist id="qb-list-${i}"></datalist>`;
 
-const clauseRow = (columns) => (c, i) => {
+const clauseRow = (columns, colOption) => (c, i) => {
   const cols = columns.includes(c.col) ? columns : [c.col, ...columns];
   return `<div class="stats-query__clause" data-clause="${i}"><select class="input" name="c${i}" aria-label="Column">${cols
-    .map((col) => option(col, col, col === c.col))
+    .map((col) => colOption(col, col === c.col))
     .join('')}</select><select class="input" name="o${i}" aria-label="Operator">${OPS.map((op) => option(op, op, op === c.op)).join(
     '',
   )}</select>${valueControl(c, i)}<button class="btn stats-query__btn" type="button" data-remove="${i}" aria-label="Remove">×</button></div>`;
 };
 
 /**
- * Form for the base table, joins and where clauses of a query. `show(q)` draws
- * it; edits call `onChange({ from, joins, where })`. Rows without a value stay
- * in the form only. `values(table, col)` resolves to `columnValues`.
+ * Form for the base table, joins, where clauses and group-by columns of a
+ * query. `show(q)` draws it; edits call `onChange({ from, joins, where, group })`.
+ * Rows without a value stay in the form only. `values(table, col)` resolves to
+ * `columnValues`.
  */
-export function builderForm(el, { names, values, label = (col, v) => printed(v), onChange }) {
-  let state = { from: 'players', joins: [], rows: [] };
+export function builderForm(el, { names, values, label = (col, v) => printed(v), columnLabel = (col) => col, onChange }) {
+  let state = { from: 'players', joins: [], rows: [], group: [] };
+  const colOption = columnOption(columnLabel);
   const valuesOf = (ref) => {
     const { join, col } = splitColumn(ref);
     return values(tableOf(state.from, join), col);
@@ -117,7 +136,9 @@ export function builderForm(el, { names, values, label = (col, v) => printed(v),
 
   const draw = () => {
     const columns = columnsOf(names, state.from, state.joins);
-    el.innerHTML = `${fromField(state.from)}${joinField()}${state.rows.map(clauseRow(columns)).join('')}<button class="btn stats-query__btn" type="button" data-add>+ Where</button>`;
+    el.innerHTML = `${fromField(state.from)}${joinField()}${groupField(columns, state.group, colOption)}${state.rows
+      .map(clauseRow(columns, colOption))
+      .join('')}<button class="btn stats-query__btn" type="button" data-add>+ Where</button>`;
     multiSelect(el.querySelector('[data-multi="joins"]'), { allLabel: 'None' }).setOptions(
       BASES[state.from].map((j) => ({ value: j, label: j })),
       state.joins,
@@ -132,16 +153,22 @@ export function builderForm(el, { names, values, label = (col, v) => printed(v),
       const raw = prev.op === 'in' ? data.getAll(`w${i}`).map(String) : String(data.get(`w${i}`) ?? '');
       return retype(prev, clause(String(data.get(`c${i}`)), String(data.get(`o${i}`)), raw));
     });
-    return { from, joins: data.getAll('joins').map(String), rows };
+    const group = groupSlots(state.group).map((_, i) => String(data.get(`g${i}`) ?? '')).filter(Boolean);
+    return { from, joins: data.getAll('joins').map(String), rows, group };
   };
 
-  const normalize = ({ from, joins, rows }) => {
+  const normalize = ({ from, joins, rows, group }) => {
     const allowed = joins.filter((j) => BASES[from].includes(j));
     const columns = columnsOf(names, from, allowed);
-    return { from, joins: allowed, rows: rows.filter((c) => columns.includes(c.col)) };
+    return {
+      from,
+      joins: allowed,
+      rows: rows.filter((c) => columns.includes(c.col)),
+      group: [...new Set(group)].filter((g) => columns.includes(g)).slice(0, MAX_GROUPS),
+    };
   };
 
-  const shape = (s) => JSON.stringify([s.from, s.joins, s.rows.map((c) => [c.col, c.op])]);
+  const shape = (s) => JSON.stringify([s.from, s.joins, s.rows.map((c) => [c.col, c.op]), s.group]);
 
   const typed = (c) =>
     valuesOf(c.col).then(({ type }) => ({
@@ -152,7 +179,7 @@ export function builderForm(el, { names, values, label = (col, v) => printed(v),
   const emit = async () => {
     const snapshot = state;
     const where = await Promise.all(snapshot.rows.filter(complete).map(typed));
-    if (snapshot === state) onChange({ from: state.from, joins: state.joins, where });
+    if (snapshot === state) onChange({ from: state.from, joins: state.joins, where, group: state.group });
   };
 
   const update = (next) => {
@@ -188,7 +215,12 @@ export function builderForm(el, { names, values, label = (col, v) => printed(v),
 
   return {
     show(q) {
-      state = normalize({ from: q.from, joins: q.joins, rows: q.where.map((c) => ({ ...c, value: c.op === 'in' ? c.value.map(printed) : printed(c.value) })) });
+      state = normalize({
+        from: q.from,
+        joins: q.joins,
+        rows: q.where.map((c) => ({ ...c, value: c.op === 'in' ? c.value.map(printed) : printed(c.value) })),
+        group: q.group,
+      });
       draw();
     },
   };

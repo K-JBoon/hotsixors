@@ -280,7 +280,7 @@
 .stats-query__saved { padding: 0; }
 .stats-query__form { margin-block-end: var(--space-xs); }
 .stats-query__clause { display: flex; gap: var(--space-3xs); align-items: end; }
-.stats-query__clause select:first-child { inline-size: 12rem; }
+.stats-query__clause select:first-child, .stats-query__group select { inline-size: 12rem; }
 .stats-query__btn { block-size: 2.25rem; }
 .stats-query__saved button { padding: var(--space-3xs) var(--space-xs); background: none; border: 0; color: inherit; font: inherit; cursor: pointer; }
 .stats-query__saved button + button { padding-inline-start: 0; opacity: 0.6; }
