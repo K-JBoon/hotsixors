@@ -935,6 +935,12 @@ background: color-mix(in srgb, var(--seg-color, var(--text-muted)) 28%, transpar
   font-size: var(--text-sm);
 }
 
+.replay-feed-warn {
+  margin: 0;
+  padding: var(--space-2xs) var(--space-sm);
+  border-bottom: 1px solid var(--hairline-strong);
+}
+
 .replay-feed-filters {
   display: flex;
   flex-direction: column;

@@ -72,10 +72,10 @@ function loadAbilLinkIndex(build) {
 }
 async function fetchAbilLinkIndex(build) {
   const index = await fetchJson('/replay/abillinks/index.json', null);
-  if (!index || !index.builds.length) return {};
+  if (!index || !index.builds.length) return { links: {}, exact: false };
   const older = index.builds.filter((b) => b <= build);
   const pick = older.length ? older[older.length - 1] : index.builds[0];
-  return fetchJson(`/replay/abillinks/${pick}.json`, {});
+  return { links: await fetchJson(`/replay/abillinks/${pick}.json`, {}), exact: pick === build };
 }
 function viewRect(model, mapMeta) {
   if (mapMeta) {
@@ -121,7 +121,7 @@ async function handleFiles(files) {
       const hash = await contentHash(buffer);
       const { analyzeReplay, MPQArchive } = await loadParser();
       const model = await analyzeReplay(new MPQArchive(buffer));
-      const abilLinkIndex = await loadAbilLinkIndex(model.baseBuild ?? model.build ?? 0);
+      const { links: abilLinkIndex, exact: abilLinkExact } = await loadAbilLinkIndex(model.baseBuild ?? model.build ?? 0);
       if (!findEntry(entry.id)) continue; // removed while it was parsing
       const twin = findByHash(hash, entry.id);
       if (twin) {
@@ -131,7 +131,7 @@ async function handleFiles(files) {
         continue;
       }
       entry.hash = hash;
-      entry.viewer = buildViewer(model, { ...data, abilLinkIndex });
+      entry.viewer = buildViewer(model, { ...data, abilLinkIndex, abilLinkExact });
       entry.card = buildCard(model, entry.viewer.mapMeta, data.draftData);
       entry.status = 'ready';
     } catch (err) {
@@ -207,7 +207,7 @@ function startClock() {
   requestAnimationFrame(tick);
 }
 
-function buildViewer(model, { draftData, shortcodeData, mapsData, footprints, abilLinkIndex, movementAbilities, heroUnits, minimapIcons, summons }) {
+function buildViewer(model, { draftData, shortcodeData, mapsData, footprints, abilLinkIndex, abilLinkExact, movementAbilities, heroUnits, minimapIcons, summons }) {
   const players = model.players;
   const movementLinks = movementLinkSet(abilLinkIndex, movementAbilities);
   const hearthLinks = hearthLinkSet(abilLinkIndex);
@@ -298,6 +298,7 @@ function buildViewer(model, { draftData, shortcodeData, mapsData, footprints, ab
     walkGrid: null, // same mask's walkability bit; paths are straight until it loads
     movementLinks,
     hearthLinks,
+    abilLinkExact,
   };
   // These finish whenever they finish; only redraw if this replay is the one on screen.
   const redraw = () => {
@@ -448,6 +449,7 @@ function renderShell() {
           <span data-feed-title>All events</span>
           <button class="btn btn--sm" data-clear-select hidden>Show all</button>
         </div>
+        ${state.abilLinkExact ? '' : `<p class="replay-note replay-feed-warn">No ability data for patch ${model.baseBuild ?? model.build ?? '?'}. Ability names may be wrong.</p>`}
         <div class="replay-feed-filters">
           <div class="feed-filter-row" data-kind-row>
             <button class="chip feed-filter feed-filter--all" data-kind-all>None</button>
