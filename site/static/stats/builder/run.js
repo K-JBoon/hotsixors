@@ -1,4 +1,4 @@
-import { aggregate, total, distinct } from '../query.js';
+import { aggregate, distinct } from '../query.js';
 import { METRICS, WRAPPERS, clauseTest, validateQuery, queryColumns } from './model.js';
 import { joinView, tableNames } from './join.js';
 
@@ -66,6 +66,8 @@ const aggregateBy = (length, where, key, metrics, make) =>
 
 const shareOf = (games) => (v) => ({ value: games && valueOf(v) != null ? valueOf(v) / games : null, n: sizeOf(v) ?? games });
 
+const radixOf = (codes) => codes.reduce((n, d) => n * d.values.length, 1);
+
 const deltaOf = (v, base) => ({
   value: valueOf(v) == null || valueOf(base) == null ? null : valueOf(v) - valueOf(base),
   n: sizeOf(v),
@@ -82,13 +84,15 @@ const compare = ({ by, dir = 'desc' }) => {
 };
 
 /**
- * Runs a query object over a stats source. `columns` lists dimension refs then
- * metric names; each row holds one value per column. Null dimension values form
- * their own group. Sized metrics hold `{ value, n }`. Sort reads `value`,
- * puts nulls last, and `dir` defaults to `desc`.
+ * Runs a query object over a stats source. `columns` lists the facet ref, if
+ * any, then dimension refs, then metric names; each row holds one value per
+ * column. Null dimension and facet values form their own group. Sized metrics
+ * hold `{ value, n }`. Sort reads `value`, puts nulls last, and `dir` defaults
+ * to `desc`. With a facet, sort and limit apply per facet value.
  * `share` divides its inner metric by the distinct `game_id` count of the
- * filtered rows. `delta` subtracts its inner metric grouped by every dimension
- * except the last. Both yield `{ value, n }` with `n` from the inner metric.
+ * filtered rows in its facet value. `delta` subtracts its inner metric grouped
+ * by the facet and every dimension except the last. Both yield `{ value, n }`
+ * with `n` from the inner metric.
  */
 export async function runQuery(stats, q) {
   const errors = validateQuery(q, await tableNames(stats));
@@ -96,19 +100,26 @@ export async function runQuery(stats, q) {
   const kinds = new Set(q.metrics.map((m) => m.kind));
   const refs = queryColumns(q);
   const { length, column } = await joinView(stats, q, kinds.has('share') ? [...new Set([...refs, 'game_id'])] : refs);
-  const codes = q.dimensions.map((ref) => encode(column(ref), length));
-  const { key, split } = groupKey(q.dimensions, codes);
+  const panels = q.facet == null ? 0 : 1;
+  const keys = panels ? [q.facet, ...q.dimensions] : q.dimensions;
+  const codes = keys.map((ref) => encode(column(ref), length));
+  const { key, split } = groupKey(keys, codes);
+  const panelOf = (k) => Math.floor(k / radixOf(codes.slice(panels)));
   const where = rowTest(q.where, column);
   const make = build(column);
   const groups = aggregateBy(length, where, key, q.metrics, make);
-  const share = kinds.has('share') ? shareOf(total(length, where, distinct(column('game_id')))) : null;
+  const panelKey = groupKey(keys.slice(0, panels), codes.slice(0, panels)).key;
+  const games = kinds.has('share')
+    ? new Map(aggregate(length, { where, key: panelKey, measures: { v: distinct(column('game_id')) } }).map(({ key: k, v }) => [k, v]))
+    : null;
   const deltas = q.metrics.filter((m) => m.kind === 'delta');
-  const parent = groupKey(q.dimensions.slice(0, -1), codes.slice(0, -1));
-  const radix = codes.at(-1)?.values.length ?? 1;
+  const depth = Math.max(keys.length - 1, panels);
+  const parent = groupKey(keys.slice(0, depth), codes.slice(0, depth));
+  const radix = radixOf(codes.slice(depth));
   const baseline = deltas.length ? aggregateBy(length, where, parent.key, deltas, make) : null;
   const finish = (k, values) => (m) => {
     const v = values[m.name];
-    if (m.kind === 'share') return share(v);
+    if (m.kind === 'share') return shareOf(games.get(panelOf(k)) ?? 0)(v);
     if (m.kind === 'delta') return deltaOf(v, baseline.get(Math.floor(k / radix))?.[m.name]);
     return v;
   };
@@ -116,9 +127,12 @@ export async function runQuery(stats, q) {
     ...split(k),
     ...Object.fromEntries(q.metrics.map((m) => [m.name, finish(k, values)(m)])),
   }));
-  const sorted = q.sort ? rows.sort(compare(q.sort)) : rows;
+  const cut = (rs) => {
+    const sorted = q.sort ? rs.sort(compare(q.sort)) : rs;
+    return q.limit ? sorted.slice(0, q.limit) : sorted;
+  };
   return {
-    columns: [...q.dimensions, ...q.metrics.map((m) => m.name)],
-    rows: q.limit ? sorted.slice(0, q.limit) : sorted,
+    columns: [...keys, ...q.metrics.map((m) => m.name)],
+    rows: panels ? [...Map.groupBy(rows, (r) => r[q.facet]).values()].flatMap(cut) : cut(rows),
   };
 }
