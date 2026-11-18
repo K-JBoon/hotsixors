@@ -424,7 +424,9 @@ body.is-dragging-file .stats-page:not(.is-empty)::after {
 .stats-chart__swatch { inline-size: 0.75rem; block-size: 3px; border-radius: var(--radius-pill); background: var(--series); }
 .stats-chart--heatmap { grid-template-columns: max-content minmax(calc(var(--cols) * 1.5rem), calc(var(--cols) * 4rem)); grid-template-rows: auto auto; grid-auto-rows: minmax(1.5rem, 1fr); overflow-x: auto; padding-inline-end: calc(var(--name) / 2); }
 .stats-chart--heatmap .stats-chart__plot { grid-row: 3 / span var(--rows); block-size: auto; aspect-ratio: var(--cols) / var(--rows); }
-.stats-chart--heatmap .stats-chart__label { display: flex; }
+.stats-chart--heatmap .stats-chart__label { display: flex; max-inline-size: 10rem; }
+.stats-chart--heatmap .stats-chart__label :is(.stats-hero, .stats-hero a) { min-inline-size: 0; }
+.stats-chart--heatmap .stats-chart__label .stats-hero span { overflow: hidden; text-overflow: ellipsis; }
 .stats-chart--heatmap .stats-portrait { width: 1.25rem; height: 1.25rem; }
 .stats-chart__key { inline-size: max(100%, 10rem); }
 .stats-chart__scale { block-size: 0.5rem; border-radius: var(--radius-sm); }
@@ -435,6 +437,3 @@ body.is-dragging-file .stats-page:not(.is-empty)::after {
 .stats-chart__cell { stroke: var(--bg-deep); }
 .stats-chart__labels { pointer-events: none; fill: var(--text-bright); stroke: var(--bg-deep); stroke-width: 3px; stroke-linejoin: round; paint-order: stroke; font-size: var(--text-2xs); font-variant-numeric: tabular-nums; text-anchor: middle; dominant-baseline: central; }
 .stats-facets { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--facet-min)), 1fr)); gap: var(--space-md); align-items: start; }
-@container (max-width: 36rem) {
-  .stats-chart--heatmap .stats-hero span { display: none; }
-}
