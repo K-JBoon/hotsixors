@@ -13,6 +13,7 @@ import { EXAMPLES } from './builder/examples.js';
 import { SCORE_LABELS } from './builder/docs.js';
 import { renderResult } from './builder/render.js';
 import { schemaRail } from './builder/schema.js';
+import { referenceRail } from './builder/reference.js';
 import {
   STAT_COLUMNS, available, facets, gameList, tournamentReport, tournamentTable, heroReport, mapReport, heroTable, mapTable, playerReport, playerTable, teamReport, teamTable,
 } from './reports.js';
@@ -424,7 +425,7 @@ const VIEWS = {
   async query(stats, filters, heroes, text, el) {
     if (text) queryText = text;
     else history.replaceState(null, '', queryHash(queryText));
-    el.innerHTML = `<div class="stats-layout"><section class="stats-section"><div class="stats-query__bar" data-part="examples"></div><div class="stats-query__bar"><input class="input" data-name placeholder="Name" aria-label="Name"><button class="btn" type="button" data-save>Save</button><span class="stats-query__list" data-part="saved"></span></div><div class="stats-filters stats-query__form"><form class="stats-query__controls" data-part="builder"></form><div class="stats-query__editor"><textarea class="input stats-query__text" rows="4" spellcheck="false" aria-label="Query"></textarea><div data-part="note"></div></div></div></section><div class="stats-layout__cols"><div class="stats-content"><div data-part="out"></div></div><aside class="stats-rail stats-query__rail"><section class="stats-section"><h2 class="stats-section__title">Schema</h2><div data-part="schema"></div></section></aside></div></div>`;
+    el.innerHTML = `<div class="stats-layout"><section class="stats-section"><div class="stats-query__bar" data-part="examples"></div><div class="stats-query__bar"><input class="input" data-name placeholder="Name" aria-label="Name"><button class="btn" type="button" data-save>Save</button><span class="stats-query__list" data-part="saved"></span></div><div class="stats-filters stats-query__form"><form class="stats-query__controls" data-part="builder"></form><div class="stats-query__editor"><textarea class="input stats-query__text" rows="4" spellcheck="false" aria-label="Query"></textarea><div data-part="note"></div></div></div></section><div class="stats-layout__cols"><div class="stats-content"><div data-part="out"></div></div><aside class="stats-rail stats-query__rail"><section class="stats-section"><h2 class="stats-section__title">Schema</h2><div data-part="schema"></div></section><section class="stats-section"><h2 class="stats-section__title">Reference</h2><div data-part="reference"></div></section></aside></div></div>`;
     const input = el.querySelector('textarea');
     const fit = () => (input.rows = Math.max(4, input.value.split('\n').length));
     const name = el.querySelector('[data-name]');
@@ -464,6 +465,7 @@ const VIEWS = {
     let form;
     const names = await tableNames(stats);
     const mark = schemaRail(part(el, 'schema'), names);
+    referenceRail(part(el, 'reference'));
     const setLast = (q) => {
       last = q;
       mark(q);

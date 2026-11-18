@@ -302,6 +302,9 @@
 .stats-query__table.is-active { border-color: var(--gold-line); }
 .stats-query__table.is-active > details > summary > code, .stats-query__joins .is-active > code { color: var(--accent-gold); }
 .stats-query__joins .is-thin { opacity: 0.5; }
+.stats-query__ref { grid-template-columns: minmax(0, 1fr); }
+.stats-query__ref dd + dt { margin-block-start: var(--space-2xs); }
+.stats-query__example { margin: var(--space-3xs) 0 0; padding: var(--space-2xs) var(--space-xs); background: var(--bg-panel); border-radius: var(--radius-sm); color: var(--text-primary); white-space: pre-wrap; }
 .stats-query__saved button { padding: var(--space-3xs) var(--space-xs); background: none; border: 0; color: inherit; font: inherit; cursor: pointer; }
 .stats-query__saved button + button { padding-inline-start: 0; opacity: 0.6; }
 .stats-query__saved button + button:hover { opacity: 1; }
