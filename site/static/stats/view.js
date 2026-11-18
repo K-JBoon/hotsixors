@@ -55,8 +55,19 @@ export function winRateCell(v, games) {
   return `<span class="stats-wr${tone}" title="95% interval ${fmt.pct(lo)}–${fmt.pct(hi)}" style="--lo: ${at(lo)}; --hi: ${at(hi)}">${fmt.pct(v)}</span>`;
 }
 
+/** Marks only when some value passes `test`, so an all-thin set stays plain. */
+export const unlessAll = (test) => (xs) => (xs.every(test) ? () => false : test);
+
 const thin = (n) => typeof n === 'number' && n < THIN_GAMES;
-export const thinOf = (counts) => (counts.every(thin) ? () => false : thin);
+export const thinOf = unlessAll(thin);
+
+const RATE_KINDS = ['rate', 'share', 'delta'];
+
+/** 95% interval half-width at p = 0.5 over `n` trials. */
+const halfWidth = (n, z = 1.96) => z / (2 * Math.sqrt(n));
+
+/** Rates, shares and deltas are low sample when the half-width exceeds 10 pp; other metrics below `THIN_GAMES`. */
+export const lowSample = (kind, n) => typeof n === 'number' && (RATE_KINDS.includes(kind) ? halfWidth(n) > 0.1 : n < THIN_GAMES);
 
 let heroIndex = null;
 /** Hero slug → `{ name, portrait }` from the draft tool's data. */
@@ -142,15 +153,21 @@ document.addEventListener('keydown', (e) => {
   setQuery(next);
 });
 
+const rowThin = (count) => (rows) => {
+  const dim = thinOf(rows.map(count));
+  return (_, r) => dim(count(r));
+};
+
 /**
  * Sortable table. `columns`: `{ key, label, title, html(row) | format, num, shrink, sort(row, dir) }`;
- * `shrink` sizes the column to its content. Rows whose `count` is under THIN_GAMES are dimmed.
+ * `shrink` sizes the column to its content. Rows whose `count` is under THIN_GAMES are dimmed;
+ * `thin(shownRows)` returns a `(column, row)` cell test that overrides it, dimming rows with any thin cell.
  * Clicking a header re-sorts in place. Rows beyond `pageSize` go to further pages.
  * `search: { placeholder, key, text(row) }` adds a filter box when rows span several pages or a query is active;
  * typing anywhere on the page fills the last focused one. The query, saved under `key` (default `placeholder`), survives re-renders until the hash changes.
  * `onSort(key, dir)` runs after a header click.
  */
-export function renderTable(container, { columns, rows, sortKey, sortDir = -1, pageSize = 20, split = Infinity, empty, search, onSort, count = (r) => r.games }) {
+export function renderTable(container, { columns, rows, sortKey, sortDir = -1, pageSize = 20, split = Infinity, empty, search, onSort, count = (r) => r.games, thin = rowThin(count) }) {
   empty ??= 'No games match these filters.';
   let key = columns.some((c) => c.key === sortKey) ? sortKey : columns[0].key;
   let dir = sortDir;
@@ -211,10 +228,10 @@ export function renderTable(container, { columns, rows, sortKey, sortDir = -1, p
     const pages = Math.max(1, Math.ceil(sorted.length / size));
     page = Math.min(page, pages - 1);
     const start = page * size;
-    const dim = thinOf(sorted.map(count));
+    const dim = thin(sorted);
     const trs = sorted
       .slice(start, start + size)
-      .map((r) => `<tr${dim(count(r)) ? ' class="is-thin"' : ''}>${columns.map((c) => `<td class="${cls(c)}">${cell(c, r)}</td>`).join('')}</tr>`);
+      .map((r) => `<tr${columns.some((c) => dim(c, r)) ? ' class="is-thin"' : ''}>${columns.map((c) => `<td class="${cls(c)}">${cell(c, r)}</td>`).join('')}</tr>`);
     const half = Math.ceil(trs.length / 2);
     const bodies = trs.length > split ? [trs.slice(0, half), trs.slice(half)] : [trs];
     const table = (body) => `<div class="table-wrap"><table class="table stats-table"><thead><tr>${head}</tr></thead><tbody>${body.join('')}</tbody></table></div>`;

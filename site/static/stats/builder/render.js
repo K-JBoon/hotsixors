@@ -1,4 +1,4 @@
-import { MISSING_ICON, escapeHtml, fmt, heroCell, heroName, heroPortrait, renderTable, talentCell, talentName, thinOf, wilson, winRateCell } from '../view.js';
+import { MISSING_ICON, escapeHtml, fmt, heroCell, heroName, heroPortrait, lowSample, renderTable, talentCell, talentName, unlessAll, wilson, winRateCell } from '../view.js';
 import { barChart, extent, heatmapChart, lineChart, scatterChart } from '../charts.js';
 import { DERIVED_JOINS, METRICS, splitColumn } from './model.js';
 import { valueOf } from './run.js';
@@ -94,7 +94,7 @@ const dimensionColumn = (names) => (ref) => {
 
 const metricColumn = (m) => {
   const cell = metricCell(m);
-  return { key: m.name, label: m.name, title: printCall(m), num: true, sort: (r) => valueOf(r[m.name]), html: (r) => cell(r[m.name]) };
+  return { key: m.name, metric: m, label: m.name, title: printCall(m), num: true, sort: (r) => valueOf(r[m.name]), html: (r) => cell(r[m.name]) };
 };
 
 /** Sample size per row: the first `count` metric, else the first sized metric. */
@@ -102,6 +102,21 @@ const sampleSize = (metrics) => {
   const counted = metrics.find((m) => m.kind === 'count');
   if (counted) return (r) => r[counted.name];
   return (r) => metrics.map((m) => r[m.name]).find((v) => v != null && typeof v === 'object')?.n;
+};
+
+const cellSample = (m, v) => (m.kind === 'count' ? v : v?.n);
+
+const lowCell = (m) => (r) => lowSample(m.kind, cellSample(m, r[m.name]));
+
+/** Low-sample test per `(metric, row)` cell; off for a metric whose every cell in `rows` is low sample. */
+const thinCells = (rows, metrics) => {
+  const tests = new Map(metrics.map((m) => [m, unlessAll(lowCell(m))(rows)]));
+  return (m, r) => tests.get(m)(r);
+};
+
+const thinRow = (rows, metrics) => {
+  const dim = thinCells(rows, metrics);
+  return (r) => metrics.some((m) => dim(m, r));
 };
 
 const dimensionText = (names, dimensions) => (r) =>
@@ -118,7 +133,10 @@ const table = (el, { rows }, q, names, key) => {
     rows,
     sortKey: q.sort?.by ?? columns[0]?.key,
     sortDir: q.sort ? (q.sort.dir === 'asc' ? 1 : -1) : 1,
-    count: sampleSize(q.metrics),
+    thin: (shown) => {
+      const dim = thinCells(shown, q.metrics);
+      return (c, r) => c.metric != null && dim(c.metric, r);
+    },
     empty: 'No rows match this query.',
     search: q.dimensions.length ? { placeholder: 'Filter', key, text: dimensionText(names, q.dimensions) } : undefined,
   });
@@ -147,8 +165,7 @@ const bar = (el, result, q, names) => {
   if (!rows.length) return noRows(el);
   const dims = q.dimensions.map(dimensionColumn(names));
   const cell = metricCell(m);
-  const size = sampleSize(q.metrics);
-  const dim = thinOf(rows.map(size));
+  const dim = thinRow(rows, [m]);
   const rate = m.kind === 'rate';
   const value = (r) => valueOf(r[m.name]);
   const interval = (r) => (rate && value(r) != null ? wilson(value(r), r[m.name].n) : null);
@@ -162,7 +179,7 @@ const bar = (el, result, q, names) => {
       text: cell(r[m.name]),
       interval: interval(r),
       tone: interval(r) && tone(interval(r)),
-      thin: dim(size(r)),
+      thin: dim(r),
     }));
     barChart(pel, {
       bars,
@@ -192,7 +209,7 @@ const line = (el, result, q, names) => {
   const sName = sRefs.length ? (r) => sRefs.map((ref) => dimensionName(names, ref)(r[ref])).join(' ') : () => m.name;
   const sLabel = sRefs.length ? (r) => sRefs.map((ref) => dimensionLabel(names, ref)(r[ref])).join(' ') : () => escapeHtml(m.name);
   const size = sampleSize(q.metrics);
-  const dim = thinOf(rows.map(size));
+  const dim = thinRow(rows, [m]);
   const format = metricFormat(m);
   const seriesKey = (r) => JSON.stringify(sRefs.map((ref) => r[ref]));
   const games = (rs) => rs.reduce((t, r) => t + (size(r) ?? 0), 0);
@@ -202,7 +219,7 @@ const line = (el, result, q, names) => {
     if (!r) return null;
     const v = valueOf(r[m.name]);
     const n = size(r);
-    return { value: v, title: `${sName(r)} ${xName(r[xRef])}: ${format(v)}${n == null ? '' : `, n=${fmt.int(n)}`}`, thin: dim(n) };
+    return { value: v, title: `${sName(r)} ${xName(r[xRef])}: ${format(v)}${n == null ? '' : `, n=${fmt.int(n)}`}`, thin: dim(r) };
   };
   const seriesOf = (prs) => {
     const at = Map.groupBy(prs, seriesKey);
@@ -234,7 +251,7 @@ const scatter = (el, result, q, names) => {
   const [mx, my] = ms;
   const [fx, fy] = ms.map(metricFormat);
   const size = q.metrics.some((m) => m.kind === 'count') ? sampleSize(q.metrics) : smallestSize(ms);
-  const dim = thinOf(rows.map(size));
+  const dim = thinRow(rows, ms);
   const name = dimensionText(names, q.dimensions);
   const heroRef = q.dimensions.find((ref) => splitColumn(ref).col === 'hero');
   const interval = (m, v) => (m.kind === 'rate' ? wilson(valueOf(v), v.n) : null);
@@ -252,7 +269,7 @@ const scatter = (el, result, q, names) => {
       mark: hero == null ? null : heroPortrait(names.heroes, hero) || MISSING_ICON,
       href: hero == null ? null : heroHash(hero),
       title: `${name(r) || '–'}: ${mx.name} ${fx(x)}, ${my.name} ${fy(y)}${n == null ? '' : `, n=${fmt.int(n)}`}`,
-      thin: dim(n),
+      thin: dim(r),
     };
   };
   const pointsOf = (prs) => prs.filter(plottable).sort((a, b) => (size(a) ?? 0) - (size(b) ?? 0)).map(pointOf);
@@ -261,7 +278,7 @@ const scatter = (el, result, q, names) => {
   facetPanels(el, rows, q, names, (pel, prs) => scatterChart(pel, { points: pointsOf(prs), x: ax, y: ay }));
 };
 
-/** Cell sample size: a `count` metric when present, else `m`'s own `n`; `share` of an unsized metric has none. */
+/** Sample size shown in a cell title: a `count` metric when present, else `m`'s own `n`; `share` of an unsized metric has none. */
 const cellSize = (m, metrics) => {
   if (metrics.some((x) => x.kind === 'count')) return sampleSize(metrics);
   if (m.kind === 'share' && !METRICS[m.args[0].kind].sized) return () => undefined;
@@ -309,10 +326,10 @@ const heatmap = (el, result, q, names) => {
   const [a, b] = q.dimensions;
   const [rRef, cRef] = distinctCount(rows, a) >= distinctCount(rows, b) ? [a, b] : [b, a];
   const size = cellSize(m, q.metrics);
-  const dim = thinOf(rows.map(size));
+  const dim = thinRow(rows, [m]);
   const format = metricFormat(m);
   const name = dimensionText(names, [q.facet, ...q.dimensions].filter((ref) => ref != null));
-  const range = sharedRange(rows, (r) => valueOf(r[m.name]), (r) => dim(size(r)));
+  const range = sharedRange(rows, (r) => valueOf(r[m.name]), dim);
   const label = (ref) => {
     const html = dimensionColumn(names)(ref).html;
     const title = dimensionName(names, ref);
@@ -333,7 +350,7 @@ const heatmap = (el, result, q, names) => {
       const v = r && valueOf(r[m.name]);
       if (v == null) return null;
       const n = size(r);
-      return { value: v, title: `${name(r) || '–'}: ${format(v)}${n == null ? '' : `, n=${fmt.int(n)}`}`, thin: dim(n) };
+      return { value: v, title: `${name(r) || '–'}: ${format(v)}${n == null ? '' : `, n=${fmt.int(n)}`}`, thin: dim(r) };
     };
     heatmapChart(pel, {
       rows: rs.map(label(rRef)),
