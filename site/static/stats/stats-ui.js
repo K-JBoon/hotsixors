@@ -20,7 +20,7 @@ import { referenceRail } from './builder/reference.js';
 import {
   STAT_COLUMNS, available, facets, gameList, tournamentReport, tournamentTable, heroReport, mapReport, heroTable, mapTable, playerReport, playerTable, teamReport, teamTable,
 } from './reports.js';
-import { LIQUIPEDIA_ICON, MISSING_ICON, deltaCell, escapeHtml, fmt, heroCell, heroName, loadHeroes, lowSample, renderTable, renderTalentTiers, talentLink, talentName, talentTiers, thinOf, tierLevel, tiles, unlessAll, wilson, winRateCell } from './view.js';
+import { LIQUIPEDIA_ICON, MISSING_ICON, deltaCell, escapeHtml, fmt, heroCell, heroName, loadHeroes, renderTable, renderTalentTiers, talentLink, talentName, talentTiers, thinOf, tierLevel, tiles, wilson, winRateCell } from './view.js';
 
 const root = document.querySelector('[data-stats-root]');
 const view = root.querySelector('[data-view]');
@@ -195,10 +195,10 @@ function patchChart(el, filters, patches) {
   const { rows, empty } = minGames(patches, filters);
   if (!rows.length) return emptyNote(el, empty);
   const ordered = [...rows].sort((a, b) => patchRank(a.patch) - patchRank(b.patch));
-  const thin = unlessAll((r) => lowSample('rate', r.games))(ordered);
+  const dim = thinOf(ordered.map((r) => r.games));
   const series = [['Win', 'winRate'], ['Pick', 'pickRate']].map(([label, key]) => ({
     label,
-    points: ordered.map((r) => ({ value: r[key], title: `${r.patch} ${label}: ${fmt.pct(r[key])}, ${fmt.int(r.games)} games`, thin: thin(r) })),
+    points: ordered.map((r) => ({ value: r[key], title: `${r.patch} ${label}: ${fmt.pct(r[key])}, ${fmt.int(r.games)} games`, thin: dim(r.games) })),
   }));
   lineChart(el, { xs: ordered.map((r) => r.patch), series, on: [true, true], head: 'Rate', format: fmt.pct, ref: 0.5 });
 }
