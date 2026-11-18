@@ -173,7 +173,6 @@
   .stats-overview { order: 0; }
   .stats-rail .stats-tiles { grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr)); }
 }
-.stats-split { display: grid; grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr)); gap: var(--space-xs); align-items: start; }
 
 .stats-hero { display: inline-flex; align-items: center; gap: var(--space-2xs); white-space: nowrap; }
 .stats-hero a { display: inline-flex; align-items: center; gap: var(--space-2xs); }

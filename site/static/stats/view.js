@@ -174,7 +174,7 @@ const rowThin = (count) => (rows) => {
  * typing anywhere on the page fills the last focused one. The query, saved under `key` (default `placeholder`), survives re-renders until the hash changes.
  * `onSort(key, dir)` runs after a header click.
  */
-export function renderTable(container, { columns, rows, sortKey, sortDir = -1, pageSize = 20, split = Infinity, empty, search, onSort, count = (r) => r.games, thin = rowThin(count), thinCells = false }) {
+export function renderTable(container, { columns, rows, sortKey, sortDir = -1, pageSize = 20, empty, search, onSort, count = (r) => r.games, thin = rowThin(count), thinCells = false }) {
   empty ??= 'No games match these filters.';
   let key = columns.some((c) => c.key === sortKey) ? sortKey : columns[0].key;
   let dir = sortDir;
@@ -243,9 +243,7 @@ export function renderTable(container, { columns, rows, sortKey, sortDir = -1, p
         const tdClass = (c) => (thinCells && dim(c, r) ? `${cls(c)} is-thin`.trim() : cls(c));
         return `<tr${faded ? ' class="is-thin"' : ''}>${columns.map((c) => `<td class="${tdClass(c)}">${cell(c, r)}</td>`).join('')}</tr>`;
       });
-    const half = Math.ceil(trs.length / 2);
-    const bodies = trs.length > split ? [trs.slice(0, half), trs.slice(half)] : [trs];
-    const table = (body) => `<div class="table-wrap"><table class="table stats-table"><thead><tr>${head}</tr></thead><tbody>${body.join('')}</tbody></table></div>`;
+    const table = `<div class="table-wrap"><table class="table stats-table"><thead><tr>${head}</tr></thead><tbody>${trs.join('')}</tbody></table></div>`;
     const pager = pages > 1
       ? `<nav class="stats-pager" aria-label="Table pages">
           <button class="btn btn--sm" type="button" data-page="${page - 1}"${page === 0 ? ' disabled' : ''}>Previous</button>
@@ -254,7 +252,7 @@ export function renderTable(container, { columns, rows, sortKey, sortDir = -1, p
         </nav>`
       : '';
     target.innerHTML = sorted.length
-      ? `${bodies.length > 1 ? `<div class="stats-split">${bodies.map(table).join('')}</div>` : table(trs)}${pager}`
+      ? `${table}${pager}`
       : `<p class="stats-note">${escapeHtml(rows.length ? 'No rows match that search.' : empty)}</p>`;
     const wrap = target.querySelector('.table-wrap');
     if (wrap && pages > 1) {

@@ -731,7 +731,6 @@ const VIEWS = {
       rows: report.builds,
       sortKey: 'games',
       pageSize: 20,
-      split: 10,
       empty: 'No builds through level 16 under these filters.',
     });
     tableOrChart(el, 'maps', {
@@ -922,6 +921,7 @@ const VIEWS = {
         { key: 'topHero', label: 'Most played', html: (x) => heroCell(heroes, x.topHero, hash('hero', x.topHero)) },
       ],
       rows: r.roster,
+      pageSize: 10,
       sortKey: 'games',
     });
     statsTable(part(el, 'heroes'), filters, {
