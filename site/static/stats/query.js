@@ -60,7 +60,7 @@ async function openTable(url) {
 /** In-memory tables with the same interface as openStats, e.g. from local replays. */
 export function memoryStats(tables, meta) {
   const byName = Object.fromEntries(
-    ['games', 'players', 'draft'].map((name) => [name, Object.fromEntries(tables[name].map((c) => [c.name, c.data]))]),
+    ['games', 'players', 'draft', 'levels'].map((name) => [name, Object.fromEntries(tables[name].map((c) => [c.name, c.data]))]),
   );
   return {
     meta,

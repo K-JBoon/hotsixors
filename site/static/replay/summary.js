@@ -3,7 +3,7 @@ import { LOOPS_PER_SECOND, statData, str, teamFromInt } from './analyze/stat-eve
 
 // Bump when the summary shape or its extraction rules change; cached summaries
 // with another version are rebuilt.
-export const SUMMARY_VERSION = 3;
+export const SUMMARY_VERSION = 4;
 
 const FILETIME_EPOCH_MS = 11644473600000;
 const GAME_MODES = {
@@ -84,6 +84,7 @@ export async function summarizeReplay(archive) {
   const bySlotId = new Map(details.m_playerList.map((p, i) => [p.m_workingSetSlotId ?? i, players[i]]));
 
   const draft = [];
+  const teamLevels = [[], []];
   const tracker = readFile(archive, 'replay.tracker.events');
   for (const ev of tracker ? decodeTrackerEvents(tracker, protocol) : []) {
     switch (ev._event) {
@@ -107,12 +108,17 @@ export async function summarizeReplay(archive) {
         if (p && !p.heroUnit && unit.startsWith('Hero')) p.heroUnit = unit;
         break;
       }
-      case 'NNet.Replay.Tracker.SStatGameEvent':
-        if (str(ev.m_eventName) === 'TalentChosen') {
-          const p = byTrackerId(statData(ev, 'm_intData', 'PlayerID'));
-          if (p) p.talents.push(str(statData(ev, 'm_stringData', 'PurchaseName')));
+      case 'NNet.Replay.Tracker.SStatGameEvent': {
+        const name = str(ev.m_eventName);
+        const p = byTrackerId(statData(ev, 'm_intData', 'PlayerID'));
+        if (name === 'TalentChosen' && p) p.talents.push(str(statData(ev, 'm_stringData', 'PurchaseName')));
+        if (name === 'LevelUp' && teamLevels[p?.team]) {
+          const level = statData(ev, 'm_intData', 'Level');
+          const levels = teamLevels[p.team];
+          if (level > (levels.at(-1)?.level ?? 1)) levels.push({ level, timeS: Math.round(ev._gameloop / LOOPS_PER_SECOND) });
         }
         break;
+      }
       case 'NNet.Replay.Tracker.SScoreResultEvent':
         for (const inst of ev.m_instanceList) {
           const key = str(inst.m_name);
@@ -142,6 +148,7 @@ export async function summarizeReplay(archive) {
     firstPick,
     players,
     draft,
+    teamLevels,
   };
 }
 

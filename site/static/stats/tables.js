@@ -76,6 +76,7 @@ export function buildTables(summaries, resolve, eventOf = () => null) {
   const draft = tableBuilder({
     ...common, order: 'INT32', kind: 'STRING', team: 'INT32', hero: 'STRING', win: 'BOOLEAN', team_name: 'STRING',
   });
+  const levels = tableBuilder({ ...common, team: 'INT32', level: 'INT32', time_s: 'INT32' });
 
   const perEvent = new Map();
   for (const s of usable) {
@@ -110,6 +111,10 @@ export function buildTables(summaries, resolve, eventOf = () => null) {
       });
     });
 
+    (s.teamLevels ?? []).forEach((ups, team) => {
+      for (const { level, timeS } of ups) levels.push({ ...base, team, level, time_s: timeS });
+    });
+
     if (event) {
       const agg = perEvent.get(event.tournament) ?? { games: 0, first: null, last: null };
       agg.games++;
@@ -123,6 +128,7 @@ export function buildTables(summaries, resolve, eventOf = () => null) {
     games: games.columns,
     players: players.columns,
     draft: draft.columns,
+    levels: levels.columns,
     scoreColumns: scoreColumns.map((k) => SCORE_PREFIX + k),
     events: perEvent,
     skipped,
