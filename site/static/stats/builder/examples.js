@@ -37,6 +37,85 @@ GROUP BY talent_pair.a, talent_pair.b
 FACET BY talent_pair.tiers
 VIEW heatmap`,
   },
+  {
+    name: 'Win rate by patch',
+    allPatches: true,
+    text: `SELECT patch, hero, rate(win) AS win
+FROM players
+WHERE hero IN ('hanzo', 'blaze', 'johanna', 'dehaka', 'malfurion', 'muradin', 'sylvanas', 'rehgar')
+GROUP BY patch, hero
+HAVING count() >= 100
+VIEW line`,
+  },
+  {
+    name: 'Ban rate',
+    text: `SELECT hero, share(count()) AS bans
+FROM draft
+WHERE kind = 'ban'
+GROUP BY hero
+ORDER BY bans DESC
+LIMIT 20
+VIEW bar`,
+  },
+  {
+    name: 'First picks',
+    text: `SELECT hero, share(count()) AS first
+FROM draft
+WHERE kind = 'pick' AND "order" = 4
+GROUP BY hero
+ORDER BY first DESC
+LIMIT 20
+VIEW bar`,
+  },
+  {
+    name: 'Pick and ban by map',
+    text: `SELECT hero, map, kind, share(count()) AS share
+FROM draft
+GROUP BY hero, map
+FACET BY kind
+VIEW heatmap`,
+  },
+  {
+    name: 'Best duos',
+    text: `SELECT hero, teammate.hero, delta(rate(win)) AS win, count() AS games
+FROM players JOIN teammate
+GROUP BY hero, teammate.hero
+HAVING count() >= 50
+VIEW heatmap`,
+  },
+  {
+    name: 'Team hero pools',
+    text: `SELECT team_name, distinct(hero) AS heroes, mode(hero) AS top
+FROM players
+WHERE team_name != NULL
+GROUP BY team_name
+ORDER BY heroes DESC`,
+  },
+  {
+    name: 'Popularity by map',
+    text: `SELECT hero, map, share(count()) AS picks
+FROM players
+GROUP BY hero
+FACET BY map
+ORDER BY picks DESC
+LIMIT 10
+VIEW bar`,
+  },
+  {
+    name: 'Game length by map',
+    text: `SELECT map, mean(duration_s) AS seconds
+FROM players
+GROUP BY map
+ORDER BY seconds DESC
+VIEW bar`,
+  },
+  {
+    name: 'Mercs vs. win rate',
+    text: `SELECT hero, mean(score_MercCampCaptures) AS mercs, rate(win) AS win
+FROM players
+GROUP BY hero
+VIEW scatter`,
+  },
 ];
 
 export const withWhere = (where, text) => {
@@ -44,4 +123,7 @@ export const withWhere = (where, text) => {
   return printQuery({ ...q, where: [...where, ...q.where] });
 };
 
-export const examples = (where) => EXAMPLES.map((e) => ({ ...e, text: withWhere(where, e.text) }));
+const withoutPatch = (where) => where.filter((c) => c.col !== 'patch');
+
+export const examples = (where) =>
+  EXAMPLES.map(({ allPatches, ...e }) => ({ ...e, text: withWhere(allPatches ? withoutPatch(where) : where, e.text) }));
