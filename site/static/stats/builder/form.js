@@ -110,7 +110,7 @@ const joinField = () =>
 const dimensionSlots = (dimensions) => (dimensions.length < MAX_DIMENSIONS ? [...dimensions, ''] : dimensions);
 
 const dimensionField = (columns, dimensions, colOption) =>
-  `<div class="stats-filters__field"><span id="qb-dimensions">Group</span><div class="stats-query__clause stats-query__dimensions">${dimensionSlots(dimensions)
+  `<div class="stats-filters__field"><span id="qb-dimensions">Dimension</span><div class="stats-query__clause stats-query__dimensions">${dimensionSlots(dimensions)
     .map(
       (d, i) =>
         `<select class="input" name="d${i}" aria-labelledby="qb-dimensions">${option('', 'None', !d)}${columns
@@ -212,10 +212,10 @@ const clauseRow = (columns, colOption, of) => (c, i) => {
 const metricRow = (columns, colOption) => (m, i) =>
   `<div class="stats-query__clause" data-metric="${i}"><input class="input stats-query__name" name="mn${i}" value="${escapeHtml(
     m.name,
-  )}" aria-label="Name" autocomplete="off" spellcheck="false"><select class="input" name="mk${i}" aria-label="Measure">${TOPS.map((k) =>
+  )}" aria-label="Name" autocomplete="off" spellcheck="false"><select class="input" name="mk${i}" aria-label="Metric">${TOPS.map((k) =>
     option(k, k, k === topOf(m)),
   ).join('')}</select>${
-    m.wrap ? `<select class="input" name="mi${i}" aria-label="Inner measure">${KINDS.map((k) => option(k, k, k === m.kind)).join('')}</select>` : ''
+    m.wrap ? `<select class="input" name="mi${i}" aria-label="Inner metric">${KINDS.map((k) => option(k, k, k === m.kind)).join('')}</select>` : ''
   }${m.args
     .map(argControl(columns, colOption, m, i))
     .join('')}<button class="btn stats-query__btn" type="button" data-add="where" data-of="${i}">+ Where</button><button class="btn stats-query__btn" type="button" data-remove-metric="${i}" aria-label="Remove">×</button></div>${m.where
@@ -271,9 +271,9 @@ export function builderForm(el, { names, values, label = (col, v) => printed(v),
     const columns = columnsOf(names, state.from, state.joins);
     el.innerHTML = `${radioField('from', 'Table', Object.keys(BASES), state.from)}${joinField()}${dimensionField(columns, state.dimensions, colOption)}${state.rows
       .map(clauseRow(columns, colOption))
-      .join('')}<button class="btn stats-query__btn" type="button" data-add="where">+ Where</button><div class="stats-filters__field stats-query__metrics"><span>Measure</span>${state.metrics
+      .join('')}<button class="btn stats-query__btn" type="button" data-add="where">+ Where</button><div class="stats-filters__field stats-query__metrics"><span>Metric</span>${state.metrics
       .map(metricRow(columns, colOption))
-      .join('')}<button class="btn stats-query__btn" type="button" data-add="metric">+ Measure</button></div>${sortField(
+      .join('')}<button class="btn stats-query__btn" type="button" data-add="metric">+ Metric</button></div>${sortField(
       sortKeys(state),
       state.sort,
       colOption,

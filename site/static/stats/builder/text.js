@@ -111,12 +111,12 @@ export const parseQuery = (text) => {
     if (startsCall()) return call();
     const type = paramType(kind, n);
     if (type === 'col') return identifier('a column');
-    if (type === 'metric') return fail(`expected a measure, got ${peek().raw}`);
+    if (type === 'metric') return fail(`expected a metric, got ${peek().raw}`);
     return type || !isIdent(peek()) ? value() : identifier('a column');
   };
 
   const call = () => {
-    const kind = startsCall() ? next().raw : fail(`expected a measure, got ${peek().raw}`);
+    const kind = startsCall() ? next().raw : fail(`expected a metric, got ${peek().raw}`);
     expect('(');
     const args = [];
     if (!accept(')')) {
@@ -135,10 +135,10 @@ export const parseQuery = (text) => {
   const item = () => {
     const at = peek().at;
     if (isIdent(peek()) && !startsCall()) return { col: identifier('a column'), at };
-    if (!startsCall()) return fail(`expected a column or measure, got ${peek().raw}`);
+    if (!startsCall()) return fail(`expected a column or metric, got ${peek().raw}`);
     const m = call();
     expect('as');
-    return { metric: metric(identifier('a measure name'), m) };
+    return { metric: metric(identifier('a metric name'), m) };
   };
 
   const joins = () => {

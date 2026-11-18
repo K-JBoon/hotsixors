@@ -113,7 +113,7 @@ const arity = (params) => [params.filter((p) => !p.endsWith('?')).length, params
 const metricErrors = (column, where) => {
   const check = (m, path, wrapped) => {
     const spec = METRICS[m?.kind];
-    if (!spec) return [error(`${path}.kind`, `unknown measure ${m?.kind}`)];
+    if (!spec) return [error(`${path}.kind`, `unknown metric ${m?.kind}`)];
     const wrapper = WRAPPERS.includes(m.kind);
     if (wrapper && wrapped) return [error(`${path}.kind`, `${m.kind} cannot sit inside share or delta`)];
     if (wrapper && m.where?.length) return [error(`${path}.where`, `where belongs inside ${m.kind}`)];
@@ -140,8 +140,8 @@ const RESERVED_NAMES = ['key'];
 export const nameClash = ({ metrics, dimensions }, i) => {
   const { name } = metrics[i];
   if (RESERVED_NAMES.includes(name)) return `${name} is a reserved name`;
-  if (dimensions.includes(name)) return `${name} is a group-by column`;
-  return metrics.findIndex((m) => m.name === name) < i ? `duplicate measure ${name}` : null;
+  if (dimensions.includes(name)) return `${name} is a dimension`;
+  return metrics.findIndex((m) => m.name === name) < i ? `duplicate metric ${name}` : null;
 };
 
 const nameErrors = (q) =>
@@ -151,9 +151,9 @@ const nameErrors = (q) =>
   });
 
 const VIEW_SHAPES = {
-  scatter: (q) => (q.metrics.length < 2 ? 'scatter needs two measures' : null),
-  heatmap: (q) => (q.dimensions.length !== 2 ? 'heatmap needs two group-by columns' : null),
-  line: (q) => (q.dimensions.length < 1 ? 'line needs a group-by column' : null),
+  scatter: (q) => (q.metrics.length < 2 ? 'scatter needs two metrics' : null),
+  heatmap: (q) => (q.dimensions.length !== 2 ? 'heatmap needs two dimensions' : null),
+  line: (q) => (q.dimensions.length < 1 ? 'line needs a dimension' : null),
 };
 
 const viewErrors = (q) => {
@@ -166,7 +166,7 @@ const sortErrors = ({ sort, dimensions, metrics }) => {
   if (sort == null) return [];
   const keys = [...metrics.map((m) => m.name), ...dimensions];
   return [
-    ...(keys.includes(sort.by) ? [] : [error('sort.by', `sort ${sort.by} is not a measure or group-by column`)]),
+    ...(keys.includes(sort.by) ? [] : [error('sort.by', `sort ${sort.by} is not a metric or dimension`)]),
     ...(sort.dir == null || SORT_DIRS.includes(sort.dir) ? [] : [error('sort.dir', `unknown sort direction ${sort.dir}`)]),
   ];
 };
@@ -183,7 +183,7 @@ export const validateQuery = (q, names) => {
   return [
     ...q.joins.flatMap((j, i) => (BASES[q.from].includes(j) ? [] : [error(`joins.${i}`, `${q.from} does not allow join ${j}`)])),
     ...where(q.where, 'where'),
-    ...(q.dimensions.length > MAX_DIMENSIONS ? [error('dimensions', `at most ${MAX_DIMENSIONS} group-by columns`)] : []),
+    ...(q.dimensions.length > MAX_DIMENSIONS ? [error('dimensions', `at most ${MAX_DIMENSIONS} dimensions`)] : []),
     ...q.dimensions.flatMap((d, i) => column(d, `dimensions.${i}`)),
     ...q.metrics.flatMap((m, i) => metric(m, `metrics.${i}`)),
     ...nameErrors(q),

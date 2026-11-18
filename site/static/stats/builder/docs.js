@@ -93,7 +93,7 @@ export const isScore = (col) => col.startsWith(SCORE_PREFIX);
 
 export const columnDoc = (table, col) => COLUMN_DOCS[table]?.[col] ?? (isScore(col) ? SCORE_DOC : null);
 
-export const MEASURE_DOCS = {
+export const METRIC_DOCS = {
   count: 'Number of rows in the group.',
   present: 'Number of rows where the column is not null.',
   sum: 'Sum of the column; null counts as 0.',
@@ -103,18 +103,18 @@ export const MEASURE_DOCS = {
   ratio: 'Sum of the first column divided by the sum of the second, times the optional scale, over rows where both are not null.',
   mode: 'Most frequent non-null value of the column.',
   latest: 'Value of the first column on the row where the second column is largest, such as the latest name by date.',
-  share: 'Inner measure divided by the number of distinct games among all rows that pass WHERE.',
-  delta: 'Inner measure minus the same measure grouped by every GROUP BY column except the last.',
+  share: 'Inner metric divided by the number of distinct games among all rows that pass WHERE.',
+  delta: 'Inner metric minus the same metric over every dimension except the last.',
 };
 
 export const CLAUSE_DOCS = {
-  SELECT: 'Lists the GROUP BY columns and the measures, each measure as call AS name.',
+  SELECT: 'Lists the dimensions and the metrics, each metric as call AS name.',
   FROM: 'Sets the base table, players or draft.',
   JOIN: 'Adds the columns of a joined table, read as join.column. Works as LEFT JOIN: a row with no match stays, with null joined columns. JOIN teammate JOIN opponent gives 4 × 5 = 20 rows per player row.',
   WHERE: 'Keeps only the rows where every condition is true.',
-  'GROUP BY': 'Makes one result row per distinct value of up to two columns; null values make their own group.',
-  FILTER: 'Limits one measure to the rows where every condition is true.',
-  'ORDER BY': 'Sorts result rows by a measure or GROUP BY column, DESC by default, nulls last.',
+  'GROUP BY': 'Sets the dimensions: one result row per distinct value of up to two columns. Null is a value too.',
+  FILTER: 'Limits one metric to the rows where every condition is true.',
+  'ORDER BY': 'Sorts result rows by a metric or dimension, DESC by default, nulls last.',
   LIMIT: 'Keeps the first n result rows after sorting.',
   VIEW: 'Sets the result display: table, bar, line, scatter or heatmap.',
 };

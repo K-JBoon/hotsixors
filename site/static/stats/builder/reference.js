@@ -1,7 +1,7 @@
 import { escapeHtml } from '../view.js';
 import { METRICS, query, clause, fn, metric } from './model.js';
 import { printQuery } from './text.js';
-import { MEASURE_DOCS, CLAUSE_DOCS } from './docs.js';
+import { METRIC_DOCS, CLAUSE_DOCS } from './docs.js';
 
 const m = (name, kind, args, where) => metric(name, fn(kind, args, where));
 
@@ -38,8 +38,8 @@ const signature = (kind) => `${kind}(${METRICS[kind].params.join(', ')})`;
 /** Reference entries; `example` is a query object, `text` its printed form. */
 export const REFERENCE = [
   {
-    title: 'Measures',
-    entries: Object.keys(METRICS).map((kind) => ({ head: signature(kind), doc: MEASURE_DOCS[kind], example: METRIC_EXAMPLES[kind] })),
+    title: 'Metrics',
+    entries: Object.keys(METRICS).map((kind) => ({ head: signature(kind), doc: METRIC_DOCS[kind], example: METRIC_EXAMPLES[kind] })),
   },
   {
     title: 'Clauses',
