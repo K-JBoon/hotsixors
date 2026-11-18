@@ -199,12 +199,13 @@ const heatDomain = (values, ref) => {
 /**
  * Grid of `rows` x `cols` cells colored by value; diverging around `ref` when given.
  * `rows`, `cols`: `{ label, title? }`, `label` HTML. `cells[i][j]`: `{ value, title, thin? } | null`.
- * The color domain covers non-thin cells when any exist; others clamp.
+ * The color domain covers `range` (`[lo, hi]`) when given, else non-thin cells when any exist; others clamp.
  */
-export function heatmapChart(el, { rows, cols, cells, head, format, ref = null, minStep = 0 }) {
+export function heatmapChart(el, { rows, cols, cells, head, format, ref = null, minStep = 0, range = null }) {
   const all = cells.flat().filter((c) => c?.value != null);
   const solid = all.filter((c) => !c.thin);
-  const { domain, ticks } = niceTicks(heatDomain((solid.length ? solid : all).map((c) => c.value), ref), 4, minStep);
+  const values = range ?? (solid.length ? solid : all).map((c) => c.value);
+  const { domain, ticks } = niceTicks(heatDomain(values, ref), 4, minStep);
   const at = linear(domain);
   const { color, key } = ramp(ref, ref == null ? 0 : at(ref));
   const rects = cells.flatMap((row, i) =>

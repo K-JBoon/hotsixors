@@ -1,5 +1,5 @@
 import { MISSING_ICON, escapeHtml, fmt, heroCell, heroName, heroPortrait, renderTable, thinOf, wilson, winRateCell } from '../view.js';
-import { barChart, heatmapChart, lineChart, scatterChart } from '../charts.js';
+import { barChart, extent, heatmapChart, lineChart, scatterChart } from '../charts.js';
 import { METRICS, splitColumn } from './model.js';
 import { valueOf } from './run.js';
 import { printCall } from './text.js';
@@ -149,27 +149,28 @@ const line = (el, result, q, heroes) => {
   if (!m || TEXT_METRICS.includes(m.kind)) return table(el, result, q, heroes);
   const { rows } = result;
   if (!rows.length) return noRows(el);
-  const [xRef, sRef] = q.dimensions;
+  const [xRef, ...sRefs] = q.dimensions;
   const xSort = dimensionColumn(heroes)(xRef).sort;
   const xs = [...new Set(rows.map((r) => r[xRef]))].sort((a, b) => ascending(xSort({ [xRef]: a }), xSort({ [xRef]: b })));
   const xName = dimensionName(heroes, xRef);
-  const sName = sRef ? dimensionName(heroes, sRef) : () => m.name;
+  const sName = sRefs.length ? (r) => sRefs.map((ref) => dimensionName(heroes, ref)(r[ref])).join(' ') : () => m.name;
+  const sLabel = sRefs.length ? (r) => sRefs.map((ref) => dimensionLabel(heroes, ref)(r[ref])).join(' ') : () => escapeHtml(m.name);
   const size = sampleSize(q.metrics);
   const dim = thinOf(rows.map(size));
   const format = metricFormat(m);
-  const bySeries = Map.groupBy(rows, (r) => (sRef ? r[sRef] : null));
+  const bySeries = Map.groupBy(rows, (r) => JSON.stringify(sRefs.map((ref) => r[ref])));
   const games = (rs) => rs.reduce((t, r) => t + (size(r) ?? 0), 0);
   const ranked = [...bySeries].sort(([, a], [, b]) => games(b) - games(a));
-  const series = ranked.map(([s, rs]) => {
+  const series = ranked.map(([, rs]) => {
     const at = new Map(rs.map((r) => [r[xRef], r]));
     const point = (x) => {
       const r = at.get(x);
       if (!r) return null;
       const v = valueOf(r[m.name]);
       const n = size(r);
-      return { value: v, title: `${sName(s)} ${xName(x)}: ${format(v)}${n == null ? '' : `, n=${fmt.int(n)}`}`, thin: dim(n) };
+      return { value: v, title: `${sName(r)} ${xName(x)}: ${format(v)}${n == null ? '' : `, n=${fmt.int(n)}`}`, thin: dim(n) };
     };
-    return { label: sRef ? dimensionLabel(heroes, sRef)(s) : escapeHtml(m.name), points: xs.map(point) };
+    return { label: sLabel(rs[0]), points: xs.map(point) };
   });
   lineChart(el, {
     xs: xs.map(xName),
@@ -235,42 +236,77 @@ const axisValues = (rows, ref, sort, heroes) => {
   return values.sort((a, b) => ascending(key({ [ref]: a }), key({ [ref]: b })));
 };
 
+/** Value range over `rows`, skipping thin rows when any others have a value; null when no row has one. */
+const sharedRange = (rows, value, thin = () => false) => {
+  const valued = rows.filter((r) => value(r) != null);
+  const solid = valued.filter((r) => !thin(r));
+  return valued.length ? extent((solid.length ? solid : valued).map(value)) : null;
+};
+
+/** Draws `draw(panel, rows)` once per `q.facet` value in a labeled grid, or once in `el` without a facet. */
+const facetPanels = (el, rows, q, heroes, draw, min = '20rem') => {
+  if (q.facet == null) return draw(el, rows);
+  const groups = Map.groupBy(rows, (r) => r[q.facet]);
+  const values = axisValues(rows, q.facet, null, heroes);
+  const label = dimensionLabel(heroes, q.facet);
+  el.innerHTML = `<div class="stats-facets" style="--facet-min: ${min}">${values
+    .map((v) => `<section class="stats-section"><h3 class="stats-section__title">${label(v)}</h3><div></div></section>`)
+    .join('')}</div>`;
+  el.querySelectorAll('.stats-facets > section > div').forEach((panel, i) => draw(panel, groups.get(values[i]) ?? []));
+};
+
+const FACET_AT = { line: 1 };
+
+const withFacet = (q) =>
+  q.facet == null ? q : { ...q, facet: null, dimensions: q.dimensions.toSpliced(FACET_AT[q.view] ?? 0, 0, q.facet) };
+
+const distinctCount = (rows, ref) => new Set(rows.map((r) => r[ref])).size;
+
 const heatmap = (el, result, q, heroes) => {
   const [m] = q.metrics;
-  if (!m || TEXT_METRICS.includes(m.kind)) return table(el, result, q, heroes);
+  if (!m || TEXT_METRICS.includes(m.kind)) return table(el, result, withFacet(q), heroes);
   const { rows } = result;
   if (!rows.length) return noRows(el);
-  const [a, b] = q.dimensions.map((ref) => [ref, axisValues(rows, ref, q.sort, heroes)]);
-  const [[rRef, rs], [cRef, cs]] = a[1].length >= b[1].length ? [a, b] : [b, a];
+  const [a, b] = q.dimensions;
+  const [rRef, cRef] = distinctCount(rows, a) >= distinctCount(rows, b) ? [a, b] : [b, a];
   const size = cellSize(m, q.metrics);
   const dim = thinOf(rows.map(size));
   const format = metricFormat(m);
-  const name = dimensionText(heroes, q.dimensions);
-  const at = new Map([...Map.groupBy(rows, (r) => r[rRef])].map(([k, rs]) => [k, new Map(rs.map((r) => [r[cRef], r]))]));
-  const cell = (rv, cv) => {
-    const r = at.get(rv).get(cv);
-    const v = r && valueOf(r[m.name]);
-    if (v == null) return null;
-    const n = size(r);
-    return { value: v, title: `${name(r) || '–'}: ${format(v)}${n == null ? '' : `, n=${fmt.int(n)}`}`, thin: dim(n) };
-  };
+  const name = dimensionText(heroes, [q.facet, ...q.dimensions].filter((ref) => ref != null));
+  const range = sharedRange(rows, (r) => valueOf(r[m.name]), (r) => dim(size(r)));
   const label = (ref) => {
     const html = dimensionColumn(heroes)(ref).html;
     const title = dimensionName(heroes, ref);
     return (v) => ({ label: html({ [ref]: v }), title: title(v) });
   };
-  heatmapChart(el, {
-    rows: rs.map(label(rRef)),
-    cols: cs.map(label(cRef)),
-    cells: rs.map((rv) => cs.map((cv) => cell(rv, cv))),
-    head: [escapeHtml(`${rRef} / ${cRef}`), metricHead(m)],
-    format,
-    ref: refOf(m),
-    minStep: minStepOf(m),
-  });
+  const panel = (pel, prs) => {
+    if (!prs.length) return noRows(pel);
+    const rs = axisValues(prs, rRef, q.sort, heroes);
+    const cs = axisValues(prs, cRef, q.sort, heroes);
+    const at = new Map([...Map.groupBy(prs, (r) => r[rRef])].map(([k, rs]) => [k, new Map(rs.map((r) => [r[cRef], r]))]));
+    const cell = (rv, cv) => {
+      const r = at.get(rv).get(cv);
+      const v = r && valueOf(r[m.name]);
+      if (v == null) return null;
+      const n = size(r);
+      return { value: v, title: `${name(r) || '–'}: ${format(v)}${n == null ? '' : `, n=${fmt.int(n)}`}`, thin: dim(n) };
+    };
+    heatmapChart(pel, {
+      rows: rs.map(label(rRef)),
+      cols: cs.map(label(cRef)),
+      cells: rs.map((rv) => cs.map((cv) => cell(rv, cv))),
+      head: [escapeHtml(`${rRef} / ${cRef}`), metricHead(m)],
+      format,
+      ref: refOf(m),
+      minStep: minStepOf(m),
+      range,
+    });
+  };
+  facetPanels(el, rows, q, heroes, panel, `calc(${distinctCount(rows, cRef)} * 1.5rem + 16rem)`);
 };
 
 const VIEWS = { table, bar, line, scatter, heatmap };
 
 /** Draws a `runQuery` result in `el` per `q.view`; views without a renderer fall back to the table. */
-export const renderResult = (el, result, q, heroes) => (VIEWS[q.view] ?? table)(el, result, q, heroes);
+export const renderResult = (el, result, q, heroes) =>
+  q.view === 'heatmap' ? heatmap(el, result, q, heroes) : (VIEWS[q.view] ?? table)(el, result, withFacet(q), heroes);

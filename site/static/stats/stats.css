@@ -414,6 +414,7 @@ body.is-dragging-file .stats-page:not(.is-empty)::after {
 .stats-chart__cols > * { writing-mode: vertical-rl; rotate: 180deg; white-space: nowrap; }
 .stats-chart__cols .stats-hero span { display: none; }
 .stats-chart__cell { stroke: var(--bg-deep); }
+.stats-facets { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--facet-min)), 1fr)); gap: var(--space-md); align-items: start; }
 @container (max-width: 36rem) {
   .stats-chart__axis text:nth-child(even) { display: none; }
   .stats-chart--heatmap .stats-hero span { display: none; }
