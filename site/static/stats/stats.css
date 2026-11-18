@@ -406,12 +406,13 @@ body.is-dragging-file .stats-page:not(.is-empty)::after {
 .stats-chart__legend { display: flex; flex-wrap: wrap; gap: var(--space-3xs); margin-inline-start: -4.5rem; padding-block-start: var(--space-sm); }
 .stats-chart__legend .stats-portrait { width: 1rem; height: 1rem; }
 .stats-chart__swatch { inline-size: 0.75rem; block-size: 3px; border-radius: var(--radius-pill); background: var(--series); }
-.stats-chart--heatmap { grid-template-columns: max-content minmax(calc(var(--cols) * 1.5rem), calc(var(--cols) * 4rem)); grid-template-rows: auto auto; grid-auto-rows: 1.5rem; overflow-x: auto; }
+.stats-chart--heatmap { grid-template-columns: max-content minmax(calc(var(--cols) * 1.5rem), calc(var(--cols) * 4rem)); grid-template-rows: auto auto; grid-auto-rows: 1.5rem; overflow-x: auto; padding-inline-end: calc(var(--name) / 2); }
 .stats-chart--heatmap .stats-chart__plot { grid-row: 3 / span var(--rows); }
 .stats-chart--heatmap .stats-portrait { width: 1.25rem; height: 1.25rem; }
 .stats-chart__scale { block-size: 0.5rem; border-radius: var(--radius-sm); }
-.stats-chart__cols { display: grid; grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); align-items: end; justify-items: center; padding-block: var(--space-2xs); font-size: var(--text-xs); color: var(--text-muted); }
-.stats-chart__cols > * { writing-mode: vertical-rl; rotate: 180deg; white-space: nowrap; }
+.stats-chart__cols { display: grid; grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); align-items: end; justify-items: center; padding-block: calc(var(--name) * 0.87 + 1.5em) var(--space-2xs); font-size: var(--text-xs); color: var(--text-muted); }
+.stats-chart__cols > * { position: relative; display: grid; justify-items: center; }
+.stats-chart__name { position: absolute; inset-block-end: calc(100% + var(--space-3xs)); inset-inline-start: 50%; max-inline-size: var(--name); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; transform-origin: 0 50%; transform: rotate(-60deg); }
 .stats-chart__cols .stats-hero span { display: none; }
 .stats-chart__cell { stroke: var(--bg-deep); }
 .stats-facets { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--facet-min)), 1fr)); gap: var(--space-md); align-items: start; }

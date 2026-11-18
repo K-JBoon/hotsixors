@@ -318,6 +318,11 @@ const heatmap = (el, result, q, names) => {
     const title = dimensionName(names, ref);
     return (v) => ({ label: html({ [ref]: v }), title: title(v) });
   };
+  const column = (ref) => {
+    const head = label(ref);
+    const mark = CELLS[kindOf(ref)] ? (v) => (v == null ? '' : head(v).label) : () => '';
+    return (v) => ({ label: mark(v), name: head(v).title });
+  };
   const panel = (pel, prs) => {
     if (!prs.length) return noRows(pel);
     const rs = axisValues(prs, rRef, q.sort, names);
@@ -332,7 +337,7 @@ const heatmap = (el, result, q, names) => {
     };
     heatmapChart(pel, {
       rows: rs.map(label(rRef)),
-      cols: cs.map(label(cRef)),
+      cols: cs.map(column(cRef)),
       cells: rs.map((rv) => cs.map((cv) => cell(rv, cv))),
       head: [escapeHtml(`${rRef} / ${cRef}`), metricHead(m)],
       format,

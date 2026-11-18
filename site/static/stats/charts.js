@@ -203,7 +203,7 @@ const heatDomain = (values, ref) => {
 
 /**
  * Grid of `rows` x `cols` cells colored by value; diverging around `ref` when given.
- * `rows`, `cols`: `{ label, title? }`, `label` HTML. `cells[i][j]`: `{ value, title, thin? } | null`.
+ * `rows`: `{ label, title? }`, `label` HTML. `cols`: `{ label, name, title? }`, `label` optional mark HTML, `name` text. `cells[i][j]`: `{ value, title, thin? } | null`.
  * The color domain covers `range` (`[lo, hi]`) when given, else non-thin cells when any exist; others clamp.
  */
 export function heatmapChart(el, { rows, cols, cells, head, format, ref = null, minStep = 0, range = null }) {
@@ -221,11 +221,12 @@ export function heatmapChart(el, { rows, cols, cells, head, format, ref = null, 
     ),
   );
   const title = (t) => (t ? ` title="${escapeHtml(t)}"` : '');
-  el.innerHTML = `<div class="stats-chart stats-chart--heatmap" style="--rows: ${rows.length}; --cols: ${cols.length}">
+  const name = Math.max(...cols.map((c) => c.name.length), 1);
+  el.innerHTML = `<div class="stats-chart stats-chart--heatmap" style="--rows: ${rows.length}; --cols: ${cols.length}; --name: min(${name}ch, 8rem)">
     <div class="stats-chart__head">${head[1]}</div>
     <div class="stats-chart__key"><div class="stats-chart__scale" style="background: linear-gradient(90deg, ${key})"></div>${axis(at, ticks, format)}</div>
     <div class="stats-chart__head">${head[0]}</div>
-    <div class="stats-chart__cols">${cols.map((c) => `<div${title(c.title)}>${c.label}</div>`).join('')}</div>
+    <div class="stats-chart__cols">${cols.map((c) => `<div${title(c.title ?? c.name)}><span class="stats-chart__name">${escapeHtml(c.name)}</span>${c.label ?? ''}</div>`).join('')}</div>
     <svg class="stats-chart__plot">${rects.join('')}</svg>
     ${rows.map((r) => `<div class="stats-chart__label"${title(r.title)}>${r.label}</div>`).join('')}
   </div>`;
