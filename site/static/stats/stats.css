@@ -292,6 +292,11 @@
 .stats-query__metrics { flex-basis: 100%; justify-items: start; }
 .stats-query__metrics [data-metric] select:not(:first-of-type) { inline-size: 12rem; }
 .stats-query__metrics [data-clause] { margin-inline-start: calc(8rem + var(--space-3xs)); }
+@media (max-width: 900px) {
+  .stats-query__clause { flex-wrap: wrap; max-inline-size: 100%; }
+  .stats-query__clause > .input { max-inline-size: 100%; }
+  .stats-query__metrics [data-clause] { margin-inline-start: var(--space-sm); }
+}
 .stats-query__rail { inline-size: 24rem; font-size: var(--text-xs); }
 .stats-query__table { display: grid; gap: var(--space-2xs); }
 .stats-query__table summary { cursor: pointer; }
