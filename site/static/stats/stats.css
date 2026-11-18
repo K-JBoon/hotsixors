@@ -433,6 +433,7 @@ body.is-dragging-file .stats-page:not(.is-empty)::after {
 .stats-chart__name { position: absolute; inset-block-end: calc(100% + var(--space-3xs)); inset-inline-start: 50%; max-inline-size: var(--name); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; transform-origin: 0 50%; transform: rotate(-60deg); }
 .stats-chart__cols .stats-hero span { display: none; }
 .stats-chart__cell { stroke: var(--bg-deep); }
+.stats-chart__labels { pointer-events: none; fill: var(--text-bright); stroke: var(--bg-deep); stroke-width: 3px; stroke-linejoin: round; paint-order: stroke; font-size: var(--text-2xs); font-variant-numeric: tabular-nums; text-anchor: middle; dominant-baseline: central; }
 .stats-facets { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--facet-min)), 1fr)); gap: var(--space-md); align-items: start; }
 @container (max-width: 36rem) {
   .stats-chart--heatmap .stats-hero span { display: none; }

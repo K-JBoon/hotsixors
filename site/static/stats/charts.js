@@ -229,6 +229,44 @@ const ramp = (ref, mid) =>
         key: `var(--danger), var(--bg-card) ${pct(mid)}, var(--success-light)`,
       };
 
+const compact = (n) => (n < 1000 ? String(n) : n < 10000 ? `${(n / 1000).toFixed(1)}k` : `${Math.round(n / 1000)}k`);
+
+/** Minimum cell size in rem per set of label lines. */
+const LABEL_STEPS = [
+  [4, ['value', 'ci', 'n']],
+  [3, ['value', 'n']],
+  [2, ['n']],
+  [0, []],
+];
+
+const LINE = 1.2;
+
+const cellText = (x, y, lines) =>
+  lines.length
+    ? `<text x="${x}" y="${y}">${lines.map((l, k) => `<tspan x="${x}" dy="${k ? LINE : (-(lines.length - 1) * LINE) / 2}em">${escapeHtml(l)}</tspan>`).join('')}</text>`
+    : '';
+
+const cellLabels = new WeakMap();
+
+const LABEL_PAD = 6;
+
+/** Draws the largest label step whose cell size and text widths fit. */
+const fitLabels = (plot) => {
+  const { cols, draw } = cellLabels.get(plot);
+  const cell = plot.getBoundingClientRect().width / cols;
+  if (plot.dataset.cell === cell.toFixed(1)) return;
+  plot.dataset.cell = cell.toFixed(1);
+  const size = cell / parseFloat(getComputedStyle(document.documentElement).fontSize);
+  const g = plot.querySelector('.stats-chart__labels');
+  const fits = () => [...g.children].every((t) => t.getBBox().width + LABEL_PAD <= cell);
+  const [step] = LABEL_STEPS.filter(([min]) => size >= min - 0.01).find(([, fields]) => ((g.innerHTML = draw(fields)), fits()));
+  plot.dataset.step = step;
+};
+
+const labelObserver = new ResizeObserver((entries) =>
+  entries.forEach(({ target }) => (target.isConnected ? fitLabels(target) : labelObserver.unobserve(target))),
+);
+
 const heatDomain = (values, ref) => {
   if (ref == null) return extent(values);
   const span = Math.max(...values.map((v) => Math.abs(v - ref)), 0) || 1;
@@ -254,6 +292,17 @@ export function heatmapChart(el, { rows, cols, cells, head, format, ref = null, 
       return [`<rect class="stats-chart__cell${c.thin ? ' is-thin' : ''}" ${geometry} style="fill: ${color(at(c.value))}"><title>${escapeHtml(c.title)}</title></rect>${stripes('rect', geometry, c.thin)}`];
     }),
   );
+  const text = (c) => ({ value: format(c.value), ci: c.ci, n: c.n == null ? null : compact(c.n) });
+  const draw = (fields) =>
+    cells
+      .flatMap((row, i) =>
+        row.map((c, j) => {
+          if (c?.value == null) return '';
+          const t = text(c);
+          return cellText(pct((j + 0.5) / cols.length), pct((i + 0.5) / rows.length), fields.map((f) => t[f]).filter((l) => l != null));
+        }),
+      )
+      .join('');
   const title = (t) => (t ? ` title="${escapeHtml(t)}"` : '');
   const name = Math.max(...cols.map((c) => c.name.length), 1);
   el.innerHTML = `<div class="stats-chart stats-chart--heatmap" style="--rows: ${rows.length}; --cols: ${cols.length}; --name: min(${name}ch, 8rem)">
@@ -261,8 +310,11 @@ export function heatmapChart(el, { rows, cols, cells, head, format, ref = null, 
     <div class="stats-chart__key"><div class="stats-chart__scale" style="background: linear-gradient(90deg, ${key})"></div>${axis(at, ref == null ? domain : [domain[0], ref, domain[1]], format)}</div>
     <div class="stats-chart__head">${head[0]}</div>
     <div class="stats-chart__cols">${cols.map((c) => `<div${title(c.title ?? c.name)}><span class="stats-chart__name">${escapeHtml(c.name)}</span>${c.label ?? ''}</div>`).join('')}</div>
-    <svg class="stats-chart__plot">${STRIPES}${rects.join('')}</svg>
+    <svg class="stats-chart__plot">${STRIPES}${rects.join('')}<g class="stats-chart__labels"></g></svg>
     ${rows.map((r) => `<div class="stats-chart__label"${title(r.title)}>${r.label}</div>`).join('')}
   </div>`;
   fitAxes(el);
+  const plot = el.querySelector('.stats-chart__plot');
+  cellLabels.set(plot, { cols: cols.length, draw });
+  labelObserver.observe(plot);
 }

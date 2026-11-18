@@ -1,4 +1,4 @@
-import { MISSING_ICON, escapeHtml, fmt, heroCell, heroName, heroPortrait, lowSample, renderTable, talentCell, talentName, unlessAll, wilson, winRateCell } from '../view.js';
+import { MISSING_ICON, escapeHtml, fmt, halfWidth, heroCell, heroName, heroPortrait, lowSample, renderTable, talentCell, talentName, unlessAll, wilson, winRateCell } from '../view.js';
 import { barChart, extent, heatmapChart, lineChart, scatterChart } from '../charts.js';
 import { METRICS, knownOrder, splitColumn } from './model.js';
 import { valueOf } from './run.js';
@@ -281,6 +281,15 @@ const cellSize = (m, metrics) => {
   return (r) => r[m.name]?.n;
 };
 
+const PROPORTIONS = ['rate', 'share'];
+
+/** 95% interval half-width of a proportion cell: Wilson for rates, p = 0.5 for shares and deltas of proportions. */
+const confidenceOf = (m) => {
+  if (m.kind === 'rate') return (v) => (v?.n ? (([lo, hi]) => (hi - lo) / 2)(wilson(valueOf(v), v.n)) : null);
+  if (m.kind === 'share' || (m.kind === 'delta' && PROPORTIONS.includes(m.args[0].kind))) return (v) => (v?.n ? halfWidth(v.n) : null);
+  return () => null;
+};
+
 const axisValues = (rows, ref, sort, names) => {
   const values = [...new Set(rows.map((r) => r[ref]))];
   if (sort) return values;
@@ -322,6 +331,7 @@ const heatmap = (el, result, q, names) => {
   if (!rows.length) return noRows(el);
   const [rRef, cRef] = q.dimensions;
   const size = cellSize(m, q.metrics);
+  const confidence = confidenceOf(m);
   const dim = thinRow(rows, [m]);
   const format = metricFormat(m);
   const name = dimensionText(names, [q.facet, ...q.dimensions].filter((ref) => ref != null));
@@ -346,7 +356,14 @@ const heatmap = (el, result, q, names) => {
       const v = r && valueOf(r[m.name]);
       if (v == null) return null;
       const n = size(r);
-      return { value: v, title: `${name(r) || '–'}: ${format(v)}${n == null ? '' : `, n=${fmt.int(n)}`}`, thin: dim(r) };
+      const ci = confidence(r[m.name]);
+      return {
+        value: v,
+        title: `${name(r) || '–'}: ${format(v)}${n == null ? '' : `, n=${fmt.int(n)}`}`,
+        thin: dim(r),
+        n: r[m.name]?.n,
+        ci: ci == null ? null : `±${(ci * 100).toFixed(1)}`,
+      };
     };
     heatmapChart(pel, {
       rows: rs.map(label(rRef)),

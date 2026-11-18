@@ -64,7 +64,7 @@ export const thinOf = unlessAll(thin);
 const RATE_KINDS = ['rate', 'share', 'delta'];
 
 /** 95% interval half-width at p = 0.5 over `n` trials. */
-const halfWidth = (n, z = 1.96) => z / (2 * Math.sqrt(n));
+export const halfWidth = (n, z = 1.96) => z / (2 * Math.sqrt(n));
 
 /** Rates, shares and deltas are low sample when the half-width exceeds 10 pp; other metrics below `THIN_GAMES`. */
 export const lowSample = (kind, n) => typeof n === 'number' && (RATE_KINDS.includes(kind) ? halfWidth(n) > 0.1 : n < THIN_GAMES);
