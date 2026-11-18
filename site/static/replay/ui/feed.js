@@ -4,7 +4,7 @@ import { LOOPS_PER_SECOND } from '../analyze/stat-events.js';
 import { castLabel } from './abilities.js';
 import { clockText, escapeHtml, formatLoop, killerNames, portraitHtml } from './html.js';
 import { icon } from './icons.js';
-import { TALENT_TIERS } from './panel.js';
+import { TALENT_TIERS } from '../../js/talent-tiers.js';
 import { seekTo } from './playback.js';
 import { root, state, TEAM_COLORS } from './state.js';
 export function objectiveBandHtml(model) {

@@ -1,10 +1,12 @@
-import { splitColumn, tableOf, queryColumns } from './model.js';
+import { splitColumn, tableOf, queryColumns, DERIVED_JOINS } from './model.js';
 
 const TABLES = ['players', 'games', 'draft'];
 
-/** `{ players, games, draft }` column names of a stats source, the `names` input of validateQuery. */
-export const tableNames = async (stats) =>
-  Object.fromEntries(await Promise.all(TABLES.map(async (t) => [t, await stats.names(t)])));
+/** Column names per table and per derived join, the `names` input of validateQuery. */
+export const tableNames = async (stats) => ({
+  ...Object.fromEntries(await Promise.all(TABLES.map(async (t) => [t, await stats.names(t)]))),
+  ...Object.fromEntries(Object.entries(DERIVED_JOINS).map(([j, d]) => [j, d.columns])),
+});
 
 const caches = new WeakMap();
 
@@ -83,6 +85,8 @@ const expand = async (stats, from, joins) => {
  * for refs in `refs`.
  */
 export async function joinView(stats, q, refs = queryColumns(q)) {
+  const derived = q.joins.find((j) => DERIVED_JOINS[j]);
+  if (derived) throw new Error(`JOIN ${derived} cannot run yet`);
   const byJoin = Map.groupBy(refs.map(splitColumn), (r) => r.join);
   const [{ length, index }, loaded] = await Promise.all([
     expand(stats, q.from, q.joins),

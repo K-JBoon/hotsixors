@@ -31,7 +31,7 @@ const joinItem = (base) => (join) =>
 
 const tableBox = (table, cols) => {
   const plain = cols.filter((c) => !isScore(c));
-  const joins = BASES[table] ?? [];
+  const joins = (BASES[table] ?? []).filter((j) => JOINS[j]);
   return `<div class="card stats-query__table" data-table="${table}">
     <details><summary>${code(table)} <span class="stats-note">${escapeHtml(TABLE_DOCS[table])}</span></summary>${columnList(plain.map((c) => [c, columnDoc(table, c)]))}${scoreList(cols.filter(isScore))}</details>
     ${joins.length ? `<ul class="stats-query__joins">${joins.map(joinItem(table)).join('')}</ul>` : ''}

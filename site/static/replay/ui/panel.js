@@ -7,8 +7,8 @@ import { seekTo } from './playback.js';
 import { activeScoreColumns, compactNumber, scoreSortValue, scoreValues } from './scores.js';
 import { hideTalentTooltip, initTalentTooltip } from './talent-tooltip.js';
 import { root, state, TEAM_COLORS } from './state.js';
+import { TALENT_TIERS } from '../../js/talent-tiers.js';
 
-export const TALENT_TIERS = [1, 4, 7, 10, 13, 16, 20];
 function heroCellHtml(p) {
   const url = heroUrl(p);
   const title = escapeHtml(p.hero);

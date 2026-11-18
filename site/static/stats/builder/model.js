@@ -1,8 +1,25 @@
 import { count, present, sum, mean, rate, distinct, ratio, mode, latest, minorOf } from '../query.js';
+import { TALENT_TIERS } from '../../js/talent-tiers.js';
 
-export const BASES = { players: ['game', 'teammate', 'opponent'], draft: ['game'] };
+export const BASES = { players: ['game', 'teammate', 'opponent', 'talent_pair'], draft: ['game'] };
 
 export const JOINS = { game: 'games', teammate: 'players', opponent: 'players' };
+
+const TALENT_PAIRS = TALENT_TIERS.slice(1).map((level, i) => ({
+  tiers: `${TALENT_TIERS[i]}-${level}`,
+  a: `talent${i + 1}`,
+  b: `talent${i + 2}`,
+}));
+
+/** Joins without a table. `rows(row)` maps one base row, keyed by `reads`, to its joined rows. */
+export const DERIVED_JOINS = {
+  talent_pair: {
+    columns: ['tiers', 'a', 'b'],
+    reads: TALENT_TIERS.map((_, i) => `talent${i + 1}`),
+    values: { tiers: TALENT_PAIRS.map((p) => p.tiers) },
+    rows: (row) => TALENT_PAIRS.map((p) => ({ tiers: p.tiers, a: row[p.a] ?? null, b: row[p.b] ?? null })),
+  },
+};
 
 export const VIEWS = ['table', 'bar', 'line', 'scatter', 'heatmap'];
 
@@ -54,7 +71,11 @@ export const splitColumn = (ref) => {
   return dot < 0 ? { join: null, col: ref } : { join: ref.slice(0, dot), col: ref.slice(dot + 1) };
 };
 
-export const tableOf = (from, join) => (join ? JOINS[join] : from);
+/** Table a column ref reads; null for a derived join. */
+export const tableOf = (from, join) => (join ? (JOINS[join] ?? null) : from);
+
+/** Key into tableNames output: the table, or the join name for a derived join. */
+export const namesKey = (from, join) => (join && DERIVED_JOINS[join] ? join : tableOf(from, join));
 
 export const paramType = (kind, i) => METRICS[kind]?.params[i]?.replace('?', '');
 
@@ -96,7 +117,7 @@ const columnErrors = ({ from, joins }, names) => (ref, path) => {
   if (typeof ref !== 'string' || !ref) return [error(path, 'expected a column name')];
   const { join, col } = splitColumn(ref);
   if (join && !joins.includes(join)) return [error(path, `join ${join} is not in the query`)];
-  return names[tableOf(from, join)]?.includes(col) ? [] : [error(path, `unknown column ${ref}`)];
+  return names[namesKey(from, join)]?.includes(col) ? [] : [error(path, `unknown column ${ref}`)];
 };
 
 const unquotedPatch = ({ col, value }) =>

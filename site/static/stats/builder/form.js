@@ -1,6 +1,6 @@
 import {
   BASES,
-  JOINS,
+  DERIVED_JOINS,
   MAX_DIMENSIONS,
   METRICS,
   OPS,
@@ -10,6 +10,7 @@ import {
   fn,
   metric,
   nameClash,
+  namesKey,
   paramType,
   splitColumn,
   tableOf,
@@ -56,7 +57,7 @@ const complete = (c) => (c.op === 'in' ? c.value.length > 0 : c.value !== '');
 
 const columnsOf = (names, from, joins) => [
   ...(names[from] ?? []),
-  ...joins.flatMap((j) => (names[JOINS[j]] ?? []).map((c) => `${j}.${c}`)),
+  ...joins.flatMap((j) => (names[namesKey(from, j)] ?? []).map((c) => `${j}.${c}`)),
 ];
 
 const emptyValue = (op) => (op === 'in' ? [] : '');
@@ -243,7 +244,8 @@ export function builderForm(el, { names, values, label = (col, v) => printed(v),
   const colOption = columnOption(columnLabel);
   const valuesOf = (ref) => {
     const { join, col } = splitColumn(ref);
-    return values(tableOf(state.from, join), col);
+    const table = tableOf(state.from, join);
+    return table ? values(table, col) : Promise.resolve({ type: 'string', values: DERIVED_JOINS[join]?.values[col] ?? [] });
   };
 
   const optionsOf = (ref) =>
