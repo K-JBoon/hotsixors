@@ -76,6 +76,7 @@ export const COLUMN_DOCS = {
     opponent: 'Tournament team name of the other team; opponent.<column> reads the opponent join.',
     duration_s: 'Game length in seconds.',
     picked_first: 'True when the team of the player made the first hero pick, null when unknown.',
+    team_mercs: 'Sum of score_MercCampCaptures over the team of the player in the game, null when the team has no score data.',
     ...TALENTS,
   },
   games: {

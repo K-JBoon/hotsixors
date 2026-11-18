@@ -76,22 +76,6 @@ FACET BY kind
 VIEW heatmap`,
   },
   {
-    name: 'Best duos',
-    text: `SELECT hero, teammate.hero, delta(rate(win)) AS win, count() AS games
-FROM players JOIN teammate
-GROUP BY hero, teammate.hero
-HAVING count() >= 50
-VIEW heatmap`,
-  },
-  {
-    name: 'Team hero pools',
-    text: `SELECT team_name, distinct(hero) AS heroes, mode(hero) AS top
-FROM players
-WHERE team_name != NULL
-GROUP BY team_name
-ORDER BY heroes DESC`,
-  },
-  {
     name: 'Popularity by map',
     text: `SELECT hero, map, share(count()) AS picks
 FROM players
@@ -111,10 +95,12 @@ VIEW bar`,
   },
   {
     name: 'Mercs vs. win rate',
-    text: `SELECT hero, mean(score_MercCampCaptures) AS mercs, rate(win) AS win
+    text: `SELECT team_mercs, rate(win) AS win, count() AS games
 FROM players
-GROUP BY hero
-VIEW scatter`,
+WHERE team_mercs <= 25
+GROUP BY team_mercs
+ORDER BY team_mercs ASC
+VIEW line`,
   },
   {
     name: 'Win rate by game length',

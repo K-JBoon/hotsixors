@@ -28,9 +28,19 @@ const GAME_LENGTHS = [
   { label: '25m+', below: Infinity },
 ];
 
+const teamSum = (col) => ({ length, game_id, team, [col]: values }) => {
+  const key = (i) => `${game_id[i]}:${team[i]}`;
+  const sums = new Map();
+  for (let i = 0; i < length; i++) if (values[i] != null) sums.set(key(i), (sums.get(key(i)) ?? 0) + Number(values[i]));
+  return Array.from({ length }, (_, i) => (team[i] == null ? null : (sums.get(key(i)) ?? null)));
+};
+
 const gameLength = (s) => (s == null ? null : GAME_LENGTHS.find((b) => s < b.below).label);
 
-/** Columns without a stored source. `value(row, game)` maps `reads` of the row and `game` of its games row. */
+/**
+ * Columns without a stored source. `value(row, game)` maps `reads` of the row and `game` of its games row;
+ * `column(source)` maps the `reads` columns of the whole table to one value per row.
+ */
 export const DERIVED_COLUMNS = {
   game_length: {
     tables: ['players', 'games', 'draft'],
@@ -45,6 +55,11 @@ export const DERIVED_COLUMNS = {
     game: ['first_pick'],
     values: [false, true],
     value: ({ team }, { first_pick }) => (team == null || first_pick == null ? null : team === first_pick),
+  },
+  team_mercs: {
+    tables: ['players'],
+    reads: ['game_id', 'team', 'score_MercCampCaptures'],
+    column: teamSum('score_MercCampCaptures'),
   },
 };
 

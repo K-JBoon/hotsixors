@@ -110,7 +110,8 @@ const pick = (cols, source, i) => Object.fromEntries(cols.map((c) => [c, i < 0 ?
 
 const derivedColumn = (stats, table, col) =>
   memo(stats, `column:${table}:${col}`, async () => {
-    const { reads, game, value } = DERIVED_COLUMNS[col];
+    const { reads, game, value, column } = DERIVED_COLUMNS[col];
+    if (column) return column(await stats.columns(table, reads));
     const [rows, games, gameIndex] = await Promise.all([
       stats.columns(table, ['game_id', ...reads]),
       stats.columns('games', game),
