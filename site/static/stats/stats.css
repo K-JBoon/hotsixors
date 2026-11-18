@@ -311,9 +311,8 @@
 .stats-query__cols dd { margin: 0; color: var(--text-muted); }
 .stats-query__joins { display: grid; gap: var(--space-2xs); margin: 0; padding: 0; list-style: none; }
 .stats-query__joins .stats-note { display: block; font-size: inherit; margin-block-start: var(--space-3xs); }
-.stats-query__fan { vertical-align: middle; margin-inline-start: var(--space-2xs); color: var(--text-muted); fill: currentColor; stroke: currentColor; stroke-width: 1; }
 .stats-query__table.is-active { border-color: var(--gold-line); }
-.stats-query__table.is-active > details > summary > code, .stats-query__joins .is-active > code, .stats-query__joins .is-active > .stats-query__fan { color: var(--accent-gold); }
+.stats-query__table.is-active > details > summary > code, .stats-query__joins .is-active > code { color: var(--accent-gold); }
 .stats-query__joins .is-thin { opacity: 0.5; }
 .stats-query__ref { grid-template-columns: minmax(0, 1fr); }
 .stats-query__ref dd + dt { margin-block-start: var(--space-2xs); }

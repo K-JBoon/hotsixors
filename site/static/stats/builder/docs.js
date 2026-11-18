@@ -15,8 +15,6 @@ export const JOIN_DOCS = {
   talent_pair: 'Each player row becomes 6 rows, one per pair of adjacent talent tiers.',
 };
 
-export const JOIN_ROWS = { game: 1, teammate: 4, opponent: 5, talent_pair: DERIVED_JOINS.talent_pair.values.tiers.length };
-
 const JOIN_ON = {
   game: ['game_id'],
   teammate: ['game_id', 'team', ['slot', '!=']],
