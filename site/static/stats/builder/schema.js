@@ -1,5 +1,5 @@
 import { escapeHtml } from '../view.js';
-import { BASES, JOINS } from './model.js';
+import { BASES, JOINS, DERIVED_JOINS } from './model.js';
 import { TABLE_DOCS, JOIN_DOCS, JOIN_ROWS, joinSql, SCORE_DOC, SCORE_LABELS, SCORE_PREFIX, isScore, columnDoc } from './docs.js';
 
 const ORDER = ['players', 'draft', 'games'];
@@ -23,15 +23,22 @@ const fan = (n) => {
   return `<svg class="stats-query__fan" viewBox="0 0 ${FAN.w} ${FAN.h}" width="${FAN.w}" height="${FAN.h}" role="img" aria-label="1 row to ${n}"><title>1 row to ${n}</title>${ys.map((y) => `<line x1="${x0}" y1="${mid}" x2="${x1}" y2="${y}"/>`).join('')}${dot(x0, mid)}${ys.map((y) => dot(x1, y)).join('')}</svg>`;
 };
 
+const gotoButton = (join) => (JOINS[join] ? ` → <button class="btn btn--sm" type="button" data-goto="${JOINS[join]}">${JOINS[join]}</button>` : '');
+
+const joinColumns = (join) =>
+  DERIVED_JOINS[join]
+    ? columnList(DERIVED_JOINS[join].columns.map((c) => [`${join}.${c}`, columnDoc(join, c)]))
+    : `<span class="stats-note">Columns: ${code(`${join}.<column>`)}</span>`;
+
 const joinItem = (base) => (join) =>
-  `<li data-join="${join}">${code(`JOIN ${join}`)} → <button class="btn btn--sm" type="button" data-goto="${JOINS[join]}">${JOINS[join]}</button> ${fan(JOIN_ROWS[join])}
-    <span class="stats-note">Columns: ${code(`${join}.<column>`)}</span>
+  `<li data-join="${join}">${code(`JOIN ${join}`)}${gotoButton(join)} ${fan(JOIN_ROWS[join])}
+    ${joinColumns(join)}
     <pre class="stats-query__example"><code>${escapeHtml(joinSql(base, join, JOINS[join]))}</code></pre>
     <span class="stats-note">${escapeHtml(JOIN_DOCS[join])}</span></li>`;
 
 const tableBox = (table, cols) => {
   const plain = cols.filter((c) => !isScore(c));
-  const joins = (BASES[table] ?? []).filter((j) => JOINS[j]);
+  const joins = BASES[table] ?? [];
   return `<div class="card stats-query__table" data-table="${table}">
     <details><summary>${code(table)} <span class="stats-note">${escapeHtml(TABLE_DOCS[table])}</span></summary>${columnList(plain.map((c) => [c, columnDoc(table, c)]))}${scoreList(cols.filter(isScore))}</details>
     ${joins.length ? `<ul class="stats-query__joins">${joins.map(joinItem(table)).join('')}</ul>` : ''}

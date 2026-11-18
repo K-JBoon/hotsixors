@@ -1,4 +1,5 @@
 import { STAT_COLUMNS } from '../reports.js';
+import { DERIVED_JOINS } from './model.js';
 
 export const TABLE_DOCS = {
   players: 'One row per player per game, 10 rows per game.',
@@ -10,9 +11,10 @@ export const JOIN_DOCS = {
   game: 'Adds the games row of the same game. The row count does not change.',
   teammate: 'Each player row becomes 4 rows, one per teammate. The row of the player is not included.',
   opponent: 'Each player row becomes 5 rows, one per player of the other team.',
+  talent_pair: 'Each player row becomes 6 rows, one per pair of adjacent talent tiers.',
 };
 
-export const JOIN_ROWS = { game: 1, teammate: 4, opponent: 5 };
+export const JOIN_ROWS = { game: 1, teammate: 4, opponent: 5, talent_pair: DERIVED_JOINS.talent_pair.values.tiers.length };
 
 const JOIN_ON = {
   game: ['game_id'],
@@ -20,14 +22,27 @@ const JOIN_ON = {
   opponent: ['game_id', ['team', '!=']],
 };
 
-/** Standard SQL equivalent of `JOIN join` from `base`; `table` is the joined table. */
-export const joinSql = (base, join, table) =>
+const tableSql = (base, join, table) =>
   [
     `LEFT JOIN ${table} AS ${join}`,
     ...JOIN_ON[join]
       .map((k) => (Array.isArray(k) ? k : [k, '=']))
       .map(([col, op], i) => `${i ? 'AND' : ' ON'} ${join}.${col} ${op} ${base}.${col}`),
   ].join('\n');
+
+const DERIVED_SQL = {
+  talent_pair: (join) => {
+    const { tiers } = DERIVED_JOINS[join].values;
+    return [
+      'CROSS JOIN LATERAL (VALUES',
+      ...tiers.map((t, i) => `  ('${t}', talent${i + 1}, talent${i + 2})${i < tiers.length - 1 ? ',' : ''}`),
+      `) AS ${join} (${DERIVED_JOINS[join].columns.join(', ')})`,
+    ].join('\n');
+  },
+};
+
+/** Standard SQL equivalent of `JOIN join` from `base`; `table` is the joined table, absent for derived joins. */
+export const joinSql = (base, join, table) => DERIVED_SQL[join]?.(join) ?? tableSql(base, join, table);
 
 const COMMON = {
   game_id: 'Unique ID of the game.',
@@ -80,6 +95,11 @@ export const COLUMN_DOCS = {
     hero: 'Hero ID such as valla.',
     win: 'True when the team that made the ban or pick won.',
     team_name: 'Tournament team name of the team that made the ban or pick.',
+  },
+  talent_pair: {
+    tiers: 'Levels of the two tiers, such as 1-4.',
+    a: 'Talent ID chosen at the lower tier, null when not chosen.',
+    b: 'Talent ID chosen at the higher tier, null when not chosen.',
   },
 };
 
