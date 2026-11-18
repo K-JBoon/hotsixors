@@ -133,6 +133,7 @@ export const CLAUSE_DOCS = {
   JOIN: 'Adds the columns of a joined table, read as join.column. Works as LEFT JOIN: a row with no match stays, with null joined columns. JOIN teammate JOIN opponent gives 4 × 5 = 20 rows per player row.',
   WHERE: 'Keeps only the rows where every condition is true.',
   'GROUP BY': 'Sets the dimensions: one result row per distinct value of up to two columns. Null is a value too.',
+  'FACET BY': 'Splits the result into one panel per distinct value of a column. Each panel has the same dimensions and metrics.',
   FILTER: 'Limits one metric to the rows where every condition is true.',
   'ORDER BY': 'Sorts result rows by a metric or dimension, DESC by default, nulls last.',
   LIMIT: 'Keeps the first n result rows after sorting.',

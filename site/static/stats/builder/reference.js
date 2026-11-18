@@ -27,6 +27,7 @@ const CLAUSE_EXAMPLES = {
   JOIN: query({ joins: ['game'], dimensions: ['game.stage'], metrics: [m('rows', 'count')] }),
   WHERE: query({ ...byHero, where: [clause('patch', '=', '2.55'), clause('strict', '=', true)] }),
   'GROUP BY': query(byHero),
+  'FACET BY': query({ ...byHero, facet: 'map' }),
   FILTER: query({ dimensions: ['hero'], metrics: [m('wins', 'count', [], [clause('win', '=', true)])] }),
   'ORDER BY': query({ ...byHero, sort: { by: 'games', dir: 'desc' } }),
   LIMIT: query({ ...byHero, sort: { by: 'games', dir: 'desc' }, limit: 10 }),

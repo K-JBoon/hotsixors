@@ -22,4 +22,17 @@ FROM players JOIN opponent
 GROUP BY hero, opponent.hero
 VIEW heatmap`,
   },
+  {
+    name: 'Talent pairs',
+    text: `SELECT talent_pair.a,
+       talent_pair.b,
+       talent_pair.tiers,
+       delta(rate(win)) AS win,
+       count() AS games
+FROM players JOIN talent_pair
+WHERE hero = 'valla'
+GROUP BY talent_pair.a, talent_pair.b
+FACET BY talent_pair.tiers
+VIEW heatmap`,
+  },
 ];
