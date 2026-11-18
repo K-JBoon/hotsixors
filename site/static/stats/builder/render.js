@@ -1,6 +1,6 @@
 import { MISSING_ICON, escapeHtml, fmt, halfWidth, heroCell, heroName, heroPortrait, lowSample, renderTable, talentCell, talentName, unlessAll, wilson, winRateCell } from '../view.js';
 import { barChart, extent, heatmapChart, lineChart, scatterChart } from '../charts.js';
-import { METRICS, knownOrder, splitColumn } from './model.js';
+import { METRICS, kindOf, knownOrder, splitColumn } from './model.js';
 import { valueOf } from './run.js';
 import { printCall } from './text.js';
 
@@ -48,13 +48,6 @@ const metricCell = (m) => {
 const versionKey = (v) => (typeof v === 'string' ? v.split('.').map((p) => p.padStart(8, '0')).join('.') : v);
 
 const heroHash = (slug) => `#hero/${encodeURIComponent(slug)}`;
-
-const TALENT_COLUMN = /^talent\d+$/;
-
-const kindOf = (ref) => {
-  const { join, col } = splitColumn(ref);
-  return TALENT_COLUMN.test(col) || (join === 'talent_pair' && ['a', 'b'].includes(col)) ? 'talent' : col;
-};
 
 const talentLevel = (talents, id) => Number(talents[id]?.tier?.replace(/\D/g, '') || 99);
 

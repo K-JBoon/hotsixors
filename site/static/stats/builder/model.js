@@ -130,6 +130,13 @@ export const splitColumn = (ref) => {
   return dot < 0 ? { join: null, col: ref } : { join: ref.slice(0, dot), col: ref.slice(dot + 1) };
 };
 
+const TALENT_COLUMN = /^talent\d+$/;
+
+export const kindOf = (ref) => {
+  const { join, col } = splitColumn(ref);
+  return TALENT_COLUMN.test(col) || (join === 'talent_pair' && ['a', 'b'].includes(col)) ? 'talent' : col;
+};
+
 /** Table a column ref reads; null for a derived join. */
 export const tableOf = (from, join) => (join ? (JOINS[join] ?? null) : from);
 

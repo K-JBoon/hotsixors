@@ -12,12 +12,13 @@ import { runQuery } from './builder/run.js';
 import { examples, withWhere } from './builder/examples.js';
 import { SCORE_LABELS } from './builder/docs.js';
 import { renderResult } from './builder/render.js';
+import { csvFileName, toCsv } from './builder/csv.js';
 import { schemaRail } from './builder/schema.js';
 import { referenceRail } from './builder/reference.js';
 import {
   STAT_COLUMNS, available, facets, gameList, tournamentReport, tournamentTable, heroReport, mapReport, heroTable, mapTable, playerReport, playerTable, teamReport, teamTable,
 } from './reports.js';
-import { LIQUIPEDIA_ICON, MISSING_ICON, deltaCell, escapeHtml, fmt, heroCell, heroName, loadHeroes, renderTable, renderTalentTiers, tiles, wilson, winRateCell } from './view.js';
+import { LIQUIPEDIA_ICON, MISSING_ICON, deltaCell, escapeHtml, fmt, heroCell, heroName, loadHeroes, renderTable, renderTalentTiers, talentName, tiles, wilson, winRateCell } from './view.js';
 
 const root = document.querySelector('[data-stats-root]');
 const view = root.querySelector('[data-view]');
@@ -430,7 +431,7 @@ const VIEWS = {
     if (text) queryText = text;
     else queryText ??= withWhere(where, DEFAULT_QUERY);
     if (!text) history.replaceState(null, '', queryHash(queryText));
-    el.innerHTML = `<div class="stats-layout stats-layout--wide"><section class="stats-section"><div class="stats-query__bar" data-part="examples"></div><div class="stats-query__bar"><input class="input" data-name placeholder="Name" aria-label="Name"><button class="btn" type="button" data-save>Save</button><span class="stats-query__list" data-part="saved"></span></div><div class="stats-filters stats-query__form"><form class="stats-query__controls" data-part="builder"></form><div class="stats-query__editor"><textarea class="input stats-query__text" rows="4" spellcheck="false" aria-label="Query"></textarea><div data-part="note"></div></div></div></section><div class="stats-layout__cols"><div class="stats-content"><div data-part="out"></div></div><aside class="stats-rail stats-query__rail"><section class="stats-section"><h2 class="stats-section__title">Schema</h2><div data-part="schema"></div></section><section class="stats-section"><h2 class="stats-section__title">Reference</h2><div data-part="reference"></div></section></aside></div></div>`;
+    el.innerHTML = `<div class="stats-layout stats-layout--wide"><section class="stats-section"><div class="stats-query__bar" data-part="examples"></div><div class="stats-query__bar"><input class="input" data-name placeholder="Name" aria-label="Name"><button class="btn" type="button" data-save>Save</button><button class="btn" type="button" data-csv disabled>Download CSV</button><span class="stats-query__list" data-part="saved"></span></div><div class="stats-filters stats-query__form"><form class="stats-query__controls" data-part="builder"></form><div class="stats-query__editor"><textarea class="input stats-query__text" rows="4" spellcheck="false" aria-label="Query"></textarea><div data-part="note"></div></div></div></section><div class="stats-layout__cols"><div class="stats-content"><div data-part="out"></div></div><aside class="stats-rail stats-query__rail"><section class="stats-section"><h2 class="stats-section__title">Schema</h2><div data-part="schema"></div></section><section class="stats-section"><h2 class="stats-section__title">Reference</h2><div data-part="reference"></div></section></aside></div></div>`;
     const input = el.querySelector('textarea');
     const fit = () => (input.rows = Math.max(4, input.value.split('\n').length));
     const name = el.querySelector('[data-name]');
@@ -450,12 +451,28 @@ const VIEWS = {
       await saveSetting(SAVED_KEY, list);
     };
     const save = () => name.value.trim() && store(withSaved(saved, name.value.trim(), input.value));
+    const csvButton = el.querySelector('[data-csv]');
+    let shown = null;
+    const show = (s) => {
+      shown = s;
+      csvButton.disabled = !s?.result.rows.length;
+    };
+    const download = () => {
+      if (!shown) return;
+      const csv = toCsv(shown.result, shown.q, { hero: (v) => heroName(heroes, v), talent: (v) => talentName(talents, v) });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+      a.download = csvFileName(name.value);
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href));
+    };
     let token = 0;
     const run = async () => {
       const t = ++token;
       const { q, result, error } = await queryResult(stats, input.value);
       if (t !== token) return;
       const fail = (message) => {
+        show(null);
         out.innerHTML = '';
         note.innerHTML = `<p class="stats-note stats-query__error">${escapeHtml(message)}</p>`;
       };
@@ -463,6 +480,7 @@ const VIEWS = {
       note.innerHTML = '';
       try {
         renderResult(out, result, q, heroes, talents);
+        show({ q, result });
       } catch (e) {
         fail(String(e?.message ?? e));
       }
@@ -496,6 +514,7 @@ const VIEWS = {
     name.value = [...saved, ...exampleList].find((s) => s.text === queryText)?.name ?? '';
     showSaved();
     el.querySelector('[data-save]').addEventListener('click', save);
+    csvButton.addEventListener('click', download);
     name.addEventListener('keydown', (e) => e.key === 'Enter' && save());
     const open = (s) => {
       if (!s) return;
