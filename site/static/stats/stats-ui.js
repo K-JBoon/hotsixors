@@ -14,13 +14,11 @@ import { SCORE_LABELS } from './builder/docs.js';
 import { renderResult } from './builder/render.js';
 import { csvFileName, toCsv } from './builder/csv.js';
 import { schemaRail } from './builder/schema.js';
-import { barChart, barColumns, extent, lineChart } from './charts.js';
-import { getAvailableStorage, getStoredString, setStoredString } from '../js/storage.js';
 import { referenceRail } from './builder/reference.js';
 import {
   STAT_COLUMNS, available, facets, gameList, tournamentReport, tournamentTable, heroReport, mapReport, heroTable, mapTable, playerReport, playerTable, teamReport, teamTable,
 } from './reports.js';
-import { LIQUIPEDIA_ICON, MISSING_ICON, deltaCell, escapeHtml, fmt, heroCell, heroName, loadHeroes, renderTable, renderTalentTiers, talentLink, talentName, talentTiers, thinOf, tierLevel, tiles, wilson, winRateCell } from './view.js';
+import { LIQUIPEDIA_ICON, MISSING_ICON, deltaCell, escapeHtml, fmt, heroCell, heroName, loadHeroes, renderTable, renderTalentTiers, talentName, tiles, wilson, winRateCell } from './view.js';
 
 const root = document.querySelector('[data-stats-root]');
 const view = root.querySelector('[data-view]');
@@ -164,78 +162,6 @@ function section(title, id) {
 }
 const part = (el, id) => el.querySelector(`[data-part="${id}"]`);
 
-const SECTION_VIEWS = [['table', 'Table'], ['chart', 'Chart']];
-const viewSwitch = (id) => `<div class="segmented" role="radiogroup" aria-label="View" data-switch="${id}">${SECTION_VIEWS
-  .map(([v, label], i) => `<label class="segmented__btn"><input type="radio" name="view-${id}" value="${v}"${i ? '' : ' checked'}> ${label}</label>`)
-  .join('')}</div>`;
-const viewKey = (id) => `hotsixors.stats.view.${route().tab}.${id}`;
-
-/** Hidden copy of a table that keeps a rail section as wide in chart mode as in table mode. */
-const sizer = (table) => {
-  const el = document.createElement('div');
-  el.className = 'stats-sizer';
-  table(el);
-  return el;
-};
-
-/** Draws section `id` with `draw.table(body)` or `draw.chart(body)`, as picked by its head switch and saved per page and section. */
-function tableOrChart(el, id, draw) {
-  const body = part(el, id);
-  const radios = el.querySelector(`[data-switch="${id}"]`);
-  const storage = getAvailableStorage();
-  const show = (mode) => {
-    radios.querySelector(`input[value="${mode}"]`).checked = true;
-    draw[mode](body);
-    if (mode === 'chart') body.append(sizer(draw.table));
-  };
-  radios.addEventListener('change', (e) => {
-    setStoredString(storage, viewKey(id), e.target.value);
-    show(e.target.value);
-  });
-  show(getStoredString(storage, viewKey(id), 'table', SECTION_VIEWS.map(([v]) => v)));
-}
-
-const emptyNote = (el, empty) => {
-  el.innerHTML = `<p class="stats-note">${escapeHtml(empty ?? 'No games match these filters.')}</p>`;
-};
-
-/** Win and pick rate per patch, oldest first; rates over few games are striped. */
-function patchChart(el, filters, patches) {
-  const { rows, empty } = minGames(patches, filters);
-  if (!rows.length) return emptyNote(el, empty);
-  const ordered = [...rows].sort((a, b) => patchRank(a.patch) - patchRank(b.patch));
-  const dim = thinOf(ordered.map((r) => r.games));
-  const series = [['Win', 'winRate'], ['Pick', 'pickRate']].map(([label, key]) => ({
-    label,
-    points: ordered.map((r) => ({ value: r[key], title: `${r.patch} ${label}: ${fmt.pct(r[key])}, ${fmt.int(r.games)} games`, thin: dim(r.games) })),
-  }));
-  lineChart(el, { xs: ordered.map((r) => r.patch), series, on: [true, true], head: 'Rate', format: fmt.pct, ref: 0.5 });
-}
-
-const deltaOf = (rate, base) => (r) => (r[rate] == null || base == null ? null : r[rate] - base);
-const descending = (key) => (a, b) => (key(b) ?? -Infinity) - (key(a) ?? -Infinity) || 0;
-
-/** Bars of `rate` minus `base`; low-sample bars are striped. */
-const deltaBars = (rows, base, rate, games) => {
-  const dim = thinOf(rows.map((r) => r[games]));
-  return rows.map((r) => ({ value: deltaOf(rate, base)(r), text: deltaCell(r[rate], base, r[games]), thin: dim(r[games]) }));
-};
-
-/** Extent of non-thin bar values when any exist, so thin outliers clip at the axis edge. */
-const solidRange = (bars) => {
-  const solid = bars.filter((b) => !b.thin);
-  return solid.length ? extent(solid.map((b) => b.value)) : null;
-};
-
-/** Hero win rate per map minus `base`, best first. */
-function mapChart(el, filters, maps, base) {
-  const { rows, empty } = minGames(maps, filters);
-  if (!rows.length) return emptyNote(el, empty);
-  const ordered = [...rows].sort(descending(deltaOf('winRate', base)));
-  const bars = deltaBars(ordered, base, 'winRate', 'games').map((b, i) => ({ ...b, label: link(hash('map', ordered[i].map), ordered[i].map) }));
-  barChart(el, { bars, head: ['Map', 'vs hero'], format: fmt.delta, range: solidRange(bars) });
-}
-
 /**
  * Detail page body. `band` sections span the page above the columns; `rail` sections sit beside the
  * content under the tiles; `either` sections join them while the rail stays shorter than the content.
@@ -245,9 +171,7 @@ function detailPage(header, tileHtml, sections) {
   const item = (s, i) => {
     const attrs = s.place === 'band' ? `data-place="band"` : `data-place="${s.place}" style="order: ${i + 1}"`;
     if (s.phases) return `<div class="stats-phases" data-part="${s.id}" ${attrs}></div>`;
-    const title = `<h2 class="stats-section__title">${escapeHtml(s.title)}</h2>`;
-    const head = s.chart ? `<div class="stats-section__head">${title}${viewSwitch(s.id)}</div>` : title;
-    return `<section class="stats-section" ${attrs}>${head}<div data-part="${s.id}"></div></section>`;
+    return `<section class="stats-section" ${attrs}><h2 class="stats-section__title">${escapeHtml(s.title)}</h2><div data-part="${s.id}"></div></section>`;
   };
   const at = (pred) => sections.map((s, i) => (pred(s) ? item(s, i) : '')).join('');
   return `<div class="stats-layout">${header}${at((s) => s.place === 'band')}<div class="stats-layout__cols">
@@ -450,23 +374,6 @@ function matchupTable(el, filters, heroes, rows, base, whose) {
   });
 }
 
-/** Per tier, each talent's pick rate and win rate minus the hero's win rate at that tier. */
-function talentChart(el, talents, rows) {
-  if (!rows.length) return emptyNote(el);
-  const entries = talentTiers(rows).flatMap(([tier, list]) => [{ tier }, ...list]);
-  const dim = thinOf(rows.map((r) => r.picks));
-  const bars = (bar) => entries.map((e) => (e.talent ? { ...bar(e), thin: dim(e.picks) } : null));
-  el.innerHTML = '<div class="stats-chart-wrap"></div>';
-  barColumns(el.firstChild, {
-    labels: entries.map((e) => (e.talent ? talentLink(talents, e.talent) : `<span class="talent-tier__num">${tierLevel(e.tier)}</span>`)),
-    head: 'Talent',
-    columns: [
-      { head: 'Picked', format: fmt.pct, range: [0, 1], striped: false, bars: bars((r) => ({ value: r.pickRate, text: fmt.pct(r.pickRate) })) },
-      { head: 'vs hero', format: fmt.delta, bars: bars((r) => ({ value: deltaOf('winRate', r.tierWinRate)(r), text: deltaCell(r.winRate, r.tierWinRate, r.picks) })) },
-    ],
-  });
-}
-
 const lengthLabel = (x) => (x.to == null ? `${x.from / 60}+ min` : x.from ? `${x.from / 60}–${x.to / 60} min` : `Under ${x.to / 60} min`);
 function lengthTable(el, filters, rows) {
   statsTable(el, filters, {
@@ -474,23 +381,6 @@ function lengthTable(el, filters, rows) {
     rows,
     sortKey: 'from',
     pageSize: Infinity,
-  });
-}
-
-/** Win rate per length bucket, shortest first. */
-function lengthChart(el, filters, lengths) {
-  const { rows, empty } = minGames(lengths, filters);
-  if (!rows.length) return emptyNote(el, empty);
-  const ordered = [...rows].sort((a, b) => a.from - b.from);
-  const dim = thinOf(ordered.map((r) => r.games));
-  const points = ordered.map((r) => ({ value: r.winRate, title: `${lengthLabel(r)} Win: ${fmt.pct(r.winRate)}, ${fmt.int(r.games)} games`, thin: dim(r.games) }));
-  lineChart(el, { xs: ordered.map(lengthLabel), series: [{ label: 'Win', points }], on: [true], head: 'Win', format: fmt.pct, ref: 0.5 });
-}
-
-function lengthSection(el, filters, rows) {
-  tableOrChart(el, 'lengths', {
-    table: (body) => lengthTable(body, filters, rows),
-    chart: (body) => lengthChart(body, filters, rows),
   });
 }
 
@@ -687,34 +577,28 @@ const VIEWS = {
         ...(mine ? [] : [['Ban rate', fmt.pct(s.banRate)], ['Presence', fmt.pct(s.presence)], ['Early ban', fmt.pct(s.earlyBanRate)], ['Avg pick #', fmt.num(s.pickNumber)]]),
       ]),
       [
-        { title: 'Maps', id: 'maps', place: 'rail', chart: true },
-        { title: 'Talents', id: 'talents', place: 'main', chart: true },
+        { title: 'Maps', id: 'maps', place: 'rail' },
+        { title: 'Talents', id: 'talents', place: 'main' },
         { title: 'Builds', id: 'builds', place: 'main' },
         { title: 'Matchups', id: 'matchups', place: 'main' },
-        { title: 'Patches', id: 'patches', place: 'rail', chart: true },
-        { title: 'Game length', id: 'lengths', place: 'rail', chart: true },
+        { title: 'Patches', id: 'patches', place: 'rail' },
+        { title: 'Game length', id: 'lengths', place: 'rail' },
         { title: 'Players', id: 'players', place: 'main' },
         { title: 'Games', id: 'games', place: 'main' },
       ],
     );
-    tableOrChart(el, 'talents', {
-      table: (body) => renderTalentTiers(body, talents, report.talents, true),
-      chart: (body) => talentChart(body, talents, report.talents),
-    });
+    renderTalentTiers(part(el, 'talents'), talents, report.talents, true);
     matchupTable(part(el, 'matchups'), filters, heroes, report.matchups, s.winRate, 'hero');
-    lengthSection(el, filters, report.lengths);
-    tableOrChart(el, 'patches', {
-      table: (body) => statsTable(body, filters, {
-        columns: [
-          { key: 'patch', label: 'Patch', sort: (x) => patchRank(x.patch) },
-          gamesCol, winCol(filters),
-          { key: 'pickRate', label: 'Pick', num: true, format: fmt.pct },
-        ],
-        rows: report.patches,
-        sortKey: 'patch',
-        pageSize: 10,
-      }),
-      chart: (body) => patchChart(body, filters, report.patches),
+    lengthTable(part(el, 'lengths'), filters, report.lengths);
+    statsTable(part(el, 'patches'), filters, {
+      columns: [
+        { key: 'patch', label: 'Patch', sort: (x) => patchRank(x.patch) },
+        gamesCol, winCol(filters),
+        { key: 'pickRate', label: 'Pick', num: true, format: fmt.pct },
+      ],
+      rows: report.patches,
+      sortKey: 'patch',
+      pageSize: 10,
     });
     const talentIcon = (id) => {
       const t = talents[id];
@@ -733,10 +617,7 @@ const VIEWS = {
       pageSize: 10,
       empty: 'No builds through level 16 under these filters.',
     });
-    tableOrChart(el, 'maps', {
-      table: (body) => statsTable(body, filters, { columns: [{ key: 'map', label: 'Map', html: (x) => link(hash('map', x.map), x.map) }, gamesCol, winCol(filters)], rows: report.maps, sortKey: 'games' }),
-      chart: (body) => mapChart(body, filters, report.maps, s.winRate),
-    });
+    statsTable(part(el, 'maps'), filters, { columns: [{ key: 'map', label: 'Map', html: (x) => link(hash('map', x.map), x.map) }, gamesCol, winCol(filters)], rows: report.maps, sortKey: 'games' });
     statsTable(part(el, 'players'), filters, {
       columns: [
         { key: 'battletag', label: 'Player', html: (r) => link(hash('player', r.player), r.battletag ?? r.player) },
@@ -862,12 +743,12 @@ const VIEWS = {
         { title: 'Maps', id: 'maps', place: 'rail' },
         { title: 'Heroes', id: 'heroes', place: 'main' },
         { title: 'Matchups', id: 'matchups', place: 'main' },
-        { title: 'Game length', id: 'lengths', place: 'rail', chart: true },
+        { title: 'Game length', id: 'lengths', place: 'rail' },
         { title: 'Games', id: 'games', place: 'main' },
       ],
     );
     matchupTable(part(el, 'matchups'), filters, heroes, r.matchups, r.summary.winRate, 'player');
-    lengthSection(el, filters, r.lengths);
+    lengthTable(part(el, 'lengths'), filters, r.lengths);
     statsTable(part(el, 'heroes'), filters, {
       columns: [{ key: 'hero', label: 'Hero', sort: (x) => heroName(heroes, x.hero), html: (x) => heroCell(heroes, x.hero, hash('hero', x.hero)) }, gamesCol, winCol(filters), ...statCols(filters)],
       rows: r.heroes,
