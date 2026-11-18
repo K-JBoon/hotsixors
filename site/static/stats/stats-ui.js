@@ -14,7 +14,7 @@ import { SCORE_LABELS } from './builder/docs.js';
 import { renderResult } from './builder/render.js';
 import { csvFileName, toCsv } from './builder/csv.js';
 import { schemaRail } from './builder/schema.js';
-import { barChart, barColumns, extent, lineChart } from './charts.js';
+import { barChart, barColumns, lineChart } from './charts.js';
 import { getAvailableStorage, getStoredString, setStoredString } from '../js/storage.js';
 import { referenceRail } from './builder/reference.js';
 import {
@@ -426,8 +426,6 @@ const deltaCol = (label, title, base, rate = 'winRate', games = 'games') => ({
 const patchRank = (patch) => patch.split('.').reduce((n, part) => n * 1000 + Number(part), 0);
 
 /** Heroes beside and against the subject, each win rate against `base`. */
-const matchupGames = (x) => (x.withGames ?? 0) + (x.vsGames ?? 0);
-
 function matchupTable(el, filters, heroes, rows, base, whose) {
   statsTable(el, filters, {
     columns: [
@@ -442,24 +440,7 @@ function matchupTable(el, filters, heroes, rows, base, whose) {
     rows,
     sortKey: 'withGames',
     pageSize: 10,
-    count: matchupGames,
-  });
-}
-
-const MATCHUP_SIDES = [['With', 'withWinRate', 'withGames'], ['Against', 'vsWinRate', 'vsGames']];
-
-/** With and Against win rates minus `base` per hero, best With first; both columns share one range. */
-function matchupChart(el, filters, heroes, matchups, base) {
-  const { rows, empty } = minGames(matchups, filters, matchupGames);
-  if (!rows.length) return emptyNote(el, empty);
-  const ordered = [...rows].sort(descending(deltaOf('withWinRate', base)));
-  const sides = MATCHUP_SIDES.map(([head, rate, games]) => ({ head, bars: deltaBars(ordered, base, rate, games) }));
-  const range = extent(sides.flatMap((c) => c.bars.map((b) => b.value)));
-  el.innerHTML = '<div class="stats-chart-scroll"></div>';
-  barColumns(el.firstChild, {
-    labels: ordered.map((x) => heroCell(heroes, x.hero, hash('hero', x.hero))),
-    head: 'Hero',
-    columns: sides.map((c) => ({ ...c, format: fmt.delta, range })),
+    count: (x) => (x.withGames ?? 0) + (x.vsGames ?? 0),
   });
 }
 
@@ -477,13 +458,6 @@ function talentChart(el, talents, rows) {
       { head: 'Picked', format: fmt.pct, range: [0, 1], bars: bars((r) => ({ value: r.pickRate, text: fmt.pct(r.pickRate) })) },
       { head: 'vs hero', format: fmt.delta, bars: bars((r) => ({ value: deltaOf('winRate', r.tierWinRate)(r), text: deltaCell(r.winRate, r.tierWinRate, r.picks) })) },
     ],
-  });
-}
-
-function matchupSection(el, filters, heroes, rows, base, whose) {
-  tableOrChart(el, 'matchups', {
-    table: (body) => matchupTable(body, filters, heroes, rows, base, whose),
-    chart: (body) => matchupChart(body, filters, heroes, rows, base),
   });
 }
 
@@ -710,7 +684,7 @@ const VIEWS = {
         { title: 'Maps', id: 'maps', place: 'rail', chart: true },
         { title: 'Talents', id: 'talents', place: 'main', chart: true },
         { title: 'Builds', id: 'builds', place: 'main' },
-        { title: 'Matchups', id: 'matchups', place: 'main', chart: true },
+        { title: 'Matchups', id: 'matchups', place: 'main' },
         { title: 'Patches', id: 'patches', place: 'rail', chart: true },
         { title: 'Game length', id: 'lengths', place: 'rail', chart: true },
         { title: 'Players', id: 'players', place: 'main' },
@@ -721,7 +695,7 @@ const VIEWS = {
       table: (body) => renderTalentTiers(body, talents, report.talents, true),
       chart: (body) => talentChart(body, talents, report.talents),
     });
-    matchupSection(el, filters, heroes, report.matchups, s.winRate, 'hero');
+    matchupTable(part(el, 'matchups'), filters, heroes, report.matchups, s.winRate, 'hero');
     lengthSection(el, filters, report.lengths);
     tableOrChart(el, 'patches', {
       table: (body) => statsTable(body, filters, {
@@ -882,12 +856,12 @@ const VIEWS = {
         ...(mine ? [] : [{ title: 'Teams', id: 'teams', place: 'rail' }]),
         { title: 'Maps', id: 'maps', place: 'rail' },
         { title: 'Heroes', id: 'heroes', place: 'main' },
-        { title: 'Matchups', id: 'matchups', place: 'main', chart: true },
+        { title: 'Matchups', id: 'matchups', place: 'main' },
         { title: 'Game length', id: 'lengths', place: 'rail', chart: true },
         { title: 'Games', id: 'games', place: 'main' },
       ],
     );
-    matchupSection(el, filters, heroes, r.matchups, r.summary.winRate, 'player');
+    matchupTable(part(el, 'matchups'), filters, heroes, r.matchups, r.summary.winRate, 'player');
     lengthSection(el, filters, r.lengths);
     statsTable(part(el, 'heroes'), filters, {
       columns: [{ key: 'hero', label: 'Hero', sort: (x) => heroName(heroes, x.hero), html: (x) => heroCell(heroes, x.hero, hash('hero', x.hero)) }, gamesCol, winCol(filters), ...statCols(filters)],

@@ -397,8 +397,6 @@ body.is-dragging-file .stats-page:not(.is-empty)::after {
 .stats-chart-wrap { overflow-x: auto; }
 .stats-sizer { display: none; }
 .stats-rail .stats-sizer { display: block; block-size: 0; overflow: hidden; visibility: hidden; }
-.stats-chart-scroll { max-block-size: 40rem; overflow: auto; }
-.stats-chart-scroll :is(.stats-chart__head, .stats-chart__axis) { position: sticky; inset-block-start: 0; z-index: 1; background: var(--bg-deep); }
 .stats-chart__stripe { fill: var(--stripe); }
 .stats-chart__line.is-thin { stroke-dasharray: 2 3; }
 .stats-chart__dot.is-thin::after { content: ''; position: absolute; inset: 0; border-radius: var(--radius-sm); }
