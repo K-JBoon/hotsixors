@@ -132,7 +132,7 @@ export const METRIC_DOCS = {
   ratio: 'Sum of the first column divided by the sum of the second, times the optional scale, over rows where both are not null.',
   mode: 'Most frequent non-null value of the column.',
   latest: 'Value of the first column on the row where the second column is largest, such as the latest name by date.',
-  share: 'Inner metric divided by the number of distinct games among all rows that pass WHERE.',
+  share: 'Inner metric divided by the number of distinct games among rows that pass WHERE, grouped by the facet and every dimension except the first.',
   delta: 'Inner metric minus the same metric over every dimension except the last.',
 };
 

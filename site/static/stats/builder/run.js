@@ -30,7 +30,17 @@ const groupKey = (dimensions, codes) => {
         return out;
       }, []),
     );
-  return { key, split };
+  const digits = (k) =>
+    codes.reduceRight((ds, d) => {
+      ds.unshift(k % d.values.length);
+      k = Math.floor(k / d.values.length);
+      return ds;
+    }, []);
+  const project = (keep) => (k) => {
+    const ds = digits(k);
+    return keep.reduce((p, j) => p * codes[j].values.length + ds[j], 0);
+  };
+  return { key, split, project };
 };
 
 const sized = (inner, cols) => ({
@@ -95,7 +105,7 @@ const compare = ({ by, dir = 'desc' }, dimensions) => {
  * hold `{ value, n }`. Sort reads `value`, puts nulls last, and `dir` defaults
  * to `desc`. With a facet, sort and limit apply per facet value.
  * `share` divides its inner metric by the distinct `game_id` count of the
- * filtered rows in its facet value. `delta` subtracts its inner metric grouped
+ * filtered rows grouped by the facet and every dimension except the first. `delta` subtracts its inner metric grouped
  * by the facet and every dimension except the last. Both yield `{ value, n }`
  * with `n` from the inner metric. `having` drops groups with fewer rows after
  * every metric is computed, before sort and limit.
@@ -109,14 +119,18 @@ export async function runQuery(stats, q) {
   const panels = q.facet == null ? 0 : 1;
   const keys = panels ? [q.facet, ...q.dimensions] : q.dimensions;
   const codes = keys.map((ref) => encode(column(ref), length));
-  const { key, split } = groupKey(keys, codes);
-  const panelOf = (k) => Math.floor(k / radixOf(codes.slice(panels)));
+  const { key, split, project } = groupKey(keys, codes);
   const where = rowTest(q.where, column);
   const make = build(column);
   const groups = aggregateBy(length, where, key, q.metrics, make);
-  const panelKey = groupKey(keys.slice(0, panels), codes.slice(0, panels)).key;
+  const shareKeep = keys.map((_, j) => j).filter((j) => j !== panels);
+  const shareOfGroup = project(shareKeep);
+  const shareKey = groupKey(
+    shareKeep.map((j) => keys[j]),
+    shareKeep.map((j) => codes[j]),
+  ).key;
   const games = kinds.has('share')
-    ? new Map(aggregate(length, { where, key: panelKey, measures: { v: distinct(column('game_id')) } }).map(({ key: k, v }) => [k, v]))
+    ? new Map(aggregate(length, { where, key: shareKey, measures: { v: distinct(column('game_id')) } }).map(({ key: k, v }) => [k, v]))
     : null;
   const deltas = q.metrics.filter((m) => m.kind === 'delta');
   const depth = Math.max(keys.length - 1, panels);
@@ -125,7 +139,7 @@ export async function runQuery(stats, q) {
   const baseline = deltas.length ? aggregateBy(length, where, parent.key, deltas, make) : null;
   const finish = (k, values) => (m) => {
     const v = values[m.name];
-    if (m.kind === 'share') return shareOf(games.get(panelOf(k)) ?? 0)(v);
+    if (m.kind === 'share') return shareOf(games.get(shareOfGroup(k)) ?? 0)(v);
     if (m.kind === 'delta') return deltaOf(v, baseline.get(Math.floor(k / radix))?.[m.name]);
     return v;
   };
