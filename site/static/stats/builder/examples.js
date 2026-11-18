@@ -94,6 +94,14 @@ ORDER BY seconds DESC
 VIEW bar`,
   },
   {
+    name: 'Time to level',
+    text: `SELECT level, map, mean(time_s) AS time
+FROM levels
+GROUP BY level
+FACET BY map
+VIEW line`,
+  },
+  {
     name: 'Mercs vs. win rate',
     text: `SELECT team_mercs, rate(win) AS win, count() AS games
 FROM players

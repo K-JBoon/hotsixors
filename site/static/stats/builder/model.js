@@ -1,7 +1,7 @@
 import { count, present, sum, mean, rate, distinct, ratio, mode, latest, minorOf } from '../query.js';
 import { TALENT_TIERS } from '../../js/talent-tiers.js';
 
-export const BASES = { players: ['game', 'teammate', 'opponent', 'talent_pair'], draft: ['game'] };
+export const BASES = { players: ['game', 'teammate', 'opponent', 'talent_pair'], draft: ['game'], levels: ['game'] };
 
 export const JOINS = { game: 'games', teammate: 'players', opponent: 'players' };
 
@@ -43,7 +43,7 @@ const gameLength = (s) => (s == null ? null : GAME_LENGTHS.find((b) => s < b.bel
  */
 export const DERIVED_COLUMNS = {
   game_length: {
-    tables: ['players', 'games', 'draft'],
+    tables: ['players', 'games', 'draft', 'levels'],
     reads: [],
     game: ['duration_s'],
     values: GAME_LENGTHS.map((b) => b.label),

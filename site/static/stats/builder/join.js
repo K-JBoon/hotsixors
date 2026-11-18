@@ -1,6 +1,6 @@
 import { splitColumn, tableOf, queryColumns, DERIVED_JOINS, DERIVED_COLUMNS, isDerivedColumn, derivedColumnsOf } from './model.js';
 
-const TABLES = ['players', 'games', 'draft'];
+const TABLES = ['players', 'games', 'draft', 'levels'];
 
 /** Column names per table and per derived join, the `names` input of validateQuery. */
 export const tableNames = async (stats) => ({

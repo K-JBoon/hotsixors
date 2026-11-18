@@ -2,7 +2,7 @@ import { escapeHtml } from '../view.js';
 import { BASES, JOINS, DERIVED_JOINS } from './model.js';
 import { TABLE_DOCS, JOIN_DOCS, JOIN_ROWS, joinSql, SCORE_DOC, SCORE_LABELS, SCORE_PREFIX, isScore, columnDoc } from './docs.js';
 
-const ORDER = ['players', 'draft', 'games'];
+const ORDER = ['players', 'draft', 'levels', 'games'];
 
 const code = (s) => `<code>${escapeHtml(s)}</code>`;
 

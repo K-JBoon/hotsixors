@@ -5,6 +5,7 @@ export const TABLE_DOCS = {
   players: 'One row per player per game, 10 rows per game.',
   games: 'One row per game.',
   draft: 'One row per hero ban or pick; games without a draft have no rows.',
+  levels: 'One row per team per level reached, from level 2.',
 };
 
 export const JOIN_DOCS = {
@@ -100,6 +101,12 @@ export const COLUMN_DOCS = {
     team_name: 'Tournament team name of the team that made the ban or pick.',
     picked_first: 'True when the team that made the ban or pick made the first hero pick, null when unknown.',
   },
+  levels: {
+    ...COMMON,
+    team: 'Team that reached the level, 0 or 1.',
+    level: 'Team level reached, from 2.',
+    time_s: 'Game time in seconds when the team reached the level.',
+  },
   talent_pair: {
     tiers: 'Levels of the two tiers, such as 1-4.',
     a: 'Talent ID chosen at the lower tier, null when not chosen.',
@@ -133,7 +140,7 @@ export const METRIC_DOCS = {
 
 export const CLAUSE_DOCS = {
   SELECT: 'Lists the dimensions and the metrics, each metric as call AS name.',
-  FROM: 'Sets the base table, players or draft.',
+  FROM: 'Sets the base table: players, draft or levels.',
   JOIN: 'Adds the columns of a joined table, read as join.column. Works as LEFT JOIN: a row with no match stays, with null joined columns. JOIN teammate JOIN opponent gives 4 × 5 = 20 rows per player row.',
   WHERE: 'Keeps only the rows where every condition is true.',
   'GROUP BY': 'Sets the dimensions: one result row per distinct value of up to two columns. Null is a value too.',
