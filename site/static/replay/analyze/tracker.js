@@ -360,10 +360,11 @@ function onUnitPositions(ctx, ev) {
   }
 }
 function onScoreResult(ctx, ev) {
+  const bySlotId = new Map(ctx.model.players.map((p) => [p.slotId, p]));
   for (const inst of ev.m_instanceList) {
     const name = str(inst.m_name);
-    inst.m_values.forEach((slot, i) => {
-      const p = ctx.reg.byPlayerId.get(i + 1);
+    inst.m_values.forEach((slot, slotId) => {
+      const p = bySlotId.get(slotId);
       const value = slot && slot[0] ? slot[0].m_value : null;
       if (p && value != null) (p.score ||= {})[name] = value;
     });

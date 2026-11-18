@@ -123,9 +123,10 @@ export async function summarizeReplay(archive) {
         for (const inst of ev.m_instanceList) {
           const key = str(inst.m_name);
           if (NOT_SCORES.test(key)) continue;
-          inst.m_values.forEach((slot, i) => {
+          inst.m_values.forEach((slot, slotId) => {
+            const p = bySlotId.get(slotId);
             const value = slot && slot[0] ? slot[0].m_value : null;
-            if (players[i] && value != null) players[i].score[key] = Number(value);
+            if (p && value != null) p.score[key] = Number(value);
           });
         }
         break;

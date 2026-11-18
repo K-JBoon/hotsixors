@@ -30,6 +30,7 @@ const DEFAULT_GATES_OPEN_LOOP = 610;
 function newPlayers(details) {
   return details.m_playerList.map((p, i) => ({
     playerId: i + 1, // tracker playerIds are 1-based in workingSetSlotId order
+    slotId: p.m_workingSetSlotId ?? i,
     userId: null,
     team: p.m_teamId,
     name: str(p.m_name),
