@@ -46,8 +46,32 @@ const edgeAnchor = (i, n) => (i === 0 ? 'start' : i === n - 1 ? 'end' : 'middle'
 
 const axis = (x, ticks, format, anchor = (i) => edgeAnchor(i, ticks.length)) =>
   `<svg class="stats-chart__axis" aria-hidden="true">${ticks
-    .map((t, i) => `<text x="${pct(x(t))}" y="100%" text-anchor="${anchor(i)}">${escapeHtml(format(t))}</text>`)
+    .map((t, i) => `<text x="${pct(x(t))}" y="100%" text-anchor="${anchor(i)}"${t === 0 ? ' data-zero' : ''}>${escapeHtml(format(t))}</text>`)
     .join('')}</svg>`;
+
+const LABEL_GAP = 4;
+
+/** Hides tick labels that would overlap; edge-anchored and zero labels win. */
+const fitAxis = (svg) => {
+  const texts = [...svg.querySelectorAll('text')];
+  texts.forEach((t) => t.removeAttribute('display'));
+  const rank = (t) => (t.getAttribute('text-anchor') !== 'middle' ? 0 : t.hasAttribute('data-zero') ? 1 : 2);
+  const kept = [];
+  texts
+    .map((t) => ({ t, r: rank(t), box: t.getBoundingClientRect() }))
+    .sort((a, b) => a.r - b.r)
+    .forEach(({ t, box }) => {
+      const clear = kept.every((k) => box.right + LABEL_GAP <= k.left || box.left >= k.right + LABEL_GAP);
+      if (clear) kept.push(box);
+      else t.setAttribute('display', 'none');
+    });
+};
+
+const axisObserver = new ResizeObserver((entries) =>
+  entries.forEach(({ target }) => (target.isConnected ? fitAxis(target) : axisObserver.unobserve(target))),
+);
+
+const fitAxes = (el) => el.querySelectorAll('.stats-chart__axis').forEach((svg) => axisObserver.observe(svg));
 
 /**
  * Horizontal bars from zero, one per entry, in the given order.
@@ -65,6 +89,7 @@ export function barChart(el, { bars, head, format, ref = null, minStep = 0, rang
     ${plot(bars, x, ticks, ref)}
     ${bars.map((b) => `${cell('label', b.thin)(b.label)}${cell('value num', b.thin)(b.text)}`).join('')}
   </div>`;
+  fitAxes(el);
 }
 
 const SERIES = [
@@ -133,6 +158,7 @@ export function lineChart(el, opts) {
     ${axis((i) => (i + 0.5) / xs.length, shown, (i) => xs[i], () => 'middle')}
     ${legend(series, on)}
   </div>`;
+  fitAxes(el);
   el.querySelector('.stats-chart__legend')?.addEventListener('click', (e) => {
     const k = e.target.closest('[data-series]')?.dataset.series;
     if (k != null) toggle(+k);
@@ -182,6 +208,7 @@ export function scatterChart(el, { points, x: xAxis, y: yAxis }) {
     ${axis(x.at, x.ticks, xAxis.format)}
     <div class="stats-chart__head num">${xAxis.head}</div>
   </div>`;
+  fitAxes(el);
 }
 
 const ramp = (ref, mid) =>
@@ -210,7 +237,7 @@ export function heatmapChart(el, { rows, cols, cells, head, format, ref = null, 
   const all = cells.flat().filter((c) => c?.value != null);
   const solid = all.filter((c) => !c.thin);
   const values = range ?? (solid.length ? solid : all).map((c) => c.value);
-  const { domain, ticks } = niceTicks(heatDomain(values, ref), 4, minStep);
+  const { domain } = niceTicks(heatDomain(values, ref), 4, minStep);
   const at = linear(domain);
   const { color, key } = ramp(ref, ref == null ? 0 : at(ref));
   const rects = cells.flatMap((row, i) =>
@@ -224,10 +251,11 @@ export function heatmapChart(el, { rows, cols, cells, head, format, ref = null, 
   const name = Math.max(...cols.map((c) => c.name.length), 1);
   el.innerHTML = `<div class="stats-chart stats-chart--heatmap" style="--rows: ${rows.length}; --cols: ${cols.length}; --name: min(${name}ch, 8rem)">
     <div class="stats-chart__head">${head[1]}</div>
-    <div class="stats-chart__key"><div class="stats-chart__scale" style="background: linear-gradient(90deg, ${key})"></div>${axis(at, ticks, format)}</div>
+    <div class="stats-chart__key"><div class="stats-chart__scale" style="background: linear-gradient(90deg, ${key})"></div>${axis(at, ref == null ? domain : [domain[0], ref, domain[1]], format)}</div>
     <div class="stats-chart__head">${head[0]}</div>
     <div class="stats-chart__cols">${cols.map((c) => `<div${title(c.title ?? c.name)}><span class="stats-chart__name">${escapeHtml(c.name)}</span>${c.label ?? ''}</div>`).join('')}</div>
     <svg class="stats-chart__plot">${rects.join('')}</svg>
     ${rows.map((r) => `<div class="stats-chart__label"${title(r.title)}>${r.label}</div>`).join('')}
   </div>`;
+  fitAxes(el);
 }

@@ -411,6 +411,7 @@ body.is-dragging-file .stats-page:not(.is-empty)::after {
 .stats-chart--heatmap { grid-template-columns: max-content minmax(calc(var(--cols) * 1.5rem), calc(var(--cols) * 4rem)); grid-template-rows: auto auto; grid-auto-rows: 1.5rem; overflow-x: auto; padding-inline-end: calc(var(--name) / 2); }
 .stats-chart--heatmap .stats-chart__plot { grid-row: 3 / span var(--rows); }
 .stats-chart--heatmap .stats-portrait { width: 1.25rem; height: 1.25rem; }
+.stats-chart__key { inline-size: max(100%, 10rem); }
 .stats-chart__scale { block-size: 0.5rem; border-radius: var(--radius-sm); }
 .stats-chart__cols { display: grid; grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); align-items: end; justify-items: center; padding-block: calc(var(--name) * 0.87 + 1.5em) var(--space-2xs); font-size: var(--text-xs); color: var(--text-muted); }
 .stats-chart__cols > * { position: relative; display: grid; justify-items: center; }
@@ -419,6 +420,5 @@ body.is-dragging-file .stats-page:not(.is-empty)::after {
 .stats-chart__cell { stroke: var(--bg-deep); }
 .stats-facets { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--facet-min)), 1fr)); gap: var(--space-md); align-items: start; }
 @container (max-width: 36rem) {
-  .stats-chart__axis text:nth-child(even) { display: none; }
   .stats-chart--heatmap .stats-hero span { display: none; }
 }
