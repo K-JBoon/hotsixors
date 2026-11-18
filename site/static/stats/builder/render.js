@@ -66,7 +66,7 @@ const sampleSize = (metrics) => {
 const dimensionText = (heroes, dimensions) => (r) =>
   dimensions.map((ref) => (splitColumn(ref).col === 'hero' && r[ref] != null ? heroName(heroes, r[ref]) : String(r[ref] ?? ''))).join(' ');
 
-const table = (el, { rows }, q, heroes) => {
+const table = (el, { rows }, q, heroes, key) => {
   const columns = [...q.dimensions.map(dimensionColumn(heroes)), ...q.metrics.map(metricColumn)];
   if (!columns.length) {
     el.innerHTML = '<p class="stats-note">No columns.</p>';
@@ -79,7 +79,7 @@ const table = (el, { rows }, q, heroes) => {
     sortDir: q.sort ? (q.sort.dir === 'asc' ? 1 : -1) : 1,
     count: sampleSize(q.metrics),
     empty: 'No rows match this query.',
-    search: q.dimensions.length ? { placeholder: 'Filter', text: dimensionText(heroes, q.dimensions) } : undefined,
+    search: q.dimensions.length ? { placeholder: 'Filter', key, text: dimensionText(heroes, q.dimensions) } : undefined,
   });
 };
 
@@ -249,7 +249,7 @@ const sharedRange = (rows, value, thin = () => false) => {
   return valued.length ? extent((solid.length ? solid : valued).map(value)) : null;
 };
 
-/** Draws `draw(panel, rows)` once per `q.facet` value in a labeled grid, or once in `el` without a facet. */
+/** Draws `draw(panel, rows, value)` once per `q.facet` value in a labeled grid, or once in `el` without a facet. */
 const facetPanels = (el, rows, q, heroes, draw, min = '20rem') => {
   if (q.facet == null) return draw(el, rows);
   const groups = Map.groupBy(rows, (r) => r[q.facet]);
@@ -258,12 +258,13 @@ const facetPanels = (el, rows, q, heroes, draw, min = '20rem') => {
   el.innerHTML = `<div class="stats-facets" style="--facet-min: ${min}">${values
     .map((v) => `<section class="stats-section"><h3 class="stats-section__title">${label(v)}</h3><div></div></section>`)
     .join('')}</div>`;
-  el.querySelectorAll('.stats-facets > section > div').forEach((panel, i) => draw(panel, groups.get(values[i]) ?? []));
+  el.querySelectorAll('.stats-facets > section > div').forEach((panel, i) => draw(panel, groups.get(values[i]) ?? [], values[i]));
 };
 
-const withFacet = (q) => (q.facet == null ? q : { ...q, facet: null, dimensions: [q.facet, ...q.dimensions] });
-
-const tableView = (el, result, q, heroes) => table(el, result, withFacet(q), heroes);
+const tableView = (el, { rows }, q, heroes) => {
+  if (!rows.length || !(q.dimensions.length + q.metrics.length)) return table(el, { rows }, q, heroes);
+  facetPanels(el, rows, q, heroes, (pel, prs, v) => table(pel, { rows: prs }, q, heroes, q.facet && JSON.stringify([q.facet, v])), '100%');
+};
 
 const distinctCount = (rows, ref) => new Set(rows.map((r) => r[ref])).size;
 

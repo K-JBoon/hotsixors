@@ -138,8 +138,8 @@ document.addEventListener('keydown', (e) => {
  * Sortable table. `columns`: `{ key, label, title, html(row) | format, num, shrink, sort(row, dir) }`;
  * `shrink` sizes the column to its content. Rows whose `count` is under THIN_GAMES are dimmed.
  * Clicking a header re-sorts in place. Rows beyond `pageSize` go to further pages.
- * `search: { placeholder, text(row) }` adds a filter box when rows span several pages or a query is active;
- * typing anywhere on the page fills it. The query survives re-renders until the hash changes.
+ * `search: { placeholder, key, text(row) }` adds a filter box when rows span several pages or a query is active;
+ * typing anywhere on the page fills the last focused one. The query, saved under `key` (default `placeholder`), survives re-renders until the hash changes.
  * `onSort(key, dir)` runs after a header click.
  */
 export function renderTable(container, { columns, rows, sortKey, sortDir = -1, pageSize = 20, split = Infinity, empty, search, onSort, count = (r) => r.games }) {
@@ -149,7 +149,8 @@ export function renderTable(container, { columns, rows, sortKey, sortDir = -1, p
   let page = 0;
   let fullHeight = 0;
   let query = '';
-  const saved = search ? savedQueries.get(search.placeholder) ?? '' : '';
+  const saveKey = search?.key ?? search?.placeholder;
+  const saved = search ? savedQueries.get(saveKey) ?? '' : '';
   const searchable = search && (rows.length > pageSize || normalizeSearchValue(saved) !== '');
   const haystacks = searchable && new Map(rows.map((r) => [r, normalizeSearchValue(search.text(r))]));
   let target = container;
@@ -162,7 +163,7 @@ export function renderTable(container, { columns, rows, sortKey, sortDir = -1, p
     input.value = saved;
     query = normalizeSearchValue(input.value);
     const setQuery = (value) => {
-      savedQueries.set(search.placeholder, value);
+      savedQueries.set(saveKey, value);
       const next = normalizeSearchValue(value);
       if (next === query) return;
       query = next;
@@ -176,6 +177,7 @@ export function renderTable(container, { columns, rows, sortKey, sortDir = -1, p
       setQuery('');
     });
     activeSearch = { input, setQuery };
+    input.addEventListener('focus', () => (activeSearch = { input, setQuery }));
   }
   const cell = (c, r) => (c.html ? c.html(r) : c.format ? c.format(r[c.key]) : escapeHtml(r[c.key] ?? '–'));
   const sortValue = (c, r) => (c.sort ? c.sort(r, dir) : r[c.key]);
