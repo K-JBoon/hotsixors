@@ -20,7 +20,7 @@ import { referenceRail } from './builder/reference.js';
 import {
   STAT_COLUMNS, available, facets, gameList, tournamentReport, tournamentTable, heroReport, mapReport, heroTable, mapTable, playerReport, playerTable, teamReport, teamTable,
 } from './reports.js';
-import { LIQUIPEDIA_ICON, MISSING_ICON, deltaCell, escapeHtml, fmt, heroCell, heroName, loadHeroes, lowSample, renderTable, renderTalentTiers, talentName, thinOf, tiles, unlessAll, wilson, winRateCell } from './view.js';
+import { LIQUIPEDIA_ICON, MISSING_ICON, deltaCell, escapeHtml, fmt, heroCell, heroName, loadHeroes, lowSample, renderTable, renderTalentTiers, talentLink, talentName, talentTiers, thinOf, tierLevel, tiles, unlessAll, wilson, winRateCell } from './view.js';
 
 const root = document.querySelector('[data-stats-root]');
 const view = root.querySelector('[data-view]');
@@ -452,6 +452,23 @@ function matchupChart(el, filters, heroes, matchups, base) {
   });
 }
 
+/** Per tier, each talent's pick rate and win rate minus the hero's win rate at that tier. */
+function talentChart(el, talents, rows) {
+  if (!rows.length) return emptyNote(el);
+  const entries = talentTiers(rows).flatMap(([tier, list]) => [{ tier }, ...list]);
+  const dim = thinOf(rows.map((r) => r.picks));
+  const bars = (bar) => entries.map((e) => (e.talent ? { ...bar(e), thin: dim(e.picks) } : null));
+  el.innerHTML = '<div class="stats-chart-wrap"></div>';
+  barColumns(el.firstChild, {
+    labels: entries.map((e) => (e.talent ? talentLink(talents, e.talent) : `<span class="talent-tier__num">${tierLevel(e.tier)}</span>`)),
+    head: 'Talent',
+    columns: [
+      { head: 'Picked', format: fmt.pct, range: [0, 1], bars: bars((r) => ({ value: r.pickRate, text: fmt.pct(r.pickRate) })) },
+      { head: 'vs hero', format: fmt.delta, bars: bars((r) => ({ value: deltaOf('winRate', r.tierWinRate)(r), text: deltaCell(r.winRate, r.tierWinRate, r.picks) })) },
+    ],
+  });
+}
+
 function matchupSection(el, filters, heroes, rows, base, whose) {
   tableOrChart(el, 'matchups', {
     table: (body) => matchupTable(body, filters, heroes, rows, base, whose),
@@ -680,7 +697,7 @@ const VIEWS = {
       ]),
       [
         { title: 'Maps', id: 'maps', place: 'rail', chart: true },
-        { title: 'Talents', id: 'talents', place: 'main' },
+        { title: 'Talents', id: 'talents', place: 'main', chart: true },
         { title: 'Builds', id: 'builds', place: 'main' },
         { title: 'Matchups', id: 'matchups', place: 'main', chart: true },
         { title: 'Patches', id: 'patches', place: 'rail', chart: true },
@@ -689,7 +706,10 @@ const VIEWS = {
         { title: 'Games', id: 'games', place: 'main' },
       ],
     );
-    renderTalentTiers(part(el, 'talents'), talents, report.talents, true);
+    tableOrChart(el, 'talents', {
+      table: (body) => renderTalentTiers(body, talents, report.talents, true),
+      chart: (body) => talentChart(body, talents, report.talents),
+    });
     matchupSection(el, filters, heroes, report.matchups, s.winRate, 'hero');
     lengthSection(el, filters, report.lengths);
     tableOrChart(el, 'patches', {

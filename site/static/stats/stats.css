@@ -393,6 +393,7 @@ body.is-dragging-file .stats-page:not(.is-empty)::after {
 .stats-chart .num { text-align: end; font-variant-numeric: tabular-nums; }
 .stats-chart .is-thin { opacity: 0.7; }
 .stats-chart__stripes { pointer-events: none; }
+.stats-chart-wrap { overflow-x: auto; }
 .stats-chart-scroll { max-block-size: 40rem; overflow: auto; }
 .stats-chart-scroll :is(.stats-chart__head, .stats-chart__axis) { position: sticky; inset-block-start: 0; z-index: 1; background: var(--bg-deep); }
 .stats-chart__stripe { fill: var(--stripe); }

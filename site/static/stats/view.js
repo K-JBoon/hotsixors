@@ -106,25 +106,31 @@ export const MISSING_ICON = '<span class="stats-portrait stats-portrait--missing
 const TIER_LEVELS = [1, 4, 7, 10, 13, 16, 20];
 const splitId = (id) => id.replace(/([a-z])([A-Z])/g, '$1 $2');
 
+export const tierLevel = (tier) => TIER_LEVELS[tier - 1] ?? tier;
+
+/** Talent rows grouped by tier, tiers ascending, talents most picked first. */
+export const talentTiers = (rows) =>
+  [...Map.groupBy(rows, (r) => r.tier)].sort(([a], [b]) => a - b).map(([tier, list]) => [tier, [...list].sort((a, b) => b.picks - a.picks)]);
+
+/** Icon and name linking to the talent on its hero page. */
+export function talentLink(talents, id) {
+  const t = talents[id];
+  if (!t) return `<span class="stats-hero" title="Not in the current game data">${MISSING_ICON}<span>${escapeHtml(splitId(id))}</span></span>`;
+  const img = `<img class="stats-portrait" src="/images/abilitytalents/${escapeHtml(t.icon)}" alt="" loading="lazy">`;
+  return `<span class="stats-hero"><a href="/heroes/${escapeHtml(t.hero)}/#talent-${escapeHtml(id)}">${img}<span>${escapeHtml(t.name)}</span></a></span>`;
+}
+
 /**
  * Talent picks as one table, a row group per tier, most picked first.
  * `rows` are heroReport talents: `{ tier, talent, picks, pickRate, winRate }`.
  * `delta` adds a column against `tierWinRate`, the hero's win rate in games that reached the tier.
  */
 export function renderTalentTiers(container, talents, rows, delta = false) {
-  const tiers = Map.groupBy(rows, (r) => r.tier);
   const dim = thinOf(rows.map((r) => r.picks));
-  const talentCell = (r) => {
-    const t = talents[r.talent];
-    if (!t) return `<span class="stats-hero" title="Not in the current game data">${MISSING_ICON}<span>${escapeHtml(splitId(r.talent))}</span></span>`;
-    const img = `<img class="stats-portrait" src="/images/abilitytalents/${escapeHtml(t.icon)}" alt="" loading="lazy">`;
-    return `<span class="stats-hero"><a href="/heroes/${escapeHtml(t.hero)}/#talent-${escapeHtml(r.talent)}">${img}<span>${escapeHtml(t.name)}</span></a></span>`;
-  };
-  const group = (tier) => {
-    const list = tiers.get(tier).sort((a, b) => b.picks - a.picks);
-    const level = `<th scope="rowgroup" rowspan="${list.length}" class="stats-talents__level"><span class="talent-tier__num">${TIER_LEVELS[tier - 1] ?? tier}</span></th>`;
+  const group = ([tier, list]) => {
+    const level = `<th scope="rowgroup" rowspan="${list.length}" class="stats-talents__level"><span class="talent-tier__num">${tierLevel(tier)}</span></th>`;
     return `<tbody>${list.map((r, i) => `<tr${dim(r.picks) ? ' class="is-thin"' : ''}>${i ? '' : level}
-      <td>${talentCell(r)}</td>
+      <td>${talentLink(talents, r.talent)}</td>
       <td class="num">${fmt.pct(r.pickRate)}</td>
       <td class="num">${winRateCell(r.winRate, r.picks)}</td>${delta ? `
       <td class="num">${deltaCell(r.winRate, r.tierWinRate, r.picks)}</td>` : ''}
@@ -133,7 +139,7 @@ export function renderTalentTiers(container, talents, rows, delta = false) {
   container.innerHTML = rows.length
     ? `<div class="table-wrap"><table class="table stats-table stats-talents">
         <thead><tr><th scope="col">Level</th><th scope="col">Talent</th><th scope="col" class="num">Picked</th><th scope="col" class="num">Win</th>${delta ? '<th scope="col" class="num" title="Win rate minus hero win rate at this level">vs hero</th>' : ''}<th scope="col" class="num">Games</th></tr></thead>
-        ${[...tiers.keys()].sort((a, b) => a - b).map(group).join('')}
+        ${talentTiers(rows).map(group).join('')}
       </table></div>`
     : '<p class="stats-note">No games match these filters.</p>';
 }
