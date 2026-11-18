@@ -33,7 +33,7 @@ const STRIPES = '<defs><pattern id="stats-stripes" width="5" height="5" patternU
 /** Striped copy of a thin SVG mark, drawn over it. */
 const stripes = (tag, geometry, thin) => (thin ? `<${tag} class="stats-chart__stripes" ${geometry} fill="url(#stats-stripes)"/>` : '');
 
-const plot = (bars, x, ticks, ref, attrs) => {
+const plot = (bars, x, ticks, ref, attrs, striped = true) => {
   const y = (i, f) => pct((i + f) / bars.length);
   const zero = x(0);
   const grid = ticks.map((t) => `<line class="stats-chart__grid" x1="${pct(x(t))}" x2="${pct(x(t))}" y1="0" y2="100%"/>`);
@@ -42,7 +42,7 @@ const plot = (bars, x, ticks, ref, attrs) => {
     const at = clamp01(x(b.value));
     const cls = b.thin ? ' is-thin' : '';
     const geometry = `x="${pct(Math.min(at, zero))}" width="${pct(Math.abs(at - zero))}" y="${y(i, (1 - BAR) / 2)}" height="${y(0, BAR)}"`;
-    const bar = `<rect class="stats-chart__bar${cls}" ${geometry}/>${stripes('rect', geometry, b.thin)}`;
+    const bar = `<rect class="stats-chart__bar${cls}" ${geometry}/>${stripes('rect', geometry, striped && b.thin)}`;
     if (b.interval == null) return [bar];
     const [lo, hi] = b.interval.map((v) => clamp01(x(v)));
     return [bar, `<line class="stats-chart__whisker ${b.tone ?? ''}${cls}" x1="${pct(lo)}" x2="${pct(hi)}" y1="${y(i, 0.5)}" y2="${y(i, 0.5)}"/>`];
@@ -84,19 +84,20 @@ const fitAxes = (el) => el.querySelectorAll('.stats-chart__axis').forEach((svg) 
 
 /**
  * Rows of horizontal bars from zero, one bar column per entry of `columns`, each on its own axis.
- * `labels`: row label HTML. `columns`: `{ head, bars, format, ref?, minStep?, steps?, range? }`, `head` HTML;
+ * `labels`: row label HTML. `columns`: `{ head, bars, format, ref?, minStep?, steps?, range?, striped? }`, `head` HTML;
  * `bars` align with `labels` as `{ value, text, interval?: [lo, hi], tone?, thin? } | null`, `text` HTML.
  * `ref` draws a reference line at that value. `minStep` bounds the tick spacing; `steps` as in niceTicks.
  * An axis covers its `range` (`[lo, hi]`) when given, else its values and intervals; bars and intervals clip to it.
+ * Thin bars are dimmed, and striped unless `striped` is false.
  */
 export function barColumns(el, { labels, head, columns }) {
   const at = (k, j) => `style="grid-column: ${2 * k + j}"`;
   const cell = (cls, thin, attrs = '') => (html) => `<div class="stats-chart__${cls}${thin ? ' is-thin' : ''}" ${attrs}>${html}</div>`;
-  const drawn = columns.map(({ head: title, bars, format, ref = null, minStep = 0, steps = [], range = null }, k) => {
+  const drawn = columns.map(({ head: title, bars, format, ref = null, minStep = 0, steps = [], range = null, striped = true }, k) => {
     const values = range ?? bars.flatMap((b) => (b ? [b.value, ...(b.interval ?? [])] : []));
     const { domain, ticks } = niceTicks(extent([0, ...values, ...(ref == null ? [] : [ref])]), 5, minStep, steps);
     const x = linear(domain);
-    return { head: `${axis(x, ticks, format, undefined, at(k, 2))}${cell('head num', false, at(k, 3))(title)}`, plot: plot(bars, x, ticks, ref, at(k, 2)) };
+    return { head: `${axis(x, ticks, format, undefined, at(k, 2))}${cell('head num', false, at(k, 3))(title)}`, plot: plot(bars, x, ticks, ref, at(k, 2), striped) };
   });
   const row = (label, i) => {
     const bars = columns.map((c) => c.bars[i]);

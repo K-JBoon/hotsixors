@@ -461,7 +461,7 @@ function talentChart(el, talents, rows) {
     labels: entries.map((e) => (e.talent ? talentLink(talents, e.talent) : `<span class="talent-tier__num">${tierLevel(e.tier)}</span>`)),
     head: 'Talent',
     columns: [
-      { head: 'Picked', format: fmt.pct, range: [0, 1], bars: bars((r) => ({ value: r.pickRate, text: fmt.pct(r.pickRate) })) },
+      { head: 'Picked', format: fmt.pct, range: [0, 1], striped: false, bars: bars((r) => ({ value: r.pickRate, text: fmt.pct(r.pickRate) })) },
       { head: 'vs hero', format: fmt.delta, bars: bars((r) => ({ value: deltaOf('winRate', r.tierWinRate)(r), text: deltaCell(r.winRate, r.tierWinRate, r.picks) })) },
     ],
   });
