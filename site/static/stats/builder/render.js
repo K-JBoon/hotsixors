@@ -101,7 +101,7 @@ const metricHead = (m) => `<span title="${escapeHtml(printCall(m))}">${escapeHtm
 
 const bar = (el, result, q, heroes) => {
   const [m] = q.metrics;
-  if (!m || TEXT_METRICS.includes(m.kind)) return table(el, result, q, heroes);
+  if (!m || TEXT_METRICS.includes(m.kind)) return tableView(el, result, q, heroes);
   const { rows } = result;
   if (!rows.length) return noRows(el);
   const dims = q.dimensions.map(dimensionColumn(heroes));
@@ -109,27 +109,30 @@ const bar = (el, result, q, heroes) => {
   const size = sampleSize(q.metrics);
   const dim = thinOf(rows.map(size));
   const rate = m.kind === 'rate';
-  const key = (r) => valueOf(r[m.name]) ?? -Infinity;
-  const ordered = q.sort ? rows : [...rows].sort((a, b) => (key(a) === key(b) ? 0 : key(b) - key(a)));
-  const bars = ordered.map((r) => {
-    const v = r[m.name];
-    const interval = rate && valueOf(v) != null ? wilson(valueOf(v), v.n) : null;
-    return {
+  const value = (r) => valueOf(r[m.name]);
+  const interval = (r) => (rate && value(r) != null ? wilson(value(r), r[m.name].n) : null);
+  const range = [(r) => interval(r)?.[0] ?? value(r), (r) => interval(r)?.[1] ?? value(r)].flatMap((f) => sharedRange(rows, f) ?? []);
+  const key = (r) => value(r) ?? -Infinity;
+  const panel = (pel, prs) => {
+    const ordered = q.sort ? prs : [...prs].sort((a, b) => (key(a) === key(b) ? 0 : key(b) - key(a)));
+    const bars = ordered.map((r) => ({
       label: dims.length ? dims.map((d) => d.html(r)).join(' ') : '–',
-      value: valueOf(v),
-      text: cell(v),
-      interval,
-      tone: interval && tone(interval),
+      value: value(r),
+      text: cell(r[m.name]),
+      interval: interval(r),
+      tone: interval(r) && tone(interval(r)),
       thin: dim(size(r)),
-    };
-  });
-  barChart(el, {
-    bars,
-    head: [escapeHtml(q.dimensions.join(' ')), metricHead(m)],
-    format: metricFormat(m),
-    ref: rate ? 0.5 : null,
-    minStep: minStepOf(m),
-  });
+    }));
+    barChart(pel, {
+      bars,
+      head: [escapeHtml(q.dimensions.join(' ')), metricHead(m)],
+      format: metricFormat(m),
+      ref: rate ? 0.5 : null,
+      minStep: minStepOf(m),
+      range: range.length ? extent(range) : null,
+    });
+  };
+  facetPanels(el, rows, q, heroes, panel);
 };
 
 const LINE_SERIES = 8;
@@ -146,7 +149,7 @@ const dimensionLabel = (heroes, ref) => (v) =>
 
 const line = (el, result, q, heroes) => {
   const [m] = q.metrics;
-  if (!m || TEXT_METRICS.includes(m.kind)) return table(el, result, q, heroes);
+  if (!m || TEXT_METRICS.includes(m.kind)) return tableView(el, result, q, heroes);
   const { rows } = result;
   if (!rows.length) return noRows(el);
   const [xRef, ...sRefs] = q.dimensions;
@@ -158,29 +161,31 @@ const line = (el, result, q, heroes) => {
   const size = sampleSize(q.metrics);
   const dim = thinOf(rows.map(size));
   const format = metricFormat(m);
-  const bySeries = Map.groupBy(rows, (r) => JSON.stringify(sRefs.map((ref) => r[ref])));
+  const seriesKey = (r) => JSON.stringify(sRefs.map((ref) => r[ref]));
   const games = (rs) => rs.reduce((t, r) => t + (size(r) ?? 0), 0);
-  const ranked = [...bySeries].sort(([, a], [, b]) => games(b) - games(a));
-  const series = ranked.map(([, rs]) => {
-    const at = new Map(rs.map((r) => [r[xRef], r]));
-    const point = (x) => {
-      const r = at.get(x);
-      if (!r) return null;
-      const v = valueOf(r[m.name]);
-      const n = size(r);
-      return { value: v, title: `${sName(r)} ${xName(x)}: ${format(v)}${n == null ? '' : `, n=${fmt.int(n)}`}`, thin: dim(n) };
-    };
-    return { label: sLabel(rs[0]), points: xs.map(point) };
-  });
-  lineChart(el, {
-    xs: xs.map(xName),
-    series,
-    on: series.map((_, i) => i < LINE_SERIES),
-    head: metricHead(m),
-    format,
-    ref: refOf(m),
-    minStep: minStepOf(m),
-  });
+  const ranked = [...Map.groupBy(rows, seriesKey)].sort(([, a], [, b]) => games(b) - games(a));
+  const index = new Map(ranked.map(([k], i) => [k, i]));
+  const point = (r) => {
+    if (!r) return null;
+    const v = valueOf(r[m.name]);
+    const n = size(r);
+    return { value: v, title: `${sName(r)} ${xName(r[xRef])}: ${format(v)}${n == null ? '' : `, n=${fmt.int(n)}`}`, thin: dim(n) };
+  };
+  const seriesOf = (prs) => {
+    const at = Map.groupBy(prs, seriesKey);
+    return ranked.map(([k, rs]) => {
+      const byX = new Map((at.get(k) ?? []).map((r) => [r[xRef], r]));
+      return { label: sLabel(rs[0]), points: xs.map((x) => point(byX.get(x))) };
+    });
+  };
+  const draw = (on) => {
+    const range = sharedRange(rows.filter((r) => on[index.get(seriesKey(r))]), (r) => valueOf(r[m.name]));
+    const toggle = (k) => draw(on.map((v, i) => (i === k ? !v : v)));
+    const panel = (pel, prs) =>
+      lineChart(pel, { xs: xs.map(xName), series: seriesOf(prs), on, head: metricHead(m), format, ref: refOf(m), minStep: minStepOf(m), range, toggle });
+    facetPanels(el, rows, q, heroes, panel, '24rem');
+  };
+  draw(ranked.map((_, i) => i < LINE_SERIES));
 };
 
 const smallestSize = (metrics) => (r) => {
@@ -190,7 +195,7 @@ const smallestSize = (metrics) => (r) => {
 
 const scatter = (el, result, q, heroes) => {
   const ms = q.metrics.slice(0, 2);
-  if (ms.length < 2 || ms.some((m) => TEXT_METRICS.includes(m.kind))) return table(el, result, q, heroes);
+  if (ms.length < 2 || ms.some((m) => TEXT_METRICS.includes(m.kind))) return tableView(el, result, q, heroes);
   const { rows } = result;
   if (!rows.length) return noRows(el);
   const [mx, my] = ms;
@@ -200,26 +205,27 @@ const scatter = (el, result, q, heroes) => {
   const name = dimensionText(heroes, q.dimensions);
   const heroRef = q.dimensions.find((ref) => splitColumn(ref).col === 'hero');
   const interval = (m, v) => (m.kind === 'rate' ? wilson(valueOf(v), v.n) : null);
-  const plotted = rows.filter((r) => ms.every((m) => valueOf(r[m.name]) != null));
-  const points = plotted
-    .sort((a, b) => (size(a) ?? 0) - (size(b) ?? 0))
-    .map((r) => {
-      const [x, y] = ms.map((m) => valueOf(r[m.name]));
-      const n = size(r);
-      const hero = heroRef ? r[heroRef] : null;
-      return {
-        x,
-        y,
-        xi: interval(mx, r[mx.name]),
-        yi: interval(my, r[my.name]),
-        mark: hero == null ? null : heroPortrait(heroes, hero) || MISSING_ICON,
-        href: hero == null ? null : heroHash(hero),
-        title: `${name(r) || '–'}: ${mx.name} ${fx(x)}, ${my.name} ${fy(y)}${n == null ? '' : `, n=${fmt.int(n)}`}`,
-        thin: dim(n),
-      };
-    });
-  const axisOf = (m, format) => ({ head: metricHead(m), format, ref: refOf(m), minStep: minStepOf(m) });
-  scatterChart(el, { points, x: axisOf(mx, fx), y: axisOf(my, fy) });
+  const plottable = (r) => ms.every((m) => valueOf(r[m.name]) != null);
+  const plotted = rows.filter(plottable);
+  const pointOf = (r) => {
+    const [x, y] = ms.map((m) => valueOf(r[m.name]));
+    const n = size(r);
+    const hero = heroRef ? r[heroRef] : null;
+    return {
+      x,
+      y,
+      xi: interval(mx, r[mx.name]),
+      yi: interval(my, r[my.name]),
+      mark: hero == null ? null : heroPortrait(heroes, hero) || MISSING_ICON,
+      href: hero == null ? null : heroHash(hero),
+      title: `${name(r) || '–'}: ${mx.name} ${fx(x)}, ${my.name} ${fy(y)}${n == null ? '' : `, n=${fmt.int(n)}`}`,
+      thin: dim(n),
+    };
+  };
+  const pointsOf = (prs) => prs.filter(plottable).sort((a, b) => (size(a) ?? 0) - (size(b) ?? 0)).map(pointOf);
+  const axisOf = (m, format) => ({ head: metricHead(m), format, ref: refOf(m), minStep: minStepOf(m), range: sharedRange(plotted, (r) => valueOf(r[m.name])) });
+  const [ax, ay] = [axisOf(mx, fx), axisOf(my, fy)];
+  facetPanels(el, rows, q, heroes, (pel, prs) => scatterChart(pel, { points: pointsOf(prs), x: ax, y: ay }));
 };
 
 /** Cell sample size: a `count` metric when present, else `m`'s own `n`; `share` of an unsized metric has none. */
@@ -255,16 +261,15 @@ const facetPanels = (el, rows, q, heroes, draw, min = '20rem') => {
   el.querySelectorAll('.stats-facets > section > div').forEach((panel, i) => draw(panel, groups.get(values[i]) ?? []));
 };
 
-const FACET_AT = { line: 1 };
+const withFacet = (q) => (q.facet == null ? q : { ...q, facet: null, dimensions: [q.facet, ...q.dimensions] });
 
-const withFacet = (q) =>
-  q.facet == null ? q : { ...q, facet: null, dimensions: q.dimensions.toSpliced(FACET_AT[q.view] ?? 0, 0, q.facet) };
+const tableView = (el, result, q, heroes) => table(el, result, withFacet(q), heroes);
 
 const distinctCount = (rows, ref) => new Set(rows.map((r) => r[ref])).size;
 
 const heatmap = (el, result, q, heroes) => {
   const [m] = q.metrics;
-  if (!m || TEXT_METRICS.includes(m.kind)) return table(el, result, withFacet(q), heroes);
+  if (!m || TEXT_METRICS.includes(m.kind)) return tableView(el, result, q, heroes);
   const { rows } = result;
   if (!rows.length) return noRows(el);
   const [a, b] = q.dimensions;
@@ -305,8 +310,7 @@ const heatmap = (el, result, q, heroes) => {
   facetPanels(el, rows, q, heroes, panel, `calc(${distinctCount(rows, cRef)} * 1.5rem + 16rem)`);
 };
 
-const VIEWS = { table, bar, line, scatter, heatmap };
+const VIEWS = { bar, line, scatter, heatmap };
 
 /** Draws a `runQuery` result in `el` per `q.view`; views without a renderer fall back to the table. */
-export const renderResult = (el, result, q, heroes) =>
-  q.view === 'heatmap' ? heatmap(el, result, q, heroes) : (VIEWS[q.view] ?? table)(el, result, withFacet(q), heroes);
+export const renderResult = (el, result, q, heroes) => (VIEWS[q.view] ?? tableView)(el, result, q, heroes);

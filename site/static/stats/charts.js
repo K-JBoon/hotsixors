@@ -53,9 +53,10 @@ const axis = (x, ticks, format, anchor = (i) => edgeAnchor(i, ticks.length)) =>
  * Horizontal bars from zero, one per entry, in the given order.
  * `bars`: `{ label, value, text, interval?: [lo, hi], tone?, thin? }`; `label` and `text` are HTML.
  * `head`: `[label, value]` HTML. `ref` draws a reference line at that value. `minStep` bounds the tick spacing.
+ * The axis covers `range` (`[lo, hi]`) when given, else the values and intervals.
  */
-export function barChart(el, { bars, head, format, ref = null, minStep = 0 }) {
-  const values = bars.flatMap((b) => [b.value, ...(b.interval ?? [])]);
+export function barChart(el, { bars, head, format, ref = null, minStep = 0, range = null }) {
+  const values = range ?? bars.flatMap((b) => [b.value, ...(b.interval ?? [])]);
   const { domain, ticks } = niceTicks(extent([0, ...values, ...(ref == null ? [] : [ref])]), 5, minStep);
   const x = linear(domain);
   const cell = (cls, thin) => (html) => `<div class="stats-chart__${cls}${thin ? ' is-thin' : ''}">${html}</div>`;
@@ -115,10 +116,13 @@ const legend = (series, on) =>
 /**
  * Lines over ordinal `xs` (plain text, in order), one per series.
  * `series`: `{ label, points }`; `label` is HTML, `points` align with `xs` as `{ value, title, thin? } | null`.
- * `on` flags drawn series; the legend toggles them. The y domain covers drawn series and `ref`.
+ * `on` flags drawn series; the legend calls `toggle(k)`, by default redrawing with series `k` flipped.
+ * The y domain covers `range` (`[lo, hi]`) when given, else drawn series, and `ref`.
  */
-export function lineChart(el, { xs, series, on, head, format, ref = null, minStep = 0 }) {
-  const values = series.flatMap((s, k) => (on[k] ? s.points.map((p) => p?.value) : []));
+export function lineChart(el, opts) {
+  const { xs, series, on, head, format, ref = null, minStep = 0, range = null } = opts;
+  const toggle = opts.toggle ?? ((k) => lineChart(el, { ...opts, on: on.map((v, i) => (i === k ? !v : v)) }));
+  const values = range ?? series.flatMap((s, k) => (on[k] ? s.points.map((p) => p?.value) : []));
   const { domain, ticks } = niceTicks(extent([...values, ...(ref == null ? [] : [ref])]), 5, minStep);
   const y = (v) => 1 - linear(domain)(v);
   const step = Math.ceil(xs.length / MAX_X_LABELS);
@@ -131,14 +135,14 @@ export function lineChart(el, { xs, series, on, head, format, ref = null, minSte
   </div>`;
   el.querySelector('.stats-chart__legend')?.addEventListener('click', (e) => {
     const k = e.target.closest('[data-series]')?.dataset.series;
-    if (k != null) lineChart(el, { xs, series, on: on.map((v, i) => (i === +k ? !v : v)), head, format, ref, minStep });
+    if (k != null) toggle(+k);
   });
 }
 
 const clamp01 = (v) => Math.min(Math.max(v, 0), 1);
 
-const scale = ({ ref = null, minStep = 0 }, values) => {
-  const { domain, ticks } = niceTicks(extent([...values, ...(ref == null ? [] : [ref])]), 5, minStep);
+const scale = ({ ref = null, minStep = 0, range = null }, values) => {
+  const { domain, ticks } = niceTicks(extent([...(range ?? values), ...(ref == null ? [] : [ref])]), 5, minStep);
   return { at: linear(domain), ticks };
 };
 
@@ -159,7 +163,8 @@ const dot = (p, x, y, xAxis, yAxis) => {
 /**
  * Points over two linear axes, drawn in the given order.
  * `points`: `{ x, y, xi?, yi?, mark?, href?, title, thin? }`; `xi`/`yi` are `[lo, hi]` whiskers, `mark` is HTML.
- * `x`, `y`: `{ head, format, ref?, minStep? }`; `head` is HTML. Whiskers clip to the domain.
+ * `x`, `y`: `{ head, format, ref?, minStep?, range? }`; `head` is HTML, `range` (`[lo, hi]`) overrides the point extent.
+ * Whiskers clip to the domain.
  */
 export function scatterChart(el, { points, x: xAxis, y: yAxis }) {
   const x = scale(xAxis, points.map((p) => p.x));
