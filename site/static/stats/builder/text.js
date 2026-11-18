@@ -4,7 +4,7 @@ const TOKEN =
   /\s+|(?<str>'(?:[^']|'')*')|(?<ident>"(?:[^"]|"")*")|(?<num>-?\d[\w.]*)|(?<name>[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*)|(?<op>!=|<>|<=|>=|[=<>(),])/y;
 
 const KEYWORDS = new Set(
-  'select from join where group by order limit view as filter and in asc desc true false null'.split(' '),
+  'select from join where group facet by order limit view as filter and in asc desc true false null'.split(' '),
 );
 
 const LITERALS = { true: true, false: false, null: null };
@@ -42,9 +42,9 @@ const isIdent = (t) => t.type === 'ident' || (t.type === 'name' && !keywordOf(t)
 const OP_ALIASES = { '<>': '!=' };
 
 /**
- * `SELECT item, ... FROM t JOIN j, ... WHERE c AND ... GROUP BY col, ... ORDER BY k ASC|DESC LIMIT n VIEW v`.
+ * `SELECT item, ... FROM t JOIN j, ... WHERE c AND ... GROUP BY col, ... FACET BY col ORDER BY k ASC|DESC LIMIT n VIEW v`.
  * Every clause is optional; keywords ignore case. An item is a dimension or `call AS name`.
- * Dimensions in SELECT must equal GROUP BY. A call is `kind(arg, ...)` with an optional `FILTER (WHERE c AND ...)`.
+ * Dimensions in SELECT must equal GROUP BY; the facet column may also appear. A call is `kind(arg, ...)` with an optional `FILTER (WHERE c AND ...)`.
  * Values are `'strings'` (`''` escapes a quote), numbers, `TRUE`, `FALSE`, `NULL`, or `(v, ...)` after `IN`.
  * `"quoted"` names escape keywords and other characters. Throws an Error with `line`, `column` and `reason`.
  */
@@ -156,12 +156,19 @@ export const parseQuery = (text) => {
 
   const after = (word, parse) => () => (expect(word), parse());
 
+  const facet = () => {
+    const col = identifier('a column');
+    if (is(',')) fail('FACET BY takes one column');
+    return col;
+  };
+
   const CLAUSES = [
     ['select', 'select', () => list(item)],
     ['from', 'from', () => identifier('a base table')],
     ['join', 'joins', joins],
     ['where', 'where', conditions],
     ['group', 'dimensions', after('by', () => list(() => identifier('a column')))],
+    ['facet', 'facet', after('by', facet)],
     ['order', 'sort', after('by', sort)],
     ['limit', 'limit', limit],
     ['view', 'view', () => identifier('a view')],
@@ -175,10 +182,10 @@ export const parseQuery = (text) => {
   }
 
   const { select = [], ...rest } = parts;
-  const cols = select.filter((s) => 'col' in s);
+  const cols = select.filter((s) => 'col' in s && s.col !== rest.facet);
   const dimensions = rest.dimensions ?? [];
   const stray = cols.find((c) => !dimensions.includes(c.col));
-  if (stray) fail(`${stray.col} is not in GROUP BY`, stray.at);
+  if (stray) fail(`${stray.col} is not in GROUP BY${rest.facet == null ? '' : ' or FACET BY'}`, stray.at);
   if (cols.length && cols.map((c) => c.col).join('\0') !== dimensions.join('\0')) fail('SELECT columns must match GROUP BY', cols[0].at);
   return query({ ...rest, metrics: select.filter((s) => s.metric).map((s) => s.metric) });
 };
@@ -212,11 +219,12 @@ const printSelect = (items) => {
 /** Inverse of `parseQuery`, one clause per line. Empty clauses and `VIEW table` are left out. */
 export const printQuery = (q) =>
   [
-    (q.dimensions.length || q.metrics.length) &&
-      printSelect([...q.dimensions.map(ident), ...q.metrics.map(({ name, ...m }) => `${printCall(m)} AS ${ident(name)}`)]),
+    (q.dimensions.length || q.facet != null || q.metrics.length) &&
+      printSelect([...q.dimensions.map(ident), ...(q.facet == null ? [] : [ident(q.facet)]), ...q.metrics.map(({ name, ...m }) => `${printCall(m)} AS ${ident(name)}`)]),
     `FROM ${ident(q.from)}${q.joins.map((j) => ` JOIN ${ident(j)}`).join('')}`,
     q.where.length && `WHERE ${printConditions(q.where)}`,
     q.dimensions.length && `GROUP BY ${q.dimensions.map(ident).join(', ')}`,
+    q.facet != null && `FACET BY ${ident(q.facet)}`,
     q.sort && `ORDER BY ${ident(q.sort.by)} ${(q.sort.dir ?? 'desc').toUpperCase()}`,
     q.limit != null && `LIMIT ${q.limit}`,
     q.view !== 'table' && `VIEW ${ident(q.view)}`,

@@ -41,11 +41,12 @@ export const query = ({
   joins = [],
   where = [],
   dimensions = [],
+  facet = null,
   metrics = [],
   sort = null,
   limit = null,
   view = 'table',
-} = {}) => ({ from, joins, where, dimensions, metrics, sort, limit, view });
+} = {}) => ({ from, joins, where, dimensions, facet, metrics, sort, limit, view });
 
 /** `opponent.hero` -> `{ join: 'opponent', col: 'hero' }`; unprefixed refs read the base table. */
 export const splitColumn = (ref) => {
@@ -68,7 +69,7 @@ export const metricColumns = (m) => [
 
 /** Column refs a query reads, without duplicates. */
 export const queryColumns = (q) => [
-  ...new Set([...q.where.map((c) => c.col), ...q.dimensions, ...q.metrics.flatMap(metricColumns)]),
+  ...new Set([...q.where.map((c) => c.col), ...q.dimensions, ...(q.facet == null ? [] : [q.facet]), ...q.metrics.flatMap(metricColumns)]),
 ];
 
 const COMPARE = {
@@ -137,10 +138,11 @@ const metricErrors = (column, where) => {
 const RESERVED_NAMES = ['key'];
 
 /** Why metric `i` cannot use its name, else null. */
-export const nameClash = ({ metrics, dimensions }, i) => {
+export const nameClash = ({ metrics, dimensions, facet }, i) => {
   const { name } = metrics[i];
   if (RESERVED_NAMES.includes(name)) return `${name} is a reserved name`;
   if (dimensions.includes(name)) return `${name} is a dimension`;
+  if (name === facet) return `${name} is the facet`;
   return metrics.findIndex((m) => m.name === name) < i ? `duplicate metric ${name}` : null;
 };
 
@@ -171,6 +173,12 @@ const sortErrors = ({ sort, dimensions, metrics }) => {
   ];
 };
 
+const facetErrors = (column, { facet, dimensions }) => {
+  if (facet == null) return [];
+  if (dimensions.includes(facet)) return [error('facet', `facet ${facet} is also a dimension`)];
+  return column(facet, 'facet');
+};
+
 const limitErrors = ({ limit }) =>
   limit == null || (Number.isInteger(limit) && limit > 0) ? [] : [error('limit', 'limit must be a positive integer')];
 
@@ -185,6 +193,7 @@ export const validateQuery = (q, names) => {
     ...where(q.where, 'where'),
     ...(q.dimensions.length > MAX_DIMENSIONS ? [error('dimensions', `at most ${MAX_DIMENSIONS} dimensions`)] : []),
     ...q.dimensions.flatMap((d, i) => column(d, `dimensions.${i}`)),
+    ...facetErrors(column, q),
     ...q.metrics.flatMap((m, i) => metric(m, `metrics.${i}`)),
     ...nameErrors(q),
     ...viewErrors(q),
