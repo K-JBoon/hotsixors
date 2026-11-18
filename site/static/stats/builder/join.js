@@ -42,23 +42,51 @@ const PARTNERS = {
   opponent: (team, i) => (j) => team[j] !== team[i],
 };
 
+/** Rows of a derived join for every base row; base row `i` owns rows `offsets[i]` to `offsets[i + 1]`. */
+const derivedRows = (stats, from, join) =>
+  memo(stats, `derived:${from}:${join}`, async () => {
+    const { columns, reads, rows } = DERIVED_JOINS[join];
+    const source = await stats.columns(from, reads);
+    const offsets = new Int32Array(source.length + 1);
+    const table = Object.fromEntries(columns.map((c) => [c, []]));
+    for (let i = 0; i < source.length; i++) {
+      const out = rows(Object.fromEntries(reads.map((c) => [c, source[c][i]])));
+      for (const row of out) for (const c of columns) table[c].push(row[c]);
+      offsets[i + 1] = offsets[i] + out.length;
+    }
+    return { offsets, table: { length: offsets[source.length], ...table } };
+  });
+
+const range = (from, to) => Array.from({ length: to - from }, (_, k) => from + k);
+
 const product = (lists) => lists.reduce((n, l) => n * l.length, 1);
+
+const rowLists = async (stats, from, game_id, expanding) => {
+  const partners = expanding.some((j) => PARTNERS[j]) ? await playersByGame(stats) : null;
+  const derived = new Map(
+    await Promise.all(expanding.filter((j) => DERIVED_JOINS[j]).map(async (j) => [j, (await derivedRows(stats, from, j)).offsets])),
+  );
+  const list = (j, i) => {
+    if (derived.has(j)) return range(derived.get(j)[i], derived.get(j)[i + 1]);
+    return (partners.byGame.get(game_id[i]) ?? []).filter(PARTNERS[j](partners.team, i));
+  };
+  return (i) =>
+    expanding.map((j) => {
+      const rows = list(j, i);
+      return rows.length ? rows : [-1];
+    });
+};
 
 /** Row indices into each table, one entry per view row. `base: null` means identity; -1 means no joined row. */
 const expand = async (stats, from, joins) => {
-  const expanding = joins.filter((j) => PARTNERS[j]);
+  const expanding = joins.filter((j) => PARTNERS[j] || DERIVED_JOINS[j]);
   if (!joins.length) return { length: (await stats.columns(from, [])).length, index: { base: null } };
   const { length: n, game_id } = await stats.columns(from, ['game_id']);
   const games = joins.includes('game') ? await gameRows(stats) : null;
   const gameOf = (i) => games.get(game_id[i]) ?? -1;
   if (!expanding.length) return { length: n, index: { base: null, game: Int32Array.from({ length: n }, (_, i) => gameOf(i)) } };
 
-  const { byGame, team } = await playersByGame(stats);
-  const lists = (i) =>
-    expanding.map((j) => {
-      const rows = (byGame.get(game_id[i]) ?? []).filter(PARTNERS[j](team, i));
-      return rows.length ? rows : [-1];
-    });
+  const lists = await rowLists(stats, from, game_id, expanding);
   let length = 0;
   for (let i = 0; i < n; i++) length += product(lists(i));
 
@@ -78,20 +106,22 @@ const expand = async (stats, from, joins) => {
   return { length, index };
 };
 
+const joinColumns = async (stats, from, join, cols) =>
+  DERIVED_JOINS[join] ? (await derivedRows(stats, from, join)).table : stats.columns(tableOf(from, join), cols);
+
 /**
  * Joined view of `q.from` with `q.joins`. `game` is a one-to-one lookup;
  * `teammate` and `opponent` add one view row per matching player, or one row
- * of nulls when the game has none. `column(ref)` returns values per view row
+ * of nulls when the game has none. A derived join adds the rows its `rows`
+ * builds from the base row. `column(ref)` returns values per view row
  * for refs in `refs`.
  */
 export async function joinView(stats, q, refs = queryColumns(q)) {
-  const derived = q.joins.find((j) => DERIVED_JOINS[j]);
-  if (derived) throw new Error(`JOIN ${derived} cannot run yet`);
   const byJoin = Map.groupBy(refs.map(splitColumn), (r) => r.join);
   const [{ length, index }, loaded] = await Promise.all([
     expand(stats, q.from, q.joins),
     Promise.all(
-      [...byJoin].map(async ([join, rs]) => [join, await stats.columns(tableOf(q.from, join), rs.map((r) => r.col))]),
+      [...byJoin].map(async ([join, rs]) => [join, await joinColumns(stats, q.from, join, rs.map((r) => r.col))]),
     ).then((entries) => new Map(entries)),
   ]);
   const cache = new Map();
