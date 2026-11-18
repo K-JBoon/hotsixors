@@ -82,6 +82,14 @@ export function heroCell(heroes, slug, href = null) {
 
 export const heroName = (heroes, slug) => heroes.get(slug)?.name ?? slug;
 
+export const talentName = (talents, id) => talents[id]?.name ?? id;
+
+export function talentCell(talents, id) {
+  const t = talents[id];
+  const img = t?.icon ? `<img class="stats-portrait" src="/images/abilitytalents/${escapeHtml(t.icon)}" alt="" loading="lazy">` : '';
+  return `<span class="stats-hero">${img}<span>${escapeHtml(talentName(talents, id))}</span></span>`;
+}
+
 export const MISSING_ICON = '<span class="stats-portrait stats-portrait--missing" aria-hidden="true">?</span>';
 
 const TIER_LEVELS = [1, 4, 7, 10, 13, 16, 20];

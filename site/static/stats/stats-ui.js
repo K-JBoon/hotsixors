@@ -434,6 +434,7 @@ const VIEWS = {
     const savedEl = part(el, 'saved');
     const examplesEl = part(el, 'examples');
     let saved = await loadSaved();
+    const talents = await stats.json('talents').catch(() => ({}));
     const showSaved = () => {
       savedEl.innerHTML = queryChips(saved, input.value, true);
       examplesEl.innerHTML = queryChips(EXAMPLES, input.value, false);
@@ -456,7 +457,7 @@ const VIEWS = {
       if (error) return fail(error);
       note.innerHTML = '';
       try {
-        renderResult(out, result, q, heroes);
+        renderResult(out, result, q, heroes, talents);
       } catch (e) {
         fail(String(e?.message ?? e));
       }

@@ -1,6 +1,6 @@
-import { MISSING_ICON, escapeHtml, fmt, heroCell, heroName, heroPortrait, renderTable, thinOf, wilson, winRateCell } from '../view.js';
+import { MISSING_ICON, escapeHtml, fmt, heroCell, heroName, heroPortrait, renderTable, talentCell, talentName, thinOf, wilson, winRateCell } from '../view.js';
 import { barChart, extent, heatmapChart, lineChart, scatterChart } from '../charts.js';
-import { METRICS, splitColumn } from './model.js';
+import { DERIVED_JOINS, METRICS, splitColumn } from './model.js';
 import { valueOf } from './run.js';
 import { printCall } from './text.js';
 
@@ -38,17 +38,58 @@ const versionKey = (v) => (typeof v === 'string' ? v.split('.').map((p) => p.pad
 
 const heroHash = (slug) => `#hero/${encodeURIComponent(slug)}`;
 
-const dimensionColumn = (heroes) => (ref) => {
-  const { col } = splitColumn(ref);
-  if (col === 'hero') {
-    return {
-      key: ref,
-      label: ref,
-      sort: (r) => (r[ref] == null ? null : heroName(heroes, r[ref])),
-      html: (r) => (r[ref] == null ? '–' : heroCell(heroes, r[ref], heroHash(r[ref]))),
-    };
-  }
-  return { key: ref, label: ref, sort: col === 'patch' ? (r) => versionKey(r[ref]) : (r) => r[ref], html: (r) => text(r[ref]) };
+const TALENT_COLUMN = /^talent\d+$/;
+
+const kindOf = (ref) => {
+  const { join, col } = splitColumn(ref);
+  return TALENT_COLUMN.test(col) || (join === 'talent_pair' && ['a', 'b'].includes(col)) ? 'talent' : col;
+};
+
+const knownValues = (ref) => {
+  const { join, col } = splitColumn(ref);
+  return DERIVED_JOINS[join]?.values?.[col];
+};
+
+const talentLevel = (talents, id) => Number(talents[id]?.tier?.replace(/\D/g, '') || 99);
+
+const talentKey = (talents, id) => `${String(talentLevel(talents, id)).padStart(2, '0')} ${talentName(talents, id)}`;
+
+const SORTS = {
+  hero: ({ heroes }, v) => heroName(heroes, v),
+  talent: ({ talents }, v) => talentKey(talents, v),
+  patch: (_, v) => versionKey(v),
+};
+
+const sortKey = (names, ref) => {
+  const known = knownValues(ref);
+  if (known) return (v) => (v == null ? null : known.includes(v) ? known.indexOf(v) : known.length);
+  const sort = SORTS[kindOf(ref)];
+  return sort ? (v) => (v == null ? null : sort(names, v)) : (v) => v;
+};
+
+const NAMES = {
+  hero: ({ heroes }, v) => heroName(heroes, v),
+  talent: ({ talents }, v) => talentName(talents, v),
+  date: (_, v) => fmt.date(v),
+};
+
+const CELLS = {
+  hero: ({ heroes }, v, link) => heroCell(heroes, v, link ? heroHash(v) : null),
+  talent: ({ talents }, v) => talentCell(talents, v),
+};
+
+const dimensionName = (names, ref) => (v) =>
+  v == null ? '–' : (NAMES[kindOf(ref)] ?? ((_, v) => String(v)))(names, v);
+
+const dimensionLabel = (names, ref, link = false) => (v) => {
+  const cell = CELLS[kindOf(ref)];
+  return v != null && cell ? cell(names, v, link) : text(v);
+};
+
+const dimensionColumn = (names) => (ref) => {
+  const key = sortKey(names, ref);
+  const label = dimensionLabel(names, ref, true);
+  return { key: ref, label: ref, sort: (r) => key(r[ref]), html: (r) => label(r[ref]) };
 };
 
 const metricColumn = (m) => {
@@ -63,11 +104,11 @@ const sampleSize = (metrics) => {
   return (r) => metrics.map((m) => r[m.name]).find((v) => v != null && typeof v === 'object')?.n;
 };
 
-const dimensionText = (heroes, dimensions) => (r) =>
-  dimensions.map((ref) => (splitColumn(ref).col === 'hero' && r[ref] != null ? heroName(heroes, r[ref]) : String(r[ref] ?? ''))).join(' ');
+const dimensionText = (names, dimensions) => (r) =>
+  dimensions.map((ref) => (CELLS[kindOf(ref)] && r[ref] != null ? NAMES[kindOf(ref)](names, r[ref]) : String(r[ref] ?? ''))).join(' ');
 
-const table = (el, { rows }, q, heroes, key) => {
-  const columns = [...q.dimensions.map(dimensionColumn(heroes)), ...q.metrics.map(metricColumn)];
+const table = (el, { rows }, q, names, key) => {
+  const columns = [...q.dimensions.map(dimensionColumn(names)), ...q.metrics.map(metricColumn)];
   if (!columns.length) {
     el.innerHTML = '<p class="stats-note">No columns.</p>';
     return;
@@ -79,7 +120,7 @@ const table = (el, { rows }, q, heroes, key) => {
     sortDir: q.sort ? (q.sort.dir === 'asc' ? 1 : -1) : 1,
     count: sampleSize(q.metrics),
     empty: 'No rows match this query.',
-    search: q.dimensions.length ? { placeholder: 'Filter', key, text: dimensionText(heroes, q.dimensions) } : undefined,
+    search: q.dimensions.length ? { placeholder: 'Filter', key, text: dimensionText(names, q.dimensions) } : undefined,
   });
 };
 
@@ -99,12 +140,12 @@ const noRows = (el) => {
 
 const metricHead = (m) => `<span title="${escapeHtml(printCall(m))}">${escapeHtml(m.name)}</span>`;
 
-const bar = (el, result, q, heroes) => {
+const bar = (el, result, q, names) => {
   const [m] = q.metrics;
-  if (!m || TEXT_METRICS.includes(m.kind)) return tableView(el, result, q, heroes);
+  if (!m || TEXT_METRICS.includes(m.kind)) return tableView(el, result, q, names);
   const { rows } = result;
   if (!rows.length) return noRows(el);
-  const dims = q.dimensions.map(dimensionColumn(heroes));
+  const dims = q.dimensions.map(dimensionColumn(names));
   const cell = metricCell(m);
   const size = sampleSize(q.metrics);
   const dim = thinOf(rows.map(size));
@@ -132,32 +173,24 @@ const bar = (el, result, q, heroes) => {
       range: range.length ? extent(range) : null,
     });
   };
-  facetPanels(el, rows, q, heroes, panel);
+  facetPanels(el, rows, q, names, panel);
 };
 
 const LINE_SERIES = 8;
 
 const ascending = (a, b) => (a === b ? 0 : a == null ? 1 : b == null ? -1 : a < b ? -1 : 1);
 
-const NAMES = { hero: (heroes, v) => heroName(heroes, v), date: (_, v) => fmt.date(v) };
-
-const dimensionName = (heroes, ref) => (v) =>
-  v == null ? '–' : (NAMES[splitColumn(ref).col] ?? ((_, v) => String(v)))(heroes, v);
-
-const dimensionLabel = (heroes, ref) => (v) =>
-  v != null && splitColumn(ref).col === 'hero' ? heroCell(heroes, v) : text(v);
-
-const line = (el, result, q, heroes) => {
+const line = (el, result, q, names) => {
   const [m] = q.metrics;
-  if (!m || TEXT_METRICS.includes(m.kind)) return tableView(el, result, q, heroes);
+  if (!m || TEXT_METRICS.includes(m.kind)) return tableView(el, result, q, names);
   const { rows } = result;
   if (!rows.length) return noRows(el);
   const [xRef, ...sRefs] = q.dimensions;
-  const xSort = dimensionColumn(heroes)(xRef).sort;
+  const xSort = dimensionColumn(names)(xRef).sort;
   const xs = [...new Set(rows.map((r) => r[xRef]))].sort((a, b) => ascending(xSort({ [xRef]: a }), xSort({ [xRef]: b })));
-  const xName = dimensionName(heroes, xRef);
-  const sName = sRefs.length ? (r) => sRefs.map((ref) => dimensionName(heroes, ref)(r[ref])).join(' ') : () => m.name;
-  const sLabel = sRefs.length ? (r) => sRefs.map((ref) => dimensionLabel(heroes, ref)(r[ref])).join(' ') : () => escapeHtml(m.name);
+  const xName = dimensionName(names, xRef);
+  const sName = sRefs.length ? (r) => sRefs.map((ref) => dimensionName(names, ref)(r[ref])).join(' ') : () => m.name;
+  const sLabel = sRefs.length ? (r) => sRefs.map((ref) => dimensionLabel(names, ref)(r[ref])).join(' ') : () => escapeHtml(m.name);
   const size = sampleSize(q.metrics);
   const dim = thinOf(rows.map(size));
   const format = metricFormat(m);
@@ -183,7 +216,7 @@ const line = (el, result, q, heroes) => {
     const toggle = (k) => draw(on.map((v, i) => (i === k ? !v : v)));
     const panel = (pel, prs) =>
       lineChart(pel, { xs: xs.map(xName), series: seriesOf(prs), on, head: metricHead(m), format, ref: refOf(m), minStep: minStepOf(m), range, toggle });
-    facetPanels(el, rows, q, heroes, panel, '24rem');
+    facetPanels(el, rows, q, names, panel, '24rem');
   };
   draw(ranked.map((_, i) => i < LINE_SERIES));
 };
@@ -193,16 +226,16 @@ const smallestSize = (metrics) => (r) => {
   return ns.length ? Math.min(...ns) : undefined;
 };
 
-const scatter = (el, result, q, heroes) => {
+const scatter = (el, result, q, names) => {
   const ms = q.metrics.slice(0, 2);
-  if (ms.length < 2 || ms.some((m) => TEXT_METRICS.includes(m.kind))) return tableView(el, result, q, heroes);
+  if (ms.length < 2 || ms.some((m) => TEXT_METRICS.includes(m.kind))) return tableView(el, result, q, names);
   const { rows } = result;
   if (!rows.length) return noRows(el);
   const [mx, my] = ms;
   const [fx, fy] = ms.map(metricFormat);
   const size = q.metrics.some((m) => m.kind === 'count') ? sampleSize(q.metrics) : smallestSize(ms);
   const dim = thinOf(rows.map(size));
-  const name = dimensionText(heroes, q.dimensions);
+  const name = dimensionText(names, q.dimensions);
   const heroRef = q.dimensions.find((ref) => splitColumn(ref).col === 'hero');
   const interval = (m, v) => (m.kind === 'rate' ? wilson(valueOf(v), v.n) : null);
   const plottable = (r) => ms.every((m) => valueOf(r[m.name]) != null);
@@ -216,7 +249,7 @@ const scatter = (el, result, q, heroes) => {
       y,
       xi: interval(mx, r[mx.name]),
       yi: interval(my, r[my.name]),
-      mark: hero == null ? null : heroPortrait(heroes, hero) || MISSING_ICON,
+      mark: hero == null ? null : heroPortrait(names.heroes, hero) || MISSING_ICON,
       href: hero == null ? null : heroHash(hero),
       title: `${name(r) || '–'}: ${mx.name} ${fx(x)}, ${my.name} ${fy(y)}${n == null ? '' : `, n=${fmt.int(n)}`}`,
       thin: dim(n),
@@ -225,7 +258,7 @@ const scatter = (el, result, q, heroes) => {
   const pointsOf = (prs) => prs.filter(plottable).sort((a, b) => (size(a) ?? 0) - (size(b) ?? 0)).map(pointOf);
   const axisOf = (m, format) => ({ head: metricHead(m), format, ref: refOf(m), minStep: minStepOf(m), range: sharedRange(plotted, (r) => valueOf(r[m.name])) });
   const [ax, ay] = [axisOf(mx, fx), axisOf(my, fy)];
-  facetPanels(el, rows, q, heroes, (pel, prs) => scatterChart(pel, { points: pointsOf(prs), x: ax, y: ay }));
+  facetPanels(el, rows, q, names, (pel, prs) => scatterChart(pel, { points: pointsOf(prs), x: ax, y: ay }));
 };
 
 /** Cell sample size: a `count` metric when present, else `m`'s own `n`; `share` of an unsized metric has none. */
@@ -235,10 +268,10 @@ const cellSize = (m, metrics) => {
   return (r) => r[m.name]?.n;
 };
 
-const axisValues = (rows, ref, sort, heroes) => {
+const axisValues = (rows, ref, sort, names) => {
   const values = [...new Set(rows.map((r) => r[ref]))];
   if (sort) return values;
-  const key = dimensionColumn(heroes)(ref).sort;
+  const key = dimensionColumn(names)(ref).sort;
   return values.sort((a, b) => ascending(key({ [ref]: a }), key({ [ref]: b })));
 };
 
@@ -250,27 +283,27 @@ const sharedRange = (rows, value, thin = () => false) => {
 };
 
 /** Draws `draw(panel, rows, value)` once per `q.facet` value in a labeled grid, or once in `el` without a facet. */
-const facetPanels = (el, rows, q, heroes, draw, min = '20rem') => {
+const facetPanels = (el, rows, q, names, draw, min = '20rem') => {
   if (q.facet == null) return draw(el, rows);
   const groups = Map.groupBy(rows, (r) => r[q.facet]);
-  const values = axisValues(rows, q.facet, null, heroes);
-  const label = dimensionLabel(heroes, q.facet);
+  const values = axisValues(rows, q.facet, null, names);
+  const label = dimensionLabel(names, q.facet);
   el.innerHTML = `<div class="stats-facets" style="--facet-min: ${min}">${values
     .map((v) => `<section class="stats-section"><h3 class="stats-section__title">${label(v)}</h3><div></div></section>`)
     .join('')}</div>`;
   el.querySelectorAll('.stats-facets > section > div').forEach((panel, i) => draw(panel, groups.get(values[i]) ?? [], values[i]));
 };
 
-const tableView = (el, { rows }, q, heroes) => {
-  if (!rows.length || !(q.dimensions.length + q.metrics.length)) return table(el, { rows }, q, heroes);
-  facetPanels(el, rows, q, heroes, (pel, prs, v) => table(pel, { rows: prs }, q, heroes, q.facet && JSON.stringify([q.facet, v])), '100%');
+const tableView = (el, { rows }, q, names) => {
+  if (!rows.length || !(q.dimensions.length + q.metrics.length)) return table(el, { rows }, q, names);
+  facetPanels(el, rows, q, names, (pel, prs, v) => table(pel, { rows: prs }, q, names, q.facet && JSON.stringify([q.facet, v])), '100%');
 };
 
 const distinctCount = (rows, ref) => new Set(rows.map((r) => r[ref])).size;
 
-const heatmap = (el, result, q, heroes) => {
+const heatmap = (el, result, q, names) => {
   const [m] = q.metrics;
-  if (!m || TEXT_METRICS.includes(m.kind)) return tableView(el, result, q, heroes);
+  if (!m || TEXT_METRICS.includes(m.kind)) return tableView(el, result, q, names);
   const { rows } = result;
   if (!rows.length) return noRows(el);
   const [a, b] = q.dimensions;
@@ -278,17 +311,17 @@ const heatmap = (el, result, q, heroes) => {
   const size = cellSize(m, q.metrics);
   const dim = thinOf(rows.map(size));
   const format = metricFormat(m);
-  const name = dimensionText(heroes, [q.facet, ...q.dimensions].filter((ref) => ref != null));
+  const name = dimensionText(names, [q.facet, ...q.dimensions].filter((ref) => ref != null));
   const range = sharedRange(rows, (r) => valueOf(r[m.name]), (r) => dim(size(r)));
   const label = (ref) => {
-    const html = dimensionColumn(heroes)(ref).html;
-    const title = dimensionName(heroes, ref);
+    const html = dimensionColumn(names)(ref).html;
+    const title = dimensionName(names, ref);
     return (v) => ({ label: html({ [ref]: v }), title: title(v) });
   };
   const panel = (pel, prs) => {
     if (!prs.length) return noRows(pel);
-    const rs = axisValues(prs, rRef, q.sort, heroes);
-    const cs = axisValues(prs, cRef, q.sort, heroes);
+    const rs = axisValues(prs, rRef, q.sort, names);
+    const cs = axisValues(prs, cRef, q.sort, names);
     const at = new Map([...Map.groupBy(prs, (r) => r[rRef])].map(([k, rs]) => [k, new Map(rs.map((r) => [r[cRef], r]))]));
     const cell = (rv, cv) => {
       const r = at.get(rv).get(cv);
@@ -308,10 +341,10 @@ const heatmap = (el, result, q, heroes) => {
       range,
     });
   };
-  facetPanels(el, rows, q, heroes, panel, `calc(${distinctCount(rows, cRef)} * 1.5rem + 16rem)`);
+  facetPanels(el, rows, q, names, panel, `calc(${distinctCount(rows, cRef)} * 1.5rem + 16rem)`);
 };
 
 const VIEWS = { bar, line, scatter, heatmap };
 
-/** Draws a `runQuery` result in `el` per `q.view`; views without a renderer fall back to the table. */
-export const renderResult = (el, result, q, heroes) => (VIEWS[q.view] ?? tableView)(el, result, q, heroes);
+/** Draws a `runQuery` result in `el` per `q.view`; views without a renderer fall back to the table. `talents` maps talent ID to `{ name, icon, tier }`. */
+export const renderResult = (el, result, q, heroes, talents) => (VIEWS[q.view] ?? tableView)(el, result, q, { heroes, talents });
