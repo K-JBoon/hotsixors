@@ -170,6 +170,14 @@ const viewSwitch = (id) => `<div class="segmented" role="radiogroup" aria-label=
   .join('')}</div>`;
 const viewKey = (id) => `hotsixors.stats.view.${route().tab}.${id}`;
 
+/** Hidden copy of a table that keeps a rail section as wide in chart mode as in table mode. */
+const sizer = (table) => {
+  const el = document.createElement('div');
+  el.className = 'stats-sizer';
+  table(el);
+  return el;
+};
+
 /** Draws section `id` with `draw.table(body)` or `draw.chart(body)`, as picked by its head switch and saved per page and section. */
 function tableOrChart(el, id, draw) {
   const body = part(el, id);
@@ -178,6 +186,7 @@ function tableOrChart(el, id, draw) {
   const show = (mode) => {
     radios.querySelector(`input[value="${mode}"]`).checked = true;
     draw[mode](body);
+    if (mode === 'chart') body.append(sizer(draw.table));
   };
   radios.addEventListener('change', (e) => {
     setStoredString(storage, viewKey(id), e.target.value);
