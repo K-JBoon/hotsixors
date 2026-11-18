@@ -325,8 +325,7 @@ const heatmap = (el, result, q, names) => {
   if (!m || TEXT_METRICS.includes(m.kind)) return tableView(el, result, q, names);
   const { rows } = result;
   if (!rows.length) return noRows(el);
-  const [a, b] = q.dimensions;
-  const [rRef, cRef] = distinctCount(rows, a) >= distinctCount(rows, b) ? [a, b] : [b, a];
+  const [rRef, cRef] = q.dimensions;
   const size = cellSize(m, q.metrics);
   const dim = thinRow(rows, [m]);
   const format = metricFormat(m);
