@@ -39,6 +39,13 @@ export const DERIVED_COLUMNS = {
     values: GAME_LENGTHS.map((b) => b.label),
     value: (_, { duration_s }) => gameLength(duration_s),
   },
+  picked_first: {
+    tables: ['players', 'draft'],
+    reads: ['team'],
+    game: ['first_pick'],
+    values: [false, true],
+    value: ({ team }, { first_pick }) => (team == null || first_pick == null ? null : team === first_pick),
+  },
 };
 
 export const isDerivedColumn = (table, col) => DERIVED_COLUMNS[col]?.tables.includes(table) ?? false;

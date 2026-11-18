@@ -75,6 +75,7 @@ export const COLUMN_DOCS = {
     team_name: 'Tournament team name of the player, null outside tournaments.',
     opponent: 'Tournament team name of the other team; opponent.<column> reads the opponent join.',
     duration_s: 'Game length in seconds.',
+    picked_first: 'True when the team of the player made the first hero pick, null when unknown.',
     ...TALENTS,
   },
   games: {
@@ -96,6 +97,7 @@ export const COLUMN_DOCS = {
     hero: 'Hero ID such as valla.',
     win: 'True when the team that made the ban or pick won.',
     team_name: 'Tournament team name of the team that made the ban or pick.',
+    picked_first: 'True when the team that made the ban or pick made the first hero pick, null when unknown.',
   },
   talent_pair: {
     tiers: 'Levels of the two tiers, such as 1-4.',
