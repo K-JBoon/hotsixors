@@ -469,6 +469,23 @@ function lengthTable(el, filters, rows) {
   });
 }
 
+/** Win rate per length bucket, shortest first. */
+function lengthChart(el, filters, lengths) {
+  const { rows, empty } = minGames(lengths, filters);
+  if (!rows.length) return emptyNote(el, empty);
+  const ordered = [...rows].sort((a, b) => a.from - b.from);
+  const dim = thinOf(ordered.map((r) => r.games));
+  const points = ordered.map((r) => ({ value: r.winRate, title: `${lengthLabel(r)} Win: ${fmt.pct(r.winRate)}, ${fmt.int(r.games)} games`, thin: dim(r.games) }));
+  lineChart(el, { xs: ordered.map(lengthLabel), series: [{ label: 'Win', points }], on: [true], head: 'Win', format: fmt.pct, ref: 0.5 });
+}
+
+function lengthSection(el, filters, rows) {
+  tableOrChart(el, 'lengths', {
+    table: (body) => lengthTable(body, filters, rows),
+    chart: (body) => lengthChart(body, filters, rows),
+  });
+}
+
 const DEFAULT_QUERY = `SELECT hero, count() AS games, rate(win) AS win
 FROM players
 GROUP BY hero
@@ -667,14 +684,14 @@ const VIEWS = {
         { title: 'Builds', id: 'builds', place: 'main' },
         { title: 'Matchups', id: 'matchups', place: 'main', chart: true },
         { title: 'Patches', id: 'patches', place: 'rail', chart: true },
-        { title: 'Game length', id: 'lengths', place: 'rail' },
+        { title: 'Game length', id: 'lengths', place: 'rail', chart: true },
         { title: 'Players', id: 'players', place: 'main' },
         { title: 'Games', id: 'games', place: 'main' },
       ],
     );
     renderTalentTiers(part(el, 'talents'), talents, report.talents, true);
     matchupSection(el, filters, heroes, report.matchups, s.winRate, 'hero');
-    lengthTable(part(el, 'lengths'), filters, report.lengths);
+    lengthSection(el, filters, report.lengths);
     tableOrChart(el, 'patches', {
       table: (body) => statsTable(body, filters, {
         columns: [
@@ -835,12 +852,12 @@ const VIEWS = {
         { title: 'Maps', id: 'maps', place: 'rail' },
         { title: 'Heroes', id: 'heroes', place: 'main' },
         { title: 'Matchups', id: 'matchups', place: 'main', chart: true },
-        { title: 'Game length', id: 'lengths', place: 'rail' },
+        { title: 'Game length', id: 'lengths', place: 'rail', chart: true },
         { title: 'Games', id: 'games', place: 'main' },
       ],
     );
     matchupSection(el, filters, heroes, r.matchups, r.summary.winRate, 'player');
-    lengthTable(part(el, 'lengths'), filters, r.lengths);
+    lengthSection(el, filters, r.lengths);
     statsTable(part(el, 'heroes'), filters, {
       columns: [{ key: 'hero', label: 'Hero', sort: (x) => heroName(heroes, x.hero), html: (x) => heroCell(heroes, x.hero, hash('hero', x.hero)) }, gamesCol, winCol(filters), ...statCols(filters)],
       rows: r.heroes,
