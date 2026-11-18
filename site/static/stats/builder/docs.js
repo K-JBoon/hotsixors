@@ -7,10 +7,27 @@ export const TABLE_DOCS = {
 };
 
 export const JOIN_DOCS = {
-  game: 'Adds the games row of the same game to each row, without adding rows.',
-  teammate: 'Adds the players rows of the 4 teammates, so each player row becomes 4 rows.',
-  opponent: 'Adds the players rows of the 5 opposing players, so each player row becomes 5 rows.',
+  game: 'Adds the games row of the same game. The row count does not change.',
+  teammate: 'Each player row becomes 4 rows, one per teammate. The row of the player is not included.',
+  opponent: 'Each player row becomes 5 rows, one per player of the other team.',
 };
+
+export const JOIN_ROWS = { game: 1, teammate: 4, opponent: 5 };
+
+const JOIN_ON = {
+  game: ['game_id'],
+  teammate: ['game_id', 'team', ['slot', '!=']],
+  opponent: ['game_id', ['team', '!=']],
+};
+
+/** Standard SQL equivalent of `JOIN join` from `base`; `table` is the joined table. */
+export const joinSql = (base, join, table) =>
+  [
+    `LEFT JOIN ${table} AS ${join}`,
+    ...JOIN_ON[join]
+      .map((k) => (Array.isArray(k) ? k : [k, '=']))
+      .map(([col, op], i) => `${i ? 'AND' : ' ON'} ${join}.${col} ${op} ${base}.${col}`),
+  ].join('\n');
 
 const COMMON = {
   game_id: 'Unique ID of the game.',
@@ -93,7 +110,7 @@ export const MEASURE_DOCS = {
 export const CLAUSE_DOCS = {
   SELECT: 'Lists the GROUP BY columns and the measures, each measure as call AS name.',
   FROM: 'Sets the base table, players or draft.',
-  JOIN: 'Adds the columns of a joined table, read as join.column.',
+  JOIN: 'Adds the columns of a joined table, read as join.column. Works as LEFT JOIN: a row with no match stays, with null joined columns. JOIN teammate JOIN opponent gives 4 × 5 = 20 rows per player row.',
   WHERE: 'Keeps only the rows where every condition is true.',
   'GROUP BY': 'Makes one result row per distinct value of up to two columns; null values make their own group.',
   FILTER: 'Limits one measure to the rows where every condition is true.',
