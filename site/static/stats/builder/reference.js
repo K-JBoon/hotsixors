@@ -29,6 +29,7 @@ const CLAUSE_EXAMPLES = {
   'GROUP BY': query(byHero),
   'FACET BY': query({ ...byHero, facet: 'map' }),
   FILTER: query({ dimensions: ['hero'], metrics: [m('wins', 'count', [], [clause('win', '=', true)])] }),
+  HAVING: query({ ...byHero, having: 50 }),
   'ORDER BY': query({ ...byHero, sort: { by: 'games', dir: 'desc' } }),
   LIMIT: query({ ...byHero, sort: { by: 'games', dir: 'desc' }, limit: 10 }),
   VIEW: query({ ...byHero, view: 'bar' }),

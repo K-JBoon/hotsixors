@@ -135,6 +135,7 @@ export const CLAUSE_DOCS = {
   'GROUP BY': 'Sets the dimensions: one result row per distinct value of up to two columns. Null is a value too.',
   'FACET BY': 'Splits the result into one panel per distinct value of a column. Each panel has the same dimensions and metrics.',
   FILTER: 'Limits one metric to the rows where every condition is true.',
+  HAVING: 'Removes result rows where count() is less than n. Shares and deltas do not change.',
   'ORDER BY': 'Sorts result rows by a metric or dimension, DESC by default, nulls last.',
   LIMIT: 'Keeps the first n result rows after sorting.',
   VIEW: 'Sets the result display: table, bar, line, scatter or heatmap.',

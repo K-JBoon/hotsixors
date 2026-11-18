@@ -100,10 +100,14 @@ const sortField = (keys, sort, colOption, dimensions) =>
     'aria-label="Direction"',
   )}</div></div>`;
 
-const limitField = (limit) =>
-  `<div class="stats-filters__field"><span id="qb-limit">Limit</span><input class="input stats-filters__min" aria-labelledby="qb-limit" type="number" min="1" name="limit" value="${
-    limit ?? ''
+const countField = (name, label) => (value) =>
+  `<div class="stats-filters__field"><span id="qb-${name}">${label}</span><input class="input stats-filters__min" aria-labelledby="qb-${name}" type="number" min="1" name="${name}" value="${
+    value ?? ''
   }" placeholder="All"></div>`;
+
+const havingField = countField('having', 'Min games');
+
+const limitField = countField('limit', 'Limit');
 
 const joinField = () =>
   `<div class="stats-filters__field"><span id="qb-joins">Join</span><div data-multi="joins" aria-labelledby="qb-joins"></div></div>`;
@@ -144,7 +148,7 @@ const sortKeys = (s) => [...namedIn(s).map((m) => m.name), ...s.dimensions];
 
 const pruneSort = (s) => ({ ...s, sort: s.sort && sortKeys(s).includes(s.sort.by) ? s.sort : null });
 
-const readLimit = (raw) => (raw.trim() === '' ? null : Number(raw));
+const readCount = (raw) => (raw.trim() === '' ? null : Number(raw));
 
 const autoName = (kind, taken) =>
   [kind, ...Array.from({ length: taken.length + 1 }, (_, n) => `${kind}${n + 2}`)].find((n) => !taken.includes(n));
@@ -235,12 +239,12 @@ const metricRow = (columns, colOption) => (m, i) =>
 
 /**
  * Form for every part of a query. `show(q)` draws it; edits call
- * `onChange({ from, joins, where, dimensions, facet, metrics, sort, limit, view })`.
+ * `onChange({ from, joins, where, dimensions, facet, metrics, having, sort, limit, view })`.
  * Where rows without a value and metrics without a valid unique name stay in
  * the form only. `values(table, col)` resolves to `columnValues`.
  */
 export function builderForm(el, { names, values, label = (col, v) => printed(v), columnLabel = (col) => col, onChange }) {
-  let state = { from: 'players', joins: [], rows: [], dimensions: [], facet: null, metrics: [], sort: null, limit: null, view: 'table' };
+  let state = { from: 'players', joins: [], rows: [], dimensions: [], facet: null, metrics: [], sort: null, having: null, limit: null, view: 'table' };
   const colOption = columnOption(columnLabel);
   const valuesOf = (ref) => {
     const { join, col } = splitColumn(ref);
@@ -285,7 +289,7 @@ export function builderForm(el, { names, values, label = (col, v) => printed(v),
       .map(clauseRow(columns, colOption))
       .join('')}<button class="btn stats-query__btn" type="button" data-add="where">+ Where</button><div class="stats-filters__field stats-query__metrics"><span>Metric</span>${state.metrics
       .map(metricRow(columns, colOption))
-      .join('')}<button class="btn stats-query__btn" type="button" data-add="metric">+ Metric</button></div>${sortField(
+      .join('')}<button class="btn stats-query__btn" type="button" data-add="metric">+ Metric</button></div>${havingField(state.having)}${sortField(
       sortKeys(state),
       state.sort,
       colOption,
@@ -343,7 +347,8 @@ export function builderForm(el, { names, values, label = (col, v) => printed(v),
       facet: String(data.get('facet') ?? '') || null,
       metrics,
       sort: by ? { by: at < 0 ? by : metrics[at].name, dir: String(data.get('dir') ?? 'desc') } : null,
-      limit: readLimit(String(data.get('limit') ?? '')),
+      having: readCount(String(data.get('having') ?? '')),
+      limit: readCount(String(data.get('limit') ?? '')),
       view: String(data.get('view') ?? state.view),
     };
   };
@@ -399,8 +404,8 @@ export function builderForm(el, { names, values, label = (col, v) => printed(v),
       Promise.all(namedIn(snapshot).map(typedMetric)),
     ]);
     if (snapshot === state) {
-      const { from, joins, dimensions, facet, sort, limit, view } = state;
-      onChange({ from, joins, where, dimensions, facet, metrics, sort, limit, view });
+      const { from, joins, dimensions, facet, having, sort, limit, view } = state;
+      onChange({ from, joins, where, dimensions, facet, metrics, having, sort, limit, view });
     }
   };
 
@@ -454,6 +459,7 @@ export function builderForm(el, { names, values, label = (col, v) => printed(v),
         facet: q.facet,
         metrics: q.metrics.map(formMetric).filter(Boolean),
         sort: q.sort,
+        having: q.having,
         limit: q.limit,
         view: q.view,
       });

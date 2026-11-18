@@ -1,4 +1,4 @@
-import { aggregate, distinct } from '../query.js';
+import { aggregate, count, distinct } from '../query.js';
 import { METRICS, WRAPPERS, clauseTest, validateQuery, queryColumns } from './model.js';
 import { joinView, tableNames } from './join.js';
 
@@ -64,6 +64,9 @@ const aggregateBy = (length, where, key, metrics, make) =>
     ),
   );
 
+const countBy = (length, where, key) =>
+  new Map(aggregate(length, { where, key, measures: { n: count() } }).map(({ key: k, n }) => [k, n]));
+
 const shareOf = (games) => (v) => ({ value: games && valueOf(v) != null ? valueOf(v) / games : null, n: sizeOf(v) ?? games });
 
 const radixOf = (codes) => codes.reduce((n, d) => n * d.values.length, 1);
@@ -92,7 +95,8 @@ const compare = ({ by, dir = 'desc' }) => {
  * `share` divides its inner metric by the distinct `game_id` count of the
  * filtered rows in its facet value. `delta` subtracts its inner metric grouped
  * by the facet and every dimension except the last. Both yield `{ value, n }`
- * with `n` from the inner metric.
+ * with `n` from the inner metric. `having` drops groups with fewer rows after
+ * every metric is computed, before sort and limit.
  */
 export async function runQuery(stats, q) {
   const errors = validateQuery(q, await tableNames(stats));
@@ -123,7 +127,9 @@ export async function runQuery(stats, q) {
     if (m.kind === 'delta') return deltaOf(v, baseline.get(Math.floor(k / radix))?.[m.name]);
     return v;
   };
-  const rows = [...groups].map(([k, values]) => ({
+  const sizes = q.having == null ? null : countBy(length, where, key);
+  const kept = sizes ? [...groups].filter(([k]) => sizes.get(k) >= q.having) : [...groups];
+  const rows = kept.map(([k, values]) => ({
     ...split(k),
     ...Object.fromEntries(q.metrics.map((m) => [m.name, finish(k, values)(m)])),
   }));

@@ -4,7 +4,7 @@ const TOKEN =
   /\s+|(?<str>'(?:[^']|'')*')|(?<ident>"(?:[^"]|"")*")|(?<num>-?\d[\w.]*)|(?<name>[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*)|(?<op>!=|<>|<=|>=|[=<>(),])/y;
 
 const KEYWORDS = new Set(
-  'select from join where group facet by order limit view as filter and in asc desc true false null'.split(' '),
+  'select from join where group facet having by order limit view as filter and in asc desc true false null'.split(' '),
 );
 
 const LITERALS = { true: true, false: false, null: null };
@@ -42,7 +42,7 @@ const isIdent = (t) => t.type === 'ident' || (t.type === 'name' && !keywordOf(t)
 const OP_ALIASES = { '<>': '!=' };
 
 /**
- * `SELECT item, ... FROM t JOIN j, ... WHERE c AND ... GROUP BY col, ... FACET BY col ORDER BY k ASC|DESC LIMIT n VIEW v`.
+ * `SELECT item, ... FROM t JOIN j, ... WHERE c AND ... GROUP BY col, ... FACET BY col HAVING count() >= n ORDER BY k ASC|DESC LIMIT n VIEW v`.
  * Every clause is optional; keywords ignore case. An item is a dimension or `call AS name`.
  * Dimensions in SELECT must equal GROUP BY; the facet column may also appear. A call is `kind(arg, ...)` with an optional `FILTER (WHERE c AND ...)`.
  * Values are `'strings'` (`''` escapes a quote), numbers, `TRUE`, `FALSE`, `NULL`, or `(v, ...)` after `IN`.
@@ -152,7 +152,16 @@ export const parseQuery = (text) => {
     return { by, dir: accept('asc') ? 'asc' : (accept('desc'), 'desc') };
   };
 
-  const limit = () => (peek().type === 'num' ? Number(next().raw) : fail(`expected a number, got ${peek().raw}`));
+  const number = () => (peek().type === 'num' ? Number(next().raw) : fail(`expected a number, got ${peek().raw}`));
+
+  const having = () => {
+    if (peek().raw !== 'count') fail(`expected count(), got ${peek().raw}`);
+    next();
+    expect('(');
+    expect(')');
+    expect('>=');
+    return number();
+  };
 
   const after = (word, parse) => () => (expect(word), parse());
 
@@ -169,8 +178,9 @@ export const parseQuery = (text) => {
     ['where', 'where', conditions],
     ['group', 'dimensions', after('by', () => list(() => identifier('a column')))],
     ['facet', 'facet', after('by', facet)],
+    ['having', 'having', having],
     ['order', 'sort', after('by', sort)],
-    ['limit', 'limit', limit],
+    ['limit', 'limit', number],
     ['view', 'view', () => identifier('a view')],
   ];
 
@@ -225,6 +235,7 @@ export const printQuery = (q) =>
     q.where.length && `WHERE ${printConditions(q.where)}`,
     q.dimensions.length && `GROUP BY ${q.dimensions.map(ident).join(', ')}`,
     q.facet != null && `FACET BY ${ident(q.facet)}`,
+    q.having != null && `HAVING count() >= ${q.having}`,
     q.sort && `ORDER BY ${ident(q.sort.by)} ${(q.sort.dir ?? 'desc').toUpperCase()}`,
     q.limit != null && `LIMIT ${q.limit}`,
     q.view !== 'table' && `VIEW ${ident(q.view)}`,

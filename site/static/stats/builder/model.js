@@ -61,9 +61,10 @@ export const query = ({
   facet = null,
   metrics = [],
   sort = null,
+  having = null,
   limit = null,
   view = 'table',
-} = {}) => ({ from, joins, where, dimensions, facet, metrics, sort, limit, view });
+} = {}) => ({ from, joins, where, dimensions, facet, metrics, having, sort, limit, view });
 
 /** `opponent.hero` -> `{ join: 'opponent', col: 'hero' }`; unprefixed refs read the base table. */
 export const splitColumn = (ref) => {
@@ -200,8 +201,12 @@ const facetErrors = (column, { facet, dimensions }) => {
   return column(facet, 'facet');
 };
 
-const limitErrors = ({ limit }) =>
-  limit == null || (Number.isInteger(limit) && limit > 0) ? [] : [error('limit', 'limit must be a positive integer')];
+const positive = (key) => (q) =>
+  q[key] == null || (Number.isInteger(q[key]) && q[key] > 0) ? [] : [error(key, `${key} must be a positive integer`)];
+
+const havingErrors = positive('having');
+
+const limitErrors = positive('limit');
 
 /** `names` maps table name to its column names. Empty result means the query can run. */
 export const validateQuery = (q, names) => {
@@ -219,6 +224,7 @@ export const validateQuery = (q, names) => {
     ...nameErrors(q),
     ...viewErrors(q),
     ...sortErrors(q),
+    ...havingErrors(q),
     ...limitErrors(q),
   ];
 };
