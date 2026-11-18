@@ -116,6 +116,22 @@ FROM players
 GROUP BY hero
 VIEW scatter`,
   },
+  {
+    name: 'Win rate by game length',
+    text: `SELECT hero, game_length, delta(rate(win)) AS win, count() AS games
+FROM players
+GROUP BY hero, game_length
+VIEW heatmap`,
+  },
+  {
+    name: 'First-pick advantage',
+    text: `SELECT map, rate(win) AS win
+FROM players
+WHERE picked_first = TRUE
+GROUP BY map
+ORDER BY win DESC
+VIEW bar`,
+  },
 ];
 
 export const withWhere = (where, text) => {
