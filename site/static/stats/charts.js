@@ -33,12 +33,12 @@ const STRIPES = '<defs><pattern id="stats-stripes" width="5" height="5" patternU
 /** Striped copy of a thin SVG mark, drawn over it. */
 const stripes = (tag, geometry, thin) => (thin ? `<${tag} class="stats-chart__stripes" ${geometry} fill="url(#stats-stripes)"/>` : '');
 
-const plot = (bars, x, ticks, ref) => {
+const plot = (bars, x, ticks, ref, attrs) => {
   const y = (i, f) => pct((i + f) / bars.length);
   const zero = x(0);
   const grid = ticks.map((t) => `<line class="stats-chart__grid" x1="${pct(x(t))}" x2="${pct(x(t))}" y1="0" y2="100%"/>`);
   const marks = bars.flatMap((b, i) => {
-    if (b.value == null) return [];
+    if (b?.value == null) return [];
     const at = clamp01(x(b.value));
     const cls = b.thin ? ' is-thin' : '';
     const geometry = `x="${pct(Math.min(at, zero))}" width="${pct(Math.abs(at - zero))}" y="${y(i, (1 - BAR) / 2)}" height="${y(0, BAR)}"`;
@@ -48,13 +48,13 @@ const plot = (bars, x, ticks, ref) => {
     return [bar, `<line class="stats-chart__whisker ${b.tone ?? ''}${cls}" x1="${pct(lo)}" x2="${pct(hi)}" y1="${y(i, 0.5)}" y2="${y(i, 0.5)}"/>`];
   });
   const rule = (v, cls) => `<line class="${cls}" x1="${pct(x(v))}" x2="${pct(x(v))}" y1="0" y2="100%"/>`;
-  return `<svg class="stats-chart__plot" aria-hidden="true">${STRIPES}${grid.join('')}${rule(0, 'stats-chart__zero')}${marks.join('')}${ref == null ? '' : rule(ref, 'stats-chart__ref')}</svg>`;
+  return `<svg class="stats-chart__plot" aria-hidden="true" ${attrs}>${STRIPES}${grid.join('')}${rule(0, 'stats-chart__zero')}${marks.join('')}${ref == null ? '' : rule(ref, 'stats-chart__ref')}</svg>`;
 };
 
 const edgeAnchor = (i, n) => (i === 0 ? 'start' : i === n - 1 ? 'end' : 'middle');
 
-const axis = (x, ticks, format, anchor = (i) => edgeAnchor(i, ticks.length)) =>
-  `<svg class="stats-chart__axis" aria-hidden="true">${ticks
+const axis = (x, ticks, format, anchor = (i) => edgeAnchor(i, ticks.length), attrs = '') =>
+  `<svg class="stats-chart__axis" aria-hidden="true" ${attrs}>${ticks
     .map((t, i) => `<text x="${pct(x(t))}" y="100%" text-anchor="${anchor(i)}"${t === 0 ? ' data-zero' : ''}>${escapeHtml(format(t))}</text>`)
     .join('')}</svg>`;
 
@@ -83,23 +83,36 @@ const axisObserver = new ResizeObserver((entries) =>
 const fitAxes = (el) => el.querySelectorAll('.stats-chart__axis').forEach((svg) => axisObserver.observe(svg));
 
 /**
- * Horizontal bars from zero, one per entry, in the given order.
- * `bars`: `{ label, value, text, interval?: [lo, hi], tone?, thin? }`; `label` and `text` are HTML.
- * `head`: `[label, value]` HTML. `ref` draws a reference line at that value. `minStep` bounds the tick spacing; `steps` as in niceTicks.
- * The axis covers `range` (`[lo, hi]`) when given, else the values and intervals; bars and intervals clip to it.
+ * Rows of horizontal bars from zero, one bar column per entry of `columns`, each on its own axis.
+ * `labels`: row label HTML. `columns`: `{ head, bars, format, ref?, minStep?, steps?, range? }`, `head` HTML;
+ * `bars` align with `labels` as `{ value, text, interval?: [lo, hi], tone?, thin? } | null`, `text` HTML.
+ * `ref` draws a reference line at that value. `minStep` bounds the tick spacing; `steps` as in niceTicks.
+ * An axis covers its `range` (`[lo, hi]`) when given, else its values and intervals; bars and intervals clip to it.
  */
-export function barChart(el, { bars, head, format, ref = null, minStep = 0, steps = [], range = null }) {
-  const values = range ?? bars.flatMap((b) => [b.value, ...(b.interval ?? [])]);
-  const { domain, ticks } = niceTicks(extent([0, ...values, ...(ref == null ? [] : [ref])]), 5, minStep, steps);
-  const x = linear(domain);
-  const cell = (cls, thin) => (html) => `<div class="stats-chart__${cls}${thin ? ' is-thin' : ''}">${html}</div>`;
-  el.innerHTML = `<div class="stats-chart stats-chart--bar" style="--rows: ${bars.length}">
-    ${cell('head')(head[0])}${axis(x, ticks, format)}${cell('head num')(head[1])}
-    ${plot(bars, x, ticks, ref)}
-    ${bars.map((b) => `${cell('label', b.thin)(b.label)}${cell('value num', b.thin)(b.text)}`).join('')}
+export function barColumns(el, { labels, head, columns }) {
+  const at = (k, j) => `style="grid-column: ${2 * k + j}"`;
+  const cell = (cls, thin, attrs = '') => (html) => `<div class="stats-chart__${cls}${thin ? ' is-thin' : ''}" ${attrs}>${html}</div>`;
+  const drawn = columns.map(({ head: title, bars, format, ref = null, minStep = 0, steps = [], range = null }, k) => {
+    const values = range ?? bars.flatMap((b) => (b ? [b.value, ...(b.interval ?? [])] : []));
+    const { domain, ticks } = niceTicks(extent([0, ...values, ...(ref == null ? [] : [ref])]), 5, minStep, steps);
+    const x = linear(domain);
+    return { head: `${axis(x, ticks, format, undefined, at(k, 2))}${cell('head num', false, at(k, 3))(title)}`, plot: plot(bars, x, ticks, ref, at(k, 2)) };
+  });
+  const row = (label, i) => {
+    const bars = columns.map((c) => c.bars[i]);
+    return `${cell('label', bars.every((b) => b?.thin))(label)}${bars.map((b, k) => cell('value num', b?.thin, at(k, 3))(b?.text ?? '')).join('')}`;
+  };
+  el.innerHTML = `<div class="stats-chart stats-chart--bar" style="--rows: ${labels.length}; --cols: ${columns.length}">
+    ${cell('head')(head)}${drawn.map((d) => d.head).join('')}
+    ${drawn.map((d) => d.plot).join('')}
+    ${labels.map(row).join('')}
   </div>`;
   fitAxes(el);
 }
+
+/** One bar column. `bars`: `{ label, ...bar }`, `label` HTML. `head`: `[label, value]` HTML. Other options as in barColumns. */
+export const barChart = (el, { bars, head, ...column }) =>
+  barColumns(el, { labels: bars.map((b) => b.label), head: head[0], columns: [{ ...column, head: head[1], bars }] });
 
 const SERIES = [
   'var(--accent-blue)',
