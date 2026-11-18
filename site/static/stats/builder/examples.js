@@ -87,10 +87,10 @@ VIEW bar`,
   },
   {
     name: 'Game length by map',
-    text: `SELECT map, mean(duration_s) AS seconds
+    text: `SELECT map, mean(duration_s) AS length
 FROM players
 GROUP BY map
-ORDER BY seconds DESC
+ORDER BY length DESC
 VIEW bar`,
   },
   {

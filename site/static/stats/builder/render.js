@@ -22,7 +22,18 @@ const FORMATS = {
 
 const DELTA_FORMATS = { rate: fmt.delta, share: fmt.delta };
 
+const TIME_COLUMNS = ['time_s', 'duration_s'];
+
+const TIME_METRICS = ['mean', 'sum', 'mode', 'latest'];
+
+const TIME_STEPS = [30, 60, 120, 300, 600, 1200, 1800, 3600];
+
+const isTime = (m) => TIME_METRICS.includes(m.kind) && TIME_COLUMNS.includes(splitColumn(m.args[0]).col);
+
+const stepsOf = (m) => (isTime(m) ? TIME_STEPS : []);
+
 const metricFormat = (m) => {
+  if (isTime(m)) return fmt.dur;
   if (m.kind === 'rate') return fmt.pct;
   if (m.kind === 'delta') return DELTA_FORMATS[m.args[0].kind] ?? signed(FORMATS[m.args[0].kind] ?? fmt.num);
   return FORMATS[m.kind] ?? text;
@@ -183,6 +194,7 @@ const bar = (el, result, q, names) => {
       format: metricFormat(m),
       ref: rate ? 0.5 : null,
       minStep: minStepOf(m),
+      steps: stepsOf(m),
       range: range.length ? extent(range) : null,
     });
   };
@@ -228,7 +240,7 @@ const line = (el, result, q, names) => {
     const range = sharedRange(rows.filter((r) => on[index.get(seriesKey(r))]), (r) => valueOf(r[m.name]));
     const toggle = (k) => draw(on.map((v, i) => (i === k ? !v : v)));
     const panel = (pel, prs) =>
-      lineChart(pel, { xs: xs.map(xName), series: seriesOf(prs), on, head: metricHead(m), format, ref: refOf(m), minStep: minStepOf(m), range, toggle });
+      lineChart(pel, { xs: xs.map(xName), series: seriesOf(prs), on, head: metricHead(m), format, ref: refOf(m), minStep: minStepOf(m), steps: stepsOf(m), range, toggle });
     facetPanels(el, rows, q, names, panel, '24rem');
   };
   draw(ranked.map((_, i) => i < LINE_SERIES));
@@ -269,7 +281,7 @@ const scatter = (el, result, q, names) => {
     };
   };
   const pointsOf = (prs) => prs.filter(plottable).sort((a, b) => (size(a) ?? 0) - (size(b) ?? 0)).map(pointOf);
-  const axisOf = (m, format) => ({ head: metricHead(m), format, ref: refOf(m), minStep: minStepOf(m), range: sharedRange(plotted, (r) => valueOf(r[m.name])) });
+  const axisOf = (m, format) => ({ head: metricHead(m), format, ref: refOf(m), minStep: minStepOf(m), steps: stepsOf(m), range: sharedRange(plotted, (r) => valueOf(r[m.name])) });
   const [ax, ay] = [axisOf(mx, fx), axisOf(my, fy)];
   facetPanels(el, rows, q, names, (pel, prs) => scatterChart(pel, { points: pointsOf(prs), x: ax, y: ay }));
 };
@@ -373,6 +385,7 @@ const heatmap = (el, result, q, names) => {
       format,
       ref: refOf(m),
       minStep: minStepOf(m),
+      steps: stepsOf(m),
       range,
     });
   };

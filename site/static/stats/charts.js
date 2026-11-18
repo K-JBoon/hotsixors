@@ -2,12 +2,15 @@ import { escapeHtml } from './view.js';
 
 const STEPS = [1, 2, 2.5, 5, 10];
 
-/** Round domain covering `[lo, hi]` and about `count` evenly spaced ticks in it, at least `minStep` apart. */
-export function niceTicks([lo, hi], count = 5, minStep = 0) {
+/**
+ * Round domain covering `[lo, hi]` and about `count` evenly spaced ticks in it, at least `minStep` apart.
+ * `steps` lists allowed tick steps in ascending order; past its last entry, steps are decimal.
+ */
+export function niceTicks([lo, hi], count = 5, minStep = 0, steps = []) {
   if (lo === hi) [lo, hi] = lo ? [Math.min(0, lo), Math.max(0, hi)] : [0, 1];
   const raw = (hi - lo) / count;
   const mag = 10 ** Math.floor(Math.log10(raw));
-  const step = Math.max(STEPS.find((s) => s * mag >= raw) * mag, minStep);
+  const step = Math.max(steps.find((s) => s >= raw) ?? STEPS.find((s) => s * mag >= raw) * mag, minStep);
   const start = Math.floor(lo / step + 1e-9) * step;
   const end = Math.ceil(hi / step - 1e-9) * step;
   const ticks = Array.from({ length: Math.round((end - start) / step) + 1 }, (_, i) => +(start + i * step).toPrecision(12));
@@ -82,12 +85,12 @@ const fitAxes = (el) => el.querySelectorAll('.stats-chart__axis').forEach((svg) 
 /**
  * Horizontal bars from zero, one per entry, in the given order.
  * `bars`: `{ label, value, text, interval?: [lo, hi], tone?, thin? }`; `label` and `text` are HTML.
- * `head`: `[label, value]` HTML. `ref` draws a reference line at that value. `minStep` bounds the tick spacing.
+ * `head`: `[label, value]` HTML. `ref` draws a reference line at that value. `minStep` bounds the tick spacing; `steps` as in niceTicks.
  * The axis covers `range` (`[lo, hi]`) when given, else the values and intervals.
  */
-export function barChart(el, { bars, head, format, ref = null, minStep = 0, range = null }) {
+export function barChart(el, { bars, head, format, ref = null, minStep = 0, steps = [], range = null }) {
   const values = range ?? bars.flatMap((b) => [b.value, ...(b.interval ?? [])]);
-  const { domain, ticks } = niceTicks(extent([0, ...values, ...(ref == null ? [] : [ref])]), 5, minStep);
+  const { domain, ticks } = niceTicks(extent([0, ...values, ...(ref == null ? [] : [ref])]), 5, minStep, steps);
   const x = linear(domain);
   const cell = (cls, thin) => (html) => `<div class="stats-chart__${cls}${thin ? ' is-thin' : ''}">${html}</div>`;
   el.innerHTML = `<div class="stats-chart stats-chart--bar" style="--rows: ${bars.length}">
@@ -152,10 +155,10 @@ const legend = (series, on) =>
  * The y domain covers `range` (`[lo, hi]`) when given, else drawn series, and `ref`.
  */
 export function lineChart(el, opts) {
-  const { xs, series, on, head, format, ref = null, minStep = 0, range = null } = opts;
+  const { xs, series, on, head, format, ref = null, minStep = 0, steps = [], range = null } = opts;
   const toggle = opts.toggle ?? ((k) => lineChart(el, { ...opts, on: on.map((v, i) => (i === k ? !v : v)) }));
   const values = range ?? series.flatMap((s, k) => (on[k] ? s.points.map((p) => p?.value) : []));
-  const { domain, ticks } = niceTicks(extent([...values, ...(ref == null ? [] : [ref])]), 5, minStep);
+  const { domain, ticks } = niceTicks(extent([...values, ...(ref == null ? [] : [ref])]), 5, minStep, steps);
   const y = (v) => 1 - linear(domain)(v);
   const step = Math.ceil(xs.length / MAX_X_LABELS);
   const shown = xs.map((_, i) => i).filter((i) => i % step === 0);
@@ -174,8 +177,8 @@ export function lineChart(el, opts) {
 
 const clamp01 = (v) => Math.min(Math.max(v, 0), 1);
 
-const scale = ({ ref = null, minStep = 0, range = null }, values) => {
-  const { domain, ticks } = niceTicks(extent([...(range ?? values), ...(ref == null ? [] : [ref])]), 5, minStep);
+const scale = ({ ref = null, minStep = 0, steps = [], range = null }, values) => {
+  const { domain, ticks } = niceTicks(extent([...(range ?? values), ...(ref == null ? [] : [ref])]), 5, minStep, steps);
   return { at: linear(domain), ticks };
 };
 
@@ -196,7 +199,7 @@ const dot = (p, x, y, xAxis, yAxis) => {
 /**
  * Points over two linear axes, drawn in the given order.
  * `points`: `{ x, y, xi?, yi?, mark?, href?, title, thin? }`; `xi`/`yi` are `[lo, hi]` whiskers, `mark` is HTML.
- * `x`, `y`: `{ head, format, ref?, minStep?, range? }`; `head` is HTML, `range` (`[lo, hi]`) overrides the point extent.
+ * `x`, `y`: `{ head, format, ref?, minStep?, steps?, range? }`; `head` is HTML, `range` (`[lo, hi]`) overrides the point extent.
  * Whiskers clip to the domain.
  */
 export function scatterChart(el, { points, x: xAxis, y: yAxis }) {
@@ -278,11 +281,11 @@ const heatDomain = (values, ref) => {
  * `rows`: `{ label, title? }`, `label` HTML. `cols`: `{ label, name, title? }`, `label` optional mark HTML, `name` text. `cells[i][j]`: `{ value, title, thin? } | null`.
  * The color domain covers `range` (`[lo, hi]`) when given, else non-thin cells when any exist; others clamp.
  */
-export function heatmapChart(el, { rows, cols, cells, head, format, ref = null, minStep = 0, range = null }) {
+export function heatmapChart(el, { rows, cols, cells, head, format, ref = null, minStep = 0, steps = [], range = null }) {
   const all = cells.flat().filter((c) => c?.value != null);
   const solid = all.filter((c) => !c.thin);
   const values = range ?? (solid.length ? solid : all).map((c) => c.value);
-  const { domain } = niceTicks(heatDomain(values, ref), 4, minStep);
+  const { domain } = niceTicks(heatDomain(values, ref), 4, minStep, steps);
   const at = linear(domain);
   const { color, key } = ramp(ref, ref == null ? 0 : at(ref));
   const rects = cells.flatMap((row, i) =>
