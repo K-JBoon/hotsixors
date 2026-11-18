@@ -163,7 +163,7 @@ async function main(): Promise<void> {
   console.log(`tables: ${tables.games[0].data.length} games, ${tables.players[0].data.length} player rows, skipped ${tables.skipped.length}`, Object.fromEntries(failed));
 
   const files: Record<string, { key: string; bytes: Uint8Array }> = {};
-  for (const name of ["games", "players", "draft"] as const) {
+  for (const name of ["games", "players", "draft", "levels"] as const) {
     const bytes = toParquet(tables[name] as Table, name !== "games");
     files[name] = { key: `${name}.${hashOf(bytes)}.parquet`, bytes };
     console.log(`tables: ${files[name].key} ${(bytes.length / 1e6).toFixed(1)} MB`);
