@@ -25,6 +25,11 @@ export const extent = (values) => {
 
 const BAR = 0.6;
 
+const STRIPES = '<defs><pattern id="stats-stripes" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect class="stats-chart__stripe" width="2" height="5"/></pattern></defs>';
+
+/** Striped copy of a thin SVG mark, drawn over it. */
+const stripes = (tag, geometry, thin) => (thin ? `<${tag} class="stats-chart__stripes" ${geometry} fill="url(#stats-stripes)"/>` : '');
+
 const plot = (bars, x, ticks, ref) => {
   const y = (i, f) => pct((i + f) / bars.length);
   const zero = x(0);
@@ -33,13 +38,14 @@ const plot = (bars, x, ticks, ref) => {
     if (b.value == null) return [];
     const at = x(b.value);
     const cls = b.thin ? ' is-thin' : '';
-    const bar = `<rect class="stats-chart__bar${cls}" x="${pct(Math.min(at, zero))}" width="${pct(Math.abs(at - zero))}" y="${y(i, (1 - BAR) / 2)}" height="${y(0, BAR)}"/>`;
+    const geometry = `x="${pct(Math.min(at, zero))}" width="${pct(Math.abs(at - zero))}" y="${y(i, (1 - BAR) / 2)}" height="${y(0, BAR)}"`;
+    const bar = `<rect class="stats-chart__bar${cls}" ${geometry}/>${stripes('rect', geometry, b.thin)}`;
     if (b.interval == null) return [bar];
     const [lo, hi] = b.interval.map(x);
     return [bar, `<line class="stats-chart__whisker ${b.tone ?? ''}${cls}" x1="${pct(lo)}" x2="${pct(hi)}" y1="${y(i, 0.5)}" y2="${y(i, 0.5)}"/>`];
   });
   const rule = (v, cls) => `<line class="${cls}" x1="${pct(x(v))}" x2="${pct(x(v))}" y1="0" y2="100%"/>`;
-  return `<svg class="stats-chart__plot" aria-hidden="true">${grid.join('')}${rule(0, 'stats-chart__zero')}${marks.join('')}${ref == null ? '' : rule(ref, 'stats-chart__ref')}</svg>`;
+  return `<svg class="stats-chart__plot" aria-hidden="true">${STRIPES}${grid.join('')}${rule(0, 'stats-chart__zero')}${marks.join('')}${ref == null ? '' : rule(ref, 'stats-chart__ref')}</svg>`;
 };
 
 const edgeAnchor = (i, n) => (i === 0 ? 'start' : i === n - 1 ? 'end' : 'middle');
@@ -124,11 +130,12 @@ const linePlot = (xs, series, on, y, ticks, format, ref) => {
     const points = s.points.flatMap((p, i) => {
       if (p?.value == null) return [];
       const [cx, cy] = at(i);
-      return [`<circle class="stats-chart__point${p.thin ? ' is-thin' : ''}" cx="${cx}" cy="${cy}" r="${r}"><title>${escapeHtml(p.title)}</title></circle>`];
+      const geometry = `cx="${cx}" cy="${cy}" r="${r}"`;
+      return [`<circle class="stats-chart__point${p.thin ? ' is-thin' : ''}" ${geometry}><title>${escapeHtml(p.title)}</title></circle>${stripes('circle', geometry, p.thin)}`];
     });
     return [`<g style="${seriesColor(k)}">${segments.join('')}${points.join('')}</g>`];
   });
-  return `<svg class="stats-chart__plot">${grid.join('')}${ref == null ? '' : hline(ref, 'stats-chart__ref')}${lines.join('')}</svg>`;
+  return `<svg class="stats-chart__plot">${STRIPES}${grid.join('')}${ref == null ? '' : hline(ref, 'stats-chart__ref')}${lines.join('')}</svg>`;
 };
 
 const legend = (series, on) =>
@@ -241,11 +248,11 @@ export function heatmapChart(el, { rows, cols, cells, head, format, ref = null, 
   const at = linear(domain);
   const { color, key } = ramp(ref, ref == null ? 0 : at(ref));
   const rects = cells.flatMap((row, i) =>
-    row.flatMap((c, j) =>
-      c?.value == null
-        ? []
-        : [`<rect class="stats-chart__cell${c.thin ? ' is-thin' : ''}" x="${pct(j / cols.length)}" y="${pct(i / rows.length)}" width="${pct(1 / cols.length)}" height="${pct(1 / rows.length)}" style="fill: ${color(at(c.value))}"><title>${escapeHtml(c.title)}</title></rect>`],
-    ),
+    row.flatMap((c, j) => {
+      if (c?.value == null) return [];
+      const geometry = `x="${pct(j / cols.length)}" y="${pct(i / rows.length)}" width="${pct(1 / cols.length)}" height="${pct(1 / rows.length)}"`;
+      return [`<rect class="stats-chart__cell${c.thin ? ' is-thin' : ''}" ${geometry} style="fill: ${color(at(c.value))}"><title>${escapeHtml(c.title)}</title></rect>${stripes('rect', geometry, c.thin)}`];
+    }),
   );
   const title = (t) => (t ? ` title="${escapeHtml(t)}"` : '');
   const name = Math.max(...cols.map((c) => c.name.length), 1);
@@ -254,7 +261,7 @@ export function heatmapChart(el, { rows, cols, cells, head, format, ref = null, 
     <div class="stats-chart__key"><div class="stats-chart__scale" style="background: linear-gradient(90deg, ${key})"></div>${axis(at, ref == null ? domain : [domain[0], ref, domain[1]], format)}</div>
     <div class="stats-chart__head">${head[0]}</div>
     <div class="stats-chart__cols">${cols.map((c) => `<div${title(c.title ?? c.name)}><span class="stats-chart__name">${escapeHtml(c.name)}</span>${c.label ?? ''}</div>`).join('')}</div>
-    <svg class="stats-chart__plot">${rects.join('')}</svg>
+    <svg class="stats-chart__plot">${STRIPES}${rects.join('')}</svg>
     ${rows.map((r) => `<div class="stats-chart__label"${title(r.title)}>${r.label}</div>`).join('')}
   </div>`;
   fitAxes(el);

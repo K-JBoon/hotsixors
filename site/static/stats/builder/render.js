@@ -137,6 +137,7 @@ const table = (el, { rows }, q, names, key) => {
       const dim = thinCells(shown, q.metrics);
       return (c, r) => c.metric != null && dim(c.metric, r);
     },
+    thinCells: true,
     empty: 'No rows match this query.',
     search: q.dimensions.length ? { placeholder: 'Filter', key, text: dimensionText(names, q.dimensions) } : undefined,
   });

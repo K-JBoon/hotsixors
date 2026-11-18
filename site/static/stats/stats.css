@@ -246,6 +246,10 @@
 .stats-table .stats-wr::before { inset-inline: 0; background: linear-gradient(90deg, transparent calc(50% - 0.5px), var(--border-soft) 0 calc(50% + 0.5px), transparent 0), var(--hairline); }
 .stats-table .stats-wr::after { inset-inline-start: var(--lo); inline-size: calc(var(--hi) - var(--lo)); background: currentColor; opacity: 0.6; }
 .stats-table tr.is-thin > td { opacity: 0.7; }
+.stats-table { --stripe: color-mix(in srgb, var(--text-primary) 12%, transparent); }
+.stats-chart { --stripe: color-mix(in srgb, var(--text-primary) 35%, transparent); }
+.stats-table td.is-thin { opacity: 0.7; }
+.stats-table td.is-thin, .stats-chart__dot.is-thin::after { background-image: repeating-linear-gradient(135deg, var(--stripe) 0 2px, transparent 0 5px); }
 
 .stats-detail { display: flex; align-items: center; gap: var(--space-sm); font-size: var(--text-lg); }
 .stats-detail h2 { margin: 0; text-transform: none; letter-spacing: normal; }
@@ -383,6 +387,10 @@ body.is-dragging-file .stats-page:not(.is-empty)::after {
 .stats-chart__value { grid-column: 3; }
 .stats-chart .num { text-align: end; font-variant-numeric: tabular-nums; }
 .stats-chart .is-thin { opacity: 0.7; }
+.stats-chart__stripes { pointer-events: none; }
+.stats-chart__stripe { fill: var(--stripe); }
+.stats-chart__line.is-thin { stroke-dasharray: 2 3; }
+.stats-chart__dot.is-thin::after { content: ''; position: absolute; inset: 0; border-radius: var(--radius-sm); }
 .stats-chart .stats-portrait { width: 1.5rem; height: 1.5rem; }
 .stats-chart svg { display: block; inline-size: 100%; overflow: visible; }
 .stats-chart__axis { grid-column: 2; block-size: 1.5em; fill: var(--text-muted); font-size: var(--text-xs); }

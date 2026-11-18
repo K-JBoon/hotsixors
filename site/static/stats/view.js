@@ -161,13 +161,14 @@ const rowThin = (count) => (rows) => {
 /**
  * Sortable table. `columns`: `{ key, label, title, html(row) | format, num, shrink, sort(row, dir) }`;
  * `shrink` sizes the column to its content. Rows whose `count` is under THIN_GAMES are dimmed;
- * `thin(shownRows)` returns a `(column, row)` cell test that overrides it, dimming rows with any thin cell.
+ * `thin(shownRows)` returns a `(column, row)` cell test that overrides it, dimming rows with any thin cell,
+ * or only the thin cells when `thinCells` is set.
  * Clicking a header re-sorts in place. Rows beyond `pageSize` go to further pages.
  * `search: { placeholder, key, text(row) }` adds a filter box when rows span several pages or a query is active;
  * typing anywhere on the page fills the last focused one. The query, saved under `key` (default `placeholder`), survives re-renders until the hash changes.
  * `onSort(key, dir)` runs after a header click.
  */
-export function renderTable(container, { columns, rows, sortKey, sortDir = -1, pageSize = 20, split = Infinity, empty, search, onSort, count = (r) => r.games, thin = rowThin(count) }) {
+export function renderTable(container, { columns, rows, sortKey, sortDir = -1, pageSize = 20, split = Infinity, empty, search, onSort, count = (r) => r.games, thin = rowThin(count), thinCells = false }) {
   empty ??= 'No games match these filters.';
   let key = columns.some((c) => c.key === sortKey) ? sortKey : columns[0].key;
   let dir = sortDir;
@@ -231,7 +232,11 @@ export function renderTable(container, { columns, rows, sortKey, sortDir = -1, p
     const dim = thin(sorted);
     const trs = sorted
       .slice(start, start + size)
-      .map((r) => `<tr${columns.some((c) => dim(c, r)) ? ' class="is-thin"' : ''}>${columns.map((c) => `<td class="${cls(c)}">${cell(c, r)}</td>`).join('')}</tr>`);
+      .map((r) => {
+        const faded = !thinCells && columns.some((c) => dim(c, r));
+        const tdClass = (c) => (thinCells && dim(c, r) ? `${cls(c)} is-thin`.trim() : cls(c));
+        return `<tr${faded ? ' class="is-thin"' : ''}>${columns.map((c) => `<td class="${tdClass(c)}">${cell(c, r)}</td>`).join('')}</tr>`;
+      });
     const half = Math.ceil(trs.length / 2);
     const bodies = trs.length > split ? [trs.slice(0, half), trs.slice(half)] : [trs];
     const table = (body) => `<div class="table-wrap"><table class="table stats-table"><thead><tr>${head}</tr></thead><tbody>${body.join('')}</tbody></table></div>`;
