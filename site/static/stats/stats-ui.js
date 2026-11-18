@@ -14,11 +14,13 @@ import { SCORE_LABELS } from './builder/docs.js';
 import { renderResult } from './builder/render.js';
 import { csvFileName, toCsv } from './builder/csv.js';
 import { schemaRail } from './builder/schema.js';
+import { lineChart } from './charts.js';
+import { getAvailableStorage, getStoredString, setStoredString } from '../js/storage.js';
 import { referenceRail } from './builder/reference.js';
 import {
   STAT_COLUMNS, available, facets, gameList, tournamentReport, tournamentTable, heroReport, mapReport, heroTable, mapTable, playerReport, playerTable, teamReport, teamTable,
 } from './reports.js';
-import { LIQUIPEDIA_ICON, MISSING_ICON, deltaCell, escapeHtml, fmt, heroCell, heroName, loadHeroes, renderTable, renderTalentTiers, talentName, tiles, wilson, winRateCell } from './view.js';
+import { LIQUIPEDIA_ICON, MISSING_ICON, deltaCell, escapeHtml, fmt, heroCell, heroName, loadHeroes, lowSample, renderTable, renderTalentTiers, talentName, tiles, unlessAll, wilson, winRateCell } from './view.js';
 
 const root = document.querySelector('[data-stats-root]');
 const view = root.querySelector('[data-view]');
@@ -162,6 +164,44 @@ function section(title, id) {
 }
 const part = (el, id) => el.querySelector(`[data-part="${id}"]`);
 
+const SECTION_VIEWS = [['table', 'Table'], ['chart', 'Chart']];
+const viewSwitch = (id) => `<div class="segmented" role="radiogroup" aria-label="View" data-switch="${id}">${SECTION_VIEWS
+  .map(([v, label], i) => `<label class="segmented__btn"><input type="radio" name="view-${id}" value="${v}"${i ? '' : ' checked'}> ${label}</label>`)
+  .join('')}</div>`;
+const viewKey = (id) => `hotsixors.stats.view.${route().tab}.${id}`;
+
+/** Draws section `id` with `draw.table(body)` or `draw.chart(body)`, as picked by its head switch and saved per page and section. */
+function tableOrChart(el, id, draw) {
+  const body = part(el, id);
+  const radios = el.querySelector(`[data-switch="${id}"]`);
+  const storage = getAvailableStorage();
+  const show = (mode) => {
+    radios.querySelector(`input[value="${mode}"]`).checked = true;
+    draw[mode](body);
+  };
+  radios.addEventListener('change', (e) => {
+    setStoredString(storage, viewKey(id), e.target.value);
+    show(e.target.value);
+  });
+  show(getStoredString(storage, viewKey(id), 'table', SECTION_VIEWS.map(([v]) => v)));
+}
+
+/** Win and pick rate per patch, oldest first; rates over few games are striped. */
+function patchChart(el, filters, patches) {
+  const { rows, empty } = minGames(patches, filters);
+  if (!rows.length) {
+    el.innerHTML = `<p class="stats-note">${escapeHtml(empty ?? 'No games match these filters.')}</p>`;
+    return;
+  }
+  const ordered = [...rows].sort((a, b) => patchRank(a.patch) - patchRank(b.patch));
+  const thin = unlessAll((r) => lowSample('rate', r.games))(ordered);
+  const series = [['Win', 'winRate'], ['Pick', 'pickRate']].map(([label, key]) => ({
+    label,
+    points: ordered.map((r) => ({ value: r[key], title: `${r.patch} ${label}: ${fmt.pct(r[key])}, ${fmt.int(r.games)} games`, thin: thin(r) })),
+  }));
+  lineChart(el, { xs: ordered.map((r) => r.patch), series, on: [true, true], head: 'Rate', format: fmt.pct, ref: 0.5 });
+}
+
 /**
  * Detail page body. `band` sections span the page above the columns; `rail` sections sit beside the
  * content under the tiles; `either` sections join them while the rail stays shorter than the content.
@@ -171,7 +211,9 @@ function detailPage(header, tileHtml, sections) {
   const item = (s, i) => {
     const attrs = s.place === 'band' ? `data-place="band"` : `data-place="${s.place}" style="order: ${i + 1}"`;
     if (s.phases) return `<div class="stats-phases" data-part="${s.id}" ${attrs}></div>`;
-    return `<section class="stats-section" ${attrs}><h2 class="stats-section__title">${escapeHtml(s.title)}</h2><div data-part="${s.id}"></div></section>`;
+    const title = `<h2 class="stats-section__title">${escapeHtml(s.title)}</h2>`;
+    const head = s.chart ? `<div class="stats-section__head">${title}${viewSwitch(s.id)}</div>` : title;
+    return `<section class="stats-section" ${attrs}>${head}<div data-part="${s.id}"></div></section>`;
   };
   const at = (pred) => sections.map((s, i) => (pred(s) ? item(s, i) : '')).join('');
   return `<div class="stats-layout">${header}${at((s) => s.place === 'band')}<div class="stats-layout__cols">
@@ -581,7 +623,7 @@ const VIEWS = {
         { title: 'Talents', id: 'talents', place: 'main' },
         { title: 'Builds', id: 'builds', place: 'main' },
         { title: 'Matchups', id: 'matchups', place: 'main' },
-        { title: 'Patches', id: 'patches', place: 'rail' },
+        { title: 'Patches', id: 'patches', place: 'rail', chart: true },
         { title: 'Game length', id: 'lengths', place: 'rail' },
         { title: 'Players', id: 'players', place: 'main' },
         { title: 'Games', id: 'games', place: 'main' },
@@ -590,15 +632,18 @@ const VIEWS = {
     renderTalentTiers(part(el, 'talents'), talents, report.talents, true);
     matchupTable(part(el, 'matchups'), filters, heroes, report.matchups, s.winRate, 'hero');
     lengthTable(part(el, 'lengths'), filters, report.lengths);
-    statsTable(part(el, 'patches'), filters, {
-      columns: [
-        { key: 'patch', label: 'Patch', sort: (x) => patchRank(x.patch) },
-        gamesCol, winCol(filters),
-        { key: 'pickRate', label: 'Pick', num: true, format: fmt.pct },
-      ],
-      rows: report.patches,
-      sortKey: 'patch',
-      pageSize: 10,
+    tableOrChart(el, 'patches', {
+      table: (body) => statsTable(body, filters, {
+        columns: [
+          { key: 'patch', label: 'Patch', sort: (x) => patchRank(x.patch) },
+          gamesCol, winCol(filters),
+          { key: 'pickRate', label: 'Pick', num: true, format: fmt.pct },
+        ],
+        rows: report.patches,
+        sortKey: 'patch',
+        pageSize: 10,
+      }),
+      chart: (body) => patchChart(body, filters, report.patches),
     });
     const talentIcon = (id) => {
       const t = talents[id];

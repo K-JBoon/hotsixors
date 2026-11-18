@@ -134,6 +134,7 @@
 .stats-view__body { display: contents; }
 .stats-section { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-xs); }
 .stats-section__title { font-size: var(--text-lg); margin: 0; }
+.stats-section__head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-xs); }
 .stats-section .select-search { margin-bottom: var(--space-xs); }
 
 
