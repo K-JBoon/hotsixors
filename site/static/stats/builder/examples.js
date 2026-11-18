@@ -1,4 +1,6 @@
-export const EXAMPLES = [
+import { parseQuery, printQuery } from './text.js';
+
+const EXAMPLES = [
   {
     name: 'Win rate vs. presence',
     text: `SELECT hero,
@@ -36,3 +38,10 @@ FACET BY talent_pair.tiers
 VIEW heatmap`,
   },
 ];
+
+export const withWhere = (where, text) => {
+  const q = parseQuery(text);
+  return printQuery({ ...q, where: [...where, ...q.where] });
+};
+
+export const examples = (where) => EXAMPLES.map((e) => ({ ...e, text: withWhere(where, e.text) }));

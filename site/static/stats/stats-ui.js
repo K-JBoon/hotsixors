@@ -5,11 +5,11 @@ import { canPickFolder, droppedReplays, folderDiff, hasReadPermission, requestRe
 import { loadSiteResolver } from './resolve.js';
 import { buildTables } from './tables.js';
 import { parseQuery, printQuery } from './builder/text.js';
-import { query, validateQuery } from './builder/model.js';
+import { clause, query, validateQuery } from './builder/model.js';
 import { tableNames } from './builder/join.js';
 import { builderForm, columnValues } from './builder/form.js';
 import { runQuery } from './builder/run.js';
-import { EXAMPLES } from './builder/examples.js';
+import { examples, withWhere } from './builder/examples.js';
 import { SCORE_LABELS } from './builder/docs.js';
 import { renderResult } from './builder/render.js';
 import { schemaRail } from './builder/schema.js';
@@ -383,11 +383,13 @@ function lengthTable(el, filters, rows) {
   });
 }
 
-let queryText = `SELECT hero, count() AS games, rate(win) AS win
+const DEFAULT_QUERY = `SELECT hero, count() AS games, rate(win) AS win
 FROM players
 GROUP BY hero
 ORDER BY games DESC
 LIMIT 20`;
+const defaultWhere = () => [...(defaultPatches.length ? [clause('patch', 'in', defaultPatches)] : []), clause('strict', '=', true)];
+let queryText = null;
 const queryHash = (text) => `#query/${encodeURIComponent(text)}`;
 const queryResult = async (stats, text) => {
   try {
@@ -423,8 +425,11 @@ const queryChips = (list, text, deletable) => list.map((s) => `<span class="chip
 
 const VIEWS = {
   async query(stats, filters, heroes, text, el) {
+    const where = defaultWhere();
+    const exampleList = examples(where);
     if (text) queryText = text;
-    else history.replaceState(null, '', queryHash(queryText));
+    else queryText ??= withWhere(where, DEFAULT_QUERY);
+    if (!text) history.replaceState(null, '', queryHash(queryText));
     el.innerHTML = `<div class="stats-layout stats-layout--wide"><section class="stats-section"><div class="stats-query__bar" data-part="examples"></div><div class="stats-query__bar"><input class="input" data-name placeholder="Name" aria-label="Name"><button class="btn" type="button" data-save>Save</button><span class="stats-query__list" data-part="saved"></span></div><div class="stats-filters stats-query__form"><form class="stats-query__controls" data-part="builder"></form><div class="stats-query__editor"><textarea class="input stats-query__text" rows="4" spellcheck="false" aria-label="Query"></textarea><div data-part="note"></div></div></div></section><div class="stats-layout__cols"><div class="stats-content"><div data-part="out"></div></div><aside class="stats-rail stats-query__rail"><section class="stats-section"><h2 class="stats-section__title">Schema</h2><div data-part="schema"></div></section><section class="stats-section"><h2 class="stats-section__title">Reference</h2><div data-part="reference"></div></section></aside></div></div>`;
     const input = el.querySelector('textarea');
     const fit = () => (input.rows = Math.max(4, input.value.split('\n').length));
@@ -437,7 +442,7 @@ const VIEWS = {
     const talents = await stats.json('talents').catch(() => ({}));
     const showSaved = () => {
       savedEl.innerHTML = queryChips(saved, input.value, true);
-      examplesEl.innerHTML = queryChips(EXAMPLES, input.value, false);
+      examplesEl.innerHTML = queryChips(exampleList, input.value, false);
     };
     const store = async (list) => {
       saved = list;
@@ -488,7 +493,7 @@ const VIEWS = {
     }, 300));
     input.value = queryText;
     fit();
-    name.value = [...saved, ...EXAMPLES].find((s) => s.text === queryText)?.name ?? '';
+    name.value = [...saved, ...exampleList].find((s) => s.text === queryText)?.name ?? '';
     showSaved();
     el.querySelector('[data-save]').addEventListener('click', save);
     name.addEventListener('keydown', (e) => e.key === 'Enter' && save());
@@ -508,7 +513,7 @@ const VIEWS = {
       if (btn.dataset.delete != null) return store(withoutSaved(saved, btn.dataset.delete));
       open(saved.find((x) => x.name === btn.dataset.open));
     });
-    examplesEl.addEventListener('click', (e) => open(EXAMPLES.find((x) => x.name === e.target.closest('button')?.dataset.open)));
+    examplesEl.addEventListener('click', (e) => open(exampleList.find((x) => x.name === e.target.closest('button')?.dataset.open)));
     form = builderForm(part(el, 'builder'), {
       names,
       values: (table, col) => columnValues(stats, table, col),
