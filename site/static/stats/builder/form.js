@@ -1,14 +1,14 @@
 import {
   BASES,
   JOINS,
-  MAX_GROUPS,
-  MEASURES,
+  MAX_DIMENSIONS,
+  METRICS,
   OPS,
   VIEWS,
   WRAPPERS,
   clause,
   fn,
-  measure,
+  metric,
   nameClash,
   paramType,
   splitColumn,
@@ -87,12 +87,12 @@ const radioField = (name, label, values, checked) =>
 
 const DIRS = ['desc', 'asc'];
 
-const sortField = (keys, sort, colOption, group) =>
+const sortField = (keys, sort, colOption, dimensions) =>
   `<div class="stats-filters__field"><span id="qb-sort">Sort</span><div class="stats-query__clause"><select class="input" name="sort" aria-labelledby="qb-sort">${option(
     '',
     'None',
     !sort,
-  )}${keys.map((k) => (group.includes(k) ? colOption(k, k === sort?.by) : option(k, k, k === sort?.by))).join('')}</select>${radios(
+  )}${keys.map((k) => (dimensions.includes(k) ? colOption(k, k === sort?.by) : option(k, k, k === sort?.by))).join('')}</select>${radios(
     'dir',
     DIRS,
     sort?.dir ?? 'desc',
@@ -107,19 +107,19 @@ const limitField = (limit) =>
 const joinField = () =>
   `<div class="stats-filters__field"><span id="qb-joins">Join</span><div data-multi="joins" aria-labelledby="qb-joins"></div></div>`;
 
-const groupSlots = (group) => (group.length < MAX_GROUPS ? [...group, ''] : group);
+const dimensionSlots = (dimensions) => (dimensions.length < MAX_DIMENSIONS ? [...dimensions, ''] : dimensions);
 
-const groupField = (columns, group, colOption) =>
-  `<div class="stats-filters__field"><span id="qb-group">Group</span><div class="stats-query__clause stats-query__group">${groupSlots(group)
+const dimensionField = (columns, dimensions, colOption) =>
+  `<div class="stats-filters__field"><span id="qb-dimensions">Group</span><div class="stats-query__clause stats-query__dimensions">${dimensionSlots(dimensions)
     .map(
-      (g, i) =>
-        `<select class="input" name="g${i}" aria-labelledby="qb-group">${option('', 'None', !g)}${columns
-          .map((col) => colOption(col, col === g))
+      (d, i) =>
+        `<select class="input" name="d${i}" aria-labelledby="qb-dimensions">${option('', 'None', !d)}${columns
+          .map((col) => colOption(col, col === d))
           .join('')}</select>`,
     )
     .join('')}</div></div>`;
 
-const KINDS = Object.keys(MEASURES).filter((k) => !WRAPPERS.includes(k));
+const KINDS = Object.keys(METRICS).filter((k) => !WRAPPERS.includes(k));
 
 const TOPS = [...KINDS, ...WRAPPERS];
 
@@ -127,9 +127,9 @@ const topOf = (m) => m.wrap ?? m.kind;
 
 const NAME = /^[A-Za-z_]\w*$/;
 
-const namedIn = (s) => s.measures.filter((m, i) => NAME.test(m.name) && !nameClash(s, i));
+const namedIn = (s) => s.metrics.filter((m, i) => NAME.test(m.name) && !nameClash(s, i));
 
-const sortKeys = (s) => [...namedIn(s).map((m) => m.name), ...s.group];
+const sortKeys = (s) => [...namedIn(s).map((m) => m.name), ...s.dimensions];
 
 const pruneSort = (s) => ({ ...s, sort: s.sort && sortKeys(s).includes(s.sort.by) ? s.sort : null });
 
@@ -150,7 +150,7 @@ const retypeArgs = (columns) => (prev, next) => {
       paramType(next.kind, j) === 'value' && columnBefore(next.kind, next.args, j) !== columnBefore(prev.kind, prev.args, j) ? '' : a,
     );
   const cols = argColumns({ kind: prev.kind, args: next.args });
-  return MEASURES[next.kind].params.map((_, j) => {
+  return METRICS[next.kind].params.map((_, j) => {
     const type = paramType(next.kind, j);
     if (type === paramType(prev.kind, j)) return next.args[j];
     return type === 'col' ? (cols[0] ?? columns[0]) : '';
@@ -161,14 +161,14 @@ const renamed = (prev, next, taken) =>
   topOf(prev) !== topOf(next) && isAuto(next.name, topOf(prev)) ? autoName(topOf(next), taken) : next.name;
 
 const formArgs = (m) =>
-  MEASURES[m.kind].params.map((_, j) => {
+  METRICS[m.kind].params.map((_, j) => {
     const a = m.args?.[j];
     return paramType(m.kind, j) === 'col' ? a : a === undefined ? '' : printed(a);
   });
 
 const formRows = (where) => where.map((c) => ({ ...c, value: c.op === 'in' ? c.value.map(printed) : printed(c.value) }));
 
-const formMeasure = (m) => {
+const formMetric = (m) => {
   const wrap = WRAPPERS.includes(m.kind) ? m.kind : null;
   const inner = wrap ? m.args?.[0] : m;
   if (!KINDS.includes(inner?.kind)) return null;
@@ -182,7 +182,7 @@ const trimArgs = (args) => args.slice(0, args.findLastIndex((a) => a !== undefin
 const argControl = (columns, colOption, m, i) => (a, j) => {
   const type = paramType(m.kind, j);
   const at = `ma${i}.${j}`;
-  const placeholder = MEASURES[m.kind].params[j].endsWith('?') ? { value: 'true', number: '1' }[type] : '';
+  const placeholder = METRICS[m.kind].params[j].endsWith('?') ? { value: 'true', number: '1' }[type] : '';
   if (type === 'col') {
     const cols = columns.includes(a) ? columns : [a, ...columns];
     return `<select class="input" name="${at}" aria-label="Column">${cols.map((col) => colOption(col, col === a)).join('')}</select>`;
@@ -209,8 +209,8 @@ const clauseRow = (columns, colOption, of) => (c, i) => {
   )}</select>${valueControl(c, at)}<button class="btn stats-query__btn" type="button" data-remove="${i}"${ofAttr(of)} aria-label="Remove">×</button></div>`;
 };
 
-const measureRow = (columns, colOption) => (m, i) =>
-  `<div class="stats-query__clause" data-measure="${i}"><input class="input stats-query__name" name="mn${i}" value="${escapeHtml(
+const metricRow = (columns, colOption) => (m, i) =>
+  `<div class="stats-query__clause" data-metric="${i}"><input class="input stats-query__name" name="mn${i}" value="${escapeHtml(
     m.name,
   )}" aria-label="Name" autocomplete="off" spellcheck="false"><select class="input" name="mk${i}" aria-label="Measure">${TOPS.map((k) =>
     option(k, k, k === topOf(m)),
@@ -218,18 +218,18 @@ const measureRow = (columns, colOption) => (m, i) =>
     m.wrap ? `<select class="input" name="mi${i}" aria-label="Inner measure">${KINDS.map((k) => option(k, k, k === m.kind)).join('')}</select>` : ''
   }${m.args
     .map(argControl(columns, colOption, m, i))
-    .join('')}<button class="btn stats-query__btn" type="button" data-add="where" data-of="${i}">+ Where</button><button class="btn stats-query__btn" type="button" data-remove-measure="${i}" aria-label="Remove">×</button></div>${m.where
+    .join('')}<button class="btn stats-query__btn" type="button" data-add="where" data-of="${i}">+ Where</button><button class="btn stats-query__btn" type="button" data-remove-metric="${i}" aria-label="Remove">×</button></div>${m.where
     .map(clauseRow(columns, colOption, i))
     .join('')}`;
 
 /**
  * Form for every part of a query. `show(q)` draws it; edits call
- * `onChange({ from, joins, where, group, measures, sort, limit, view })`.
- * Where rows without a value and measures without a valid unique name stay in
+ * `onChange({ from, joins, where, dimensions, metrics, sort, limit, view })`.
+ * Where rows without a value and metrics without a valid unique name stay in
  * the form only. `values(table, col)` resolves to `columnValues`.
  */
 export function builderForm(el, { names, values, label = (col, v) => printed(v), columnLabel = (col) => col, onChange }) {
-  let state = { from: 'players', joins: [], rows: [], group: [], measures: [], sort: null, limit: null, view: 'table' };
+  let state = { from: 'players', joins: [], rows: [], dimensions: [], metrics: [], sort: null, limit: null, view: 'table' };
   const colOption = columnOption(columnLabel);
   const valuesOf = (ref) => {
     const { join, col } = splitColumn(ref);
@@ -262,29 +262,29 @@ export function builderForm(el, { names, values, label = (col, v) => printed(v),
     });
   };
 
-  const fillMeasure = (m, i) => {
+  const fillMetric = (m, i) => {
     m.args.forEach((_, j) => paramType(m.kind, j) === 'value' && fillList(`qb-mlist-${i}-${j}`, columnBefore(m.kind, m.args, j)));
     m.where.forEach(fillValues(i));
   };
 
   const draw = () => {
     const columns = columnsOf(names, state.from, state.joins);
-    el.innerHTML = `${radioField('from', 'Table', Object.keys(BASES), state.from)}${joinField()}${groupField(columns, state.group, colOption)}${state.rows
+    el.innerHTML = `${radioField('from', 'Table', Object.keys(BASES), state.from)}${joinField()}${dimensionField(columns, state.dimensions, colOption)}${state.rows
       .map(clauseRow(columns, colOption))
-      .join('')}<button class="btn stats-query__btn" type="button" data-add="where">+ Where</button><div class="stats-filters__field stats-query__measures"><span>Measure</span>${state.measures
-      .map(measureRow(columns, colOption))
-      .join('')}<button class="btn stats-query__btn" type="button" data-add="measure">+ Measure</button></div>${sortField(
+      .join('')}<button class="btn stats-query__btn" type="button" data-add="where">+ Where</button><div class="stats-filters__field stats-query__metrics"><span>Measure</span>${state.metrics
+      .map(metricRow(columns, colOption))
+      .join('')}<button class="btn stats-query__btn" type="button" data-add="metric">+ Measure</button></div>${sortField(
       sortKeys(state),
       state.sort,
       colOption,
-      state.group,
+      state.dimensions,
     )}${limitField(state.limit)}${radioField('view', 'View', VIEWS, state.view)}`;
     multiSelect(el.querySelector('[data-multi="joins"]'), { allLabel: 'None' }).setOptions(
       BASES[state.from].map((j) => ({ value: j, label: j })),
       state.joins,
     );
     state.rows.forEach(fillValues(null));
-    state.measures.forEach(fillMeasure);
+    state.metrics.forEach(fillMetric);
   };
 
   const readRows = (data, rows, of) =>
@@ -294,8 +294,8 @@ export function builderForm(el, { names, values, label = (col, v) => printed(v),
       return retype(prev, clause(String(data.get(`c${at}`)), String(data.get(`o${at}`)), raw));
     });
 
-  const readMeasures = (data, columns) => {
-    const read = state.measures.map((prev, i) => {
+  const readMetrics = (data, columns) => {
+    const read = state.metrics.map((prev, i) => {
       const top = String(data.get(`mk${i}`) ?? topOf(prev));
       const wrap = WRAPPERS.includes(top) ? top : null;
       return {
@@ -308,7 +308,7 @@ export function builderForm(el, { names, values, label = (col, v) => printed(v),
       };
     });
     return read.map((next, i) => {
-      const prev = state.measures[i];
+      const prev = state.metrics[i];
       const taken = read.filter((_, k) => k !== i).map((m) => m.name);
       return { ...next, name: renamed(prev, next, taken), args: retypeArgs(columns)(prev, next) };
     });
@@ -318,24 +318,24 @@ export function builderForm(el, { names, values, label = (col, v) => printed(v),
     const data = new FormData(el);
     const from = String(data.get('from') ?? state.from);
     const rows = readRows(data, state.rows, null);
-    const group = groupSlots(state.group).map((_, i) => String(data.get(`g${i}`) ?? '')).filter(Boolean);
+    const dimensions = dimensionSlots(state.dimensions).map((_, i) => String(data.get(`d${i}`) ?? '')).filter(Boolean);
     const joins = data.getAll('joins').map(String);
-    const measures = readMeasures(data, columnsOf(names, from, joins));
+    const metrics = readMetrics(data, columnsOf(names, from, joins));
     const by = String(data.get('sort') ?? '');
-    const at = state.measures.findIndex((m) => m.name === by);
+    const at = state.metrics.findIndex((m) => m.name === by);
     return {
       from,
       joins,
       rows,
-      group,
-      measures,
-      sort: by ? { by: at < 0 ? by : measures[at].name, dir: String(data.get('dir') ?? 'desc') } : null,
+      dimensions,
+      metrics,
+      sort: by ? { by: at < 0 ? by : metrics[at].name, dir: String(data.get('dir') ?? 'desc') } : null,
       limit: readLimit(String(data.get('limit') ?? '')),
       view: String(data.get('view') ?? state.view),
     };
   };
 
-  const normalize = ({ from, joins, rows, group, measures, ...rest }) => {
+  const normalize = ({ from, joins, rows, dimensions, metrics, ...rest }) => {
     const allowed = joins.filter((j) => BASES[from].includes(j));
     const columns = columnsOf(names, from, allowed);
     return pruneSort({
@@ -343,8 +343,8 @@ export function builderForm(el, { names, values, label = (col, v) => printed(v),
       from,
       joins: allowed,
       rows: rows.filter((c) => columns.includes(c.col)),
-      group: [...new Set(group)].filter((g) => columns.includes(g)).slice(0, MAX_GROUPS),
-      measures: measures
+      dimensions: [...new Set(dimensions)].filter((d) => columns.includes(d)).slice(0, MAX_DIMENSIONS),
+      metrics: metrics
         .filter((m) => argColumns(m).every((c) => columns.includes(c)))
         .map((m) => ({ ...m, where: m.where.filter((c) => columns.includes(c.col)) })),
     });
@@ -352,9 +352,9 @@ export function builderForm(el, { names, values, label = (col, v) => printed(v),
 
   const rowsShape = (rows) => rows.map((c) => [c.col, c.op]);
 
-  const measureShape = (m) => [m.wrap, m.kind, argColumns(m), rowsShape(m.where)];
+  const metricShape = (m) => [m.wrap, m.kind, argColumns(m), rowsShape(m.where)];
 
-  const shape = (s) => JSON.stringify([s.from, s.joins, rowsShape(s.rows), s.group, s.measures.map(measureShape), sortKeys(s)]);
+  const shape = (s) => JSON.stringify([s.from, s.joins, rowsShape(s.rows), s.dimensions, s.metrics.map(metricShape), sortKeys(s)]);
 
   const typed = (c) =>
     valuesOf(c.col).then(({ type }) => ({
@@ -371,21 +371,21 @@ export function builderForm(el, { names, values, label = (col, v) => printed(v),
 
   const typedRows = (rows) => Promise.all(rows.filter(complete).map(typed));
 
-  const typedMeasure = async (m) => {
+  const typedMetric = async (m) => {
     const [args, where] = await Promise.all([Promise.all(m.args.map(typedArg(m))), typedRows(m.where)]);
     const inner = fn(m.kind, trimArgs(args), where);
-    return measure(m.name, m.wrap ? fn(m.wrap, [inner]) : inner);
+    return metric(m.name, m.wrap ? fn(m.wrap, [inner]) : inner);
   };
 
   const emit = async () => {
     const snapshot = state;
-    const [where, measures] = await Promise.all([
+    const [where, metrics] = await Promise.all([
       typedRows(snapshot.rows),
-      Promise.all(namedIn(snapshot).map(typedMeasure)),
+      Promise.all(namedIn(snapshot).map(typedMetric)),
     ]);
     if (snapshot === state) {
-      const { from, joins, group, sort, limit, view } = state;
-      onChange({ from, joins, where, group, measures, sort, limit, view });
+      const { from, joins, dimensions, sort, limit, view } = state;
+      onChange({ from, joins, where, dimensions, metrics, sort, limit, view });
     }
   };
 
@@ -405,24 +405,24 @@ export function builderForm(el, { names, values, label = (col, v) => printed(v),
   });
   el.addEventListener('submit', (e) => e.preventDefault());
   el.addEventListener('click', (e) => {
-    const btn = e.target.closest('[data-add], [data-remove], [data-remove-measure]');
+    const btn = e.target.closest('[data-add], [data-remove], [data-remove-metric]');
     if (!btn) return;
     const current = read();
-    const { add, remove, removeMeasure, of } = btn.dataset;
+    const { add, remove, removeMetric, of } = btn.dataset;
     const withRows = (f) =>
       of == null
         ? { ...current, rows: f(current.rows) }
-        : { ...current, measures: current.measures.map((m, k) => (k === Number(of) ? { ...m, where: f(m.where) } : m)) };
+        : { ...current, metrics: current.metrics.map((m, k) => (k === Number(of) ? { ...m, where: f(m.where) } : m)) };
     if (add === 'where') {
       const col = columnsOf(names, current.from, current.joins)[0];
       state = withRows((rows) => [...rows, clause(col, '=', '')]);
-    } else if (add === 'measure') {
-      const name = autoName('count', current.measures.map((m) => m.name));
-      state = { ...current, measures: [...current.measures, { name, wrap: null, kind: 'count', args: [], where: [] }] };
+    } else if (add === 'metric') {
+      const name = autoName('count', current.metrics.map((m) => m.name));
+      state = { ...current, metrics: [...current.metrics, { name, wrap: null, kind: 'count', args: [], where: [] }] };
     } else if (remove != null) {
       state = withRows((rows) => rows.filter((_, j) => j !== Number(remove)));
     } else {
-      state = pruneSort({ ...current, measures: current.measures.filter((_, j) => j !== Number(removeMeasure)) });
+      state = pruneSort({ ...current, metrics: current.metrics.filter((_, j) => j !== Number(removeMetric)) });
     }
     draw();
     if (add !== 'where') emit();
@@ -435,8 +435,8 @@ export function builderForm(el, { names, values, label = (col, v) => printed(v),
         from: q.from,
         joins: q.joins,
         rows: formRows(q.where),
-        group: q.group,
-        measures: q.measures.map(formMeasure).filter(Boolean),
+        dimensions: q.dimensions,
+        metrics: q.metrics.map(formMetric).filter(Boolean),
         sort: q.sort,
         limit: q.limit,
         view: q.view,

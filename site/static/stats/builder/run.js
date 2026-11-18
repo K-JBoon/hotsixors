@@ -1,5 +1,5 @@
 import { aggregate, total, distinct } from '../query.js';
-import { MEASURES, WRAPPERS, clauseTest, validateQuery, queryColumns } from './model.js';
+import { METRICS, WRAPPERS, clauseTest, validateQuery, queryColumns } from './model.js';
 import { joinView, tableNames } from './join.js';
 
 const rowTest = (clauses, column) => {
@@ -19,13 +19,13 @@ const encode = (values, length) => {
   return { codes, values: [...ids.keys()] };
 };
 
-/** Mixed-radix key over `dims`, first dim most significant. */
-const groupKey = (group, dims) => {
-  const key = (i) => dims.reduce((k, d) => k * d.values.length + d.codes[i], 0);
+/** Mixed-radix key over encoded `dimensions`, first most significant. */
+const groupKey = (dimensions, codes) => {
+  const key = (i) => codes.reduce((k, d) => k * d.values.length + d.codes[i], 0);
   const split = (k) =>
     Object.fromEntries(
-      dims.reduceRight((out, d, j) => {
-        out.unshift([group[j], d.values[k % d.values.length]]);
+      codes.reduceRight((out, d, j) => {
+        out.unshift([dimensions[j], d.values[k % d.values.length]]);
         k = Math.floor(k / d.values.length);
         return out;
       }, []),
@@ -40,7 +40,7 @@ const sized = (inner, cols) => ({
 });
 
 const build = (column) => (m) => {
-  const spec = MEASURES[m.kind];
+  const spec = METRICS[m.kind];
   const isCol = (i) => spec.params[i].startsWith('col');
   const args = (m.args ?? []).map((a, i) => (isCol(i) ? column(a) : a));
   const made = spec.make(...args);
@@ -50,16 +50,16 @@ const build = (column) => (m) => {
   return { ...inner, add: (s, i) => (test(i) ? inner.add(s, i) : s) };
 };
 
-/** Inner value of a sized measure, else the value itself. */
+/** Inner value of a sized metric, else the value itself. */
 export const valueOf = (v) => (v != null && typeof v === 'object' ? v.value : v);
 
 const sizeOf = (v) => (v != null && typeof v === 'object' ? v.n : null);
 
 const unwrap = (m) => (WRAPPERS.includes(m.kind) ? m.args[0] : m);
 
-const aggregateBy = (length, where, key, measures, make) =>
+const aggregateBy = (length, where, key, metrics, make) =>
   new Map(
-    aggregate(length, { where, key, measures: Object.fromEntries(measures.map((m) => [m.name, make(unwrap(m))])) }).map(
+    aggregate(length, { where, key, measures: Object.fromEntries(metrics.map((m) => [m.name, make(unwrap(m))])) }).map(
       ({ key: k, ...values }) => [k, values],
     ),
   );
@@ -82,29 +82,29 @@ const compare = ({ by, dir = 'desc' }) => {
 };
 
 /**
- * Runs a query object over a stats source. `columns` lists group-by refs then
- * measure names; each row holds one value per column. Null group values form
- * their own group. Sized measures hold `{ value, n }`. Sort reads `value`,
+ * Runs a query object over a stats source. `columns` lists dimension refs then
+ * metric names; each row holds one value per column. Null dimension values form
+ * their own group. Sized metrics hold `{ value, n }`. Sort reads `value`,
  * puts nulls last, and `dir` defaults to `desc`.
- * `share` divides its inner measure by the distinct `game_id` count of the
- * filtered rows. `delta` subtracts its inner measure grouped by every group-by
- * column except the last. Both yield `{ value, n }` with `n` from the inner measure.
+ * `share` divides its inner metric by the distinct `game_id` count of the
+ * filtered rows. `delta` subtracts its inner metric grouped by every dimension
+ * except the last. Both yield `{ value, n }` with `n` from the inner metric.
  */
 export async function runQuery(stats, q) {
   const errors = validateQuery(q, await tableNames(stats));
   if (errors.length) throw Object.assign(new Error(errors.map((e) => `${e.path}: ${e.message}`).join('\n')), { errors });
-  const kinds = new Set(q.measures.map((m) => m.kind));
+  const kinds = new Set(q.metrics.map((m) => m.kind));
   const refs = queryColumns(q);
   const { length, column } = await joinView(stats, q, kinds.has('share') ? [...new Set([...refs, 'game_id'])] : refs);
-  const dims = q.group.map((ref) => encode(column(ref), length));
-  const { key, split } = groupKey(q.group, dims);
+  const codes = q.dimensions.map((ref) => encode(column(ref), length));
+  const { key, split } = groupKey(q.dimensions, codes);
   const where = rowTest(q.where, column);
   const make = build(column);
-  const groups = aggregateBy(length, where, key, q.measures, make);
+  const groups = aggregateBy(length, where, key, q.metrics, make);
   const share = kinds.has('share') ? shareOf(total(length, where, distinct(column('game_id')))) : null;
-  const deltas = q.measures.filter((m) => m.kind === 'delta');
-  const parent = groupKey(q.group.slice(0, -1), dims.slice(0, -1));
-  const radix = dims.at(-1)?.values.length ?? 1;
+  const deltas = q.metrics.filter((m) => m.kind === 'delta');
+  const parent = groupKey(q.dimensions.slice(0, -1), codes.slice(0, -1));
+  const radix = codes.at(-1)?.values.length ?? 1;
   const baseline = deltas.length ? aggregateBy(length, where, parent.key, deltas, make) : null;
   const finish = (k, values) => (m) => {
     const v = values[m.name];
@@ -114,11 +114,11 @@ export async function runQuery(stats, q) {
   };
   const rows = [...groups].map(([k, values]) => ({
     ...split(k),
-    ...Object.fromEntries(q.measures.map((m) => [m.name, finish(k, values)(m)])),
+    ...Object.fromEntries(q.metrics.map((m) => [m.name, finish(k, values)(m)])),
   }));
   const sorted = q.sort ? rows.sort(compare(q.sort)) : rows;
   return {
-    columns: [...q.group, ...q.measures.map((m) => m.name)],
+    columns: [...q.dimensions, ...q.metrics.map((m) => m.name)],
     rows: q.limit ? sorted.slice(0, q.limit) : sorted,
   };
 }

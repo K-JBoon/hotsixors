@@ -8,13 +8,13 @@ export const VIEWS = ['table', 'bar', 'line', 'scatter', 'heatmap'];
 
 export const OPS = ['=', '!=', 'in', '<', '<=', '>', '>='];
 
-export const MAX_GROUPS = 2;
+export const MAX_DIMENSIONS = 2;
 
 /**
- * Param types: `col` column ref, `value` literal, `number` literal, `measure` inner measure. `?` marks optional.
- * `sized` measures yield `{ value, n }`, `n` being the rows with every `col` argument non-null.
+ * Param types: `col` column ref, `value` literal, `number` literal, `metric` inner metric. `?` marks optional.
+ * `sized` metrics yield `{ value, n }`, `n` being the rows with every `col` argument non-null.
  */
-export const MEASURES = {
+export const METRICS = {
   count: { params: [], make: count },
   present: { params: ['col'], make: present },
   sum: { params: ['col'], make: sum },
@@ -24,8 +24,8 @@ export const MEASURES = {
   ratio: { params: ['col', 'col', 'number?'], make: ratio, sized: true },
   mode: { params: ['col'], make: mode },
   latest: { params: ['col', 'col'], make: latest },
-  share: { params: ['measure'] },
-  delta: { params: ['measure'] },
+  share: { params: ['metric'] },
+  delta: { params: ['metric'] },
 };
 
 export const WRAPPERS = ['share', 'delta'];
@@ -34,18 +34,18 @@ export const clause = (col, op, value) => ({ col, op, value });
 
 export const fn = (kind, args = [], where = []) => ({ kind, args, where });
 
-export const measure = (name, inner) => ({ name, ...inner });
+export const metric = (name, inner) => ({ name, ...inner });
 
 export const query = ({
   from = 'players',
   joins = [],
   where = [],
-  group = [],
-  measures = [],
+  dimensions = [],
+  metrics = [],
   sort = null,
   limit = null,
   view = 'table',
-} = {}) => ({ from, joins, where, group, measures, sort, limit, view });
+} = {}) => ({ from, joins, where, dimensions, metrics, sort, limit, view });
 
 /** `opponent.hero` -> `{ join: 'opponent', col: 'hero' }`; unprefixed refs read the base table. */
 export const splitColumn = (ref) => {
@@ -55,20 +55,20 @@ export const splitColumn = (ref) => {
 
 export const tableOf = (from, join) => (join ? JOINS[join] : from);
 
-export const paramType = (kind, i) => MEASURES[kind]?.params[i]?.replace('?', '');
+export const paramType = (kind, i) => METRICS[kind]?.params[i]?.replace('?', '');
 
-/** Column refs one measure reads, its where clauses included. */
-export const measureColumns = (m) => [
+/** Column refs one metric reads, its where clauses included. */
+export const metricColumns = (m) => [
   ...(m.args ?? []).flatMap((a, i) => {
     const type = paramType(m.kind, i);
-    return type === 'col' ? [a] : type === 'measure' ? measureColumns(a) : [];
+    return type === 'col' ? [a] : type === 'metric' ? metricColumns(a) : [];
   }),
   ...(m.where ?? []).map((c) => c.col),
 ];
 
 /** Column refs a query reads, without duplicates. */
 export const queryColumns = (q) => [
-  ...new Set([...q.where.map((c) => c.col), ...q.group, ...q.measures.flatMap(measureColumns)]),
+  ...new Set([...q.where.map((c) => c.col), ...q.dimensions, ...q.metrics.flatMap(metricColumns)]),
 ];
 
 const COMPARE = {
@@ -110,9 +110,9 @@ const whereErrors = (column) => (clauses, path) =>
 
 const arity = (params) => [params.filter((p) => !p.endsWith('?')).length, params.length];
 
-const measureErrors = (column, where) => {
+const metricErrors = (column, where) => {
   const check = (m, path, wrapped) => {
-    const spec = MEASURES[m?.kind];
+    const spec = METRICS[m?.kind];
     if (!spec) return [error(`${path}.kind`, `unknown measure ${m?.kind}`)];
     const wrapper = WRAPPERS.includes(m.kind);
     if (wrapper && wrapped) return [error(`${path}.kind`, `${m.kind} cannot sit inside share or delta`)];
@@ -125,7 +125,7 @@ const measureErrors = (column, where) => {
       const at = `${path}.args.${i}`;
       const type = spec.params[i].replace('?', '');
       if (type === 'col') return column(a, at);
-      if (type === 'measure') return check(a, at, wrapper);
+      if (type === 'metric') return check(a, at, wrapper);
       if (type === 'number' && !Number.isFinite(a)) return [error(at, 'expected a number')];
       return [];
     };
@@ -136,24 +136,24 @@ const measureErrors = (column, where) => {
 
 const RESERVED_NAMES = ['key'];
 
-/** Why measure `i` cannot use its name, else null. */
-export const nameClash = ({ measures, group }, i) => {
-  const { name } = measures[i];
+/** Why metric `i` cannot use its name, else null. */
+export const nameClash = ({ metrics, dimensions }, i) => {
+  const { name } = metrics[i];
   if (RESERVED_NAMES.includes(name)) return `${name} is a reserved name`;
-  if (group.includes(name)) return `${name} is a group-by column`;
-  return measures.findIndex((m) => m.name === name) < i ? `duplicate measure ${name}` : null;
+  if (dimensions.includes(name)) return `${name} is a group-by column`;
+  return metrics.findIndex((m) => m.name === name) < i ? `duplicate measure ${name}` : null;
 };
 
 const nameErrors = (q) =>
-  q.measures.flatMap((_, i) => {
+  q.metrics.flatMap((_, i) => {
     const message = nameClash(q, i);
-    return message ? [error(`measures.${i}.name`, message)] : [];
+    return message ? [error(`metrics.${i}.name`, message)] : [];
   });
 
 const VIEW_SHAPES = {
-  scatter: (q) => (q.measures.length < 2 ? 'scatter needs two measures' : null),
-  heatmap: (q) => (q.group.length !== 2 ? 'heatmap needs two group-by columns' : null),
-  line: (q) => (q.group.length < 1 ? 'line needs a group-by column' : null),
+  scatter: (q) => (q.metrics.length < 2 ? 'scatter needs two measures' : null),
+  heatmap: (q) => (q.dimensions.length !== 2 ? 'heatmap needs two group-by columns' : null),
+  line: (q) => (q.dimensions.length < 1 ? 'line needs a group-by column' : null),
 };
 
 const viewErrors = (q) => {
@@ -162,9 +162,9 @@ const viewErrors = (q) => {
   return message ? [error('view', message)] : [];
 };
 
-const sortErrors = ({ sort, group, measures }) => {
+const sortErrors = ({ sort, dimensions, metrics }) => {
   if (sort == null) return [];
-  const keys = [...measures.map((m) => m.name), ...group];
+  const keys = [...metrics.map((m) => m.name), ...dimensions];
   return [
     ...(keys.includes(sort.by) ? [] : [error('sort.by', `sort ${sort.by} is not a measure or group-by column`)]),
     ...(sort.dir == null || SORT_DIRS.includes(sort.dir) ? [] : [error('sort.dir', `unknown sort direction ${sort.dir}`)]),
@@ -179,13 +179,13 @@ export const validateQuery = (q, names) => {
   if (!BASES[q.from]) return [error('from', `unknown base table ${q.from}`)];
   const column = columnErrors(q, names);
   const where = whereErrors(column);
-  const measure = measureErrors(column, where);
+  const metric = metricErrors(column, where);
   return [
     ...q.joins.flatMap((j, i) => (BASES[q.from].includes(j) ? [] : [error(`joins.${i}`, `${q.from} does not allow join ${j}`)])),
     ...where(q.where, 'where'),
-    ...(q.group.length > MAX_GROUPS ? [error('group', `at most ${MAX_GROUPS} group-by columns`)] : []),
-    ...q.group.flatMap((g, i) => column(g, `group.${i}`)),
-    ...q.measures.flatMap((m, i) => measure(m, `measures.${i}`)),
+    ...(q.dimensions.length > MAX_DIMENSIONS ? [error('dimensions', `at most ${MAX_DIMENSIONS} group-by columns`)] : []),
+    ...q.dimensions.flatMap((d, i) => column(d, `dimensions.${i}`)),
+    ...q.metrics.flatMap((m, i) => metric(m, `metrics.${i}`)),
     ...nameErrors(q),
     ...viewErrors(q),
     ...sortErrors(q),

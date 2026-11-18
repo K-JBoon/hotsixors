@@ -1,6 +1,6 @@
 import { MISSING_ICON, escapeHtml, fmt, heroCell, heroName, heroPortrait, renderTable, thinOf, wilson, winRateCell } from '../view.js';
 import { barChart, heatmapChart, lineChart, scatterChart } from '../charts.js';
-import { MEASURES, splitColumn } from './model.js';
+import { METRICS, splitColumn } from './model.js';
 import { valueOf } from './run.js';
 import { printCall } from './text.js';
 
@@ -22,15 +22,15 @@ const FORMATS = {
 
 const DELTA_FORMATS = { rate: fmt.delta, share: fmt.delta };
 
-const measureFormat = (m) => {
+const metricFormat = (m) => {
   if (m.kind === 'rate') return fmt.pct;
   if (m.kind === 'delta') return DELTA_FORMATS[m.args[0].kind] ?? signed(FORMATS[m.args[0].kind] ?? fmt.num);
   return FORMATS[m.kind] ?? text;
 };
 
-const measureCell = (m) => {
+const metricCell = (m) => {
   if (m.kind === 'rate') return (v) => winRateCell(valueOf(v), v?.n);
-  const format = measureFormat(m);
+  const format = metricFormat(m);
   return (v) => format(valueOf(v));
 };
 
@@ -38,7 +38,7 @@ const versionKey = (v) => (typeof v === 'string' ? v.split('.').map((p) => p.pad
 
 const heroHash = (slug) => `#hero/${encodeURIComponent(slug)}`;
 
-const groupColumn = (heroes) => (ref) => {
+const dimensionColumn = (heroes) => (ref) => {
   const { col } = splitColumn(ref);
   if (col === 'hero') {
     return {
@@ -51,23 +51,23 @@ const groupColumn = (heroes) => (ref) => {
   return { key: ref, label: ref, sort: col === 'patch' ? (r) => versionKey(r[ref]) : (r) => r[ref], html: (r) => text(r[ref]) };
 };
 
-const measureColumn = (m) => {
-  const cell = measureCell(m);
+const metricColumn = (m) => {
+  const cell = metricCell(m);
   return { key: m.name, label: m.name, title: printCall(m), num: true, sort: (r) => valueOf(r[m.name]), html: (r) => cell(r[m.name]) };
 };
 
-/** Sample size per row: the first `count` measure, else the first sized measure. */
-const sampleSize = (measures) => {
-  const counted = measures.find((m) => m.kind === 'count');
+/** Sample size per row: the first `count` metric, else the first sized metric. */
+const sampleSize = (metrics) => {
+  const counted = metrics.find((m) => m.kind === 'count');
   if (counted) return (r) => r[counted.name];
-  return (r) => measures.map((m) => r[m.name]).find((v) => v != null && typeof v === 'object')?.n;
+  return (r) => metrics.map((m) => r[m.name]).find((v) => v != null && typeof v === 'object')?.n;
 };
 
-const groupText = (heroes, group) => (r) =>
-  group.map((ref) => (splitColumn(ref).col === 'hero' && r[ref] != null ? heroName(heroes, r[ref]) : String(r[ref] ?? ''))).join(' ');
+const dimensionText = (heroes, dimensions) => (r) =>
+  dimensions.map((ref) => (splitColumn(ref).col === 'hero' && r[ref] != null ? heroName(heroes, r[ref]) : String(r[ref] ?? ''))).join(' ');
 
 const table = (el, { rows }, q, heroes) => {
-  const columns = [...q.group.map(groupColumn(heroes)), ...q.measures.map(measureColumn)];
+  const columns = [...q.dimensions.map(dimensionColumn(heroes)), ...q.metrics.map(metricColumn)];
   if (!columns.length) {
     el.innerHTML = '<p class="stats-note">No columns.</p>';
     return;
@@ -77,36 +77,36 @@ const table = (el, { rows }, q, heroes) => {
     rows,
     sortKey: q.sort?.by ?? columns[0]?.key,
     sortDir: q.sort ? (q.sort.dir === 'asc' ? 1 : -1) : 1,
-    count: sampleSize(q.measures),
+    count: sampleSize(q.metrics),
     empty: 'No rows match this query.',
-    search: q.group.length ? { placeholder: 'Filter', text: groupText(heroes, q.group) } : undefined,
+    search: q.dimensions.length ? { placeholder: 'Filter', text: dimensionText(heroes, q.dimensions) } : undefined,
   });
 };
 
-const TEXT_MEASURES = ['mode', 'latest'];
+const TEXT_METRICS = ['mode', 'latest'];
 
-const INT_MEASURES = ['count', 'present', 'distinct', 'sum'];
+const INT_METRICS = ['count', 'present', 'distinct', 'sum'];
 
 const tone = ([lo, hi]) => (lo > 0.5 ? 'is-high' : hi < 0.5 ? 'is-low' : null);
 
 const refOf = (m) => (m.kind === 'rate' ? 0.5 : m.kind === 'delta' ? 0 : null);
 
-const minStepOf = (m) => (INT_MEASURES.includes(m.kind) ? 1 : 0);
+const minStepOf = (m) => (INT_METRICS.includes(m.kind) ? 1 : 0);
 
 const noRows = (el) => {
   el.innerHTML = '<p class="stats-note">No rows match this query.</p>';
 };
 
-const measureHead = (m) => `<span title="${escapeHtml(printCall(m))}">${escapeHtml(m.name)}</span>`;
+const metricHead = (m) => `<span title="${escapeHtml(printCall(m))}">${escapeHtml(m.name)}</span>`;
 
 const bar = (el, result, q, heroes) => {
-  const [m] = q.measures;
-  if (!m || TEXT_MEASURES.includes(m.kind)) return table(el, result, q, heroes);
+  const [m] = q.metrics;
+  if (!m || TEXT_METRICS.includes(m.kind)) return table(el, result, q, heroes);
   const { rows } = result;
   if (!rows.length) return noRows(el);
-  const groups = q.group.map(groupColumn(heroes));
-  const cell = measureCell(m);
-  const size = sampleSize(q.measures);
+  const dims = q.dimensions.map(dimensionColumn(heroes));
+  const cell = metricCell(m);
+  const size = sampleSize(q.metrics);
   const dim = thinOf(rows.map(size));
   const rate = m.kind === 'rate';
   const key = (r) => valueOf(r[m.name]) ?? -Infinity;
@@ -115,7 +115,7 @@ const bar = (el, result, q, heroes) => {
     const v = r[m.name];
     const interval = rate && valueOf(v) != null ? wilson(valueOf(v), v.n) : null;
     return {
-      label: groups.length ? groups.map((g) => g.html(r)).join(' ') : '–',
+      label: dims.length ? dims.map((d) => d.html(r)).join(' ') : '–',
       value: valueOf(v),
       text: cell(v),
       interval,
@@ -125,8 +125,8 @@ const bar = (el, result, q, heroes) => {
   });
   barChart(el, {
     bars,
-    head: [escapeHtml(q.group.join(' ')), measureHead(m)],
-    format: measureFormat(m),
+    head: [escapeHtml(q.dimensions.join(' ')), metricHead(m)],
+    format: metricFormat(m),
     ref: rate ? 0.5 : null,
     minStep: minStepOf(m),
   });
@@ -138,25 +138,25 @@ const ascending = (a, b) => (a === b ? 0 : a == null ? 1 : b == null ? -1 : a < 
 
 const NAMES = { hero: (heroes, v) => heroName(heroes, v), date: (_, v) => fmt.date(v) };
 
-const groupName = (heroes, ref) => (v) =>
+const dimensionName = (heroes, ref) => (v) =>
   v == null ? '–' : (NAMES[splitColumn(ref).col] ?? ((_, v) => String(v)))(heroes, v);
 
-const groupLabel = (heroes, ref) => (v) =>
+const dimensionLabel = (heroes, ref) => (v) =>
   v != null && splitColumn(ref).col === 'hero' ? heroCell(heroes, v) : text(v);
 
 const line = (el, result, q, heroes) => {
-  const [m] = q.measures;
-  if (!m || TEXT_MEASURES.includes(m.kind)) return table(el, result, q, heroes);
+  const [m] = q.metrics;
+  if (!m || TEXT_METRICS.includes(m.kind)) return table(el, result, q, heroes);
   const { rows } = result;
   if (!rows.length) return noRows(el);
-  const [xRef, sRef] = q.group;
-  const xSort = groupColumn(heroes)(xRef).sort;
+  const [xRef, sRef] = q.dimensions;
+  const xSort = dimensionColumn(heroes)(xRef).sort;
   const xs = [...new Set(rows.map((r) => r[xRef]))].sort((a, b) => ascending(xSort({ [xRef]: a }), xSort({ [xRef]: b })));
-  const xName = groupName(heroes, xRef);
-  const sName = sRef ? groupName(heroes, sRef) : () => m.name;
-  const size = sampleSize(q.measures);
+  const xName = dimensionName(heroes, xRef);
+  const sName = sRef ? dimensionName(heroes, sRef) : () => m.name;
+  const size = sampleSize(q.metrics);
   const dim = thinOf(rows.map(size));
-  const format = measureFormat(m);
+  const format = metricFormat(m);
   const bySeries = Map.groupBy(rows, (r) => (sRef ? r[sRef] : null));
   const games = (rs) => rs.reduce((t, r) => t + (size(r) ?? 0), 0);
   const ranked = [...bySeries].sort(([, a], [, b]) => games(b) - games(a));
@@ -169,35 +169,35 @@ const line = (el, result, q, heroes) => {
       const n = size(r);
       return { value: v, title: `${sName(s)} ${xName(x)}: ${format(v)}${n == null ? '' : `, n=${fmt.int(n)}`}`, thin: dim(n) };
     };
-    return { label: sRef ? groupLabel(heroes, sRef)(s) : escapeHtml(m.name), points: xs.map(point) };
+    return { label: sRef ? dimensionLabel(heroes, sRef)(s) : escapeHtml(m.name), points: xs.map(point) };
   });
   lineChart(el, {
     xs: xs.map(xName),
     series,
     on: series.map((_, i) => i < LINE_SERIES),
-    head: measureHead(m),
+    head: metricHead(m),
     format,
     ref: refOf(m),
     minStep: minStepOf(m),
   });
 };
 
-const smallestSize = (measures) => (r) => {
-  const ns = measures.map((m) => r[m.name]?.n).filter(Number.isFinite);
+const smallestSize = (metrics) => (r) => {
+  const ns = metrics.map((m) => r[m.name]?.n).filter(Number.isFinite);
   return ns.length ? Math.min(...ns) : undefined;
 };
 
 const scatter = (el, result, q, heroes) => {
-  const ms = q.measures.slice(0, 2);
-  if (ms.length < 2 || ms.some((m) => TEXT_MEASURES.includes(m.kind))) return table(el, result, q, heroes);
+  const ms = q.metrics.slice(0, 2);
+  if (ms.length < 2 || ms.some((m) => TEXT_METRICS.includes(m.kind))) return table(el, result, q, heroes);
   const { rows } = result;
   if (!rows.length) return noRows(el);
   const [mx, my] = ms;
-  const [fx, fy] = ms.map(measureFormat);
-  const size = q.measures.some((m) => m.kind === 'count') ? sampleSize(q.measures) : smallestSize(ms);
+  const [fx, fy] = ms.map(metricFormat);
+  const size = q.metrics.some((m) => m.kind === 'count') ? sampleSize(q.metrics) : smallestSize(ms);
   const dim = thinOf(rows.map(size));
-  const name = groupText(heroes, q.group);
-  const heroRef = q.group.find((ref) => splitColumn(ref).col === 'hero');
+  const name = dimensionText(heroes, q.dimensions);
+  const heroRef = q.dimensions.find((ref) => splitColumn(ref).col === 'hero');
   const interval = (m, v) => (m.kind === 'rate' ? wilson(valueOf(v), v.n) : null);
   const plotted = rows.filter((r) => ms.every((m) => valueOf(r[m.name]) != null));
   const points = plotted
@@ -217,35 +217,35 @@ const scatter = (el, result, q, heroes) => {
         thin: dim(n),
       };
     });
-  const axisOf = (m, format) => ({ head: measureHead(m), format, ref: refOf(m), minStep: minStepOf(m) });
+  const axisOf = (m, format) => ({ head: metricHead(m), format, ref: refOf(m), minStep: minStepOf(m) });
   scatterChart(el, { points, x: axisOf(mx, fx), y: axisOf(my, fy) });
 };
 
-/** Cell sample size: a `count` measure when present, else `m`'s own `n`; `share` of an unsized measure has none. */
-const cellSize = (m, measures) => {
-  if (measures.some((x) => x.kind === 'count')) return sampleSize(measures);
-  if (m.kind === 'share' && !MEASURES[m.args[0].kind].sized) return () => undefined;
+/** Cell sample size: a `count` metric when present, else `m`'s own `n`; `share` of an unsized metric has none. */
+const cellSize = (m, metrics) => {
+  if (metrics.some((x) => x.kind === 'count')) return sampleSize(metrics);
+  if (m.kind === 'share' && !METRICS[m.args[0].kind].sized) return () => undefined;
   return (r) => r[m.name]?.n;
 };
 
 const axisValues = (rows, ref, sort, heroes) => {
   const values = [...new Set(rows.map((r) => r[ref]))];
   if (sort) return values;
-  const key = groupColumn(heroes)(ref).sort;
+  const key = dimensionColumn(heroes)(ref).sort;
   return values.sort((a, b) => ascending(key({ [ref]: a }), key({ [ref]: b })));
 };
 
 const heatmap = (el, result, q, heroes) => {
-  const [m] = q.measures;
-  if (!m || TEXT_MEASURES.includes(m.kind)) return table(el, result, q, heroes);
+  const [m] = q.metrics;
+  if (!m || TEXT_METRICS.includes(m.kind)) return table(el, result, q, heroes);
   const { rows } = result;
   if (!rows.length) return noRows(el);
-  const [a, b] = q.group.map((ref) => [ref, axisValues(rows, ref, q.sort, heroes)]);
+  const [a, b] = q.dimensions.map((ref) => [ref, axisValues(rows, ref, q.sort, heroes)]);
   const [[rRef, rs], [cRef, cs]] = a[1].length >= b[1].length ? [a, b] : [b, a];
-  const size = cellSize(m, q.measures);
+  const size = cellSize(m, q.metrics);
   const dim = thinOf(rows.map(size));
-  const format = measureFormat(m);
-  const name = groupText(heroes, q.group);
+  const format = metricFormat(m);
+  const name = dimensionText(heroes, q.dimensions);
   const at = new Map([...Map.groupBy(rows, (r) => r[rRef])].map(([k, rs]) => [k, new Map(rs.map((r) => [r[cRef], r]))]));
   const cell = (rv, cv) => {
     const r = at.get(rv).get(cv);
@@ -255,15 +255,15 @@ const heatmap = (el, result, q, heroes) => {
     return { value: v, title: `${name(r) || '–'}: ${format(v)}${n == null ? '' : `, n=${fmt.int(n)}`}`, thin: dim(n) };
   };
   const label = (ref) => {
-    const html = groupColumn(heroes)(ref).html;
-    const title = groupName(heroes, ref);
+    const html = dimensionColumn(heroes)(ref).html;
+    const title = dimensionName(heroes, ref);
     return (v) => ({ label: html({ [ref]: v }), title: title(v) });
   };
   heatmapChart(el, {
     rows: rs.map(label(rRef)),
     cols: cs.map(label(cRef)),
     cells: rs.map((rv) => cs.map((cv) => cell(rv, cv))),
-    head: [escapeHtml(`${rRef} / ${cRef}`), measureHead(m)],
+    head: [escapeHtml(`${rRef} / ${cRef}`), metricHead(m)],
     format,
     ref: refOf(m),
     minStep: minStepOf(m),

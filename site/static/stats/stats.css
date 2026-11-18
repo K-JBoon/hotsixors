@@ -284,12 +284,12 @@
 .stats-filters .stats-query__text { flex: 1; block-size: auto; padding-block: var(--space-xs); line-height: 1.4; }
 @media (max-width: 900px) { .stats-query__form { grid-template-columns: minmax(0, 1fr); } }
 .stats-query__clause { display: flex; gap: var(--space-3xs); align-items: end; }
-.stats-query__clause select:first-child, .stats-query__group select { inline-size: 12rem; }
+.stats-query__clause select:first-child, .stats-query__dimensions select { inline-size: 12rem; }
 .stats-query__btn { block-size: 2.25rem; }
 .stats-query__name { inline-size: 8rem; }
-.stats-query__measures { flex-basis: 100%; justify-items: start; }
-.stats-query__measures [data-measure] select:not(:first-of-type) { inline-size: 12rem; }
-.stats-query__measures [data-clause] { margin-inline-start: calc(8rem + var(--space-3xs)); }
+.stats-query__metrics { flex-basis: 100%; justify-items: start; }
+.stats-query__metrics [data-metric] select:not(:first-of-type) { inline-size: 12rem; }
+.stats-query__metrics [data-clause] { margin-inline-start: calc(8rem + var(--space-3xs)); }
 .stats-query__rail { inline-size: 24rem; font-size: var(--text-xs); }
 .stats-query__table { display: grid; gap: var(--space-2xs); }
 .stats-query__table summary { cursor: pointer; }
