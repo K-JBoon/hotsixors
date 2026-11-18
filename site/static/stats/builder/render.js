@@ -318,6 +318,7 @@ const tableView = (el, { rows }, q, names) => {
 };
 
 const distinctCount = (rows, ref) => new Set(rows.map((r) => r[ref])).size;
+const panelCount = (rows, facet, ref) => Math.max(...[...Map.groupBy(rows, (r) => r[facet]).values()].map((g) => distinctCount(g, ref)));
 
 const heatmap = (el, result, q, names) => {
   const [m] = q.metrics;
@@ -364,7 +365,7 @@ const heatmap = (el, result, q, names) => {
       range,
     });
   };
-  facetPanels(el, rows, q, names, panel, `calc(${distinctCount(rows, cRef)} * 1.5rem + 16rem)`);
+  facetPanels(el, rows, q, names, panel, `calc(${panelCount(rows, q.facet, cRef)} * 2.5rem + 16rem)`);
 };
 
 const VIEWS = { bar, line, scatter, heatmap };
