@@ -14,7 +14,7 @@ import { SCORE_LABELS } from './builder/docs.js';
 import { renderResult } from './builder/render.js';
 import { csvFileName, toCsv } from './builder/csv.js';
 import { schemaRail } from './builder/schema.js';
-import { barChart, barColumns, lineChart } from './charts.js';
+import { barChart, barColumns, extent, lineChart } from './charts.js';
 import { getAvailableStorage, getStoredString, setStoredString } from '../js/storage.js';
 import { referenceRail } from './builder/reference.js';
 import {
@@ -221,13 +221,19 @@ const deltaBars = (rows, base, rate, games) => {
   return rows.map((r) => ({ value: deltaOf(rate, base)(r), text: deltaCell(r[rate], base, r[games]), thin: dim(r[games]) }));
 };
 
+/** Extent of non-thin bar values when any exist, so thin outliers clip at the axis edge. */
+const solidRange = (bars) => {
+  const solid = bars.filter((b) => !b.thin);
+  return solid.length ? extent(solid.map((b) => b.value)) : null;
+};
+
 /** Hero win rate per map minus `base`, best first. */
 function mapChart(el, filters, maps, base) {
   const { rows, empty } = minGames(maps, filters);
   if (!rows.length) return emptyNote(el, empty);
   const ordered = [...rows].sort(descending(deltaOf('winRate', base)));
   const bars = deltaBars(ordered, base, 'winRate', 'games').map((b, i) => ({ ...b, label: link(hash('map', ordered[i].map), ordered[i].map) }));
-  barChart(el, { bars, head: ['Map', 'vs hero'], format: fmt.delta });
+  barChart(el, { bars, head: ['Map', 'vs hero'], format: fmt.delta, range: solidRange(bars) });
 }
 
 /**
