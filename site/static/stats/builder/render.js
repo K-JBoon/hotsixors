@@ -96,11 +96,15 @@ const metricColumn = (m) => {
   return { key: m.name, metric: m, label: m.name, title: printCall(m), num: true, sort: (r) => valueOf(r[m.name]), html: (r) => cell(r[m.name]) };
 };
 
+/** Sample size of `m` per row; `share` of an unsized metric has none, its `n` is the panel game count. */
+const metricSize = (m) => (m.kind === 'share' && !METRICS[m.args[0].kind].sized ? () => undefined : (r) => r[m.name]?.n);
+
 /** Sample size per row: the first `count` metric, else the first sized metric. */
 const sampleSize = (metrics) => {
   const counted = metrics.find((m) => m.kind === 'count');
   if (counted) return (r) => r[counted.name];
-  return (r) => metrics.map((m) => r[m.name]).find((v) => v != null && typeof v === 'object')?.n;
+  const sizes = metrics.map(metricSize);
+  return (r) => sizes.map((size) => size(r)).find((n) => n != null);
 };
 
 const cellSample = (m, v) => (m.kind === 'count' ? v : v?.n);
@@ -240,7 +244,7 @@ const line = (el, result, q, names) => {
 };
 
 const smallestSize = (metrics) => (r) => {
-  const ns = metrics.map((m) => r[m.name]?.n).filter(Number.isFinite);
+  const ns = metrics.map((m) => metricSize(m)(r)).filter(Number.isFinite);
   return ns.length ? Math.min(...ns) : undefined;
 };
 
@@ -279,12 +283,8 @@ const scatter = (el, result, q, names) => {
   facetPanels(el, rows, q, names, (pel, prs) => scatterChart(pel, { points: pointsOf(prs), x: ax, y: ay }));
 };
 
-/** Sample size shown in a cell title: a `count` metric when present, else `m`'s own `n`; `share` of an unsized metric has none. */
-const cellSize = (m, metrics) => {
-  if (metrics.some((x) => x.kind === 'count')) return sampleSize(metrics);
-  if (m.kind === 'share' && !METRICS[m.args[0].kind].sized) return () => undefined;
-  return (r) => r[m.name]?.n;
-};
+/** Sample size shown in a cell: a `count` metric when present, else `m`'s own size. */
+const cellSize = (m, metrics) => (metrics.some((x) => x.kind === 'count') ? sampleSize(metrics) : metricSize(m));
 
 const PROPORTIONS = ['rate', 'share'];
 
@@ -366,7 +366,7 @@ const heatmap = (el, result, q, names) => {
         value: v,
         title: `${name(r) || '–'}: ${format(v)}${n == null ? '' : `, n=${fmt.int(n)}`}`,
         thin: dim(r),
-        n: r[m.name]?.n,
+        n,
         ci: ci == null ? null : `±${(ci * 100).toFixed(1)}`,
       };
     };
