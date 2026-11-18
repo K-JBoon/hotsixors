@@ -119,6 +119,16 @@ const dimensionField = (columns, dimensions, colOption) =>
     )
     .join('')}</div></div>`;
 
+const facetField = (columns, dimensions, facet, colOption) =>
+  `<div class="stats-filters__field"><span id="qb-facet">Facet</span><div class="stats-query__clause stats-query__dimensions"><select class="input" name="facet" aria-labelledby="qb-facet">${option(
+    '',
+    'None',
+    facet == null,
+  )}${columns
+    .filter((col) => !dimensions.includes(col))
+    .map((col) => colOption(col, col === facet))
+    .join('')}</select></div></div>`;
+
 const KINDS = Object.keys(METRICS).filter((k) => !WRAPPERS.includes(k));
 
 const TOPS = [...KINDS, ...WRAPPERS];
@@ -224,12 +234,12 @@ const metricRow = (columns, colOption) => (m, i) =>
 
 /**
  * Form for every part of a query. `show(q)` draws it; edits call
- * `onChange({ from, joins, where, dimensions, metrics, sort, limit, view })`.
+ * `onChange({ from, joins, where, dimensions, facet, metrics, sort, limit, view })`.
  * Where rows without a value and metrics without a valid unique name stay in
  * the form only. `values(table, col)` resolves to `columnValues`.
  */
 export function builderForm(el, { names, values, label = (col, v) => printed(v), columnLabel = (col) => col, onChange }) {
-  let state = { from: 'players', joins: [], rows: [], dimensions: [], metrics: [], sort: null, limit: null, view: 'table' };
+  let state = { from: 'players', joins: [], rows: [], dimensions: [], facet: null, metrics: [], sort: null, limit: null, view: 'table' };
   const colOption = columnOption(columnLabel);
   const valuesOf = (ref) => {
     const { join, col } = splitColumn(ref);
@@ -269,7 +279,7 @@ export function builderForm(el, { names, values, label = (col, v) => printed(v),
 
   const draw = () => {
     const columns = columnsOf(names, state.from, state.joins);
-    el.innerHTML = `${radioField('from', 'Table', Object.keys(BASES), state.from)}${joinField()}${dimensionField(columns, state.dimensions, colOption)}${state.rows
+    el.innerHTML = `${radioField('from', 'Table', Object.keys(BASES), state.from)}${joinField()}${dimensionField(columns, state.dimensions, colOption)}${facetField(columns, state.dimensions, state.facet, colOption)}${state.rows
       .map(clauseRow(columns, colOption))
       .join('')}<button class="btn stats-query__btn" type="button" data-add="where">+ Where</button><div class="stats-filters__field stats-query__metrics"><span>Metric</span>${state.metrics
       .map(metricRow(columns, colOption))
@@ -328,6 +338,7 @@ export function builderForm(el, { names, values, label = (col, v) => printed(v),
       joins,
       rows,
       dimensions,
+      facet: String(data.get('facet') ?? '') || null,
       metrics,
       sort: by ? { by: at < 0 ? by : metrics[at].name, dir: String(data.get('dir') ?? 'desc') } : null,
       limit: readLimit(String(data.get('limit') ?? '')),
@@ -335,15 +346,17 @@ export function builderForm(el, { names, values, label = (col, v) => printed(v),
     };
   };
 
-  const normalize = ({ from, joins, rows, dimensions, metrics, ...rest }) => {
+  const normalize = ({ from, joins, rows, dimensions, facet, metrics, ...rest }) => {
     const allowed = joins.filter((j) => BASES[from].includes(j));
     const columns = columnsOf(names, from, allowed);
+    const dims = [...new Set(dimensions)].filter((d) => columns.includes(d)).slice(0, MAX_DIMENSIONS);
     return pruneSort({
       ...rest,
       from,
       joins: allowed,
       rows: rows.filter((c) => columns.includes(c.col)),
-      dimensions: [...new Set(dimensions)].filter((d) => columns.includes(d)).slice(0, MAX_DIMENSIONS),
+      dimensions: dims,
+      facet: columns.includes(facet) && !dims.includes(facet) ? facet : null,
       metrics: metrics
         .filter((m) => argColumns(m).every((c) => columns.includes(c)))
         .map((m) => ({ ...m, where: m.where.filter((c) => columns.includes(c.col)) })),
@@ -354,7 +367,7 @@ export function builderForm(el, { names, values, label = (col, v) => printed(v),
 
   const metricShape = (m) => [m.wrap, m.kind, argColumns(m), rowsShape(m.where)];
 
-  const shape = (s) => JSON.stringify([s.from, s.joins, rowsShape(s.rows), s.dimensions, s.metrics.map(metricShape), sortKeys(s)]);
+  const shape = (s) => JSON.stringify([s.from, s.joins, rowsShape(s.rows), s.dimensions, s.facet, s.metrics.map(metricShape), sortKeys(s)]);
 
   const typed = (c) =>
     valuesOf(c.col).then(({ type }) => ({
@@ -384,8 +397,8 @@ export function builderForm(el, { names, values, label = (col, v) => printed(v),
       Promise.all(namedIn(snapshot).map(typedMetric)),
     ]);
     if (snapshot === state) {
-      const { from, joins, dimensions, sort, limit, view } = state;
-      onChange({ from, joins, where, dimensions, metrics, sort, limit, view });
+      const { from, joins, dimensions, facet, sort, limit, view } = state;
+      onChange({ from, joins, where, dimensions, facet, metrics, sort, limit, view });
     }
   };
 
@@ -436,6 +449,7 @@ export function builderForm(el, { names, values, label = (col, v) => printed(v),
         joins: q.joins,
         rows: formRows(q.where),
         dimensions: q.dimensions,
+        facet: q.facet,
         metrics: q.metrics.map(formMetric).filter(Boolean),
         sort: q.sort,
         limit: q.limit,
