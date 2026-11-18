@@ -151,10 +151,10 @@ const heroMetricCols = (filters) => [
   ...(filters.show === 'draft' ? [] : statCols(filters)),
 ];
 
-/** renderTable with Min. games applied to tables that show a games column. */
+/** renderTable with Min. games applied to tables that show a games column or give `count`. */
 function statsTable(el, filters, opts) {
-  if (!opts.columns.includes(gamesCol)) return renderTable(el, opts);
-  const { rows, empty } = minGames(opts.rows, filters);
+  if (!opts.count && !opts.columns.includes(gamesCol)) return renderTable(el, opts);
+  const { rows, empty } = minGames(opts.rows, filters, opts.count);
   return renderTable(el, { ...opts, rows, empty: empty ?? opts.empty });
 }
 
@@ -417,6 +417,8 @@ const deltaCol = (label, title, base, rate = 'winRate', games = 'games') => ({
 const patchRank = (patch) => patch.split('.').reduce((n, part) => n * 1000 + Number(part), 0);
 
 /** Heroes beside and against the subject, each win rate against `base`. */
+const matchupGames = (x) => (x.withGames ?? 0) + (x.vsGames ?? 0);
+
 function matchupTable(el, filters, heroes, rows, base, whose) {
   statsTable(el, filters, {
     columns: [
@@ -431,7 +433,7 @@ function matchupTable(el, filters, heroes, rows, base, whose) {
     rows,
     sortKey: 'withGames',
     pageSize: 10,
-    count: (x) => (x.withGames ?? 0) + (x.vsGames ?? 0),
+    count: matchupGames,
   });
 }
 
@@ -439,7 +441,7 @@ const MATCHUP_SIDES = [['With', 'withWinRate', 'withGames'], ['Against', 'vsWinR
 
 /** With and Against win rates minus `base` per hero, best With first; both columns share one range. */
 function matchupChart(el, filters, heroes, matchups, base) {
-  const { rows, empty } = minGames(matchups, filters, (x) => (x.withGames ?? 0) + (x.vsGames ?? 0));
+  const { rows, empty } = minGames(matchups, filters, matchupGames);
   if (!rows.length) return emptyNote(el, empty);
   const ordered = [...rows].sort(descending(deltaOf('withWinRate', base)));
   const sides = MATCHUP_SIDES.map(([head, rate, games]) => ({ head, bars: deltaBars(ordered, base, rate, games) }));
