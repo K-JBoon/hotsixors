@@ -730,7 +730,7 @@ const VIEWS = {
       ],
       rows: report.builds,
       sortKey: 'games',
-      pageSize: 20,
+      pageSize: 10,
       empty: 'No builds through level 16 under these filters.',
     });
     tableOrChart(el, 'maps', {
