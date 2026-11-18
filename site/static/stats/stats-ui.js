@@ -14,13 +14,13 @@ import { SCORE_LABELS } from './builder/docs.js';
 import { renderResult } from './builder/render.js';
 import { csvFileName, toCsv } from './builder/csv.js';
 import { schemaRail } from './builder/schema.js';
-import { lineChart } from './charts.js';
+import { barChart, lineChart } from './charts.js';
 import { getAvailableStorage, getStoredString, setStoredString } from '../js/storage.js';
 import { referenceRail } from './builder/reference.js';
 import {
   STAT_COLUMNS, available, facets, gameList, tournamentReport, tournamentTable, heroReport, mapReport, heroTable, mapTable, playerReport, playerTable, teamReport, teamTable,
 } from './reports.js';
-import { LIQUIPEDIA_ICON, MISSING_ICON, deltaCell, escapeHtml, fmt, heroCell, heroName, loadHeroes, lowSample, renderTable, renderTalentTiers, talentName, tiles, unlessAll, wilson, winRateCell } from './view.js';
+import { LIQUIPEDIA_ICON, MISSING_ICON, deltaCell, escapeHtml, fmt, heroCell, heroName, loadHeroes, lowSample, renderTable, renderTalentTiers, talentName, thinOf, tiles, unlessAll, wilson, winRateCell } from './view.js';
 
 const root = document.querySelector('[data-stats-root]');
 const view = root.querySelector('[data-view]');
@@ -186,13 +186,14 @@ function tableOrChart(el, id, draw) {
   show(getStoredString(storage, viewKey(id), 'table', SECTION_VIEWS.map(([v]) => v)));
 }
 
+const emptyNote = (el, empty) => {
+  el.innerHTML = `<p class="stats-note">${escapeHtml(empty ?? 'No games match these filters.')}</p>`;
+};
+
 /** Win and pick rate per patch, oldest first; rates over few games are striped. */
 function patchChart(el, filters, patches) {
   const { rows, empty } = minGames(patches, filters);
-  if (!rows.length) {
-    el.innerHTML = `<p class="stats-note">${escapeHtml(empty ?? 'No games match these filters.')}</p>`;
-    return;
-  }
+  if (!rows.length) return emptyNote(el, empty);
   const ordered = [...rows].sort((a, b) => patchRank(a.patch) - patchRank(b.patch));
   const thin = unlessAll((r) => lowSample('rate', r.games))(ordered);
   const series = [['Win', 'winRate'], ['Pick', 'pickRate']].map(([label, key]) => ({
@@ -200,6 +201,24 @@ function patchChart(el, filters, patches) {
     points: ordered.map((r) => ({ value: r[key], title: `${r.patch} ${label}: ${fmt.pct(r[key])}, ${fmt.int(r.games)} games`, thin: thin(r) })),
   }));
   lineChart(el, { xs: ordered.map((r) => r.patch), series, on: [true, true], head: 'Rate', format: fmt.pct, ref: 0.5 });
+}
+
+const deltaOf = (rate, base) => (r) => (r[rate] == null || base == null ? null : r[rate] - base);
+const descending = (key) => (a, b) => (key(b) ?? -Infinity) - (key(a) ?? -Infinity) || 0;
+
+/** Bars of `rate` minus `base`; low-sample bars are striped. */
+const deltaBars = (rows, base, rate, games) => {
+  const dim = thinOf(rows.map((r) => r[games]));
+  return rows.map((r) => ({ value: deltaOf(rate, base)(r), text: deltaCell(r[rate], base, r[games]), thin: dim(r[games]) }));
+};
+
+/** Hero win rate per map minus `base`, best first. */
+function mapChart(el, filters, maps, base) {
+  const { rows, empty } = minGames(maps, filters);
+  if (!rows.length) return emptyNote(el, empty);
+  const ordered = [...rows].sort(descending(deltaOf('winRate', base)));
+  const bars = deltaBars(ordered, base, 'winRate', 'games').map((b, i) => ({ ...b, label: link(hash('map', ordered[i].map), ordered[i].map) }));
+  barChart(el, { bars, head: ['Map', 'vs hero'], format: fmt.delta });
 }
 
 /**
@@ -619,7 +638,7 @@ const VIEWS = {
         ...(mine ? [] : [['Ban rate', fmt.pct(s.banRate)], ['Presence', fmt.pct(s.presence)], ['Early ban', fmt.pct(s.earlyBanRate)], ['Avg pick #', fmt.num(s.pickNumber)]]),
       ]),
       [
-        { title: 'Maps', id: 'maps', place: 'rail' },
+        { title: 'Maps', id: 'maps', place: 'rail', chart: true },
         { title: 'Talents', id: 'talents', place: 'main' },
         { title: 'Builds', id: 'builds', place: 'main' },
         { title: 'Matchups', id: 'matchups', place: 'main' },
@@ -663,7 +682,10 @@ const VIEWS = {
       split: 10,
       empty: 'No builds through level 16 under these filters.',
     });
-    statsTable(part(el, 'maps'), filters, { columns: [{ key: 'map', label: 'Map', html: (x) => link(hash('map', x.map), x.map) }, gamesCol, winCol(filters)], rows: report.maps, sortKey: 'games' });
+    tableOrChart(el, 'maps', {
+      table: (body) => statsTable(body, filters, { columns: [{ key: 'map', label: 'Map', html: (x) => link(hash('map', x.map), x.map) }, gamesCol, winCol(filters)], rows: report.maps, sortKey: 'games' }),
+      chart: (body) => mapChart(body, filters, report.maps, s.winRate),
+    });
     statsTable(part(el, 'players'), filters, {
       columns: [
         { key: 'battletag', label: 'Player', html: (r) => link(hash('player', r.player), r.battletag ?? r.player) },
