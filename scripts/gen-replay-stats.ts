@@ -151,7 +151,8 @@ async function main(): Promise<void> {
       await saveSummaries(null, summaries);
     }
   });
-  if (todo.length) await saveSummaries(upload ? r2 : null, summaries);
+  const remoteMissing = upload && !(await r2.list(SUMMARIES_KEY)).includes(SUMMARIES_KEY);
+  if (todo.length || remoteMissing) await saveSummaries(upload ? r2 : null, summaries);
 
   const tables = buildTables([...summaries.values()] as never[], resolver, tournamentEvents(tournamentGames) as never);
   const tournamentInfo: TournamentInfo[] = tournaments
