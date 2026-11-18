@@ -1,10 +1,10 @@
-import { splitColumn, tableOf, queryColumns, DERIVED_JOINS } from './model.js';
+import { splitColumn, tableOf, queryColumns, DERIVED_JOINS, DERIVED_COLUMNS, isDerivedColumn, derivedColumnsOf } from './model.js';
 
 const TABLES = ['players', 'games', 'draft'];
 
 /** Column names per table and per derived join, the `names` input of validateQuery. */
 export const tableNames = async (stats) => ({
-  ...Object.fromEntries(await Promise.all(TABLES.map(async (t) => [t, await stats.names(t)]))),
+  ...Object.fromEntries(await Promise.all(TABLES.map(async (t) => [t, [...(await stats.names(t)), ...derivedColumnsOf(t)]]))),
   ...Object.fromEntries(Object.entries(DERIVED_JOINS).map(([j, d]) => [j, d.columns])),
 });
 
@@ -106,8 +106,32 @@ const expand = async (stats, from, joins) => {
   return { length, index };
 };
 
+const pick = (cols, source, i) => Object.fromEntries(cols.map((c) => [c, i < 0 ? null : source[c][i]]));
+
+const derivedColumn = (stats, table, col) =>
+  memo(stats, `column:${table}:${col}`, async () => {
+    const { reads, game, value } = DERIVED_COLUMNS[col];
+    const [rows, games, gameIndex] = await Promise.all([
+      stats.columns(table, ['game_id', ...reads]),
+      stats.columns('games', game),
+      gameRows(stats),
+    ]);
+    return Array.from({ length: rows.length }, (_, i) =>
+      value(pick(reads, rows, i), pick(game, games, gameIndex.get(rows.game_id[i]) ?? -1)),
+    );
+  });
+
+const tableColumns = async (stats, table, cols) => {
+  const derived = cols.filter((c) => isDerivedColumn(table, c));
+  const [stored, values] = await Promise.all([
+    stats.columns(table, cols.filter((c) => !isDerivedColumn(table, c))),
+    Promise.all(derived.map((c) => derivedColumn(stats, table, c))),
+  ]);
+  return { ...stored, ...Object.fromEntries(derived.map((c, k) => [c, values[k]])) };
+};
+
 const joinColumns = async (stats, from, join, cols) =>
-  DERIVED_JOINS[join] ? (await derivedRows(stats, from, join)).table : stats.columns(tableOf(from, join), cols);
+  DERIVED_JOINS[join] ? (await derivedRows(stats, from, join)).table : tableColumns(stats, tableOf(from, join), cols);
 
 /**
  * Joined view of `q.from` with `q.joins`. `game` is a one-to-one lookup;

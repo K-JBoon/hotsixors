@@ -1,6 +1,5 @@
 import {
   BASES,
-  DERIVED_JOINS,
   MAX_DIMENSIONS,
   METRICS,
   OPS,
@@ -8,6 +7,7 @@ import {
   WRAPPERS,
   clause,
   fn,
+  knownValues,
   metric,
   nameClash,
   namesKey,
@@ -249,7 +249,9 @@ export function builderForm(el, { names, values, label = (col, v) => printed(v),
   const valuesOf = (ref) => {
     const { join, col } = splitColumn(ref);
     const table = tableOf(state.from, join);
-    return table ? values(table, col) : Promise.resolve({ type: 'string', values: DERIVED_JOINS[join]?.values[col] ?? [] });
+    const known = knownValues(ref);
+    if (known) return Promise.resolve({ type: typeof known[0], values: known });
+    return table ? values(table, col) : Promise.resolve({ type: 'string', values: [] });
   };
 
   const optionsOf = (ref) =>

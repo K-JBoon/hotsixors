@@ -1,5 +1,5 @@
 import { aggregate, count, distinct } from '../query.js';
-import { METRICS, WRAPPERS, clauseTest, validateQuery, queryColumns } from './model.js';
+import { METRICS, WRAPPERS, clauseTest, knownOrder, validateQuery, queryColumns } from './model.js';
 import { joinView, tableNames } from './join.js';
 
 const rowTest = (clauses, column) => {
@@ -76,11 +76,13 @@ const deltaOf = (v, base) => ({
   n: sizeOf(v),
 });
 
-const compare = ({ by, dir = 'desc' }) => {
+const compare = ({ by, dir = 'desc' }, dimensions) => {
   const sign = dir === 'asc' ? 1 : -1;
+  const order = dimensions.includes(by) ? knownOrder(by) : null;
+  const value = order ? (r) => order(r[by]) : (r) => valueOf(r[by]);
   return (a, b) => {
-    const x = valueOf(a[by]);
-    const y = valueOf(b[by]);
+    const x = value(a);
+    const y = value(b);
     if (x == null || y == null) return (x == null) - (y == null);
     return x < y ? -sign : x > y ? sign : 0;
   };
@@ -134,7 +136,7 @@ export async function runQuery(stats, q) {
     ...Object.fromEntries(q.metrics.map((m) => [m.name, finish(k, values)(m)])),
   }));
   const cut = (rs) => {
-    const sorted = q.sort ? rs.sort(compare(q.sort)) : rs;
+    const sorted = q.sort ? rs.sort(compare(q.sort, q.dimensions)) : rs;
     return q.limit ? sorted.slice(0, q.limit) : sorted;
   };
   return {

@@ -21,6 +21,42 @@ export const DERIVED_JOINS = {
   },
 };
 
+const GAME_LENGTHS = [
+  { label: '<15m', below: 900 },
+  { label: '15-20m', below: 1200 },
+  { label: '20-25m', below: 1500 },
+  { label: '25m+', below: Infinity },
+];
+
+const gameLength = (s) => (s == null ? null : GAME_LENGTHS.find((b) => s < b.below).label);
+
+/** Columns without a stored source. `value(row, game)` maps `reads` of the row and `game` of its games row. */
+export const DERIVED_COLUMNS = {
+  game_length: {
+    tables: ['players', 'games', 'draft'],
+    reads: [],
+    game: ['duration_s'],
+    values: GAME_LENGTHS.map((b) => b.label),
+    value: (_, { duration_s }) => gameLength(duration_s),
+  },
+};
+
+export const isDerivedColumn = (table, col) => DERIVED_COLUMNS[col]?.tables.includes(table) ?? false;
+
+export const derivedColumnsOf = (table) => Object.keys(DERIVED_COLUMNS).filter((c) => isDerivedColumn(table, c));
+
+/** Fixed value list of a column ref in display order, else undefined. */
+export const knownValues = (ref) => {
+  const { join, col } = splitColumn(ref);
+  return DERIVED_JOINS[join] ? DERIVED_JOINS[join].values?.[col] : DERIVED_COLUMNS[col]?.values;
+};
+
+/** Position of a value in `knownValues(ref)`, unlisted values last; null for an unlisted ref. */
+export const knownOrder = (ref) => {
+  const known = knownValues(ref);
+  return known ? (v) => (v == null ? null : known.includes(v) ? known.indexOf(v) : known.length) : null;
+};
+
 export const VIEWS = ['table', 'bar', 'line', 'scatter', 'heatmap'];
 
 export const OPS = ['=', '!=', 'in', '<', '<=', '>', '>='];

@@ -53,6 +53,7 @@ const COMMON = {
   map: 'Map name.',
   tournament: 'Tournament name, null when the game is not matched to a tournament.',
   strict: 'True on a standard map with a hero draft.',
+  game_length: "Game length bucket: '<15m', '15-20m', '20-25m' or '25m+'; null when the length is unknown.",
 };
 
 const TALENT_TIERS = 7;

@@ -1,6 +1,6 @@
 import { MISSING_ICON, escapeHtml, fmt, heroCell, heroName, heroPortrait, lowSample, renderTable, talentCell, talentName, unlessAll, wilson, winRateCell } from '../view.js';
 import { barChart, extent, heatmapChart, lineChart, scatterChart } from '../charts.js';
-import { DERIVED_JOINS, METRICS, splitColumn } from './model.js';
+import { METRICS, knownOrder, splitColumn } from './model.js';
 import { valueOf } from './run.js';
 import { printCall } from './text.js';
 
@@ -45,11 +45,6 @@ const kindOf = (ref) => {
   return TALENT_COLUMN.test(col) || (join === 'talent_pair' && ['a', 'b'].includes(col)) ? 'talent' : col;
 };
 
-const knownValues = (ref) => {
-  const { join, col } = splitColumn(ref);
-  return DERIVED_JOINS[join]?.values?.[col];
-};
-
 const talentLevel = (talents, id) => Number(talents[id]?.tier?.replace(/\D/g, '') || 99);
 
 const talentKey = (talents, id) => `${String(talentLevel(talents, id)).padStart(2, '0')} ${talentName(talents, id)}`;
@@ -61,8 +56,8 @@ const SORTS = {
 };
 
 const sortKey = (names, ref) => {
-  const known = knownValues(ref);
-  if (known) return (v) => (v == null ? null : known.includes(v) ? known.indexOf(v) : known.length);
+  const order = knownOrder(ref);
+  if (order) return order;
   const sort = SORTS[kindOf(ref)];
   return sort ? (v) => (v == null ? null : sort(names, v)) : (v) => v;
 };
